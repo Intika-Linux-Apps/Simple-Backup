@@ -1,0 +1,30 @@
+For 0.10:
++ Check how sbackupd reacts if it can not get into a folder (FUSE used by a user)
++ Check filesizes (2 Gb and 4 Gb limits)
+
+Planned for 1.0:
+For UI
+* show forever excluded paths in the GUI (including the backup target dir)
+* no "help" on restore :)
+* Follow GNOME HIG
+* first time wizard
+* add ability to restore more than one file/folder a time
+
+For core
+* encryption
+* split master backup file into smaller pieces
+* recording of a backup snapshot to a set of CDs/DVDs
+* backup media management
+* syslog logging
+* testable system
+
+DONE: 
+* add progress reporting whereever possible (via a toolbar applet) : using libnotify 
+* revert is implemented . 
+* plugins for special files/dirs (databases, ldif, cvs/svn, ...) : Fuse plugin system : we just nee to find the according FuseFS
+
+TODO :
+* Review the restore GUI
+* plugins for exporting snapshot (will be used for tape, CD ... )
+* encription will be via a FusePlugin , find the fuse encripted FS
+* Backup media management (via SnapshotManager )

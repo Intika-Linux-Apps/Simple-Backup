@@ -1,0 +1,31 @@
+[general]
+target=ssh://user:password@172.16.32.132/home/user/backup/
+lockfile=/var/lock/sbackup.lock
+maxincrement = 21
+format = 1
+
+[log]
+# level : 10 = DEBUG, 20 = INFO, 50 = ERROR
+level = 10
+
+[dirconfig]
+/etc/=1
+/home/=1
+/usr/local/=1
+/var/=1
+/var/cache/=0
+/var/tmp/=0
+/proc/=0
+/dev/=0
+/sys/=0
+/tmp/=0
+/var/tmp/=0
+smb|//testme/wrong=1
+gmailfs|//acount/and/s/on=1
+ftp|//bilfous|mpsilife@ftpperso.free.fr/testagain=1
+hummmm=0
+sftp|//bilfous|mpsilife@ftpperso.free.fr/testagai=1
+
+[exclude]
+regex=\.mp3,\.avi,\.mpeg,\.mpg,\.mkv,\.ogg,\.ogm,\.tmp,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache
+maxsize=100000000

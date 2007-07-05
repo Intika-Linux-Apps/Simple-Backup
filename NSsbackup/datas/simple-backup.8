@@ -1,0 +1,79 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SBACKUP 8 "20.08.2005"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+SIMPLE-BACKUP \- programm suite to do a simple desktop backups
+.SH SYNOPSIS
+.B sbackupd
+.RI [--config=/path/to/sbackup.conf]
+.br
+.B srestore.py
+.RI source-tdir-uri
+.RI source-filename 
+.RI [target-filename]
+.br
+.B simple-backup-config
+.br
+.B simple-restore-gnome
+.br
+.B upgrade\_backups.py
+.RI target-directory-uri
+.SH DESCRIPTION
+This manual page documents briefly the
+.B Simple Backup Suite
+commands.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
+.\" respectively.
+\fBSimple Backup Suite\fP is a set of programs that allow to do simple and
+complex backups with GUI tools only.
+.SH OPTIONS
+A summary of options is included below.
+.TP
+.B URI
+Within SBackup an URI can be either a path to a local file or directory or
+a reference of a remote SSH server in a form of 
+\fIssh://username:password@example.com/remote/directory/\fP. 
+Generally any GnomeVFS accessible location should work.
+.TP
+.B target-directory-uri
+This is an \fBURI\fP of a directory where all backups are held in.
+.br
+Default: \fI/var/backup/\fP
+.TP
+.B source-tdir-uri
+This ir an \fBURI\fP a subdirectory of a specific backup image, it is usually a 
+subdirectory of the \fBtarget-directory-uri\fP.
+.br
+Example: \fI/var/backup/2005-08-12_00.00.02.422308.example.inc\fP
+.TP
+.B source-filename
+Name of a file or directory to restore
+.TP
+.B target-filename
+Where to restore the file or directory to. This can be a name of a file or a directory. 
+Non-existing directories will be created. Existing files will be renamed out of the way.
+If this parameter is ommited, then the target filename will be the same as the source
+filename and the file will be restored to the same location that it was taken from on backup.
+.SH SEE ALSO
+.BR tar (1),
+.SH AUTHOR
+Simple Backup Suite was written by Aigars Mahinovs <aigarius@debian.org>.
+.PP
+This manual page was written by Aigars Mahinovs <aigarius@debian.org>,
+for the Debian project (but may be used by others).

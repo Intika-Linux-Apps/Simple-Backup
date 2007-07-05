@@ -1,0 +1,86 @@
+# Simple backup configuration file
+
+[general]
+
+#This is used as a base point for all the fuse mount point
+mountdir = /mnt/sbackup/
+# Backup target can be a local directory or a GnomeVFS compartible URI
+# (only ssh://user:pass@example.com/home/user/backup/ URIs are tested for now)
+target=/var/backup
+#target=ssh://user:pass@example.com/home/user/backup/
+
+# Where to put a lockfile (Leave the default)
+lockfile=/var/lock/sbackup.lock
+
+# Maximal interval between two full backups (in days)
+maxincrement = 21
+
+# Backup format:
+# 1 - All files are stored in the files.tgz
+format = 1
+
+# Run for others (This option is for root only) : will run normal users config files after the root run is finished
+run4others = 1
+
+[log]
+# level : 10 = DEBUG, 20 = INFO, 50 = ERROR
+level = 20
+# where to put the logfile when running , the logfile will be moved to the snapshot dir at the end of the backup
+file = sbackup.log
+
+
+# Backup report
+[report]
+from = foo@foo.foo
+to = foo@foo.foo
+smtpserver = smtp.foo.com
+smtpport = 25
+smtptls = 1
+#smtpcert = user.crt
+#smtpkey = user.key
+#optional
+smtpuser = foo
+smtppassword = pass 
+
+[schedule]
+#anacron = daily
+#cron = 
+
+[dirconfig]
+
+# In this section you describe, what directories to backup and what to skip 
+# More precise commands override wider ones, for example:
+# /var=1  # This means that the whole /var directory is to be backuped
+# /var/cache=0 # This means the /var/cache and its subdirectories are not
+#              # to  be backuped
+# In this case all /var, except /var/cache will be backuped
+# It works the othe way around too
+# by default nothing is backuped
+
+/etc/=1
+/home/=1
+/usr/local/=1
+/var/=1
+/var/cache/=0
+/var/tmp/=0
+/proc/=0
+/dev/=0
+/sys/=0
+/tmp/=0
+/var/tmp/=0
+
+[exclude]
+
+# Comma-separated list of regular expressions to exclude from backup
+# use this to exclude certain types of files or directories
+#
+# Note: If any of these expressions matches within the whole pathname
+#	of the file, it will NOT be backuped. Keep this list as specific 
+#	and as short as possible.
+
+regex=\.mp3,\.avi,\.mpeg,\.mpg,\.mkv,\.ogg,\.ogm,\.tmp,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache
+
+# Do not backup files bigger then this (in bytes)
+
+maxsize=100000000
+

@@ -1,0 +1,183 @@
+sbackup (0.10.4) unstable; urgency=low
+
+  * Official release.
+  * fix a bug preventing simple-backup-config to resolve anacron monthly
+  * Ubuntu Bug #67814 - fixed permission problems with remote backups
+  
+  * gksu is used instead of gksudo (Closes: #327222)
+  * Cron job is removed on package purge (Closes: #346097)
+  * Should not crash on non-dirs in backup target (Closes: #391948)
+  * Fixed typo in About (Closes: #414783)
+  * Included Franch translation (Closes: #396059)
+  * Updated all translations
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Sat, 19 May 2007 16:53:10 +0100
+
+sbackup (0.10.4~beta10) unstable; urgency=low
+
+  * Public beta release
+  
+ -- Aigars Mahinovs <aigarius@debian.org>  Sat, 19 May 2007 16:53:10 +0100
+
+sbackup (0.10.4~beta9) unstable; urgency=low
+
+  * Gnomevfs doesn't close directory handler.
+  * Hope this is the last beta
+  * Resolved a bug when using ssh 
+  * change some errors printing
+  * admin GID is now get dynamically . 
+  * Changed the right on the flist file to set read access to admin
+  * Fixes a problem with incremental backups
+  * Avoid usage of current dir for the lock file
+  * Version on about window is set to 0.10.4
+  * Bug #112540 fix : sbackup now runs under root:admin. directories are created with read access for admins
+  * Bug #102577 fix : optimizing the backup process ( thanks to Oliver Gerlich )
+  * A lot of bug fixes, This is just for testers
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat,  5 May 2007 20:02:31 +0200
+
+sbackup (0.10.3-0.2) unstable; urgency=high
+
+  * Enhancement. applied patch proposed by Oliver Gerlich. See: Bug #110113
+  * Code cleaned to prevent warnings about non existing GTK components :
+    see Bug #106818
+  * Ensure that daily backups are not skipped if the system is off at the scheduled backup time
+
+  * Created a sbackup script to install in /usr/share/sbackup/sbackup
+  (this script is almost the same created by sbackup in /etc/cron.d/
+
+  * Makefile :
+  * add a flag to create non existing dirs
+  * install the "sbackup" script in "/usr/share/sbackup/sbackup"
+
+  * the python files have been renamed in *.py and the Makefile has been
+   changed to be compliant -links are created into BIN without
+   the py extention-
+
+  * The About dialog now indicates Version 0.10.3 : Closes Bug #74963
+  * French language support added
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 28 Apr 2007 10:08:29 +0200
+
+sbackup (0.10.3-0.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * remove /usr/etc. Closes: #399762
+
+ -- Andreas Barth <aba@not.so.argh.org>  Mon,  4 Dec 2006 16:23:27 +0000
+
+sbackup (0.10.3) unstable; urgency=high
+
+  * Fix an Ubuntu-izm that creeped into the permissions (Closes: #391539)
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Fri, 06 Oct 2006 16:55:10 +0100
+
+sbackup (0.10.2) unstable; urgency=high
+
+  * "Simple fixes for simple but annoying bugs" release - intended to go 
+    into Etch and Edgy.
+  * Manage /etc/sbackup.conf and /etc/cron.d/sbackup as config files, but
+    not as conffiles, to remove unneeded "config changes upstream" prompt
+    on upgrade. SBackup can handle old config gracefuly.
+  * Brown paperbag one-liner fix on incremental backup time not being counted 
+    properly causing incremental backups to be done all the time.
+  * Reduce nice level of sbackupd process to lowest possible priority (+19)
+  * An empty regex matches everything, so avoid those
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Fri, 06 Oct 2006 16:55:10 +0100
+
+sbackup (0.10-1) unstable; urgency=low
+
+  * Added i18n support from Jonh Wendell
+  * Added Portuguese translation by Jonh Wendell
+  * Adjusts in Makefile, support to uninstall and another prefix,
+    rather than /usr (SF:1376603) - wendell
+  * fix problem with spaces in target dir (SF:1508991) - wendell
+  * Add command-line option parsing support from Andreas Sliwka
+  * Improve parsing of cron timelines with added custom option
+    (Ubuntu: #5720)
+  * Separate filenames in metadata with NULL instead of a newline
+    (Closes: #349700)
+  * Critical pseydofilesystems are explicitly excluded (Closes: #340115)
+  * Command line tar is used and is trying to be robust agaist race
+    conditions (Closes: #328824)
+  * Ability to edit filenames, paths and regexp directly in the cells - wendell
+  * Purge old backup snapshots in smart and simple way (Yay!)
+  * Really test the writability of a directory by writing into it.
+    Solves several permission related errors, especially in remote backups.
+  * Improved restore window interface - wendell
+  * Rewriten restore backend fixes bugs while restoring files beyond 2Gb
+    limit and speeds up the restore 2-3 times
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Tue, 08 Aug 2006 16:55:10 +0100
+
+sbackup (0.9-1) unstable; urgency=low
+
+  * document all the TODOs and plans
+  * backup all files if maxsize=-1 (SF:1324065)
+  * fixed many bugs with the root directory enabled for backup
+  * fixed an exception with remote target testing (Closes: #329341)
+  * secure backup permissions - now all files are 0600 (Ubuntu: #3177)
+  * also rename remote directories to get rid of ":" in filename
+  * upgrade backup directories before each backup run
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Sun,  20 Nov 2005 04:14:23 +0300
+
+sbackup (0.8-1) unstable; urgency=low
+
+  * Fix binary paths in .menu entries to sbin (Closes: #324781)
+  * Use "." instead of ":" in all directory names (Closes: #325431)
+  * Fix a bug with first item of file format exclusion list (Closes: #325426)
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Sat,  03 Sep 2005 23:14:23 +0300
+
+sbackup (0.7-2) unstable; urgency=low
+
+  * Also fix the config applet to work in sarge
+  * Move the restore icon to System->Administration menu too
+  * First upload to Debian unstable :)
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Wed,  20 Aug 2005 00:14:23 +0300
+
+sbackup (0.7-1) unstable; urgency=low
+
+  * Fix and reenable remote restore. It is still heal of a slow, but it works
+  * Add empty directories to a full backup
+  * Stop using pythons tarfile module on backup
+  * Interface to systems 'tar' tool - double speedup, 10 times less memory used
+  * Reduce memory usage by factor of 3 on restore and restore GUI
+  * target directories are checked for validity, so interrupted backup no longer
+    breaks other backups
+  * Cache all files locally on remote backup - gnomevfs is very slow on small updates
+  * A new tool added to upgrade backup directory formats
+  * Gnome Restore tool now automatically asks to upgrade old backup directories
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Wed,  17 Aug 2005 00:01:23 +0300
+
+sbackup (0.5-1) unstable; urgency=low
+
+  * Added the restore GUI: simple-restore-gnome
+  * Added the command-line: srestore.py (Also a python module for restoring)
+  * Only backup directories if there are files inside
+  * Minimize usage of /tree file (planned for removal, with compartibility)
+  * Usability adjustments to the config gui
+  * Improved configuration defaults
+  * Improved backup algorithm - now only folders with changes are included in
+    the backup archive
+  * NOTE: remote restore is *not* supported in this version
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Sun, 10 Aug 2005 20:21:20 +0300
+
+sbackup (0.4-1) unstable; urgency=low
+
+  * Adjustments to Gnome capplets Target tab
+  * Write username to cron.d file (was breaking automatic backups)
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Sun,  8 Aug 2005 20:00:00 +0300
+
+sbackup (0.3-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Aigars Mahinovs <aigarius@debian.org>  Sun,  7 Aug 2005 20:01:33 +0300
+

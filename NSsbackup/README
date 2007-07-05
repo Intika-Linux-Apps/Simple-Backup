@@ -1,0 +1,41 @@
+Simple Backup Solution
+
+SBackup is a simple backup solution intended for desktop use. 
+It can back up any subset of files and directories. Exclusions 
+can be defined by regular expressions. A maximum individual file 
+size limit can be defined. Backups may be saved to any local and 
+remote directories that are supported by gnome-vfs.
+
+This software is written withing Google Summer of Code 2005 for use
+in Ubuntu GNU/Linux distribution.
+
+INSTALLATION
+* Please see INSTALL file.
+
+To use.
+
+* Go to System/Administration gnome menu and choose 'Simple Backup Config' or,
+  if you prefer terminal, run 'sudo simple-backup-config' to configure your
+  backup settings. Do not forget to save the configuration.
+* If upgrading, backups will be updated to a new format before next backup
+
+If you do not run a Debian derrived distribution then you can comment out
+lines that backup the list of installed packages on a Debian system. 
+An automatic test will be added soon, but the lack of dpkg command shouldn't
+raise an exception there.
+
+srestore.py is a command line restore tool and simple-restore-gnome is a Gnome
+equivalent.
+
+See project homepage at: http://sourceforge.net/projects/sbackup/
+
+Feedback is welcome at SourceForge bugtrackers, Debian BTS or directly!
+
+Also, please contact me, if you want to translate SBackup to your language.
+
+
+-- 
+Best Regards,
+    Aigars Mahinovs <aigarius@debian.org>
+                    <aigarius@gmail.com>
+                    <aigarius@skype>

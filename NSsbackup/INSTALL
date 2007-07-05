@@ -1,0 +1,36 @@
+Simple Backup Solution
+
+Installation Instructions
+=========================
+
+Prerequist
+==========
+pynotify
+fuse
+
+
+Easiest way
+===========
+
+* If you use Debian or Ubuntu, try apt-get:
+
+     sudo apt-get install sbackup
+
+
+From source code way
+===================
+
+* Install python and python-gnome2 libraries.
+  - probably it's already installed in your dist
+
+* Run 'make install' in the same directory as this README file
+
+* By default, sbackup will be installed under "/usr/local" folder.
+
+
+Uninstalling
+============
+
+* If installed via apt: 'sudo apt-get remove sbackup'. Else:
+
+* Just type 'make uninstall' in the source code folder

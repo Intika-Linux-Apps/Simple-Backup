@@ -1,0 +1,24 @@
+[general]
+target=/var/backup
+lockfile=/var/lock/sbackup.lock
+maxincrement = 21
+format = 1
+
+[dirconfig]
+/etc/=1
+/home/=1
+/usr/local/=1
+/var/=1
+/var/cache/=0
+/var/tmp/=0
+/proc/=0
+/dev/=0
+/sys/=0
+/tmp/=0
+/var/tmp/=0
+
+[exclude]
+regex=\.mp3,\.avi,\.mpeg,\.mpg,\.mkv,\.ogg,\.ogm,\.tmp,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache
+maxsize=100000000
+
+badOption = true
