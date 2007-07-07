@@ -48,15 +48,15 @@ class Sbackupd () :
 		if self.__bm.config.has_option("report","from") :
 			_from =self.__bm.config.get("report","from")
 		else :
-			_from = "Sbackup Daemon <%s@%s>" % (os.getlogin(), socket.gethostname())
+			_from = "NSsbackup Daemon <%s@%s>" % (os.getlogin(), socket.gethostname())
 		
 		_to = self.__bm.config.get("report","to")
-		_title = "[Sbackup] Report of %s" % datetime.datetime.now()
+		_title = "[NSsbackup] Report of %s" % datetime.datetime.now()
 		if self.__bm.config.has_option("log","file") :
 			_content = FAM.readfile(self.__bm.config.get("log","file"))
 		else :
-			if FAM.exists("sbackup.log") :
-				_content = FAM.readfile("sbackup.log")
+			if FAM.exists("nssbackup.log") :
+				_content = FAM.readfile("nssbackup.log")
 			else :
 				_content = "I didn't find the log file. Please set it up in sbackup.conf "
 		
@@ -97,14 +97,14 @@ class Sbackupd () :
 		try : 
 			try :
 				if os.getuid() == 0 : # we are root
-					if FAM.exists("/etc/sbackup.conf") :
-						self.__bm = BackupManager("/etc/sbackup.conf")
+					if FAM.exists("/etc/nssbackup.conf") :
+						self.__bm = BackupManager("/etc/nssbackup.conf")
 					else :
 						self.__bm = BackupManager()
 					# TODO Find other users if the option is specified
 				else :  # we are others
-					if FAM.exists(os.getenv("HOME")+"/.sbackup/sbackup.conf") :
-						self.__bm = BackupManager(os.getenv("HOME")+"/.sbackup/sbackup.conf")
+					if FAM.exists(os.getenv("HOME")+"/.nssbackup/nssbackup.conf") :
+						self.__bm = BackupManager(os.getenv("HOME")+"/.nssbackup/nssbackup.conf")
 					else :
 						self.__bm = BackupManager()
 					
@@ -115,8 +115,8 @@ class Sbackupd () :
 				if os.getuid() != 0 :
 					try:
 						import pynotify
-						if pynotify.init("sbackup"):
-							n = pynotify.Notification("Sbackup", "CRASH : '%s'" % str(e))
+						if pynotify.init("NSsbackup"):
+							n = pynotify.Notification("NSsbackup", "CRASH : '%s'" % str(e))
 							n.show()
 						else:
 							getLogger().warning("there was a problem initializing the pynotify module")

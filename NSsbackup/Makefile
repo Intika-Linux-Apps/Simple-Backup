@@ -8,8 +8,7 @@ SUPPORT = $(DESTDIR)/share/nssbackup/
 DOC = $(DESTDIR)/share/doc/nssbackup/
 PIXDIR = $(DESTDIR)/share/pixmaps/
 # classes dir
-SUBCLSDIR = lib/python2.5/nssbackup
-PYDIR = $(DESTDIR)/lib/python2.5
+SUBCLSDIR = lib/python2.5/site-packages/nssbackup
 CLSDIR = $(DESTDIR)/$(SUBCLSDIR)
 
 all:
@@ -34,8 +33,8 @@ install: po-data install-po
 	install -m644 -D ./datas/simple-restore.glade $(SUPPORT)
 	install ./datas/nssbackup $(SUPPORT)
 #	install -m644 -D simple-backup-tocd.glade $(SUPPORT)
-ifeq ($(DESTDIR),/usr/local/)
-	install -b -m600 nssbackup.conf.example /etc/nssbackup.conf
+ifeq ($(DESTDIR),/usr/local)
+	install -b -m600 datas/nssbackup.conf.example /etc/nssbackup.conf
 	@echo "[places]" >> /etc/nssbackup.conf
 	@echo "prefix=$(PREFIX)" >> /etc/nssbackup.conf
 endif

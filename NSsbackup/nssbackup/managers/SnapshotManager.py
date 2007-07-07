@@ -189,7 +189,7 @@ class SnapshotManager :
 				# processing finished for this snapshot
 			return result
 			
-	def purge(self, purge="log"):
+	def purge(self, purge="30"):
 		"""
 		Purge a directory
 		@param mode : for the moment, only "log" and "simple" are supported 
