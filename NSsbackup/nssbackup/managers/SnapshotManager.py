@@ -20,10 +20,10 @@ import re
 import datetime
 import time
 import FileAccessManager as FAM
-from sbackup.util.structs import SBdict
-from sbackup.util.Snapshot import Snapshot
-from sbackup.util.exceptions import *
-from sbackup.util.log import getLogger
+from nssbackup.util.structs import SBdict
+from nssbackup.util.Snapshot import Snapshot
+from nssbackup.util.exceptions import *
+from nssbackup.util.log import getLogger
 ##
 #@author: Oumar Aziz Ouattara <wattazoum@gmail.com>
 #@version: 1.0

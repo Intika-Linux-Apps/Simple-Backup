@@ -15,11 +15,11 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from sbackup.util.Snapshot import Snapshot
-from sbackup.util.log import getLogger
-from sbackup.util.exceptions import SBException
-from sbackup.managers.SnapshotManager import SnapshotManager
-import sbackup.util as Util
+from nssbackup.util.Snapshot import Snapshot
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import SBException
+from nssbackup.managers.SnapshotManager import SnapshotManager
+import nssbackup.util as Util
 import tempfile, datetime,os, shutil
 
 class RestoreManager :

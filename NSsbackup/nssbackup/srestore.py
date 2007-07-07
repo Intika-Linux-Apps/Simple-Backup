@@ -141,8 +141,8 @@ if __name__ == "__main__":
 
 	# i18n init
 	locale.setlocale(locale.LC_ALL, '')
-	gettext.textdomain("sbackup")
-	gettext.install("sbackup", unicode=True) 
+	gettext.textdomain("nssbackup")
+	gettext.install("nssbackup", unicode=True) 
 
 	r = SRestore()
 	if not len(sys.argv) in [3,4]:

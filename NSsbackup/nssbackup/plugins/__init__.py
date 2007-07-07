@@ -20,9 +20,9 @@ import os
 import os.path
 import sys
 import glob
-import sbackup
-from sbackup.util.log import getLogger
-from sbackup.util.exceptions import SBException
+import nssbackup
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import SBException
 
 class pluginFAM :
 	"""
@@ -89,7 +89,7 @@ class PluginManager :
 		if self.__pluginList : return self.__pluginList
 		else :
 			self.__pluginList = dict()
-			tmp = inspect.getabsfile(sbackup.plugins)
+			tmp = inspect.getabsfile(nssbackup.plugins)
 			plugins_dir = os.path.dirname(tmp)
 			if os.path.isdir(plugins_dir):
 				if plugins_dir not in sys.path:

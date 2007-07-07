@@ -20,9 +20,9 @@
 
 import FileAccessManager as FAM
 from SnapshotManager import SnapshotManager
-from sbackup.util.log import getLogger
-from sbackup.util.exceptions import SBException
-from sbackup.util.Snapshot import Snapshot
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import SBException
+from nssbackup.util.Snapshot import Snapshot
 import gettext
 from gettext import gettext as _
 import re
@@ -74,7 +74,7 @@ class UpgradeManager() :
 	
 	##
 	#The downgrade feature will be certainly used for exporting snapshots, 
-	#so that it would be possible to use it with a previous version of sbackup
+	#so that it would be possible to use it with a previous version of nssbackup
 	# @param snapshot : the snapshot to downgrade : 
 	# @param version : The version to which one the snapshot will be downgraded
 	def downgradeSnapshot(self,snapshot,version="1.4"):
@@ -190,7 +190,7 @@ class UpgradeManager() :
 
 if __name__ == "__main__" :
 	# i18n init
-	gettext.textdomain("sbackup")
+	gettext.textdomain("nssbackup")
 	
 	if not len(sys.argv) in [2]:
 		print _("""

@@ -20,7 +20,7 @@ import logging.handlers
 import sys
 import traceback
 import os.path
-import sbackup.managers.FileAccessManager as FAM
+import nssbackup.managers.FileAccessManager as FAM
 
 logger = None
 logfiles = []

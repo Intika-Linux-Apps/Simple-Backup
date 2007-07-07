@@ -15,9 +15,9 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from sbackup.plugins import pluginFAM
+from nssbackup.plugins import pluginFAM
 import os
-from sbackup.util.log import getLogger
+from nssbackup.util.log import getLogger
 
 class localFuseFAM (pluginFAM):
 	"""

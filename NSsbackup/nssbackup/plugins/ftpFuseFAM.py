@@ -15,13 +15,13 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from sbackup.plugins import pluginFAM
+from nssbackup.plugins import pluginFAM
 import subprocess
 import re
 import os
 from tempfile import mkstemp
-import sbackup.managers.FileAccessManager as FAM
-from sbackup.util.exceptions import FuseFAMException
+import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.util.exceptions import FuseFAMException
 
 class ftpFuseFAM (pluginFAM)  :
 	"""

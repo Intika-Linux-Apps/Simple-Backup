@@ -20,22 +20,22 @@ import ConfigParser
 import traceback
 import smtplib
 from optparse import OptionParser
-from sbackup.util.log import getLogger
-from sbackup.util.exceptions import *
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import *
 import FileAccessManager as FAM
 
 
 class ConfigManager (ConfigParser.ConfigParser):
 	"""
-	Sbackup config manager 
+	nssbackup config manager 
 	
 	[general]
-	mountdir = /mnt/sbackup
+	mountdir = /mnt/nssbackup
 	target=/var/backup
 	#target=ssh://user:pass@example.com/home/user/backup/
 	
 	# Where to put a lockfile (Leave the default)
-	lockfile=/var/lock/sbackup.lock
+	lockfile=/var/lock/nssbackup.lock
 	
 	# Maximal interval between two full backups (in days)
 	maxincrement = 21
@@ -46,7 +46,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	
 	[log]
 	level = 20
-	file = sbackup.log
+	file = nssbackup.log
 	
 	[report]
 	from =
@@ -99,17 +99,17 @@ class ConfigManager (ConfigParser.ConfigParser):
 
 	"""
 	
-	servicefile = "/usr/share/sbackup/sbackup"
+	servicefile = "/usr/share/nssbackup/nssbackup"
 	
 	regex = r"\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache"
 	dirconfig = {'/etc/': '1', '/var/': '1', '/home/': '1', '/var/cache/': '0', '/var/tmp/': '0', '/var/spool/': '0', '/usr/local/': '1', '/media/': '0'}
 	maxsize = str(10*1024*1024)
-	mountdir = "/mnt/sbackup"
+	mountdir = "/mnt/nssbackup"
 	target = "/var/backup"
 	maxincrement = str(7)
 	prefix = "/usr"
-	lockfile = "/var/lock/sbackup.lock"
-	logfile = "/var/log/sbackup.log"
+	lockfile = "/var/lock/nssbackup.lock"
+	logfile = "/var/log/nssbackup.log"
 	format=1
 	
 	conffile = None
@@ -170,7 +170,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		# Section places
 		self.set("places", "prefix", self.prefix)
 		
-		self.conffile = "/etc/sbackup.conf"
+		self.conffile = "/etc/nssbackup.conf"
 		
 		if not FAM.exists(self.get("log","file")) :
 			FAM.createfile(self.get("log","file"))
@@ -184,16 +184,16 @@ class ConfigManager (ConfigParser.ConfigParser):
 		self.initSection()
 		
 		# Section general
-		self.set("general", "mountdir",  home +"/.sbackup/mountdir" )
+		self.set("general", "mountdir",  home +"/.nssbackup/mountdir" )
 		self.set("general", "target", home +"/backups" )
-		self.set("general", "lockfile", home +"/.sbackup/sbackup.lock" )
+		self.set("general", "lockfile", home +"/.nssbackup/nssbackup.lock" )
 		self.set("general", "maxincrement", self.maxincrement )
 		self.set("general", "format", self.format )
 		self.set("general", "purge", "log")
 		
 		# Section log
 		self.set("log", "level", "20" )
-		self.set("log", "file", home +"/.sbackup/sbackup.log" )
+		self.set("log", "file", home +"/.nssbackup/nssbackup.log" )
 		
 		# Section dirconfig
 		
@@ -207,7 +207,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		if not FAM.exists(self.get("log","file")) :
 			FAM.createfile(self.get("log","file"))
 		
-		self.conffile = home +"/.sbackup/sbackup.conf"
+		self.conffile = home +"/.nssbackup/nssbackup.conf"
 		
 		getLogger(self.get("log","file"),self.getint("log","level"))
 	
@@ -415,7 +415,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		"""
 		Set the backup Schedule
 		@param isCron : 0 for anacron schedule , 1 for Cron
-		@param value : daily/monthly/hourly/weekly for anacron, or the cronline to add at /etc/cron.d/sbackup for cron  
+		@param value : daily/monthly/hourly/weekly for anacron, or the cronline to add at /etc/cron.d/nssbackup for cron  
 		"""
 		anacronValues = ["daily","monthly","hourly","weekly"]
 		if type(isCron) != int or not (isCron in [0,1]) : 
@@ -445,24 +445,24 @@ class ConfigManager (ConfigParser.ConfigParser):
 		if not self.has_section("schedule") or (not self.has_option("schedule", "cron") and not self.has_option("schedule", "anacron")) :
 			getLogger().warning("Config file doesn't have schedule infos, probing from filesystem ")
 			#hourly
-			if os.path.exists("/etc/cron.hourly/sbackup"):
+			if os.path.exists("/etc/cron.hourly/nssbackup"):
 				getLogger().debug("Anacron hourly has been found")
 				return (0, "hourly")
 			# daily
-			elif os.path.exists("/etc/cron.daily/sbackup"):
+			elif os.path.exists("/etc/cron.daily/nssbackup"):
 				getLogger().debug("Anacron daily has been found")
 				return (0, "daily")
 			# weekly
-			elif os.path.exists("/etc/cron.weekly/sbackup"):
+			elif os.path.exists("/etc/cron.weekly/nssbackup"):
 				getLogger().debug("Anacron weekly has been found")
 				return (0, "weekly")
 			# monthly
-			elif os.path.exists("/etc/cron.monthly/sbackup"):
+			elif os.path.exists("/etc/cron.monthly/nssbackup"):
 				getLogger().debug("Anacron monthly has been found")
 				return (0, "monthly")
-			if os.path.exists("/etc/cron.d/sbackup"):
+			if os.path.exists("/etc/cron.d/nssbackup"):
 				getLogger().debug("Cron has been found")
-				return (1, FAM.readfile("/etc/cron.d/sbackup"))
+				return (1, FAM.readfile("/etc/cron.d/nssbackup"))
 			# none has been found
 			return None
 		else :
@@ -480,7 +480,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		[Log]
 		# level is in ( 1, 2( default ), 3, 4, 5 ) 
 		level = 2
-		file = /var/log/sbackup.log
+		file = /var/log/nssbackup.log
 		@param level : 1 = DEBUG, 2 = INFO, 5 = ERROR
 		@param file : The logfile to use
 		"""
@@ -560,8 +560,8 @@ class ConfigManager (ConfigParser.ConfigParser):
 		Write the schedule from the configuration file
 		"""
 		def erase_services():
-			listServ = ["/etc/cron.hourly/sbackup", "/etc/cron.daily/sbackup", 
-					"/etc/cron.weekly/sbackup", "/etc/cron.monthly/sbackup", "/etc/cron.d/sbackup"]
+			listServ = ["/etc/cron.hourly/nssbackup", "/etc/cron.daily/nssbackup", 
+					"/etc/cron.weekly/nssbackup", "/etc/cron.monthly/nssbackup", "/etc/cron.d/nssbackup"]
 			for l in listServ : 
 				if os.path.exists(l) :
 					getLogger().debug("Unlinking '%s'" % l )
@@ -576,22 +576,22 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if self.has_option("schedule", "cron") :
 				getLogger().debug("Saving Cron entries")
 				erase_services()
-				FAM.writetofile("/etc/cron.d/sbackup", self.get("schedule", "cron"))
+				FAM.writetofile("/etc/cron.d/nssbackup", self.get("schedule", "cron"))
 				
 			if self.has_option("schedule", "anacron") :
 				getLogger().debug("Saving Cron entries")
 				if self.get("schedule", "anacron") == "hourly" :
 					erase_services()
-					os.symlink(self.servicefile,"/etc/cron.hourly/sbackup")
+					os.symlink(self.servicefile,"/etc/cron.hourly/nssbackup")
 				elif self.get("schedule", "anacron") == "daily" :
 					erase_services()
-					os.symlink(self.servicefile,"/etc/cron.daily/sbackup")
+					os.symlink(self.servicefile,"/etc/cron.daily/nssbackup")
 				elif self.get("schedule", "anacron") == "weekly" :
 					erase_services()
-					os.symlink(self.servicefile,"/etc/cron.weekly/sbackup")
+					os.symlink(self.servicefile,"/etc/cron.weekly/nssbackup")
 				elif self.get("schedule", "anacron") == "monthly" :
 					erase_services()
-					os.symlink(self.servicefile,"/etc/cron.monthly/sbackup")
+					os.symlink(self.servicefile,"/etc/cron.monthly/nssbackup")
 				else : 
 					getLogger.warning("'%s' is not a valid value" % self.get("schedule", "anacron"))
 

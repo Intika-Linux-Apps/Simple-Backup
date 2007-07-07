@@ -12,12 +12,12 @@ import sys
 import os
 import time
 import locale
-import sbackup.managers.FileAccessManager as FAM
-from sbackup.plugins import PluginManager, pluginFAM
-from sbackup.managers.FuseFAM import FuseFAM
-from sbackup.util.log import getLogger
-from sbackup.util.exceptions import SBException
-from sbackup.managers.ConfigManager import ConfigManager
+import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.plugins import PluginManager, pluginFAM
+from nssbackup.managers.FuseFAM import FuseFAM
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import SBException
+from nssbackup.managers.ConfigManager import ConfigManager
 from GladeWindow import *
 from gettext import gettext as _
 
@@ -38,17 +38,17 @@ class SBconfigGTK(GladeWindow):
 	def init(self):
 		
 		if os.geteuid() == 0 :
-			if FAM.exist("/etc/sbackup.conf") :
-				self.configman = ConfigManager("/etc/sbackup.conf")
+			if FAM.exist("/etc/nssbackup.conf") :
+				self.configman = ConfigManager("/etc/nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 		else :
-			if FAM.exists(os.getenv("HOME")+os.sep.join(["",".sbackup","sbackup.conf"])) :
-				self.configman = ConfigManager(os.getenv("HOME")+os.sep.join(["",".sbackup","sbackup.conf"]))
+			if FAM.exists(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"])) :
+				self.configman = ConfigManager(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"]))
 			else :
 				self.configman = ConfigManager()
 			
-		filename = '/usr/local/share/sbackup/simple-backup-config.glade'
+		filename = '/usr/local/share/nssbackup/simple-backup-config.glade'
 
 		widget_list = [
 			'remote_inc_dialog',
@@ -434,7 +434,7 @@ class SBconfigGTK(GladeWindow):
 			if os.getuid() == 0 :
 				self.widgets["logfilechooser"].set_current_folder(os.sep.join("","var","log") )
 			else :
-				self.widgets["logfilechooser"].set_current_folder(os.sep.join(os.getenv("HOME"),".sbackup") )
+				self.widgets["logfilechooser"].set_current_folder(os.sep.join(os.getenv("HOME"),".nssbackup") )
 				
 		# report
 		def unfillreportentries():
@@ -605,29 +605,26 @@ class SBconfigGTK(GladeWindow):
 
 	def on_about_activate(self, *args):
 		about = gtk.AboutDialog()
-		about.set_name(_("Simple Backup Suite"))
-		about.set_version("0.10.3")
-		about.set_comments(_("This is a user friendly backup solution for common desktop needs. The project was was sponsored by Google during Google Summer of Code 2005 and mentored by Ubuntu."))
+		about.set_name(_("Not So Simple Backup Suite"))
+		about.set_version("0.1")
+		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
 		about.set_transient_for(self.widgets["backup_properties_dialog"])
-		about.set_copyright("Aigars Mahinovs <aigarius@debian.org>")
+		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
-		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>" ,
-						"Aigars Mahinovs <aigarius@debian.org>",
-				   		"Jonh Wendell <wendell@bani.com.br>"])
-		about.set_website("http://sourceforge.net/projects/sbackup/")
+		about.set_website("https://launchpad.net/nssbackup/")
 		about.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/share/pixmaps/sbackup-conf.png"))
 		about.run()
 		about.destroy()
 
 	def on_reload_clicked(self, *args):
 		if os.geteuid() == 0 :
-			if FAM.exist("/etc/sbackup.conf") :
-				self.configman = ConfigManager("/etc/sbackup.conf")
+			if FAM.exist("/etc/nssbackup.conf") :
+				self.configman = ConfigManager("/etc/nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 		else :
-			if FAM.exists(os.getenv("HOME")+os.sep.join(["",".sbackup","sbackup.conf"])) :
-				self.configman = ConfigManager(os.getenv("HOME")+os.sep.join(["",".sbackup","sbackup.conf"]))
+			if FAM.exists(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"])) :
+				self.configman = ConfigManager(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"]))
 			else :
 				self.configman = ConfigManager()
 		self.prefillWindow()		
@@ -638,8 +635,7 @@ class SBconfigGTK(GladeWindow):
 		self.configman.saveConf()
 
 	def on_backup_clicked(self, *args):
-		print("TODO: Add an Applet that show the progress (via logs)")
-		pid = subprocess.Popen(["sbackupd"]).pid
+		pid = subprocess.Popen(["nssbackupd"]).pid
 		
 		dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("A backup run is initiated in the background. The process id is: ")+str(pid)+".")
 		dialog.run()
@@ -1222,7 +1218,7 @@ class SBconfigGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_logfilechooser_selection_changed(self, *args):
-		self.configman.set("log", "file", self.widgets['logfilechooser'].get_filename()+os.sep+"sbackup.log")
+		self.configman.set("log", "file", self.widgets['logfilechooser'].get_filename()+os.sep+"nssbackup.log")
 		getLogger().debug("Log file : " + self.configman.get("log", "file"))
 
 	#----------------------------------------------------------------------

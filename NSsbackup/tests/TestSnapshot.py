@@ -15,7 +15,7 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from sbackup import Snapshot
+from nssbackup.util import Snapshot
 import os
 import os.path
 import unittest

@@ -18,8 +18,8 @@
 
 import unittest
 import os
-from sbackup.managers.FuseFAM import FuseFAM
-from sbackup.managers.ConfigManager import ConfigManager
+from nssbackup.managers.FuseFAM import FuseFAM
+from nssbackup.managers.ConfigManager import ConfigManager
 
 class TestFuseFAM(unittest.TestCase):
 	"""

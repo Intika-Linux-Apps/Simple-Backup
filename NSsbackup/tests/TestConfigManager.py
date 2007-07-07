@@ -18,8 +18,8 @@
 import os
 import sys
 import unittest
-from sbackup.util.exceptions import *
-from sbackup.ConfigManager import ConfigManager 
+from nssbackup.util.exceptions import *
+from nssbackup.ConfigManager import ConfigManager 
 
 class TestConfigManager(unittest.TestCase):
 
@@ -41,7 +41,7 @@ class TestConfigManager(unittest.TestCase):
 			self.assertRaises(IOError, self.config.setDefaultForRoot )
 		else :
 			self.config.setDefaultForRoot()
-			self.assertTrue(os.path.exists("/var/log/sbackup.log"))
+			self.assertTrue(os.path.exists("/var/log/nssbackup.log"))
 	
 	def testsetDefaultForUsers(self):
 		"Set the default config for normal users"	

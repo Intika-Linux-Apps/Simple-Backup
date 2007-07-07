@@ -14,7 +14,7 @@ Easiest way
 
 * If you use Debian or Ubuntu, try apt-get:
 
-     sudo apt-get install sbackup
+     sudo apt-get install nssbackup
 
 
 From source code way
@@ -31,6 +31,6 @@ From source code way
 Uninstalling
 ============
 
-* If installed via apt: 'sudo apt-get remove sbackup'. Else:
+* If installed via apt: 'sudo apt-get remove nssbackup'. Else:
 
 * Just type 'make uninstall' in the source code folder

@@ -55,14 +55,13 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/sbackup.
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/sbackup/usr PREFIX=/usr
-	[ -d $(CURDIR)/debian/sbackup/usr/etc ] && rmdir $(CURDIR)/debian/sbackup/usr/etc
-	install -d $(CURDIR)/debian/sbackup/usr/share/man/man8/
-	ln -s simple-backup.8.gz debian/sbackup/usr/share/man/man8/sbackupd.8.gz
-	ln -s simple-backup.8.gz debian/sbackup/usr/share/man/man8/srestore.py.8.gz
-	ln -s simple-backup.8.gz debian/sbackup/usr/share/man/man8/simple-backup-config.8.gz
-	ln -s simple-backup.8.gz debian/sbackup/usr/share/man/man8/simple-restore-gnome.8.gz
-	ln -s simple-backup.8.gz debian/sbackup/usr/share/man/man8/upgrade_backups.py.8.gz
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/nssbackup/usr PREFIX=/usr
+	install -d $(CURDIR)/debian/nssbackup/usr/share/man/man8/
+	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/nssbackupd.8.gz
+	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/srestore.py.8.gz
+	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/simple-backup-config.8.gz
+	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/simple-restore-gnome.8.gz
+	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/upgrade_backups.py.8.gz
 
 
 # Build architecture-independent files here.
@@ -75,7 +74,7 @@ binary-arch: build install
 	dh_testroot
 	dh_installchangelogs 
 	dh_installdocs
-	dh_installexamples sbackup.conf.example
+	dh_installexamples datas/nssbackup.conf.example
 #	dh_install
 	dh_installmenu
 #	dh_installdebconf	
@@ -86,7 +85,7 @@ binary-arch: build install
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
-	dh_installman simple-backup.8
+	dh_installman datas/simple-backup.8
 	dh_link
 	dh_strip
 	dh_compress

@@ -18,10 +18,10 @@
 import subprocess
 import os
 from tempfile import *
-from sbackup.util.log import getLogger
-from sbackup.plugins import PluginManager
+from nssbackup.util.log import getLogger
+from nssbackup.plugins import PluginManager
 from FileAccessManager import *
-from sbackup.util.exceptions import SBException
+from nssbackup.util.exceptions import SBException
 
 class FuseFAM:
 	"""
@@ -50,9 +50,9 @@ class FuseFAM:
 		else : 
 			# set the defaults 
 			if os.getuid() == 0 :
-				self.__mountdir = "/mnt/sbackup/"
+				self.__mountdir = "/mnt/nssbackup/"
 			else : 
-				self.__mountdir = os.getenv("HOME") + os.sep.join(["",".sbackup","mountdir"])
+				self.__mountdir = os.getenv("HOME") + os.sep.join(["",".nssbackup","mountdir"])
 
 	
 	def getMountedDirs(self):
@@ -163,9 +163,9 @@ class FuseFAM:
 		else : 
 			# set the defaults 
 			if os.getuid() == 0 :
-				self.__mountdir = "/mnt/sbackup/"
+				self.__mountdir = "/mnt/nssbackup/"
 			else : 
-				self.__mountdir = os.getenv("HOME") + os.sep.join(["",".sbackup","mountdir"])
+				self.__mountdir = os.getenv("HOME") + os.sep.join(["",".nssbackup","mountdir"])
 		
 		# check if the mount dir is valid
 		if not os.path.exists(self.__mountdir) : 
@@ -219,7 +219,7 @@ class FuseFAM:
 		
 	def terminate(self):
 		"""
-		Unmount all sbackup mounted dir.
+		Unmount all nssbackup mounted dir.
 		"""
 		for dir in self.__mountedDirs.itervalues() :
 			self.__umount(dir)
@@ -230,9 +230,9 @@ class FuseFAM:
 			raise SBException("Nothing to do for localpath '%s'." %remotedir)
 		# set the defaults 
 		if os.getuid() == 0 :
-			mountdir = "/mnt/sbackup/"
+			mountdir = "/mnt/nssbackup/"
 		else : 
-			mountdir = os.getenv("HOME") + os.sep.join(["",".sbackup","mountdir"])
+			mountdir = os.getenv("HOME") + os.sep.join(["",".nssbackup","mountdir"])
 		
 		# check if the mount dir is valid
 		if not os.path.exists(mountdir) : 

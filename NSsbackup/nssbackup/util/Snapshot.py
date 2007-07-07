@@ -16,7 +16,7 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 # Imports
-import sbackup.managers.FileAccessManager as FAM
+import nssbackup.managers.FileAccessManager as FAM
 import re
 import os
 import subprocess
@@ -25,7 +25,7 @@ import cPickle as pickle
 from exceptions import * 
 from log import getLogger
 from structs import SBdict
-import sbackup.util as Util
+import nssbackup.util as Util
 
 class Snapshot : 
 	"The snapshot class represents one snapshot in the backup directory"

@@ -15,11 +15,11 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-import sbackup.managers.FileAccessManager as FAM
+import nssbackup.managers.FileAccessManager as FAM
 import os
 import subprocess
-from sbackup.util.log import getLogger
-from sbackup.util.exceptions import SBException
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import SBException
 from tempfile import *
 
 def launch(cmd, opts):

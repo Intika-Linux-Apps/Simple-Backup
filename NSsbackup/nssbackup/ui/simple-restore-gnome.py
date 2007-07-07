@@ -28,11 +28,11 @@ import re
 import cPickle
 import locale
 import gettext
-import sbackup.managers.FileAccessManager as FAM
-from sbackup.managers.ConfigManager import ConfigManager
-from sbackup.managers.RestoreManager import RestoreManager
-from sbackup.managers.FuseFAM import FuseFAM
-from sbackup.managers.SnapshotManager import SnapshotManager
+import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.managers.ConfigManager import ConfigManager
+from nssbackup.managers.RestoreManager import RestoreManager
+from nssbackup.managers.FuseFAM import FuseFAM
+from nssbackup.managers.SnapshotManager import SnapshotManager
 from gettext import gettext as _
 
 # Attempt to load GTK bindings
@@ -87,7 +87,7 @@ class SRestoreGTK:
 		self.fusefam = FuseFAM(self.conf)
 		
 		# Setup glade and signals
-		gtk.glade.textdomain("sbackup")
+		gtk.glade.textdomain("nssbackup")
 		self.signals = {"gtk_main_quit": gtk.main_quit,
 				"on_customsrc_toggled": self.enable_custom,
 				"on_treeview1_row_expanded": self.on_expand_row,
@@ -99,7 +99,7 @@ class SRestoreGTK:
 				"on_customFolderButton_clicked": self.on_customFolderButton_clicked
 				}
 
-		self.widgets = gtk.glade.XML("/usr/share/sbackup/simple-restore.glade")
+		self.widgets = gtk.glade.XML("/usr/share/nssbackup/simple-restore.glade")
 		self.widgets.signal_autoconnect(self.signals)
 
 		# Get handle to window
@@ -124,13 +124,13 @@ class SRestoreGTK:
 		"""
 		global target, default_target
 		if os.geteuid() == 0 :
-			if FAM.exist("/etc/sbackup.conf") :
-				self.conf = ConfigManager("/etc/sbackup.conf")
+			if FAM.exist("/etc/nssbackup.conf") :
+				self.conf = ConfigManager("/etc/nssbackup.conf")
 			else :
 				self.conf = ConfigManager()
 		else :
-			if FAM.exists(os.getenv("HOME")+os.sep.join(["",".sbackup","sbackup.conf"])) :
-				self.conf = ConfigManager(os.getenv("HOME")+os.sep.join(["",".sbackup","sbackup.conf"]))
+			if FAM.exists(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"])) :
+				self.conf = ConfigManager(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"]))
 			else :
 				self.conf = ConfigManager()
 
@@ -386,8 +386,8 @@ if __name__ == '__main__':
 	
 	# i18n init
 	locale.setlocale(locale.LC_ALL, '')
-	gettext.textdomain("sbackup")
-	gettext.install("sbackup", unicode=True) 
+	gettext.textdomain("nssbackup")
+	gettext.install("nssbackup", unicode=True) 
 
 	# Load GUI
 	SRestoreGTK()

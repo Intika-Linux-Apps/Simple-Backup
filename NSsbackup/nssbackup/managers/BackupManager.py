@@ -26,9 +26,9 @@ from SnapshotManager import SnapshotManager
 from ConfigManager import ConfigManager
 from UpgradeManager import UpgradeManager
 import FileAccessManager as FAM
-from sbackup.util.Snapshot import Snapshot
-from sbackup.util.log import getLogger
-from sbackup.util.exceptions import *
+from nssbackup.util.Snapshot import Snapshot
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import *
 
 class BackupManager :
 	"""
@@ -72,8 +72,8 @@ class BackupManager :
 		if os.getuid() != 0 :
 			try:
 				import pynotify
-				if pynotify.init("sbackup"):
-					n = pynotify.Notification("Sbackup", "Starting Backup Session")
+				if pynotify.init("nssbackup"):
+					n = pynotify.Notification("nssbackup", "Starting Backup Session")
 					n.show()
 				else:
 					getLogger().warning("there was a problem initializing the pynotify module")
@@ -160,8 +160,8 @@ class BackupManager :
 		if os.getuid() != 0 :
 			try:
 				import pynotify
-				if pynotify.init("sbackup"):
-					n = pynotify.Notification("Sbackup", "File list ready , Committing to disk")
+				if pynotify.init("nssbackup"):
+					n = pynotify.Notification("nssbackup", "File list ready , Committing to disk")
 					n.show()
 				else:
 					getLogger().warning("there was a problem initializing the pynotify module")
@@ -352,13 +352,13 @@ class BackupManager :
 			self.__lockfile = self.config.get("general", "lockfile")
 		else :
 			getLogger().info("no lockfile in config, default will be used ")
-			self.__lockfile = "/var/lock/sbackup.lock"
+			self.__lockfile = "/var/lock/nssbackup.lock"
 		
 		# Create the lockfile so none disturbs us
 		if FAM.exists(self.__lockfile) :
 			# the lockfile exists, is it valid ?
 			last_sb_pid = FAM.readfile(self.__lockfile)
-			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and "sbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read()) ) :
+			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read()) ) :
 				raise SBException("Another Simple Backup daemon already running (pid = %s )!" % last_sb_pid )
 			else :
 				FAM.delete(self.__lockfile)
@@ -368,7 +368,7 @@ class BackupManager :
 
 	def __endSBsession(self):
 		"""
-		End Sbackup session :
+		End nssbackup session :
 		- copy the log file into the snapshot dir
 		- remove the lockfile
 		"""
@@ -377,9 +377,9 @@ class BackupManager :
 		getLogger().info("Session of backup is finished (%s is removed) " % self.__lockfile)
 		
 		if self.config.has_option("log","file") and FAM.exists(self.config.get("log","file")):
-			FAM.copyfile(self.config.get("log","file"), self.__actualSnapshot.getPath()+"/sbackup.log")
-		elif FAM.exists("sbackup.log") : 
-			FAM.copyfile(os.path.abspath("sbackup.log"), self.__actualSnapshot.getPath()+"/sbackup.log")
+			FAM.copyfile(self.config.get("log","file"), self.__actualSnapshot.getPath()+"/nssbackup.log")
+		elif FAM.exists("nssbackup.log") : 
+			FAM.copyfile(os.path.abspath("nssbackup.log"), self.__actualSnapshot.getPath()+"/nssbackup.log")
 		else :
 			getLogger().warning("I didn't find the logfile to copy into snapshot")
 			
@@ -388,8 +388,8 @@ class BackupManager :
 		if os.getuid() != 0 :
 			try:
 				import pynotify
-				if pynotify.init("sbackup"):
-					n = pynotify.Notification("Sbackup", "Ending Backup Session")
+				if pynotify.init("nssbackup"):
+					n = pynotify.Notification("nssbackup", "Ending Backup Session")
 					n.show()
 				else:
 					getLogger().warning("there was a problem initializing the pynotify module")
@@ -485,8 +485,8 @@ class BackupManager :
 	
 	def getConfig(self) :
 		"""
-		get the config for the instance of Sbackup 
-		(/etc/sbackup.conf if root  or ~/.sbackup/sbackup.conf if normal user)
+		get the config for the instance of nssbackup 
+		(/etc/nssbackup.conf if root  or ~/.nssbackup/nssbackup.conf if normal user)
 		"""
 		global __config
 		if self.__config : return self.__config

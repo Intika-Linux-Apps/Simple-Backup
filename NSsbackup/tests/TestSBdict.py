@@ -18,7 +18,7 @@
 
 import unittest
 import os
-from sbackup.util.structs import SBdict
+from nssbackup.util.structs import SBdict
 
 
 class TestSBdict(unittest.TestCase):

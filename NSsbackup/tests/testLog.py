@@ -1,4 +1,4 @@
-from sbackup.util.log import getLogger
+from nssbackup.util.log import getLogger
 
 class Test:
 	

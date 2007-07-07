@@ -1,22 +1,17 @@
-Source: sbackup
+Source: nssbackup
 Section: admin
 Priority: optional
-Maintainer: Aigars Mahinovs <aigarius@debian.org>
-Build-Depends: debhelper (>= 4.0.0)
-Standards-Version: 3.6.1
+Maintainer: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
 
-Package: sbackup
-Architecture: all
-Depends: python, python-gnome2, python-glade2, gksu, sudo
-Description: Simple Backup Suite for desktop use
- Simple Backup Suite is a set of backend backup daemon and Gnome
- GUI frontends that provide a simple yet powerful backup
- solution for common desktop users.
+Package: nssbackup
+Architecture: any
+Depends: python, python-gnome2, python-glade2
+Conflicts: sbackup
+Description: Not So Simple Backup Suite 
+ Not So Simple Backup Suite is a fork of Sbackup intended for desktop
+ use. It has multiuser support with nice handling of logs . Italso has
+ a plugin arhitecture that will allow you to extend its functionalities.
  .
- Backups can be written to local directory or remote servers using
- Gnome VFS technology. A fine control is possible regarding what
- folders and files to backup. Files can be excluded even with a set
- of regular expressions. Regular backups can be scheduled.
- .
- This tool has been written with Google sponsorship during Summer
- of Code 2005 with mentoring help from Ubuntu.
+ 
