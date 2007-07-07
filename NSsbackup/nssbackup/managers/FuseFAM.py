@@ -221,9 +221,15 @@ class FuseFAM:
 		"""
 		Unmount all nssbackup mounted dir.
 		"""
-		for dir in self.__mountedDirs.itervalues() :
-			self.__umount(dir)
-			os.rmdir(dir)
+		plugin_manager = PluginManager()
+		for src, dir in self.__mountedDirs.iteritems() :
+			for p_name, p_class in plugin_manager.getPlugins().iteritems():
+				#we got the plugin
+				plugin = p_class()
+				if plugin.matchScheme(src):
+					plugin.umount(dir)
+					os.rmdir(dir)
+			getLogger().warning("Couldn't unmount %s " % dir)
 			
 	def testFusePlugins(self, remotedir):
 		if remotedir.startswith(os.sep) :

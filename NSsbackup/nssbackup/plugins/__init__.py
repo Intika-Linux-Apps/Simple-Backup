@@ -58,6 +58,29 @@ class pluginFAM :
 		"""
 		raise SBException("'mount' Not implemented for this plugin")
 	
+	def umount(self,mounteddir):
+		"""
+		Default behaviour is to unmount with fuse
+		"""
+		if not os.path.ismount(mounteddir) :
+			# mountpoint is not mounted 
+			return
+		# Create output log file
+		outptr,outFile = mkstemp(prefix="fuseUmount_output_")
+		# Create error log file
+		errptr, errFile = mkstemp(prefix="fuseUmount_error_")
+		# Call the subprocess using convenience method
+		retval = subprocess.call(["fusermount","-u",mounteddir], 0, None, None, outptr, errptr)
+		# Close log handles
+		os.close(errptr)
+		os.close(outptr)
+		outStr, errStr = readfile(outFile), readfile(errFile)	
+		delete(outFile)
+		delete(errFile)
+		if retval != 0 :
+			raise SBException("Couldn't unmount '%s' : %s" %  (mounteddir,errStr))
+		
+	
 	def checkifmounted (self,source, mountbase):
 		"""
 		Should check if the source is mounted.
