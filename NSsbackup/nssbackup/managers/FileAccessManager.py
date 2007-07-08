@@ -49,7 +49,10 @@ def delete(  uri ):
 
 def isdir(  uri ):
 	"checks if the given uri is a dir"
-	return ( gnomevfs.get_file_info( uri ).type == 2 )
+	if uri.startswith(os.sep) :
+		return os.path.isdir(uri)
+	else :
+		return ( gnomevfs.get_file_info( uri ).type == 2 )
 
 def rename(  uri, name ) :
 	"""

@@ -45,3 +45,8 @@ class localFuseFAM (pluginFAM):
 		"""
 		getLogger().debug("Nothing to do for '%s'" % source)
 		return (os.sep,"",source.lstrip(os.sep))
+	
+	def umount(self,mounteddir):
+		"""
+		"""
+		getLogger().debug("No need to unmount %s"% mounteddir)

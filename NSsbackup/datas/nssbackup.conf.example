@@ -26,21 +26,21 @@ run4others = 1
 # level : 10 = DEBUG, 20 = INFO, 50 = ERROR
 level = 20
 # where to put the logfile when running , the logfile will be moved to the snapshot dir at the end of the backup
-file = sbackup.log
+#file = /var/log/sbackup.log
 
 
 # Backup report
 [report]
-from = foo@foo.foo
-to = foo@foo.foo
-smtpserver = smtp.foo.com
-smtpport = 25
-smtptls = 1
+#from = foo@foo.foo
+#to = foo@foo.foo
+#smtpserver = smtp.foo.com
+#smtpport = 25
+#smtptls = 1
 #smtpcert = user.crt
 #smtpkey = user.key
 #optional
-smtpuser = foo
-smtppassword = pass 
+#smtpuser = foo
+#smtppassword = pass 
 
 [schedule]
 #anacron = daily

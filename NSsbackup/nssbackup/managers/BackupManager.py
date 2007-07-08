@@ -15,8 +15,7 @@
 # Author: Aigars Mahinovs <aigarius@debian.org>
 
 from gettext import gettext as _
-import os
-import os.path
+import os , grp
 import datetime
 import time
 import re
@@ -69,16 +68,15 @@ class BackupManager :
 		"""
 		global __actualSnapshot, __snpman
 		
-		if os.getuid() != 0 :
-			try:
-				import pynotify
-				if pynotify.init("nssbackup"):
-					n = pynotify.Notification("nssbackup", "Starting Backup Session")
-					n.show()
-				else:
-					getLogger().warning("there was a problem initializing the pynotify module")
-			except Exception, e:
-				getLogger().warning(str(e))
+		try:
+			import pynotify
+			if pynotify.init("nssbackup"):
+				n = pynotify.Notification("nssbackup", "Starting Backup Session")
+				n.show()
+			else:
+				getLogger().warning("there was a problem initializing the pynotify module")
+		except Exception, e:
+			getLogger().warning(str(e))
 		
 		
 		getLogger().info("Starting backup")

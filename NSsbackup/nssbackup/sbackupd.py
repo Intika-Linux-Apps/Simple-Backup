@@ -97,13 +97,13 @@ class Sbackupd () :
 		try : 
 			try :
 				if os.getuid() == 0 : # we are root
-					if FAM.exists("/etc/nssbackup.conf") :
+					if os.path.exists("/etc/nssbackup.conf") :
 						self.__bm = BackupManager("/etc/nssbackup.conf")
 					else :
 						self.__bm = BackupManager()
 					# TODO Find other users if the option is specified
 				else :  # we are others
-					if FAM.exists(os.getenv("HOME")+"/.nssbackup/nssbackup.conf") :
+					if os.path.exists(os.getenv("HOME")+"/.nssbackup/nssbackup.conf") :
 						self.__bm = BackupManager(os.getenv("HOME")+"/.nssbackup/nssbackup.conf")
 					else :
 						self.__bm = BackupManager()

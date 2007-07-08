@@ -44,7 +44,17 @@ class SnapshotManager :
 			raise SBException("Invalid Value of targetDir : " + targetDir)
 		self.__targetDir = targetDir
 	
-
+	
+	def getSnapshot(self,name):
+		"""
+		Return the snapshot using his name.
+		@param name: 
+		"""
+		for snp in self.getSnapshots() :
+			if snp.getName() == name :
+				return snp
+		raise SBException("snapshot '%s' not found " % name)
+	
 	def getSnapshots(self, fromDate=None, toDate=None, byDate=None):
 		"""
 		@param fromDate : eg. 2007-02-17

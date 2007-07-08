@@ -227,15 +227,16 @@ class FuseFAM:
 		"""
 		plugin_manager = PluginManager()
 		for src, dir in self.__mountedDirs.iteritems() :
-			for p_name, p_class in plugin_manager.getPlugins().iteritems():
-				#we got the plugin
-				getLogger().debug("Trying '%s' plugin to match '%s' " % (p_name,src))
-				plugin = p_class()
-				if plugin.matchScheme(src):
-					getLogger().debug("Unmounting with '%s' plugin " % p_name)
-					plugin.umount(dir)
-					os.rmdir(dir)
-			getLogger().warning("Couldn't unmount %s " % dir)
+			if src is not os.sep :
+				for p_name, p_class in plugin_manager.getPlugins().iteritems():
+					#we got the plugin
+					getLogger().debug("Trying '%s' plugin to match '%s' " % (p_name,src))
+					plugin = p_class()
+					if plugin.matchScheme(src):
+						getLogger().debug("Unmounting with '%s' plugin " % p_name)
+						plugin.umount(dir)
+						os.rmdir(dir)
+				getLogger().warning("Couldn't unmount %s " % dir)
 			
 	def testFusePlugins(self, remotedir):
 		if remotedir.startswith(os.sep) :

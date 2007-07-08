@@ -23,6 +23,7 @@ from optparse import OptionParser
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import *
 import FileAccessManager as FAM
+import nssbackup.util as Util
 
 
 class ConfigManager (ConfigParser.ConfigParser):
@@ -99,7 +100,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 
 	"""
 	
-	servicefile = "/usr/share/nssbackup/nssbackup"
+	servicefile = Util.getResource("nssbackup")
 	
 	regex = r"\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache"
 	dirconfig = {'/etc/': '1', '/var/': '1', '/home/': '1', '/var/cache/': '0', '/var/tmp/': '0', '/var/spool/': '0', '/usr/local/': '1', '/media/': '0'}
@@ -554,18 +555,11 @@ class ConfigManager (ConfigParser.ConfigParser):
 		fd.close()
 		
 		self.writeSchedule()
-		
+	
 	def writeSchedule(self):
 		"""
 		Write the schedule from the configuration file
 		"""
-		def erase_services():
-			listServ = ["/etc/cron.hourly/nssbackup", "/etc/cron.daily/nssbackup", 
-					"/etc/cron.weekly/nssbackup", "/etc/cron.monthly/nssbackup", "/etc/cron.d/nssbackup"]
-			for l in listServ : 
-				if os.path.exists(l) :
-					getLogger().debug("Unlinking '%s'" % l )
-					os.unlink(l)
 		
 		if not self.has_section("schedule") or (not self.has_option("schedule", "anacron") and not self.has_option("schedule", "cron")) :
 			return
@@ -581,20 +575,28 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if self.has_option("schedule", "anacron") :
 				getLogger().debug("Saving Cron entries")
 				if self.get("schedule", "anacron") == "hourly" :
-					erase_services()
+					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.hourly/nssbackup")
 				elif self.get("schedule", "anacron") == "daily" :
-					erase_services()
+					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.daily/nssbackup")
 				elif self.get("schedule", "anacron") == "weekly" :
-					erase_services()
+					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.weekly/nssbackup")
 				elif self.get("schedule", "anacron") == "monthly" :
-					erase_services()
+					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.monthly/nssbackup")
 				else : 
 					getLogger.warning("'%s' is not a valid value" % self.get("schedule", "anacron"))
 
+	def erase_services(self):
+			listServ = ["/etc/cron.hourly/nssbackup", "/etc/cron.daily/nssbackup", 
+					"/etc/cron.weekly/nssbackup", "/etc/cron.monthly/nssbackup", "/etc/cron.d/nssbackup"]
+			for l in listServ : 
+				if os.path.exists(l) :
+					getLogger().debug("Unlinking '%s'" % l )
+					os.unlink(l)
+	
 	def testMail(self):
 		"""
 		Test the mail settings

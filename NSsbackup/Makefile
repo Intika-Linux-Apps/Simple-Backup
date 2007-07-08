@@ -61,7 +61,7 @@ uninstall:
 clean:
 	@echo "" > nssbackup/ressources
 	for lang in $(PO); do rm -rf po/$$lang ; done
-	-rm -f *.pyc
+	find ./ -name *.pyc -exec rm -f '{}' \;
 	-rm -f po/*~
 	-rm -f *.gladep
 	-rm -f *~ *.bak

@@ -69,7 +69,7 @@ def getLogger( logfile=None, level=20 ) :
 		
 		if logfile :
 			# create the logfile
-			if not FAM.exists(logfile) :
+			if not os.path.exists(logfile) :
 				FAM.writetofile(logfile, "SBackup Logger\r\n===========\r\n")
 			else :
 				# clean the logfile

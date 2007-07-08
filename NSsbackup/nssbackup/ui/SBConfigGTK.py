@@ -39,7 +39,7 @@ class SBconfigGTK(GladeWindow):
 	def init(self):
 		
 		if os.geteuid() == 0 :
-			if os.path.exist("/etc/nssbackup.conf") :
+			if os.path.exists("/etc/nssbackup.conf") :
 				self.configman = ConfigManager("/etc/nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
