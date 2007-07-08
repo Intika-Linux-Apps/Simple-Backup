@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.2.0 on Sat Jul  7 21:56:52 2007 by wattazoum@Ouattazoum-->
+<!--Generated with glade3 3.2.0 on Sun Jul  8 15:26:55 2007 by wattazoum@Ouattazoum-->
 <glade-interface>
   <widget class="GtkWindow" id="restorewindow">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+    <signal name="destroy" handler="gtk_main_quit"/>
     <child>
       <widget class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
@@ -32,7 +33,7 @@
                         <property name="label" translatable="yes">Use the default directory : </property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
-                        <signal name="group_changed" handler="on_defaultradiob_group_changed"/>
+                        <signal name="toggled" handler="on_defaultradiob_toggled"/>
                       </widget>
                     </child>
                     <child>
@@ -44,6 +45,7 @@
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">defaultradiob</property>
+                        <signal name="toggled" handler="on_defaultradiob_toggled"/>
                       </widget>
                       <packing>
                         <property name="top_attach">1</property>
@@ -61,7 +63,7 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkHBox" id="hbox2">
+                      <widget class="GtkHBox" id="custominfos">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <child>
@@ -202,9 +204,6 @@
                   </packing>
                 </child>
               </widget>
-              <packing>
-                <property name="expand">False</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkVBox" id="vbox3">

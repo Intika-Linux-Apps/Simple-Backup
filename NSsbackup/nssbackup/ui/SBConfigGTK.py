@@ -20,6 +20,7 @@ from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigManager
 from GladeWindow import *
 from gettext import gettext as _
+import nssbackup.util as Util
 
 #----------------------------------------------------------------------
 
@@ -38,17 +39,17 @@ class SBconfigGTK(GladeWindow):
 	def init(self):
 		
 		if os.geteuid() == 0 :
-			if FAM.exist("/etc/nssbackup.conf") :
+			if os.path.exist("/etc/nssbackup.conf") :
 				self.configman = ConfigManager("/etc/nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 		else :
-			if FAM.exists(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"])) :
+			if os.path.exists(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"])) :
 				self.configman = ConfigManager(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"]))
 			else :
 				self.configman = ConfigManager()
 			
-		filename = '/usr/local/share/nssbackup/simple-backup-config.glade'
+		filename = Util.getResource('simple-backup-config.glade')
 
 		widget_list = [
 			'remote_inc_dialog',
@@ -612,7 +613,7 @@ class SBconfigGTK(GladeWindow):
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
 		about.set_website("https://launchpad.net/nssbackup/")
-		about.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/share/pixmaps/sbackup-conf.png"))
+		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("sbackup-conf.png")))
 		about.run()
 		about.destroy()
 

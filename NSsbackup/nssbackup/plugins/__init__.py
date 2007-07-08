@@ -20,7 +20,9 @@ import os
 import os.path
 import sys
 import glob
-import nssbackup
+import nssbackup, subprocess
+from tempfile import *
+from nssbackup.managers.FileAccessManager import *
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 
@@ -45,7 +47,7 @@ class pluginFAM :
 		Mount the source intor the mountbase dir . This method should create a mount point to mount the source. 
 		The name of the mount point should be very expressive so that we avoid collision with other mount points
 		This method will return a tuple (baseRemoteSource, mountpoint, pathinside) where
-		- baseRemoteSource is the substring that represent the mount source (usually at the start of the source)
+		- baseRemoteSource is the substring that represent the mount source (usually at the start of the source). The matchScheme method should be able to match it
 		- mountpoint is the mount point of this baseRemoteSource.
 		- pathinside is the path inside the remote source 
 		[Use case]

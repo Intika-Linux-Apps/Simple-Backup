@@ -34,6 +34,7 @@ from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.managers.SnapshotManager import SnapshotManager
 from gettext import gettext as _
+import nssbackup.util as Util
 
 # Attempt to load GTK bindings
 try:
@@ -99,7 +100,7 @@ class SRestoreGTK:
 				"on_customFolderButton_clicked": self.on_customFolderButton_clicked
 				}
 
-		self.widgets = gtk.glade.XML("/usr/share/nssbackup/simple-restore.glade")
+		self.widgets = gtk.glade.XML(Util.getResource("simple-restore.glade"))
 		self.widgets.signal_autoconnect(self.signals)
 
 		# Get handle to window

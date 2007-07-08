@@ -17,26 +17,33 @@ default:
 
 install: po-data install-po 
 	install -d $(CLSDIR) $(BIN) $(SUPPORT) $(DOC) $(PIXDIR) $(DESTDIR)/share/applications
+ifeq ($(INSTALL),deb)
+	@echo "/usr/share/applications/" >>  nssbackup/ressources
+	@echo "/usr/share/nssbackup/" >>  nssbackup/ressources
+	@echo "/usr/share/doc/nssbackup/" >>  nssbackup/ressources
+	@echo "/usr/share/pixmaps/" >>  nssbackup/ressources
+else
+	@echo "$(SUPPORT)" >>  nssbackup/ressources
+	@echo "$(PIXDIR)" >>  nssbackup/ressources
+	@echo "$(DOC)" >>  nssbackup/ressources
+	@echo "$(DESTDIR)/share/applications/" >>  nssbackup/ressources
+endif
 	cp -rf nssbackup/* $(CLSDIR)
-	chmod +x  $(CLSDIR)/managers/UpgradeManager.py $(CLSDIR)/sbackupd.py $(CLSDIR)/ui/SBConfigGTK.py $(CLSDIR)/ui/simple-restore-gnome.py $(CLSDIR)/srestore.py
+	chmod +x  $(CLSDIR)/managers/UpgradeManager.py $(CLSDIR)/sbackupd.py $(CLSDIR)/ui/SBConfigGTK.py $(CLSDIR)/ui/SBRestoreGTK.py $(CLSDIR)/srestore.py
 	ln -s ../$(SUBCLSDIR)/sbackupd.py $(BIN)/nssbackupd
 	ln -s ../$(SUBCLSDIR)/ui/SBConfigGTK.py $(BIN)/simple-backup-config
-	ln -s ../$(SUBCLSDIR)/ui/simple-restore-gnome.py $(BIN)/simple-restore-gnome
+	ln -s ../$(SUBCLSDIR)/ui/SBRestoreGTK.py $(BIN)/simple-restore-gnome
 	ln -s ../$(SUBCLSDIR)/srestore.py $(BIN)/srestore
 	ln -s ../$(SUBCLSDIR)/managers/UpgradeManager.py $(BIN)/upgrade-backups
-#	install ./simple-backup-tocd $(BIN)
 	install -m644 -D ./datas/simple-backup-config.glade $(SUPPORT)
 	install -m644 -D ./datas/sbackup-conf.png $(PIXDIR)
 	install -m644 -D ./datas/sbackup-restore.png $(PIXDIR)
 	install -m644 -D ./datas/nssbackup.desktop $(DESTDIR)/share/applications/
 	install -m644 -D ./datas/srestore.desktop $(DESTDIR)/share/applications/
-	install -m644 -D ./datas/simple-restore.glade $(SUPPORT)
+	install -m644 -D ./datas/simple-restore-gnome.glade $(SUPPORT)
 	install ./datas/nssbackup $(SUPPORT)
-#	install -m644 -D simple-backup-tocd.glade $(SUPPORT)
 ifeq ($(DESTDIR),/usr/local)
 	install -b -m600 datas/nssbackup.conf.example /etc/nssbackup.conf
-	@echo "[places]" >> /etc/nssbackup.conf
-	@echo "prefix=$(PREFIX)" >> /etc/nssbackup.conf
 endif
 
 uninstall:
@@ -52,6 +59,7 @@ uninstall:
 	rm -rf $(CLSDIR)
 
 clean:
+	@echo "" > nssbackup/ressources
 	for lang in $(PO); do rm -rf po/$$lang ; done
 	-rm -f *.pyc
 	-rm -f po/*~

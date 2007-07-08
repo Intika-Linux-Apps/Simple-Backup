@@ -78,7 +78,9 @@ class Snapshot :
 
 	def getDate(self):
 		"""
-		@return a tuple with the date time this snapshot has been taken.
+		You can get from the dictionary returned the following keys :
+		year, month, day, hour, minute, second
+		@return : a dictionary with the date time this snapshot has been taken.
 		"""
 		m = re.match(self.__validname_re , self.getName() )
 		if not m : raise NotValidSnapshotException("Name of snapshot '%s' doesn't match requirement" % self.getName())

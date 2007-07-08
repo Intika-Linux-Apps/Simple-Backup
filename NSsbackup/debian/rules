@@ -55,7 +55,7 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/sbackup.
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/nssbackup/usr PREFIX=/usr
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/nssbackup/usr INSTALL=deb
 	install -d $(CURDIR)/debian/nssbackup/usr/share/man/man8/
 	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/nssbackupd.8.gz
 	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/srestore.py.8.gz

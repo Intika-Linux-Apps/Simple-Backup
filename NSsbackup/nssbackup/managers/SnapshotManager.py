@@ -41,7 +41,7 @@ class SnapshotManager :
 	def __init__(self,targetDir):
 		global __targetDir
 		if not targetDir or not FAM.exists(targetDir) :
-			raise SBException("Invalid Value of targetDir")
+			raise SBException("Invalid Value of targetDir : " + targetDir)
 		self.__targetDir = targetDir
 	
 

@@ -17,10 +17,33 @@
 
 import nssbackup.managers.FileAccessManager as FAM
 import os
-import subprocess
+import subprocess, nssbackup
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from tempfile import *
+import inspect
+
+def getResource(resourceName):
+	"""
+	This will look for a ressource installed by nssbackup.
+	The installation script write in the ressources file were it stores the file
+	then getRessource will look for them.
+	@param ressourceName: the ressource name, as complete as possible.
+	@param the ressource: absolute path. 
+	"""
+	tmp = inspect.getabsfile(nssbackup)
+	resfile = open(os.sep.join([os.path.dirname(tmp),"ressources"]))
+	for dir in resfile.readlines() :
+		dir = dir.strip()
+		#getLogger().debug("Searching in directory '%s'" % dir)
+		if os.path.exists(dir) and os.path.isdir(dir):
+			list = os.listdir(dir)
+			#getLogger().debug("File list is :" + str(list))
+			for f in list :
+				if f == resourceName :
+					return os.path.normpath(os.sep.join([dir,resourceName]))
+	raise SBException("'%s' hasn't been found in the ressource list"% resourceName)
+					
 
 def launch(cmd, opts):
 	"""

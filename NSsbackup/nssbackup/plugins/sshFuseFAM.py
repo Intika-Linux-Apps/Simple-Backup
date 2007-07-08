@@ -15,14 +15,14 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from sbackup.plugins import pluginFAM
+from nssbackup.plugins import pluginFAM
 import subprocess
 import re
 import os
 import pexpect
 from tempfile import mkstemp
-import sbackup.managers.FileAccessManager as FAM
-from sbackup.util.exceptions import FuseFAMException, SBException
+import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.util.exceptions import FuseFAMException, SBException
 
 class sshFuseFAM (pluginFAM)  :
 	"""
@@ -56,7 +56,7 @@ class sshFuseFAM (pluginFAM)  :
 		if not match : 
 			raise FuseFAMException("Error matching the schema 'ssh://user:pass@example.com/home/' with '%s' (The '/' after server is mandatory)" % source)
 		else :
-			remoteSource = match.group(1)+match.group(2)+":"+match.group(3)+"@"+match.group(4)
+			remoteSource = match.group(1)+match.group(2)+":"+match.group(3)+"@"+match.group(4)+'/'
 			user = match.group(2)
 			password = match.group(3)
 			mountpoint = mountbase+os.sep+"ssh_"+user+"@"+match.group(4)
