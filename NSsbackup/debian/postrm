@@ -21,7 +21,7 @@ set -e
 case "$1" in
     purge)
     
-	rm -rf /etc/sbackup.conf /etc/cron.d/sbackup /etc/cron.daily/sbackup /etc/cron.weekly/sbackup /etc/cron.monthly/sbackup /etc/cron.hourly/sbackup /usr/share/sbackup
+	rm -rf /etc/nssbackup.conf /etc/cron.d/nssbackup /etc/cron.daily/nssbackup /etc/cron.weekly/nssbackup /etc/cron.monthly/nssbackup /etc/cron.hourly/nssbackup /usr/share/nssbackup
     
     ;;
 

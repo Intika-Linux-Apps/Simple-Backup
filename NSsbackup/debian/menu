@@ -1,4 +1,4 @@
-?package(sbackup):needs="X11" section="Apps/System"\
-  title="Simple Backup Config" command="/usr/sbin/simple-backup-config"
-?package(sbackup):needs="X11" section="Apps/System"\
-  title="Simple Restore" command="/usr/sbin/simple-restore-gnome"
+?package(nssbackup):needs="X11" section="Apps/System"\
+  title="Simple Backup Config" command="/usr/bin/simple-backup-config"
+?package(nssbackup):needs="X11" section="Apps/System"\
+  title="Simple Restore" command="/usr/bin/simple-restore-gnome"

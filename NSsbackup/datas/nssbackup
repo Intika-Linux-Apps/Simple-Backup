@@ -2,6 +2,7 @@
 #
 # Sbackup Service file used by anacron
 
-if [ -x /usr/sbin/sbackupd ]
-then /usr/sbin/sbackupd
+if [ -x /usr/bin/nssbackupd ]
+then /usr/bin/nssbackupd
+elif [ -x /usr/local/bin/nssbackupd ]
 fi

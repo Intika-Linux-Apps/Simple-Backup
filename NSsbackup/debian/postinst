@@ -19,10 +19,10 @@ set -e
 
 case "$1" in
     configure)
-	if test ! -e /etc/sbackup.conf; then
-	    cp /usr/share/doc/sbackup/examples/sbackup.conf.example /etc/sbackup.conf;
-	    chown -f root.adm /etc/sbackup.conf
-	    chmod -f 640 /etc/sbackup.conf
+	if test ! -e /etc/nssbackup.conf; then
+	    cp /usr/share/doc/nssbackup/examples/nssbackup.conf.example /etc/nssbackup.conf;
+	    chown -f root.adm /etc/nssbackup.conf
+	    chmod -f 640 /etc/nssbackup.conf
 	fi
     ;;
 

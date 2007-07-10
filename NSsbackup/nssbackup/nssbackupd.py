@@ -27,7 +27,7 @@ from managers.ConfigManager import ConfigManager
 from managers.BackupManager import BackupManager
 
 ##
-#This class is intended to be a wrapper of sbackup instances . 
+#This class is intended to be a wrapper of nssbackup instances . 
 #It manages :
 # - the full backup process : creation of instances of the BackupManager with the corresponding config file 
 # - the logging of exception not handled by BackupManager
@@ -36,7 +36,7 @@ from managers.BackupManager import BackupManager
 #
 # @author: Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 # @version: 1.0
-class Sbackupd () :
+class NSsbackupd () :
 	
 	__bm = None
 
@@ -136,5 +136,5 @@ class Sbackupd () :
 			getLogger().error(str(e))
 			getLogger().error(traceback.format_exc())
 
-sbd = Sbackupd()
+sbd = NSsbackupd()
 sbd.run()

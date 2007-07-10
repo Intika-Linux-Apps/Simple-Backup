@@ -20,12 +20,12 @@ Easiest way
 From source code way
 ===================
 
-* Install python and python-gnome2 libraries.
+* Install python and python-gnome2 libraries, fuse-utils and pynotify.
   - probably it's already installed in your dist
 
 * Run 'make install' in the same directory as this README file
 
-* By default, sbackup will be installed under "/usr/local" folder.
+* By default, nssbackup will be installed under "/usr/local" folder.
 
 
 Uninstalling

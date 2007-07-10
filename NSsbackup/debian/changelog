@@ -1,6 +1,6 @@
-nssbackup (0.1-1) unstable; urgency=low
+nssbackup (0.1-1~beta1) gutsy; urgency=low
 
   * Initial release
 
- -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat,  7 Jul 2007 10:14:07 +0200
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat,  11 Jul 2007 00:14:07 +0200
 

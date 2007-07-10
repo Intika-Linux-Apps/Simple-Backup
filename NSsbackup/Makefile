@@ -29,8 +29,8 @@ else
 	@echo "$(DESTDIR)/share/applications/" >>  nssbackup/ressources
 endif
 	cp -rf nssbackup/* $(CLSDIR)
-	chmod +x  $(CLSDIR)/managers/UpgradeManager.py $(CLSDIR)/sbackupd.py $(CLSDIR)/ui/SBConfigGTK.py $(CLSDIR)/ui/SBRestoreGTK.py $(CLSDIR)/srestore.py
-	ln -s ../$(SUBCLSDIR)/sbackupd.py $(BIN)/nssbackupd
+	chmod +x  $(CLSDIR)/managers/UpgradeManager.py $(CLSDIR)/nssbackupd.py $(CLSDIR)/ui/SBConfigGTK.py $(CLSDIR)/ui/SBRestoreGTK.py $(CLSDIR)/srestore.py
+	ln -s ../$(SUBCLSDIR)/nssbackupd.py $(BIN)/nssbackupd
 	ln -s ../$(SUBCLSDIR)/ui/SBConfigGTK.py $(BIN)/simple-backup-config
 	ln -s ../$(SUBCLSDIR)/ui/SBRestoreGTK.py $(BIN)/simple-restore-gnome
 	ln -s ../$(SUBCLSDIR)/srestore.py $(BIN)/srestore

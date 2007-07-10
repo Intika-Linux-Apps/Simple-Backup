@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: nssbackup
 Architecture: any
-Depends: python, python-gnome2, python-glade2, fuse-utils
+Depends: python, python-gnome2, python-glade2, fuse-utils, python-notify
 Conflicts: sbackup
 Description: Not So Simple Backup Suite 
  Not So Simple Backup Suite is a fork of Sbackup intended for desktop
