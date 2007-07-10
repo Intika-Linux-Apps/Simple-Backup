@@ -86,6 +86,8 @@ def extract(sourcetgz, file, dest , bckupsuffix = None):
 	file = file.lstrip(os.sep)
 	
 	options = ["-xzp", "--occurrence=1", "--ignore-failed-read", '--backup=existing']
+	if os.getuid() == 0 :
+		options.append("--same-owner")
 	if dest :
 		options.append( "--directory="+dest )
 	else : 
@@ -110,6 +112,8 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	@param dest: destination
 	"""
 	options = ["-xzp", "--occurrence=1", "--ignore-failed-read", '--backup=existing']
+	if os.getuid() == 0 :
+		options.append("--same-owner")
 	if dest :
 		options.append( "--directory="+dest )
 	else : 

@@ -6,6 +6,7 @@
 # 07/07/2007
 #----------------------------------------------------------------------
 
+from gettext import gettext as _
 import sys, traceback
 from thread import *
 from GladeWindow import *
@@ -22,7 +23,9 @@ from nssbackup.util.Snapshot import Snapshot
 
 class SBRestoreGTK(GladeWindow):
 	
+	currentSnp = None
 	currentsbdict = None
+	restoreman = RestoreManager()
 
 	#----------------------------------------------------------------------
 
@@ -80,8 +83,10 @@ class SBRestoreGTK(GladeWindow):
 			'customchooser',
 			'customapply',
 			'calendar',
+			'snplist',
 			'scrolledwindow1',
 			'snplisttreeview',
+			'snpdetails',
 			'scrolledwindow2',
 			'filelisttreeview',
 			'buttonspool',
@@ -99,8 +104,6 @@ class SBRestoreGTK(GladeWindow):
 			'on_calendar_month_changed',
 			'on_calendar_day_selected',
 			'on_snplisttreeview_cursor_changed',
-			'on_filelisttreeview_select_cursor_row',
-			'on_filelisttreeview_move_cursor',
 			'on_filelisttreeview_row_expanded',
 			'on_filelisttreeview_cursor_changed',
 			'on_filelisttreeview_unselect_all',
@@ -112,6 +115,7 @@ class SBRestoreGTK(GladeWindow):
 
 		top_window = 'restorewindow'
 		GladeWindow.__init__(self, filename, top_window, widget_list, handlers)
+		self.widgets[top_window].set_icon_from_file(Util.getResource("sbackup-restore.png"))
 	#----------------------------------------------------------------------
 
 	def on_defaultradiob_toggled(self, *args):
@@ -155,18 +159,6 @@ class SBRestoreGTK(GladeWindow):
 	def on_snplisttreeview_cursor_changed(self,*args):
 		self.flisttreestore.clear()
 		self.load_filestree()
-
-	#----------------------------------------------------------------------
-
-	def on_filelisttreeview_select_cursor_row(self, *args):
-		print("TODO: on_filelisttreeview_select_cursor_row")
-		pass
-
-	#----------------------------------------------------------------------
-
-	def on_filelisttreeview_move_cursor(self, *args):
-		print("TODO: on_filelisttreeview_move_cursor")
-		pass
 
 	#----------------------------------------------------------------------
 
@@ -223,26 +215,118 @@ class SBRestoreGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_restore_clicked(self, *args):
-		print("TODO: on_restore_clicked")
-		pass
+		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
+		src = self.path_to_dir( tstore.get_path( iter ) )
+		dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format="Do you really want to restore backuped copy of '%s' ?" % src)
+		
+		response = dialog.run()
+		dialog.destroy()
+		if response == gtk.RESPONSE_YES:
+			# TODO: put a progress bar here
+			progressbar = None
+			try :
+				progressbar = gtk.ProgressBar()
+				progressbar.pulse()
+				progressbar.show()
+				self.restoreman.restore(self.currentSnp, src)
+				progressbar.destroy()
+			except Exception, e :
+				if progressbar : progressbar.destroy()
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
+				dialog.run()
+				dialog.destroy()
+		
 
 	#----------------------------------------------------------------------
 
 	def on_restoreas_clicked(self, *args):
-		print("TODO: on_restoreas_clicked")
-		pass
+		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
+		src = self.path_to_dir( tstore.get_path( iter ) )
+		
+		dialog = gtk.FileChooserDialog(title=_("Select restore location") ,action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+		dialog.set_filename( src )
+		result = dialog.run()
+		dirname = dialog.get_filename()
+		dialog.destroy()
+		
+		if result == gtk.RESPONSE_OK:
+			dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format="Do you really want to restore backuped copy of '%s' to '%s' ?" % (src, dirname))
+			
+			response = dialog.run()
+			dialog.destroy()
+			if response == gtk.RESPONSE_YES:
+				# TODO: put a progress bar here
+				progressbar = None
+				try :
+					progressbar = gtk.ProgressBar()
+					progressbar.pulse()
+					progressbar.show()
+					self.restoreman.restoreAs(self.currentSnp, src, dirname)
+					progressbar.destroy()
+				except Exception, e :
+					if progressbar : progressbar.destroy()
+					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
+					dialog.run()
+					dialog.destroy()
+
 
 	#----------------------------------------------------------------------
 
 	def on_revert_clicked(self, *args):
 		print("TODO: on_revert_clicked")
-		pass
+		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
+		src = self.path_to_dir( tstore.get_path( iter ) )
+		dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format="Do you really want to revert '%s' ?" % src)
+		
+		response = dialog.run()
+		dialog.destroy()
+		if response == gtk.RESPONSE_YES:
+			# TODO: put a progress bar here
+			progressbar = None
+			try :
+				progressbar = gtk.ProgressBar()
+				progressbar.pulse()
+				progressbar.show()
+				self.restoreman.revert(self.currentSnp, src)
+				progressbar.destroy()
+			except Exception, e :
+				if progressbar : progressbar.destroy()
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
+				dialog.run()
+				dialog.destroy()
 
 	#----------------------------------------------------------------------
 
 	def on_revertas_clicked(self, *args):
 		print("TODO: on_revertas_clicked")
-		pass
+		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
+		src = self.path_to_dir( tstore.get_path( iter ) )
+		
+		dialog = gtk.FileChooserDialog(title=_("Select revert location") ,action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+		dialog.set_filename( src )
+		result = dialog.run()
+		dirname = dialog.get_filename()
+		dialog.destroy()
+		
+		if result == gtk.RESPONSE_OK:
+			dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format="Do you really want to revert '%s' to '%s' ?" % (src, dirname))
+			
+			response = dialog.run()
+			dialog.destroy()
+			if response == gtk.RESPONSE_YES:
+				# TODO: put a progress bar here
+				progressbar = None
+				try :
+					progressbar = gtk.ProgressBar()
+					progressbar.pulse()
+					progressbar.show()
+					self.restoreman.revertAs(self.currentSnp, src,dirname)
+					progressbar.destroy()
+				except Exception, e :
+					if progressbar : progressbar.destroy()
+					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
+					dialog.run()
+					dialog.destroy()
 	
 	#----------------------------------------------------------------------
 	
@@ -257,15 +341,17 @@ class SBRestoreGTK(GladeWindow):
 		self.flisttreestore.clear()
 		self.widgets['buttonspool'].set_sensitive(False)
 		tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
-		snp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
-		self.currentsbdict = snp.getFilesList()
+		self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
+		self.currentsbdict = self.currentSnp.getFilesList()
 		
 		if len(self.currentsbdict) > 0 and self.currentsbdict.getSon(os.sep) :
+			self.widgets['snpdetails'].set_sensitive(True)
 			for k in dict.iterkeys(self.currentsbdict.getSon(os.sep)) :
 				iter = self.flisttreestore.append(None, [k])
 				self.show_dir(os.sep+k, iter)
 		else :
 			self.flisttreestore.append(None, ["This snapshot seems empty."])
+			self.widgets['snpdetails'].set_sensitive(False)
 		
 
 	def load_snapshotslist(self, date):
@@ -280,10 +366,13 @@ class SBRestoreGTK(GladeWindow):
 		self.snplisttreestore.clear()
 		self.flisttreestore.clear()
 		self.widgets['buttonspool'].set_sensitive(False)
+		self.widgets['snpdetails'].set_sensitive(True)
 		
 		if snplist == []:
 			self.snplisttreestore.append( None, ["No backups found for this day !"])
+			self.widgets['snplist'].set_sensitive(False)
 		else:
+			self.widgets['snplist'].set_sensitive(True)
 			for snapshot in snplist:
 				self.snplisttreestore.append(None, [snapshot.getName()])
 	
@@ -304,6 +393,7 @@ class SBRestoreGTK(GladeWindow):
 		self.snplisttreestore.clear()
 		self.flisttreestore.clear()
 		self.widgets['buttonspool'].set_sensitive(False)
+		self.widgets['snpdetails'].set_sensitive(True)
 
 	def change_target(self, newtarget):
 		"""

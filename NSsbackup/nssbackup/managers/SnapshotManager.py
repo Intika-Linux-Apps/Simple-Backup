@@ -217,61 +217,9 @@ class SnapshotManager :
 		# now purge according to date
 		topurge = []
 		if purge == "log":
-			print ("TODO: Check that !!!")
 			# Logarithmic purge
 			# Determine which incremental backup snapshots to remove
-			seenfull = 0
-			for e in listing:
-			    if seenfull < 1 and e.endswith( ".ful" ):
-				seenfull += 1
-			    elif seenfull > 1 and e.endswith( ".inc" ):
-				topurge.append( e )
-			
-			# Now for the fun part - expiring the full backup snapshots
-			# Only consider the full backups
-			
-			fulls = [x for x in listing if x.endswith( ".ful" )]
-			days = {}
-			
-			for adir in fulls:
-			    m = r.search( adir )
-			    dif = datetime.datetime.today() - datetime.datetime(int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),int(m.group(6)))
-			    if dif.days < 1:
-				# Keep all from last 24 hours
-				continue
-			    if days.has_key( dif.days ):
-				topurge.append( days[dif.days] )
-				days[dif.days] = adir # Keep the earliest backup of each day
-			    else:
-				days[dif.days] = adir
-		
-			bdays = sorted(days.keys())
-			
-			for i in range( 1, 4 ):
-			    week = [ x for x in bdays if x>(i*7) and x<=((i+1)*7) ]
-			    week.sort()
-			    week = week[:-1] # Keep earliest backup in a week
-			    for aday in week:
-				topurge.append( days[aday] )
-
-			for i in range( 0, 12 ):
-			    month = [ x for x in bdays if x>(28+i*30) and x<=(28+(i+1)*30) ]
-			    month.sort()
-			    month = month[:-1] # Keep earliest backup in a month
-			    for aday in month:
-				topurge.append( days[aday] )
-			
-			bdays = [x for x in bdays if x>(28+12*30)] # Now for the really old backups
-			bdays.sort()
-			
-			years = {}
-			for aday in bdays:
-			    year = int(aday/(28+12*30))
-			    if years.has_key( year ):
-				topurge.append( days[aday] ) # Keep earliest backup of a year
-				years[year] = aday
-			    else:
-				years[year] = aday
+			getLogger().warning("Logarithmic purge not implemented yet !")
 			
 		else:
 			# Purge isn't logarithmic

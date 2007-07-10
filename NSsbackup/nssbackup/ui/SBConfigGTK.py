@@ -233,6 +233,8 @@ class SBconfigGTK(GladeWindow):
 			'on_time_freq_changed',
 			'on_anacronRadio_toggled',
 			'on_ccronline_changed',
+			'on_time_domtv_cursor_changed',
+			'on_time_dowtv_cursor_changed',
 			'on_purgecheckbox_toggled',
 			'on_purgeradiobutton_toggled',
 			'on_purgedays_changed',
@@ -256,7 +258,7 @@ class SBconfigGTK(GladeWindow):
 
 		top_window = 'backup_properties_dialog'
 		GladeWindow.__init__(self, filename, top_window, widget_list, handlers)
-		
+		self.widgets[top_window].set_icon_from_file(Util.getResource("sbackup-conf.png"))
 		# Initiate all data structures
 		# Paths to be included or excluded
 		self.include = gtk.ListStore( str )
@@ -490,6 +492,7 @@ class SBconfigGTK(GladeWindow):
 			self.widgets['TLSinfos'].set_sensitive(False)
 			unfillreportentries()
 			
+		self.on_purgecheckbox_toggled()
 	#----------------------------------------------------------------------
 	
 	#   configlist is like self.conf.items( "dirconfig" ) 
@@ -924,38 +927,61 @@ class SBconfigGTK(GladeWindow):
 				self.widgets["main_radio2"].set_active(True)
 			self.widgets["anacronRadio"].set_sensitive( True )
 			self.widgets["preciselyRadio"].set_sensitive( True )
+			self.widgets["croninfos"].set_sensitive( True )
+			self.widgets["ccronline"].set_sensitive( False )
 			if self.widgets["preciselyRadio"].get_active() :
 				if self.widgets["time_freq"].get_active()==1:
 					self.widgets["time_min"].set_sensitive( True )
 					self.widgets["time_hour"].set_sensitive( False )
 					self.widgets["scrolledwindow5"].set_sensitive( False )
 					self.widgets["scrolledwindow6"].set_sensitive( False )
-					self.widgets["ccronline"].set_sensitive( False )
-					print ("TODO: Add in the configfile now")
+					# Add in the configfile now
+					cmin = str(int(self.widgets["time_min"].get_value()))
+					cronline = " ".join([cmin,"*","*","*","*"])
+					self.configman.setSchedule(1, cronline)
+					
 				elif self.widgets["time_freq"].get_active()==2:
 					self.widgets["time_min"].set_sensitive( True )
 					self.widgets["time_hour"].set_sensitive( True )
 					self.widgets["scrolledwindow5"].set_sensitive( False )
 					self.widgets["scrolledwindow6"].set_sensitive( False )
-					self.widgets["ccronline"].set_sensitive( False )
-					print ("TODO: Add in the configfile now")
+					# Add in the configfile now
+					cmin = str(int(self.widgets["time_min"].get_value()))
+					chour = str(int(self.widgets["time_hour"].get_value()))
+					cronline = " ".join([cmin,chour,"*","*","*"])
+					self.configman.setSchedule(1, cronline)
+					
 				elif self.widgets["time_freq"].get_active()==3:
 					self.widgets["time_min"].set_sensitive( True )
 					self.widgets["time_hour"].set_sensitive( True )
 					self.widgets["scrolledwindow6"].set_sensitive( True )
 					self.widgets["scrolledwindow5"].set_sensitive( False )
-					self.widgets["ccronline"].set_sensitive( False )
-					print ("TODO: Add in the configfile now")
+					# Add in the configfile now
+					cmin = str(int(self.widgets["time_min"].get_value()))
+					chour = str(int(self.widgets["time_hour"].get_value()))
+					cdow  = self.widgets["time_dowtv"].get_selection().get_selected_rows()[1]
+					try:  cdow = str(int(cdow[0][0])+1)
+					except: cdow = "1"
+					cronline = " ".join([cmin,chour,cdow,"*","*"])
+					self.configman.setSchedule(1, cronline)
+					
 				elif self.widgets["time_freq"].get_active()==4:
 					self.widgets["time_min"].set_sensitive( True )
 					self.widgets["time_hour"].set_sensitive( True )
 					self.widgets["scrolledwindow6"].set_sensitive( False )
 					self.widgets["scrolledwindow5"].set_sensitive( True )
-					self.widgets["ccronline"].set_sensitive( False )
-					print ("TODO: Add in the configfile now")
-					# TODO : put current cronline into the ccronline widget here
-			# We are in anacron mode (everything is disable)
+					# Add in the configfile now
+					cmin = str(int(self.widgets["time_min"].get_value()))
+					chour = str(int(self.widgets["time_hour"].get_value()))
+					cdom  = self.widgets["time_domtv"].get_selection().get_selected_rows()[1]
+					try:  cdom = str(int(cdom[0][0])+1)
+					except: cdom = "1"
+					cronline = " ".join([cmin,chour,"*",cdom,"*"])
+					self.configman.setSchedule(1, cronline)
+				# put current cronline into the ccronline widget here
+				self.widgets["ccronline"].set_text(cronline)
 			else :
+				# We are in anacron mode (everything is disable)
 				self.widgets["croninfos"].set_sensitive( False )
 				self.widgets["ccronline"].set_sensitive( False )
 				if self.widgets["time_freq"].get_active()==1:			
@@ -987,6 +1013,33 @@ class SBconfigGTK(GladeWindow):
 					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 
 	#----------------------------------------------------------------------
+	
+	def on_time_domtv_cursor_changed(self, *args):
+		# Add in the configfile now
+		cmin = str(int(self.widgets["time_min"].get_value()))
+		chour = str(int(self.widgets["time_hour"].get_value()))
+		cdom  = self.widgets["time_domtv"].get_selection().get_selected_rows()[1]
+		try:  cdom = str(int(cdom[0][0])+1)
+		except: cdom = "1"
+		cronline = " ".join([cmin,chour,"*",cdom,"*"])
+		self.configman.setSchedule(1, cronline)
+		# put current cronline into the ccronline widget here
+		self.widgets["ccronline"].set_text(cronline)
+		
+		
+	def on_time_dowtv_cursor_changed(self, *args):
+		# Add in the configfile now
+		cmin = str(int(self.widgets["time_min"].get_value()))
+		chour = str(int(self.widgets["time_hour"].get_value()))
+		cdow  = self.widgets["time_dowtv"].get_selection().get_selected_rows()[1]
+		try:  cdow = str(int(cdow[0][0])+1)
+		except: cdow = "1"
+		cronline = " ".join([cmin,chour,cdow,"*","*"])
+		self.configman.setSchedule(1, cronline)
+		# put current cronline into the ccronline widget here
+		self.widgets["ccronline"].set_text(cronline)
+	
+	#----------------------------------------------------------------------
 
 	def on_anacronRadio_toggled(self, *args):
 		if self.widgets["anacronRadio"].get_active() :
@@ -1001,28 +1054,26 @@ class SBconfigGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_purgecheckbox_toggled(self, *args):
-		if self.widgets["purgecheckbox"].get_active():
-		    self.widgets["purgedays"].set_sensitive( True )
-		    try: i = int(self.widgets["purgedays"].get_text())
-		    except: i = -1
-		    if not ( i>0 and i<10000 ):	i=30
-		    self.widgets["purgedays"].set_text(str(i))
-		    self.configman.set( "general", "purge", str(i) )
-		else:
-		    self.widgets["purgedays"].set_sensitive( False )
-		    self.configman.set( "general", "purge", "log" )
-
+		if self.widgets["purgecheckbox"].get_active() :
+			self.widgets['hbox16'].set_sensitive(True)
+			self.widgets['hbox17'].set_sensitive(True)
+			self.on_purgeradiobutton_toggled()
+		else :
+			self.widgets['hbox16'].set_sensitive(False)
+			self.widgets['hbox17'].set_sensitive(False)
+			self.configman.remove_option( "general", "purge")
+			
 	#----------------------------------------------------------------------
 
 	def on_purgeradiobutton_toggled(self, *args):
-		if self.widgets["purgecheckbox"].get_active():
+		if self.widgets["purgeradiobutton"].get_active():
 		    self.widgets["purgedays"].set_sensitive( True )
 		    try: i = int(self.widgets["purgedays"].get_text())
 		    except: i = -1
 		    if not ( i>0 and i<10000 ):	i=30
 		    self.widgets["purgedays"].set_text(str(i))
 		    self.configman.set( "general", "purge", str(i) )
-		else:
+		elif self.widgets["logpurgeradiobutton"].get_active():
 		    self.widgets["purgedays"].set_sensitive( False )
 		    self.configman.set( "general", "purge", "log" )
 
@@ -1030,7 +1081,6 @@ class SBconfigGTK(GladeWindow):
 		try: i = int(self.widgets["purgedays"].get_text())
 		except: i = -1
 		if not ( i>0 and i<10000 ):	i=30
-		print i
 		self.configman.set( "general", "purge", str(i) )
 		
 	#----------------------------------------------------------------------
