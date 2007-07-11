@@ -111,7 +111,7 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	@param fileslist: a path to the file containing the list
 	@param dest: destination
 	"""
-	options = ["-xzp", "--occurrence=1", "--ignore-failed-read", '--backup=existing']
+	options = ["-xzp", "--ignore-failed-read", '--backup=existing']
 	if os.getuid() == 0 :
 		options.append("--same-owner")
 	if dest :

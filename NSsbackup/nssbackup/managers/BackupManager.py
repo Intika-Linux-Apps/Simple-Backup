@@ -220,6 +220,11 @@ class BackupManager :
 				getLogger().debug("'%s' doesn't exist, it has to be exclude " % _file )
 				return True
 			
+			# refuse a file if we don't have read access
+			if not os.access(_file, os.R_OK):
+				getLogger().debug("We don't have read access to '%s', it has to be exclude " % _file )
+				return True
+			
 			# get the stats, If not possible , the file has to be exclude , return True
 			try: s = os.lstat( _file )
 			except Exception, e :
@@ -289,6 +294,8 @@ class BackupManager :
 								addtobackup( contents, cprops )
 				except OSError, e :
 					getLogger().warning("got an error with '%s' : %s" % (_file, str(e)))
+					if self.__actualSnapshot.getFilesList().has_key(_file) :
+						del self.__actualSnapshot.getFilesList()[_file]
 								
 		# End of Subroutines
 		# -----------------------------------------------------------------

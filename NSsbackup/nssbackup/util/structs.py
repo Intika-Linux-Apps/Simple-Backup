@@ -177,6 +177,22 @@ class SBdict (dict) :
 			son.__setitem__(splited[1], value)
 			dict.__setitem__(self, splited[0],[prop,son])
 			
+	def __delitem__(self,key):
+		"""
+		"""
+		if not self.has_key(key) : return False
+		
+		if key == os.sep : 
+			dict.__delitem__(self,"")
+			return True
+		else :
+			spl = key.rstrip(os.sep).split(os.sep)
+			nkey = os.sep.join(spl[:len(spl)-1])
+			last = spl[len(spl)-1]
+			dict.__delitem__(self.getSon(nkey),last)
+			return True
+	
+	
 	def __getitem__(self,key) :
 		"""
 		Return the item Value

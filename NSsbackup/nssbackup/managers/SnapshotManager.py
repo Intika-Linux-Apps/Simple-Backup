@@ -178,7 +178,7 @@ class SnapshotManager :
 				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
 					getLogger().debug("stop point found '%s'" % cursnp.getName())
 					fullfound = True
-				if cursnp.getFilesList().getSon(path) :
+				if cursnp.getFilesList().has_key(path) and cursnp.getFilesList().getSon(path) :
 					for subfile,props in cursnp.getFilesList().getSon(path).iteritems() :
 						if not result.has_key(cursnp.getPath()) :
 							result[cursnp.getPath()] = SBdict()
@@ -197,6 +197,7 @@ class SnapshotManager :
 								result[cursnp.getPath()][file] = props
 								#getLogger().debug(" %s " % result)
 				# processing finished for this snapshot
+			getLogger().debug(result)
 			return result
 			
 	def purge(self, purge="30"):
