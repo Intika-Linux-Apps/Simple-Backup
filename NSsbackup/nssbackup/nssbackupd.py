@@ -23,7 +23,7 @@ import datetime
 from util.log import getLogger
 from util.exceptions import SBException
 import managers.FileAccessManager as FAM
-from managers.ConfigManager import ConfigManager
+from managers.ConfigManager import ConfigManager, getUserConfDir
 from managers.BackupManager import BackupManager
 
 ##
@@ -103,8 +103,8 @@ class NSsbackupd () :
 						self.__bm = BackupManager()
 					# TODO Find other users if the option is specified
 				else :  # we are others
-					if os.path.exists(os.getenv("HOME")+"/.nssbackup/nssbackup.conf") :
-						self.__bm = BackupManager(os.getenv("HOME")+"/.nssbackup/nssbackup.conf")
+					if os.path.exists(getUserConfDir()+ "nssbackup.conf") :
+						self.__bm = BackupManager(getUserConfDir()+ "nssbackup.conf")
 					else :
 						self.__bm = BackupManager()
 					

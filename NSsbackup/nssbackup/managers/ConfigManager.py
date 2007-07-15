@@ -25,6 +25,27 @@ from nssbackup.util.exceptions import *
 import FileAccessManager as FAM
 import nssbackup.util as Util
 
+def getUserConfDir():
+	"""
+	Get the user config dir using the XDG specification
+	"""
+	confdir = os.sep.join([os.getenv("XDG_CONFIG_DIR", 
+				os.path.normpath(os.sep.join( [os.getenv("HOME"),".config"] )) ),
+					"nssbackup/"])
+	if not os.path.exists(confdir) :
+		os.makedirs(confdir)
+	return confdir
+
+def getUserDatasDir():
+	"""
+	Get the user datas dir using the XDG specification
+	"""
+	datadir = os.sep.join([os.getenv("XDG_DATA_HOME", 
+				os.path.normpath(os.sep.join( [os.getenv("HOME"),".local","share"] )) ),
+					"nssbackup/"]) 
+	if not os.path.exists(datadir) :
+		os.makedirs(datadir)
+	return datadir
 
 class ConfigManager (ConfigParser.ConfigParser):
 	"""
@@ -180,21 +201,20 @@ class ConfigManager (ConfigParser.ConfigParser):
 	
 	def setDefaultForUsers(self):
 		"Set the default config for normal users"
-		home = os.getenv("HOME")
 		
 		self.initSection()
 		
 		# Section general
-		self.set("general", "mountdir",  home +"/.nssbackup/mountdir" )
-		self.set("general", "target", home +"/backups" )
-		self.set("general", "lockfile", home +"/.nssbackup/nssbackup.lock" )
+		self.set("general", "mountdir",  getUserDatasDir()+"mountdir" )
+		self.set("general", "target", getUserDatasDir()+"backups" )
+		self.set("general", "lockfile", getUserDatasDir()+"nssbackup.lock" )
 		self.set("general", "maxincrement", self.maxincrement )
 		self.set("general", "format", self.format )
 		self.set("general", "purge", "log")
 		
 		# Section log
 		self.set("log", "level", "20" )
-		self.set("log", "file", home +"/.nssbackup/nssbackup.log" )
+		self.set("log", "file", getUserDatasDir()+"nssbackup.log" )
 		
 		# Section dirconfig
 		
@@ -208,7 +228,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		if not FAM.exists(self.get("log","file")) :
 			FAM.createfile(self.get("log","file"))
 		
-		self.conffile = home +"/.nssbackup/nssbackup.conf"
+		self.conffile = getUserConfDir() +"nssbackup.conf"
 		
 		getLogger(self.get("log","file"),self.getint("log","level"))
 	

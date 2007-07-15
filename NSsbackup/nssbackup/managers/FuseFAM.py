@@ -22,6 +22,7 @@ from nssbackup.util.log import getLogger
 from nssbackup.plugins import PluginManager
 from FileAccessManager import *
 from nssbackup.util.exceptions import SBException
+from nssbackup.managers.ConfigManager import getUserDatasDir
 
 class FuseFAM:
 	"""
@@ -52,7 +53,7 @@ class FuseFAM:
 			if os.getuid() == 0 :
 				self.__mountdir = "/mnt/nssbackup/"
 			else : 
-				self.__mountdir = os.getenv("HOME") + os.sep.join(["",".nssbackup","mountdir"])
+				self.__mountdir = getUserDatasDir()+"mountdir"
 
 	
 	def getMountedDirs(self):
@@ -169,7 +170,7 @@ class FuseFAM:
 			if os.getuid() == 0 :
 				self.__mountdir = "/mnt/nssbackup/"
 			else : 
-				self.__mountdir = os.getenv("HOME") + os.sep.join(["",".nssbackup","mountdir"])
+				self.__mountdir = getUserDatasDir() + "mountdir"
 		
 		# check if the mount dir is valid
 		if not os.path.exists(self.__mountdir) : 
@@ -245,7 +246,7 @@ class FuseFAM:
 		if os.getuid() == 0 :
 			mountdir = "/mnt/nssbackup/"
 		else : 
-			mountdir = os.getenv("HOME") + os.sep.join(["",".nssbackup","mountdir"])
+			mountdir = getUserDatasDir()+ "mountdir"
 		
 		# check if the mount dir is valid
 		if not os.path.exists(mountdir) : 

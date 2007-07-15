@@ -17,7 +17,7 @@ from nssbackup.plugins import PluginManager, pluginFAM
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
-from nssbackup.managers.ConfigManager import ConfigManager
+from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
 from GladeWindow import *
 from gettext import gettext as _
 import nssbackup.util as Util
@@ -44,8 +44,8 @@ class SBconfigGTK(GladeWindow):
 			else :
 				self.configman = ConfigManager()
 		else :
-			if os.path.exists(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"])) :
-				self.configman = ConfigManager(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"]))
+			if os.path.exists(getUserConfDir()+"nssbackup.conf") :
+				self.configman = ConfigManager(getUserConfDir()+"nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 			
@@ -627,8 +627,8 @@ class SBconfigGTK(GladeWindow):
 			else :
 				self.configman = ConfigManager()
 		else :
-			if FAM.exists(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"])) :
-				self.configman = ConfigManager(os.getenv("HOME")+os.sep.join(["",".nssbackup","nssbackup.conf"]))
+			if FAM.exists(getUserConfDir() + "nssbackup.conf") :
+				self.configman = ConfigManager(getUserConfDir() +"nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 		self.prefillWindow()		

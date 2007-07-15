@@ -7,12 +7,12 @@
 #----------------------------------------------------------------------
 
 from gettext import gettext as _
-import sys, traceback
+import sys, traceback, time
 from thread import *
 from GladeWindow import *
 import nssbackup.util as Util
 from nssbackup.managers.FuseFAM import FuseFAM
-from nssbackup.managers.ConfigManager import ConfigManager
+from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
 from nssbackup.managers.SnapshotManager import SnapshotManager
 from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.util.log import getLogger
@@ -41,8 +41,8 @@ class SBRestoreGTK(GladeWindow):
 				self.config = ConfigManager()
 					
 		else :  # we are others
-			if os.path.exists(os.getenv("HOME")+"/.nssbackup/nssbackup.conf") :
-				self.config = ConfigManager(os.getenv("HOME")+"/.nssbackup/nssbackup.conf")
+			if os.path.exists(getUserConfDir()+ "nssbackup.conf") :
+				self.config = ConfigManager(getUserConfDir()+ "nssbackup.conf")
 			else :
 				self.config = ConfigManager()
 		
@@ -66,6 +66,12 @@ class SBRestoreGTK(GladeWindow):
 		self.widgets['filelisttreeview'].append_column( acolumn1 )
 		
 		self.on_defaultradiob_toggled()
+		
+		# select the current day
+		today = time.localtime()
+		self.widgets["calendar"].select_month(today[1]-1,today[0])
+		self.widgets["calendar"].select_day(today[2])
+		self.on_calendar_day_selected()
 	
 	#----------------------------------------------------------------------
 
@@ -231,6 +237,8 @@ class SBRestoreGTK(GladeWindow):
 				self.restoreman.restore(self.currentSnp, src)
 				progressbar.destroy()
 			except Exception, e :
+				getLogger().error(str(e))
+				getLogger().error(traceback.format_exc())
 				if progressbar : progressbar.destroy()
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
@@ -264,6 +272,8 @@ class SBRestoreGTK(GladeWindow):
 					self.restoreman.restoreAs(self.currentSnp, src, dirname)
 					progressbar.destroy()
 				except Exception, e :
+					getLogger().error(str(e))
+					getLogger().error(traceback.format_exc())
 					if progressbar : progressbar.destroy()
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 					dialog.run()
@@ -273,7 +283,6 @@ class SBRestoreGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_revert_clicked(self, *args):
-		print("TODO: on_revert_clicked")
 		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
 		src = self.path_to_dir( tstore.get_path( iter ) )
 		dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format="Do you really want to revert '%s' ?" % src)
@@ -290,6 +299,8 @@ class SBRestoreGTK(GladeWindow):
 				self.restoreman.revert(self.currentSnp, src)
 				progressbar.destroy()
 			except Exception, e :
+				getLogger().error(str(e))
+				getLogger().error(traceback.format_exc())
 				if progressbar : progressbar.destroy()
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
@@ -298,7 +309,6 @@ class SBRestoreGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_revertas_clicked(self, *args):
-		print("TODO: on_revertas_clicked")
 		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
 		src = self.path_to_dir( tstore.get_path( iter ) )
 		
@@ -323,6 +333,8 @@ class SBRestoreGTK(GladeWindow):
 					self.restoreman.revertAs(self.currentSnp, src,dirname)
 					progressbar.destroy()
 				except Exception, e :
+					getLogger().error(str(e))
+					getLogger().error(traceback.format_exc())
 					if progressbar : progressbar.destroy()
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 					dialog.run()

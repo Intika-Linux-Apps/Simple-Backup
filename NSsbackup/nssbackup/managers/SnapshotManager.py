@@ -60,7 +60,7 @@ class SnapshotManager :
 		@param fromDate : eg. 2007-02-17
 		@param toDate :  2007-02-17
 		@param byDate : 2007-02-17
-		@return: a list with all the found snapshots (acording to the options set)
+		@return: a list with all the found snapshots (according to the options set)
 		"""
 		global __snapshots
 		snapshots = list()
@@ -175,31 +175,28 @@ class SnapshotManager :
 			cursnp = snapshot
 			while fullfound is False :
 				cursnp = cursnp.getBaseSnapshot()
-				if not cursnp.getFilesList().getSon(os.sep) :
-					getLogger().debug("snapshot '%s' is empty, don't add it" % cursnp.getName())
-				else :
-					if cursnp.isfull() or cursnp.getName() == lastsnapshot :
-						getLogger().debug("stop point found '%s'" % cursnp.getName())
-						fullfound = True
-					if cursnp.getFilesList().has_key(path) and cursnp.getFilesList().getSon(path) :
-						for subfile,props in cursnp.getFilesList().getSon(path).iteritems() :
-							if not result.has_key(cursnp.getPath()) :
-								result[cursnp.getPath()] = SBdict()
-							#now sort result.
-							keys = result.keys()
-							keys.sort(reverse=True)
-							
-							file = os.path.normpath(os.sep.join([path.rstrip(os.sep),subfile.lstrip(os.sep)]))
-							
-							for k in keys :
-								incl = result[k]
-								# /!\ Don't add the cursnp in the include check process.
-								if k != cursnp.getPath() and not incl.has_key(file):
-									# It means that it's the newer version of that file ,
-									#add the file 
-									result[cursnp.getPath()][file] = props
-									#getLogger().debug(" %s " % result)
-					# processing finished for this snapshot
+				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
+					getLogger().debug("stop point found '%s'" % cursnp.getName())
+					fullfound = True
+				if cursnp.getFilesList().has_key(path) and cursnp.getFilesList().getSon(path) :
+					for subfile,props in cursnp.getFilesList().getSon(path).iteritems() :
+						if not result.has_key(cursnp.getPath()) :
+							result[cursnp.getPath()] = SBdict()
+						#now sort result.
+						keys = result.keys()
+						keys.sort(reverse=True)
+						
+						file = os.path.normpath(os.sep.join([path.rstrip(os.sep),subfile.lstrip(os.sep)]))
+						
+						for k in keys :
+							incl = result[k]
+							# /!\ Don't add the cursnp in the include check process.
+							if k != cursnp.getPath() and not incl.has_key(file):
+								# It means that it's the newer version of that file ,
+								#add the file 
+								result[cursnp.getPath()][file] = props
+								#getLogger().debug(" %s " % result)
+				# processing finished for this snapshot
 			getLogger().debug(result)
 			return result
 			
