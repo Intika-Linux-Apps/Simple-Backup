@@ -60,8 +60,9 @@ class SBRestoreGTK(GladeWindow):
 		self.widgets['snplisttreeview'].append_column( acolumn )
 		
 		self.flisttreestore = gtk.TreeStore( str )
-		self.flisttreestore.set_sort_func(0,self.comp_func)
-		self.widgets['filelisttreeview'].set_model( self.flisttreestore )
+		self.flisttreemodelsort = gtk.TreeModelSort(self.flisttreestore)
+		self.flisttreemodelsort.set_sort_column_id(1, gtk.SORT_ASCENDING)
+		self.widgets['filelisttreeview'].set_model( self.flisttreemodelsort )
 		acolumn1 = gtk.TreeViewColumn("Path", gtk.CellRendererText(), text=0 )
 		self.widgets['filelisttreeview'].append_column( acolumn1 )
 		
@@ -421,12 +422,6 @@ class SBRestoreGTK(GladeWindow):
 			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 			dialog.run()
 			dialog.destroy()
-
-		
-	def comp_func(self, a, b):
-		if a < b : return 1
-		elif a == b : return 0
-		elif a > b : return -1
 	
 #----------------------------------------------------------------------
 
