@@ -53,9 +53,11 @@ class TestSnapshotManager(unittest.TestCase) :
 		"""
 		snapshots = self.snpman.getSnapshots()
 		revertstate = self.snpman.getRevertState(snapshots[0], os.sep)
-		self.assertEqual(len(revertstate),2)
+		self.assertEqual(len(revertstate),3)
+		for k, v in revertstate.iteritems() :
+			print(k+" = "+str(v)) 
 		self.assertFalse(revertstate[os.path.abspath('./test-datas/backupdir/2007-05-17_13.45.45.609201.wattazoum-vm.ful')].has_key("/home/wattazoum/Desktop/sbackup-test/d17/"))
-		revertstate = self.snpman.getRevertState(snapshots[0], "/home/wattazoum/Desktop/sbackup-test/")
+		revertstate = self.snpman.getRevertState(snapshots[1], "/home/wattazoum/Desktop/sbackup-test/")
 		self.assertEqual(len(revertstate),2)
 		self.assertFalse(revertstate[os.path.abspath('./test-datas/backupdir/2007-05-17_13.45.45.609201.wattazoum-vm.ful')].has_key("/home/wattazoum/Desktop/sbackup-test/d17/"))
 		self.assertTrue(revertstate[os.path.abspath('./test-datas/backupdir/2007-05-17_19.45.08.812921.wattazoum-vm.inc')].has_key("/home/wattazoum/Desktop/sbackup-test/d17/"))

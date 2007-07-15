@@ -192,14 +192,16 @@ class BackupManager :
 		# -----------------------------------------------------------------
 		# sub routines 
 		
-		def searchInStored(file):
+		def searchInStored(_file):
 			"""
 			search for a file in stored list
 			@return: the properties if found , None if not
 			"""
 			for name,sbdict in alreadyStored.iteritems() :
-				if sbdict.has_key(file) :
-					return sbdict[file]
+				getLogger().debug("Searching for '%s' in '%s'" % (_file, name))
+				if sbdict.has_key(_file) :
+					getLogger().debug("found in '%s' " % name)
+					return sbdict[_file]
 			# not found
 			return None 
 		
