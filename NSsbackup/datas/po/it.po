@@ -1,0 +1,602 @@
+# Italian translation for sbackup
+# Copyright (c) 2006 Rosetta Contributors and Canonical Ltd 2006
+# This file is distributed under the same license as the sbackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2006.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sbackup\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2007-05-08 23:03+0200\n"
+"PO-Revision-Date: 2007-04-03 08:50+0000\n"
+"Last-Translator: Alessio Treglia <quadrispro@gmail.com>\n"
+"Language-Team: Italian <it@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Rosetta-Export-Date: 2007-06-03 13:28:18+0000\n"
+
+#: simple-backup-config.py:66
+msgid "MP3 Music"
+msgstr "Musica MP3"
+
+#: simple-backup-config.py:66
+msgid "AVI Video"
+msgstr "Video AVI"
+
+#: simple-backup-config.py:66
+msgid "MPEG Video"
+msgstr "Video MPEG"
+
+#: simple-backup-config.py:66
+msgid "Matrjoshka Video"
+msgstr "Video Matrjoshka"
+
+#: simple-backup-config.py:66
+msgid "OGG Multimedia container"
+msgstr "Contenuto multimediale OGG"
+
+#: simple-backup-config.py:66
+msgid "CD Images"
+msgstr "Immagini CD"
+
+#: simple-backup-config.py:348 simple-backup-config.py:705
+msgid "Custom"
+msgstr "Personalizzato"
+
+#: simple-backup-config.py:411
+msgid "Already included item !"
+msgstr ""
+
+#: simple-backup-config.py:426
+msgid "Already excluded item !"
+msgstr ""
+
+#: simple-backup-config.py:437
+msgid "Simple Backup Suite"
+msgstr "Strumento di backup"
+
+#: simple-backup-config.py:439
+msgid ""
+"This is a user friendly backup solution for common desktop needs. The "
+"project was was sponsored by Google during Google Summer of Code 2005 and "
+"mentored by Ubuntu."
+msgstr ""
+"È un'applicazione di facile utilizzo per creare copie di backup. Il progetto "
+"è stato sponsorizzato per Ubuntu da Google durante il «Google Summer of Code "
+"2005»."
+
+#: simple-backup-config.py:442 simple-backup-config.py:445
+msgid "translator-credits"
+msgstr ""
+"Ubuntu Italian Translators, https://launchpad.net/~ubuntu-l10n-it, 2006-2007"
+
+#: simple-backup-config.py:445
+msgid "Translators : "
+msgstr ""
+
+#: simple-backup-config.py:454
+msgid "A backup run is initiated in the background. The process id is: "
+msgstr "È stato avviato un processo di backup. L'ID del processo è: "
+
+#: simple-backup-config.py:552
+msgid "Configuration save successful"
+msgstr "Configurazione salvata con successo"
+
+#: simple-backup-config.py:623
+msgid "Include file ..."
+msgstr "Includi file..."
+
+#: simple-backup-config.py:626 simple-backup-config.py:661
+msgid "All files"
+msgstr "Tutti i file"
+
+#: simple-backup-config.py:639
+msgid "Include folder ..."
+msgstr "Includi cartella..."
+
+#: simple-backup-config.py:658
+msgid "Exclude file ..."
+msgstr "Escludi file..."
+
+#: simple-backup-config.py:674
+msgid "Exclude folder ..."
+msgstr "Escludi cartella..."
+
+#: simple-backup-config.py:750
+msgid "Empty expression. Please enter a valid regular expression."
+msgstr "Espressione vuota. Inserire un'espressione regolare valida."
+
+#: simple-backup-config.py:767
+msgid "Empty filename or path. Please enter a valid filename or path."
+msgstr ""
+"Nome file o per percorso vuoto. Inserire un nome file o un percorso valido."
+
+#: simple-backup-config.py:773
+msgid ""
+"It seems the path you entered does not exists. Do you want to add this wrong "
+"path?"
+msgstr "Il percorso inserito non esiste. Aggiungerlo comunque?"
+
+#: simple-backup-config.py:995
+msgid "Currently backup configuration is only runnable by root"
+msgstr ""
+"Solo l'utente root può utilizzare la configurazione di backup attuale"
+
+#: simple-restore-gnome.py:137
+msgid "Path"
+msgstr "Percorso"
+
+#: simple-restore-gnome.py:171 simple-restore-gnome.py:175
+msgid "Error: backups directory does not exist!"
+msgstr "Errore: la directory dei backup non esiste"
+
+#: simple-restore-gnome.py:215
+msgid ""
+"Some of your backups are in an old backup format. Do you want to upgrade "
+"them?\n"
+"It should take only a few minutes."
+msgstr ""
+"Alcuni backup sono in un formato obsoleto. Si desidera aggiornarli?\n"
+"Potrebbero essere necessari alcuni minuti."
+
+#: simple-restore-gnome.py:235
+msgid "Error: no backups found in the target directory"
+msgstr "Errore: nessun backup trovato nella directory"
+
+#: simple-restore-gnome.py:252
+msgid ""
+"Select any of the available backups to see list of files that can be "
+"restored."
+msgstr ""
+"Selezionare uno qualsiasi fra i backup disponibili per vedere l'elenco dei "
+"file che posso essere ripristinati."
+
+#: simple-restore-gnome.py:257
+msgid "Choose a source folder"
+msgstr "Scegliere una cartella"
+
+#: simple-restore-gnome.py:337
+msgid "Loading ..."
+msgstr "Caricamento..."
+
+#: simple-restore-gnome.py:378
+msgid "Sorry, help is not implemented yet."
+msgstr "La guida non è ancora disponibile."
+
+#: simple-restore-gnome.py:390
+#, python-format
+msgid "Do you really want to restore backuped copy of '%s' to '%s' ?"
+msgstr "Ripristinare veramente la copia di backup di «%s» in «%s»?"
+
+#: simple-restore-gnome.py:395
+msgid "Restoring ..."
+msgstr "Ripristino..."
+
+#: simple-restore-gnome.py:413 simple-restore-gnome.py:422
+msgid "Select restore location"
+msgstr "Seleziona posizione di ripristino"
+
+#: srestore.py:74
+msgid "E: File not found in the backup snapshot"
+msgstr "E: il file non è stato trovato nell'immagine del backup"
+
+#: srestore.py:149
+msgid "Simple Backup suit command line restore utility\n"
+msgstr "Utilità di ripristino a riga di comando di «Strumento di backup»\n"
+
+#: srestore.py:150
+msgid ""
+" Usage: simple-restore backup-url file-or-dir-to-restore [target-file-or-dir]"
+msgstr ""
+" Uso: simple-restore backup-url file-o-dir-da-ripristinare [file-o-dir-"
+"destinazione]"
+
+#: srestore.py:151
+msgid ""
+" Note: backup-url must include the snapshot subdirectory name, for example:"
+msgstr ""
+" Nota: «backup-url» deve includere il percorso completo della sotto "
+"directory dell'immagine, per esempio:"
+
+#: srestore.py:153
+msgid " Use simple-restore-gnome for more ease of use.\n"
+msgstr " Usare simple-restore-gnome per una semplicità ancora maggiore.\n"
+
+#: srestore.py:162
+msgid "Restore FAILED! Please check you parameters."
+msgstr "Ripristino fallito. Controllare i parametri."
+
+#: upgrade_backups.py:73
+#, python-format
+msgid "I: Upgrading from v1.0 to v1.2: %s"
+msgstr "I: aggiornamento dalla versione 1.0 alla versione 1.2: %s"
+
+#: upgrade_backups.py:91
+#, python-format
+msgid "I: Upgrading to v1.3: %s"
+msgstr ""
+
+#: upgrade_backups.py:98
+#, python-format
+msgid "I: Upgrading to v1.4: %s"
+msgstr ""
+
+#: upgrade_backups.py:134 upgrade_backups.py:145
+#, python-format
+msgid "W: Damaged backup metainfo - disabling %s"
+msgstr ""
+
+#: upgrade_backups.py:331
+msgid ""
+"\n"
+"Simple Backup suit command line backup format upgrade\n"
+"Usage: upgrade-backup backup-target-url\n"
+"Note: backup-target-url must not include the snapshot subdirectory name, for "
+"example:\n"
+"\n"
+"   /var/backup/\n"
+"\n"
+"Use simple-restore-gnome for more ease of use.\n"
+msgstr ""
+"\n"
+"Istruzioni a riga di comando di «Strumento di backup» per l'aggiornamento "
+"del backup\n"
+"Uso: upgrade-backup backup-target-url\n"
+"Nota: backup-target-url non deve includere il nome della sotto directory "
+"dell'immagine, per esempio:\n"
+"   /var/backup/\n"
+"\n"
+"Usare simple-restore-gnome per una semplicità ancora maggiore.\n"
+
+#: simple-backup-config.glade:9
+msgid "Backup Properties"
+msgstr "Impostazioni di backup"
+
+#: simple-backup-config.glade:53
+msgid ""
+"Do backup now, with configuration above. Don't forget to save any "
+"modification before click this button."
+msgstr ""
+"Esegue il backup con la configurazione salvata. Salvare le modifiche prima "
+"di avviare il backup."
+
+#: simple-backup-config.glade:99
+msgid "_Backup Now!"
+msgstr "_Esegui backup"
+
+#: simple-backup-config.glade:130
+msgid "Saves any modification made in the backup configuration above."
+msgstr "Salva tutte le modifiche apportate alla configurazione."
+
+#: simple-backup-config.glade:189
+msgid "Use recommended backup settings"
+msgstr "Usare le impostazioni di backup raccomandate"
+
+#: simple-backup-config.glade:240
+msgid ""
+"<small>Do standard backups.\n"
+"Defaults: daily incremental and weekly full backup to /var/backup of all "
+"user files, /etc, /usr/local and /var. \n"
+"Multimedia files, temporary files and files larger than 100 Mb are "
+"excluded.</small>"
+msgstr ""
+"<small>Esegue backup standard.\n"
+"Predefinito: crea backup incrementali completi giornalieri e settimanali in "
+"/var/backup di tutti i file utente, di /etc, /usr/local e /var. \n"
+"File multimediali, temporanei e di dimensioni maggiori a 100 Mb sono "
+"esclusi.</small>"
+
+#: simple-backup-config.glade:275
+msgid "Use custom backup settings"
+msgstr "Usare le impostazioni personalizzate"
+
+#: simple-backup-config.glade:327
+msgid ""
+"<small>Do backups according to the settings defined on the next pages of "
+"this dialog.</small>"
+msgstr ""
+"<small>Esegue backup con le impostazioni definite dall'utente in questa "
+"finestra.</small>"
+
+#: simple-backup-config.glade:360
+msgid "Manual backups only"
+msgstr "Solo backup manuali"
+
+#: simple-backup-config.glade:412
+msgid ""
+"<small>Do not backup your data automatically. Note: this does not prevent "
+"doing manual backups.</small>"
+msgstr ""
+"<small>Non esegue backup automatici. Nota: ciò non impedisce l'esecuzione di "
+"backup manuali.</small>"
+
+#: simple-backup-config.glade:450
+msgid "General"
+msgstr "Generale"
+
+#: simple-backup-config.glade:562 simple-backup-config.glade:817
+msgid "Add File"
+msgstr "Aggiungi file"
+
+#: simple-backup-config.glade:637 simple-backup-config.glade:892
+msgid "Add Directory"
+msgstr "Aggiungi cartella"
+
+#: simple-backup-config.glade:695
+msgid "Include"
+msgstr "Includi"
+
+#: simple-backup-config.glade:950
+msgid "Paths"
+msgstr "Percorsi"
+
+#: simple-backup-config.glade:1056
+msgid "File types"
+msgstr "Formati dei file"
+
+#: simple-backup-config.glade:1162
+msgid "Regex"
+msgstr "Espressioni regolari"
+
+#: simple-backup-config.glade:1202
+msgid "Do not backup files bigger than "
+msgstr "Ignorare file più grandi di "
+
+#: simple-backup-config.glade:1241
+msgid "Mb"
+msgstr "Mb"
+
+#: simple-backup-config.glade:1303
+msgid "Max size"
+msgstr "Dimensione massima"
+
+#: simple-backup-config.glade:1332
+msgid "Exclude"
+msgstr "Escludi"
+
+#: simple-backup-config.glade:1362
+msgid "Use default backup directory (/var/backup)"
+msgstr "Usare la directory predefinita (/var/backup)"
+
+#: simple-backup-config.glade:1382
+msgid "Use custom local backup directory"
+msgstr "Usare la directory di backup personalizzata"
+
+#: simple-backup-config.glade:1425
+msgid "Select the destination folder"
+msgstr "Seleziona cartella di destinazione"
+
+#: simple-backup-config.glade:1451
+msgid "Use a remote directory (SSH or FTP)"
+msgstr "Usare una directory remota (SSH o FTP)"
+
+#: simple-backup-config.glade:1477
+msgid ""
+"Please test writability of the target directory by pressing \"Test\" button "
+"on the right."
+msgstr ""
+"Controllare che la directory di destinazione sia accessibile premendo il "
+"pulsante «Prova»."
+
+#: simple-backup-config.glade:1507
+msgid "ssh://username:password@example.com/remote/dir/"
+msgstr "ssh://nomeutente:password@esempio.it/directory/remota/"
+
+#: simple-backup-config.glade:1567
+msgid "Test"
+msgstr "Prova"
+
+#: simple-backup-config.glade:1636
+msgid ""
+"<i>The selected destination is not writtable with current permissions.\n"
+"The backups can not be written there.</i>"
+msgstr ""
+"<i>Non è possibile scrivere sulla destinazione selezionata con i permessi "
+"attuali.\n"
+"I backup non possono essere scritti.</i>"
+
+#: simple-backup-config.glade:1680
+msgid "Destination"
+msgstr "Destinazione"
+
+#: simple-backup-config.glade:1719
+msgid "Do backups "
+msgstr "Eseguire backup "
+
+#: simple-backup-config.glade:1745
+msgid ""
+"never\n"
+"hourly\n"
+"daily\n"
+"weekly\n"
+"monthly\n"
+"custom"
+msgstr ""
+"mai\n"
+"ogni ora\n"
+"giornalmente\n"
+"settimanalmente\n"
+"mensilmente\n"
+"personalizzato"
+
+#: simple-backup-config.glade:1767
+msgid "simply"
+msgstr ""
+
+#: simple-backup-config.glade:1788
+msgid "precisely"
+msgstr ""
+
+#: simple-backup-config.glade:1808
+msgid "at:"
+msgstr "a:"
+
+#: simple-backup-config.glade:1849
+msgid "Day of month:"
+msgstr "Giorno del mese:"
+
+#: simple-backup-config.glade:1877
+msgid "Day of week:"
+msgstr "Giorno della settimana:"
+
+#: simple-backup-config.glade:1905
+msgid "Hour"
+msgstr "Ora"
+
+#: simple-backup-config.glade:1933
+msgid "Minute"
+msgstr "Minuto"
+
+#: simple-backup-config.glade:2085
+msgid "Custom cron time definition: "
+msgstr "Configurazione personalizzata di cron: "
+
+#: simple-backup-config.glade:2148
+msgid "Do a full backup at least once every"
+msgstr "Eseguire un backup integrale almeno ogni:"
+
+#: simple-backup-config.glade:2193 simple-backup-config.glade:2410
+msgid "days"
+msgstr "giorni"
+
+#: simple-backup-config.glade:2248
+msgid ""
+"<small>You can configure how often to start a backup run and when to do it.\n"
+"Unless a set number of days has passed since the last full backup, "
+"incremental backups will be done.\n"
+"See \"man 5 crontab\" for cron time definition format.</small>"
+msgstr ""
+"<small>È possibile impostare la frequenza dei backup e quando eseguirli.\n"
+"A meno che non sia passato un certo periodo di tempo dall'ultimo backup "
+"completo, verranno eseguiti dei backup incrementali.\n"
+"Per informazioni sull'uso del comando «cron», consultare la pagina della "
+"documentazione «man 5 cron».</small>"
+
+#: simple-backup-config.glade:2288
+msgid "Time"
+msgstr "Tempo"
+
+#: simple-backup-config.glade:2318
+msgid "Enable purging of old and incomplete backups"
+msgstr "Abilitare l'eliminazione dei backup vecchi e incompleti"
+
+#: simple-backup-config.glade:2370
+msgid "Simple cutoff: Erase all backups older than "
+msgstr "Metodo rapido: cancellare tutti i backup più vecchi di "
+
+#: simple-backup-config.glade:2475
+msgid "Logarithmic (Recommended)"
+msgstr "Logaritmico (raccomandato)"
+
+#: simple-backup-config.glade:2496
+msgid ""
+"<small>Keep progressivelly less backups into the past:\n"
+"Keep all backups from yesterday.\n"
+"Keep one backup per day from last week.\n"
+"Keep one backup per week from last month.\n"
+"Keep one backup per month from last year.\n"
+"Keep one backup per year further into past.\n"
+"Erase all other backups.</small>\n"
+msgstr ""
+"<small>Mantiene progressivamente sempre meno backup:\n"
+"Mantiene tutti i backup del giorno precedente.\n"
+"Mantiene un backup per ogni giorno dell'ultima settimana.\n"
+"Mantiene un backup per ogni settimana dell'ultimo mese.\n"
+"Mantiene un backup per ogni mese dell'ultimo anno.\n"
+"Mantiene un backup all'anno.\n"
+"Cancella tutti gli altri backup.</small>\n"
+
+#: simple-backup-config.glade:2558
+msgid ""
+"<small>Note: Additionally all incomplete and irrecoverable backups will be "
+"erased as long as there is a complete backup snapshot made later on.</small>"
+msgstr ""
+"<small>Nota: gli ulteriori backup incompleti e irrecuperabili verranno "
+"cancellati finché vi sarà sempre un backup completo.</small>"
+
+#: simple-backup-config.glade:2596
+msgid "Purging"
+msgstr "Pulizia"
+
+#: simple-backup-config.glade:2611
+msgid "Cleaning old backups"
+msgstr "Eliminazione vecchi backup"
+
+#: simple-backup-config.glade:2630
+msgid "Exclude file type"
+msgstr "Escludi tipo di file"
+
+#: simple-backup-config.glade:2701
+msgid "Standard file types:"
+msgstr "Tipi di file standard:"
+
+#: simple-backup-config.glade:2747
+msgid "Custom defined file type with "
+msgstr "Tipo di file definito dall'utente con "
+
+#: simple-backup-config.glade:2787
+msgid "file extension"
+msgstr "come estensione"
+
+#: simple-backup-config.glade:2827
+msgid "Exclude by regex"
+msgstr "Escludi con espressione regolare"
+
+#: simple-backup-config.glade:2899
+msgid ""
+"Enter a regular expression.\n"
+"Files and directories matching this expression will be excluded from backup."
+msgstr ""
+"Inserire un'espressione regolare.\n"
+"Tutti i file e le cartelle corrispondenti a questa espressione verranno "
+"esclusi dal backup."
+
+#: simple-restore.glade:8
+msgid "Restore files/directories"
+msgstr "Ripristina file e directory"
+
+#: simple-restore.glade:42
+msgid "<b>Restore Source Folder</b>"
+msgstr "<b>Cartella da cui ripristinare</b>"
+
+#: simple-restore.glade:113
+msgid "Use default:"
+msgstr "Predefinita:"
+
+#: simple-restore.glade:136
+msgid "Use custom:"
+msgstr "Personalizzata:"
+
+#: simple-restore.glade:194
+msgid ""
+"Type in this box text like that:\n"
+"\n"
+"/home/user/folder - To use a local folder\n"
+"ssh://user:password@machine:/remote/folder - To use a ssh location\n"
+"ssh://user:password@machine:/remote/folder - To use a ftp location"
+msgstr ""
+"Digitare qualcosa di simile:\n"
+"\n"
+"/home/utente/cartella per usare una cartella locale\n"
+"ssh://utente:password@computer:/cartella/remota per usare una cartella "
+"remota con ssh\n"
+"ftp://utente:password@computer:/cartella/remota per usare una cartella "
+"remota con ftp"
+
+#: simple-restore.glade:273
+msgid "Available backups:"
+msgstr "Backup disponibili:"
+
+#: simple-restore.glade:360
+msgid "<b>Files and Folders to restore</b>"
+msgstr "<b>File e cartelle da ripristinare</b>"
+
+#: simple-restore.glade:544
+msgid "Restore"
+msgstr "Ripristina"
+
+#: simple-restore.glade:620
+msgid "Restore As..."
+msgstr "Ripristina come..."

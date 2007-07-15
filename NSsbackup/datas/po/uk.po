@@ -1,0 +1,605 @@
+# Ukrainian translation for sbackup
+# Copyright (c) 2006 Rosetta Contributors and Canonical Ltd 2006
+# This file is distributed under the same license as the sbackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2006.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sbackup\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2007-05-08 23:03+0200\n"
+"PO-Revision-Date: 2007-01-06 14:00+0000\n"
+"Last-Translator: Vlad Kozlovskyy <dbdeveloper@rambler.ru>\n"
+"Language-Team: Ukrainian <uk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Rosetta-Export-Date: 2007-06-03 13:28:24+0000\n"
+
+#: simple-backup-config.py:66
+msgid "MP3 Music"
+msgstr "Аудіо-файли у форматі MP3"
+
+#: simple-backup-config.py:66
+msgid "AVI Video"
+msgstr "Файли Відео AVI"
+
+#: simple-backup-config.py:66
+msgid "MPEG Video"
+msgstr "Файли Відео MPEG"
+
+#: simple-backup-config.py:66
+msgid "Matrjoshka Video"
+msgstr "Файли Відео Матроска"
+
+#: simple-backup-config.py:66
+msgid "OGG Multimedia container"
+msgstr "Мультимедійний контейнер OGG"
+
+#: simple-backup-config.py:66
+msgid "CD Images"
+msgstr "Образи компакт-дисків"
+
+#: simple-backup-config.py:348 simple-backup-config.py:705
+msgid "Custom"
+msgstr "Власні:"
+
+#: simple-backup-config.py:411
+msgid "Already included item !"
+msgstr ""
+
+#: simple-backup-config.py:426
+msgid "Already excluded item !"
+msgstr ""
+
+#: simple-backup-config.py:437
+msgid "Simple Backup Suite"
+msgstr "Набір для простого резервування"
+
+#: simple-backup-config.py:439
+msgid ""
+"This is a user friendly backup solution for common desktop needs. The "
+"project was was sponsored by Google during Google Summer of Code 2005 and "
+"mentored by Ubuntu."
+msgstr ""
+"Цей набір являє собою просте і зручне рішення для резервування елементів "
+"системи, таких як файли та каталоги, достатнє для виконання більшості "
+"настільних задач. Проект спонсорувався фірмою Google впродовж Google Summer "
+"of Code 2005 і підтримується Ubuntu."
+
+#: simple-backup-config.py:442 simple-backup-config.py:445
+msgid "translator-credits"
+msgstr "Перекладачі"
+
+#: simple-backup-config.py:445
+msgid "Translators : "
+msgstr ""
+
+#: simple-backup-config.py:454
+msgid "A backup run is initiated in the background. The process id is: "
+msgstr "Створення резервної копії розпочато у фоновому режимі. Ід.процесу: "
+
+#: simple-backup-config.py:552
+msgid "Configuration save successful"
+msgstr "Конфигурация успишно збережена"
+
+#: simple-backup-config.py:623
+msgid "Include file ..."
+msgstr "Включити файл ..."
+
+#: simple-backup-config.py:626 simple-backup-config.py:661
+msgid "All files"
+msgstr "Усі файли"
+
+#: simple-backup-config.py:639
+msgid "Include folder ..."
+msgstr "Включити каталог ..."
+
+#: simple-backup-config.py:658
+msgid "Exclude file ..."
+msgstr "Виключити файл ..."
+
+#: simple-backup-config.py:674
+msgid "Exclude folder ..."
+msgstr "Виключити каталог ..."
+
+#: simple-backup-config.py:750
+msgid "Empty expression. Please enter a valid regular expression."
+msgstr "Порожній вираз. Будь-ласка введіть коректний регулярний вираз."
+
+#: simple-backup-config.py:767
+msgid "Empty filename or path. Please enter a valid filename or path."
+msgstr ""
+"Порожні ім'я файлу або шлях. Будь-ласка введіть коректне ім'я файлу або шлях."
+
+#: simple-backup-config.py:773
+msgid ""
+"It seems the path you entered does not exists. Do you want to add this wrong "
+"path?"
+msgstr "Здається, введений Вами шлях не існує.  Добавити цей хибний шлях?"
+
+#: simple-backup-config.py:995
+msgid "Currently backup configuration is only runnable by root"
+msgstr ""
+"На даний момент резервне копіювання може запускатись тільки Адміністратором"
+
+#: simple-restore-gnome.py:137
+msgid "Path"
+msgstr "Шлях"
+
+#: simple-restore-gnome.py:171 simple-restore-gnome.py:175
+msgid "Error: backups directory does not exist!"
+msgstr "Помилка: каталогу резервних копій не існує!"
+
+#: simple-restore-gnome.py:215
+msgid ""
+"Some of your backups are in an old backup format. Do you want to upgrade "
+"them?\n"
+"It should take only a few minutes."
+msgstr ""
+"Деякі з Ваших резервних копій збережені в старому форматі. Бажаєте привести "
+"їх до нового формату?\n"
+"Це займе тільки декілька хвилин."
+
+#: simple-restore-gnome.py:235
+msgid "Error: no backups found in the target directory"
+msgstr "Помилка: жодної резервної копії не знайдено у вказаному каталозі"
+
+#: simple-restore-gnome.py:252
+msgid ""
+"Select any of the available backups to see list of files that can be "
+"restored."
+msgstr ""
+"Виберіть будь-яку з існуючих резервних копій, щоб переглянути список файлів, "
+"які можна відновити."
+
+#: simple-restore-gnome.py:257
+msgid "Choose a source folder"
+msgstr "Виберіть каталог-джерело"
+
+#: simple-restore-gnome.py:337
+msgid "Loading ..."
+msgstr "Завантаження ..."
+
+#: simple-restore-gnome.py:378
+msgid "Sorry, help is not implemented yet."
+msgstr "Вибачте, система допомоги ще не реалізована."
+
+#: simple-restore-gnome.py:390
+#, python-format
+msgid "Do you really want to restore backuped copy of '%s' to '%s' ?"
+msgstr "Ви справді бажаєте відновити резервну копію '%s' за адресою '%s' ?"
+
+#: simple-restore-gnome.py:395
+msgid "Restoring ..."
+msgstr "Відновлення ..."
+
+#: simple-restore-gnome.py:413 simple-restore-gnome.py:422
+msgid "Select restore location"
+msgstr "Вкажить мисцезнаходження архиву"
+
+#: srestore.py:74
+msgid "E: File not found in the backup snapshot"
+msgstr "Помилка: Файл не знайдено у резервному знімку"
+
+#: srestore.py:149
+msgid "Simple Backup suit command line restore utility\n"
+msgstr ""
+"Утиліта командного рядка Комплекту спрощенного резервування (Simple Backup "
+"suit)\n"
+
+#: srestore.py:150
+msgid ""
+" Usage: simple-restore backup-url file-or-dir-to-restore [target-file-or-dir]"
+msgstr ""
+" Використання: simple-restore url-резервної-копії файл-або-каталог-для-"
+"відновлення [цільовий-файл-або-каталог]"
+
+#: srestore.py:151
+msgid ""
+" Note: backup-url must include the snapshot subdirectory name, for example:"
+msgstr ""
+" Зауваження: url-резервної-копії повинен включати назву підкаталога "
+"резервного знімку, наприклад:"
+
+#: srestore.py:153
+msgid " Use simple-restore-gnome for more ease of use.\n"
+msgstr ""
+" Використовуйте simple-restore-gnome для ініціації відновлення у графічному "
+"режимі\n"
+
+#: srestore.py:162
+msgid "Restore FAILED! Please check you parameters."
+msgstr ""
+"Відновлення закінчилось НЕВДАЧЕЮ! Будь-ласка перевірте свої параметри."
+
+#: upgrade_backups.py:73
+#, python-format
+msgid "I: Upgrading from v1.0 to v1.2: %s"
+msgstr "I: Модернізація з вер.1.0 до вер.1.2: %s"
+
+#: upgrade_backups.py:91
+#, python-format
+msgid "I: Upgrading to v1.3: %s"
+msgstr ""
+
+#: upgrade_backups.py:98
+#, python-format
+msgid "I: Upgrading to v1.4: %s"
+msgstr ""
+
+#: upgrade_backups.py:134 upgrade_backups.py:145
+#, python-format
+msgid "W: Damaged backup metainfo - disabling %s"
+msgstr ""
+
+#: upgrade_backups.py:331
+msgid ""
+"\n"
+"Simple Backup suit command line backup format upgrade\n"
+"Usage: upgrade-backup backup-target-url\n"
+"Note: backup-target-url must not include the snapshot subdirectory name, for "
+"example:\n"
+"\n"
+"   /var/backup/\n"
+"\n"
+"Use simple-restore-gnome for more ease of use.\n"
+msgstr ""
+"\n"
+"Утиліта командного ряда Комплекту спрощенного резервування для модернізації "
+"формату копії\n"
+"Використання: upgrade-backup url-резервної-копії\n"
+"Зауваження: url-резервної-копії не повинен включати ім'я підкаталогу копії, "
+"наприклад:\n"
+"\n"
+"   /var/backup/\n"
+"\n"
+"Використовуйте simple-restore-gnome щоб скористатись перевагою Графічного "
+"Інтерфейсу Користувача\n"
+
+#: simple-backup-config.glade:9
+msgid "Backup Properties"
+msgstr "Налаштування резервного копіювання"
+
+#: simple-backup-config.glade:53
+msgid ""
+"Do backup now, with configuration above. Don't forget to save any "
+"modification before click this button."
+msgstr ""
+"Розпочніть резервне копіювання. Не забудьте зберегти всі зміни в інших "
+"видатках перед натисненням цієї кнопки."
+
+#: simple-backup-config.glade:99
+msgid "_Backup Now!"
+msgstr "_Розпочати резервне копіювання!"
+
+#: simple-backup-config.glade:130
+msgid "Saves any modification made in the backup configuration above."
+msgstr "Зберегти всі зміни зроблені в конфігурації"
+
+#: simple-backup-config.glade:189
+msgid "Use recommended backup settings"
+msgstr "Використовувати запропоновані налаштування резервування"
+
+#: simple-backup-config.glade:240
+msgid ""
+"<small>Do standard backups.\n"
+"Defaults: daily incremental and weekly full backup to /var/backup of all "
+"user files, /etc, /usr/local and /var. \n"
+"Multimedia files, temporary files and files larger than 100 Mb are "
+"excluded.</small>"
+msgstr ""
+"<small>Робити стандартне резервування.\n"
+"Установки: щоденне доповнююче і щотижневе повне резервування в /var/backup "
+"усіх файлів користувачів, /etc, /usr/local та /var. \n"
+"Файли мультимедіа, тимчасові та більші за 100 Мб не резервуються.</small>"
+
+#: simple-backup-config.glade:275
+msgid "Use custom backup settings"
+msgstr "Використовувати власні налаштування резервування"
+
+#: simple-backup-config.glade:327
+msgid ""
+"<small>Do backups according to the settings defined on the next pages of "
+"this dialog.</small>"
+msgstr ""
+"<small>Виконати резервування згідно налаштувань, вказаних на попередній "
+"сторінці цього діалогу.</small>"
+
+#: simple-backup-config.glade:360
+msgid "Manual backups only"
+msgstr "Запускати резервування тільки вручну"
+
+#: simple-backup-config.glade:412
+msgid ""
+"<small>Do not backup your data automatically. Note: this does not prevent "
+"doing manual backups.</small>"
+msgstr ""
+"<small>Не робити резервування автоматично. Зауваження: це не забороняє "
+"запускати резервування вручну</small>"
+
+#: simple-backup-config.glade:450
+msgid "General"
+msgstr "Загальне"
+
+#: simple-backup-config.glade:562 simple-backup-config.glade:817
+msgid "Add File"
+msgstr "Додати файл"
+
+#: simple-backup-config.glade:637 simple-backup-config.glade:892
+msgid "Add Directory"
+msgstr "Додати каталог"
+
+#: simple-backup-config.glade:695
+msgid "Include"
+msgstr "Включити"
+
+#: simple-backup-config.glade:950
+msgid "Paths"
+msgstr "Шляхи"
+
+#: simple-backup-config.glade:1056
+msgid "File types"
+msgstr "Фільтр:"
+
+#: simple-backup-config.glade:1162
+msgid "Regex"
+msgstr "Регулярний вираз"
+
+#: simple-backup-config.glade:1202
+msgid "Do not backup files bigger than "
+msgstr "Не зберігати файли більші за "
+
+#: simple-backup-config.glade:1241
+msgid "Mb"
+msgstr "Мб"
+
+#: simple-backup-config.glade:1303
+msgid "Max size"
+msgstr "Макс.розмір"
+
+#: simple-backup-config.glade:1332
+msgid "Exclude"
+msgstr "Виключені"
+
+#: simple-backup-config.glade:1362
+msgid "Use default backup directory (/var/backup)"
+msgstr "Використовувати стандартну директорію резервування (/var/backup)"
+
+#: simple-backup-config.glade:1382
+msgid "Use custom local backup directory"
+msgstr "Використовувати власну директорію резервування"
+
+#: simple-backup-config.glade:1425
+msgid "Select the destination folder"
+msgstr "Виберіть каталог призначення"
+
+#: simple-backup-config.glade:1451
+msgid "Use a remote directory (SSH or FTP)"
+msgstr "Використовувати віддалену директорію (SSH або FTP)"
+
+#: simple-backup-config.glade:1477
+msgid ""
+"Please test writability of the target directory by pressing \"Test\" button "
+"on the right."
+msgstr ""
+"Будь-ласка перевірте дозвіл запису у вибрану директорію натиснувши кнопку "
+"\"Перевірка\""
+
+#: simple-backup-config.glade:1507
+msgid "ssh://username:password@example.com/remote/dir/"
+msgstr "ssh://username:password@example.com/remote/dir/"
+
+#: simple-backup-config.glade:1567
+msgid "Test"
+msgstr "Перевірка"
+
+#: simple-backup-config.glade:1636
+msgid ""
+"<i>The selected destination is not writtable with current permissions.\n"
+"The backups can not be written there.</i>"
+msgstr ""
+"<i>Вибране місце призначення закрите на запис.\n"
+"Резервні копії не зможуть туди записатись.</i>"
+
+#: simple-backup-config.glade:1680
+msgid "Destination"
+msgstr "Місце призначення"
+
+#: simple-backup-config.glade:1719
+msgid "Do backups "
+msgstr "Почати резервування "
+
+#: simple-backup-config.glade:1745
+msgid ""
+"never\n"
+"hourly\n"
+"daily\n"
+"weekly\n"
+"monthly\n"
+"custom"
+msgstr ""
+"ніколи\n"
+"щогодини\n"
+"щодня\n"
+"щотижня\n"
+"щомісяця\n"
+"інше"
+
+#: simple-backup-config.glade:1767
+msgid "simply"
+msgstr ""
+
+#: simple-backup-config.glade:1788
+msgid "precisely"
+msgstr ""
+
+#: simple-backup-config.glade:1808
+msgid "at:"
+msgstr "в:"
+
+#: simple-backup-config.glade:1849
+msgid "Day of month:"
+msgstr "День місяця:"
+
+#: simple-backup-config.glade:1877
+msgid "Day of week:"
+msgstr "День тижня:"
+
+#: simple-backup-config.glade:1905
+msgid "Hour"
+msgstr "Година"
+
+#: simple-backup-config.glade:1933
+msgid "Minute"
+msgstr "Хвилина"
+
+#: simple-backup-config.glade:2085
+msgid "Custom cron time definition: "
+msgstr "Ручне налаштування часу в cron: "
+
+#: simple-backup-config.glade:2148
+msgid "Do a full backup at least once every"
+msgstr "Робити повне резервне копіювання, щонайменше раз на"
+
+#: simple-backup-config.glade:2193 simple-backup-config.glade:2410
+msgid "days"
+msgstr "днів"
+
+#: simple-backup-config.glade:2248
+msgid ""
+"<small>You can configure how often to start a backup run and when to do it.\n"
+"Unless a set number of days has passed since the last full backup, "
+"incremental backups will be done.\n"
+"See \"man 5 crontab\" for cron time definition format.</small>"
+msgstr ""
+"<small>Ви можете налаштувати як часто і коли саме робити резервування.\n"
+"Доки не мине встановлена к-сть днів з попереднього повного резервування, "
+"будуть виконуватись доповнюючі резервування.\n"
+"Див.\"man 5 crontab\" щоб познайомитись з форматом опису часу в cron.</small>"
+
+#: simple-backup-config.glade:2288
+msgid "Time"
+msgstr "Час"
+
+#: simple-backup-config.glade:2318
+msgid "Enable purging of old and incomplete backups"
+msgstr "Включити вилучення старих та незавершених резервних копій"
+
+#: simple-backup-config.glade:2370
+msgid "Simple cutoff: Erase all backups older than "
+msgstr "Просте обрізання: Вилучати всі резервні копії старіші за "
+
+#: simple-backup-config.glade:2475
+msgid "Logarithmic (Recommended)"
+msgstr "Логарифмічний (рекомендовано)"
+
+#: simple-backup-config.glade:2496
+msgid ""
+"<small>Keep progressivelly less backups into the past:\n"
+"Keep all backups from yesterday.\n"
+"Keep one backup per day from last week.\n"
+"Keep one backup per week from last month.\n"
+"Keep one backup per month from last year.\n"
+"Keep one backup per year further into past.\n"
+"Erase all other backups.</small>\n"
+msgstr ""
+"<small>Зберігати поступово зменшуючу к-сть резервних копій в минулом:\n"
+"Зберігати всі резервні дані за учора.\n"
+"Зберігати по одній щоденній резервній копії впродовж останнього тиждня.\n"
+"Зберігати по одній щотижневій копії впродовж останнього місяця.\n"
+"Зберігати по одній щомісячній копії впродовж останнього року.\n"
+"Зберігати по одній копії за попередні роки.</small>\n"
+
+#: simple-backup-config.glade:2558
+msgid ""
+"<small>Note: Additionally all incomplete and irrecoverable backups will be "
+"erased as long as there is a complete backup snapshot made later on.</small>"
+msgstr ""
+"<small>Зауваження: Додатково усі незакінчені та невідновлювані копії буде "
+"вилучено як тільки новий повний знімок системи буде зроблено.</small>"
+
+#: simple-backup-config.glade:2596
+msgid "Purging"
+msgstr "Очистка"
+
+#: simple-backup-config.glade:2611
+msgid "Cleaning old backups"
+msgstr "Знищення старих резервних копій"
+
+#: simple-backup-config.glade:2630
+msgid "Exclude file type"
+msgstr "Виключати файли типу"
+
+#: simple-backup-config.glade:2701
+msgid "Standard file types:"
+msgstr "Стандартні типи файлів:"
+
+#: simple-backup-config.glade:2747
+msgid "Custom defined file type with "
+msgstr "Вручну визначений тип файлу з "
+
+#: simple-backup-config.glade:2787
+msgid "file extension"
+msgstr "розширення файлу"
+
+#: simple-backup-config.glade:2827
+msgid "Exclude by regex"
+msgstr "Виключати за регулярним виразом"
+
+#: simple-backup-config.glade:2899
+msgid ""
+"Enter a regular expression.\n"
+"Files and directories matching this expression will be excluded from backup."
+msgstr ""
+"Введіть регулярний вираз.\n"
+"Файли та директорії, що будуть відповідати цьому виразу резервуватись не "
+"будуть."
+
+#: simple-restore.glade:8
+msgid "Restore files/directories"
+msgstr "Відновлення файлів/директорій"
+
+#: simple-restore.glade:42
+msgid "<b>Restore Source Folder</b>"
+msgstr "<b>Папка з резервними копіями</b>"
+
+#: simple-restore.glade:113
+msgid "Use default:"
+msgstr "Використ.стандартний:"
+
+#: simple-restore.glade:136
+msgid "Use custom:"
+msgstr "Використ.власний:"
+
+#: simple-restore.glade:194
+msgid ""
+"Type in this box text like that:\n"
+"\n"
+"/home/user/folder - To use a local folder\n"
+"ssh://user:password@machine:/remote/folder - To use a ssh location\n"
+"ssh://user:password@machine:/remote/folder - To use a ftp location"
+msgstr ""
+"Введить в поли вводу текст схожий на:\n"
+"/home/user/folder - Для використання локальної папки\n"
+"ssh://user:password@machine:/remote/folder - Для доступу до місця "
+"призначення ч/з ssh\n"
+"ssh://user:password@machine:/remote/folder - Для доступу до місця "
+"призначення ч/з ftp"
+
+#: simple-restore.glade:273
+msgid "Available backups:"
+msgstr "Доступні резервні копії:"
+
+#: simple-restore.glade:360
+msgid "<b>Files and Folders to restore</b>"
+msgstr "<b>Файли і Папки для відновлення</b>"
+
+#: simple-restore.glade:544
+msgid "Restore"
+msgstr "Відновлення"
+
+#: simple-restore.glade:620
+msgid "Restore As..."
+msgstr "Відновити як..."

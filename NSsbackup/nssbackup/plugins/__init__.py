@@ -21,6 +21,7 @@ import os.path
 import sys
 import glob
 import nssbackup, subprocess
+from gettext import gettext as _
 from tempfile import *
 from nssbackup.managers.FileAccessManager import *
 from nssbackup.util.log import getLogger
@@ -133,7 +134,7 @@ class PluginManager :
 								self.__pluginList[symbol_name] = symbol
 	                            
 					except Exception, e:
-						getLogger().warning("Could not import plugin %s ! Cause : %s " % (file,str(e)))                    
+						getLogger().warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
 						continue
 			return self.__pluginList
 		

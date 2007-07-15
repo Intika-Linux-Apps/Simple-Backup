@@ -6,6 +6,7 @@
 # 07/07/2007
 #----------------------------------------------------------------------
 
+import gettext
 from gettext import gettext as _
 import sys, traceback, time
 from thread import *
@@ -56,14 +57,14 @@ class SBRestoreGTK(GladeWindow):
 		#tree strores
 		self.snplisttreestore = gtk.TreeStore( str )
 		self.widgets['snplisttreeview'].set_model( self.snplisttreestore )
-		acolumn = gtk.TreeViewColumn("Snapshots", gtk.CellRendererText(), text=0 )
+		acolumn = gtk.TreeViewColumn(_("Snapshots"), gtk.CellRendererText(), text=0 )
 		self.widgets['snplisttreeview'].append_column( acolumn )
 		
 		self.flisttreestore = gtk.TreeStore( str )
-		self.flisttreemodelsort = gtk.TreeModelSort(self.flisttreestore)
-		self.flisttreemodelsort.set_sort_column_id(1, gtk.SORT_ASCENDING)
+		# self.flisttreemodelsort = gtk.TreeModelSort(self.flisttreestore)
+		# self.flisttreemodelsort.set_sort_column_id(1, gtk.SORT_ASCENDING)
 		self.widgets['filelisttreeview'].set_model( self.flisttreemodelsort )
-		acolumn1 = gtk.TreeViewColumn("Path", gtk.CellRendererText(), text=0 )
+		acolumn1 = gtk.TreeViewColumn(_("Path"), gtk.CellRendererText(), text=0 )
 		self.widgets['filelisttreeview'].append_column( acolumn1 )
 		
 		self.on_defaultradiob_toggled()
@@ -135,7 +136,7 @@ class SBRestoreGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_customchooser_clicked(self, *args):
-		dialog = gtk.FileChooserDialog("Choose a source folder", None, gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(_("Choose a source folder"), None, gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		dialog.set_local_only(False)
 		if dialog.run() == gtk.RESPONSE_OK:
@@ -204,7 +205,7 @@ class SBRestoreGTK(GladeWindow):
 			for d in dict.iterkeys(self.currentsbdict.getSon(os.path.normpath(path))):
 				iter = self.flisttreestore.append( rootiter, [d] )
 				if self.currentsbdict.getSon(os.sep.join([os.path.normpath(path),d])) :
-					self.flisttreestore.append( iter, ["Loading ..."] )
+					self.flisttreestore.append( iter, [_("Loading ...")] )
 		if dummy :
 			self.flisttreestore.remove( dummy )
 	
@@ -363,7 +364,7 @@ class SBRestoreGTK(GladeWindow):
 				iter = self.flisttreestore.append(None, [k])
 				self.show_dir(os.sep+k, iter)
 		else :
-			self.flisttreestore.append(None, ["This snapshot seems empty."])
+			self.flisttreestore.append(None, [_("This snapshot seems empty.")])
 			self.widgets['snpdetails'].set_sensitive(False)
 		
 
@@ -382,7 +383,7 @@ class SBRestoreGTK(GladeWindow):
 		self.widgets['snpdetails'].set_sensitive(True)
 		
 		if snplist == []:
-			self.snplisttreestore.append( None, ["No backups found for this day !"])
+			self.snplisttreestore.append( None, [_("No backups found for this day !")])
 			self.widgets['snplist'].set_sensitive(False)
 		else:
 			self.widgets['snplist'].set_sensitive(True)
@@ -434,4 +435,6 @@ def main(argv):
 #----------------------------------------------------------------------
 
 if __name__ == '__main__':
+	application = 'nssbackup'
+	gettext.install(application)
 	main(sys.argv)

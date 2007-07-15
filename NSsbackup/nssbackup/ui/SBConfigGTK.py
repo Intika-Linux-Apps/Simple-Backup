@@ -19,6 +19,7 @@ from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
 from GladeWindow import *
+import gettext
 from gettext import gettext as _
 import nssbackup.util as Util
 
@@ -267,7 +268,7 @@ class SBconfigGTK(GladeWindow):
 		cell = gtk.CellRendererText()
 		cell.set_property('editable', True)
 		cell.connect('edited', self.cell_edited_callback, (self.include, "dirconfig", 1))
-		column = gtk.TreeViewColumn('Name', cell, text=0)
+		column = gtk.TreeViewColumn(_('Name'), cell, text=0)
 		self.includetv.append_column(column)
 
 		self.ex_paths = gtk.ListStore( str )
@@ -276,7 +277,7 @@ class SBconfigGTK(GladeWindow):
 		cell1 = gtk.CellRendererText()
 		cell1.set_property('editable', True)
 		cell1.connect('edited', self.cell_edited_callback, (self.ex_paths, "dirconfig", 0))
-		column1 = gtk.TreeViewColumn('Name', cell1, text=0)
+		column1 = gtk.TreeViewColumn(_('Name'), cell1, text=0)
 		self.ex_pathstv.append_column(column1)
 
 		# Excluded file types and general regular expressions
@@ -284,7 +285,7 @@ class SBconfigGTK(GladeWindow):
 		self.ex_ftypetv = self.widgets["ex_ftypetv"]
 		self.ex_ftypetv.set_model( self.ex_ftype )
 		cell3 = gtk.CellRendererText()
-		column3 = gtk.TreeViewColumn('File Type', cell3, text=0)
+		column3 = gtk.TreeViewColumn(_('File Type'), cell3, text=0)
 		cell2 = gtk.CellRendererText()
 		column2 = gtk.TreeViewColumn('Ext.', cell2, text=1)
 		self.ex_ftypetv.append_column(column3)
@@ -305,7 +306,7 @@ class SBconfigGTK(GladeWindow):
 		cell = gtk.CellRendererText()
 		cell.set_property('editable', True)
 		cell.connect('edited', self.cell_remoteinc_edited_callback, (self.remoteinc, "dirconfig", 1))
-		column = gtk.TreeViewColumn('Name', cell, text=0)
+		column = gtk.TreeViewColumn(_('Name'), cell, text=0)
 		self.rem_includetv.append_column(column)
 		
 		# Day of month table
@@ -313,7 +314,7 @@ class SBconfigGTK(GladeWindow):
 		self.time_domtv = self.widgets["time_domtv"]
 		self.time_domtv.set_model( self.time_dom )
 		cell6 = gtk.CellRendererText()
-		column6 = gtk.TreeViewColumn('Name', cell6, text=0)
+		column6 = gtk.TreeViewColumn(_('Name'), cell6, text=0)
 		self.time_domtv.append_column(column6)
 
 		for i in range(1, 32):
@@ -324,7 +325,7 @@ class SBconfigGTK(GladeWindow):
 		self.time_dowtv = self.widgets["time_dowtv"]
 		self.time_dowtv.set_model( self.time_dow )
 		cell7 = gtk.CellRendererText()
-		column7 = gtk.TreeViewColumn('Name', cell7, text=0)
+		column7 = gtk.TreeViewColumn(_('Name'), cell7, text=0)
 		self.time_dowtv.append_column(column7)
 
 		self.known_ftypes = { "mp3": _("MP3 Music"), "avi": _("AVI Video"), "mpeg": _("MPEG Video"), "mpg": _("MPEG Video"), "mkv": _("Matrjoshka Video"), "ogg": _("OGG Multimedia container"), "iso": _("CD Images")}
@@ -437,7 +438,7 @@ class SBconfigGTK(GladeWindow):
 			if os.getuid() == 0 :
 				self.widgets["logfilechooser"].set_current_folder(os.sep.join("","var","log") )
 			else :
-				self.widgets["logfilechooser"].set_current_folder(os.sep.join(os.getenv("HOME"),".nssbackup") )
+				self.widgets["logfilechooser"].set_current_folder(getUserConfDir())
 				
 		# report
 		def unfillreportentries():
@@ -609,7 +610,7 @@ class SBconfigGTK(GladeWindow):
 
 	def on_about_activate(self, *args):
 		about = gtk.AboutDialog()
-		about.set_name(_("Not So Simple Backup Suite"))
+		about.set_name("Not So Simple Backup Suite")
 		about.set_version("0.1")
 		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
 		about.set_transient_for(self.widgets["backup_properties_dialog"])
@@ -833,7 +834,7 @@ class SBconfigGTK(GladeWindow):
 			dialog.destroy()
 		else :
 			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, 
-											message_format="'%d' test(s) didn't succeed !" % (len(self.remoteinc)- n))
+											message_format=_("'%d' test(s) didn't succeed !") % (len(self.remoteinc)- n))
 			dialog.run()
 			dialog.destroy()
 
@@ -1095,7 +1096,7 @@ class SBconfigGTK(GladeWindow):
 			dialog.destroy()
 		
 		if result :
-			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format="Test Succeeded !")
+			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Test Succeeded !"))
 			dialog.run()
 			dialog.destroy()
 
@@ -1240,7 +1241,7 @@ class SBconfigGTK(GladeWindow):
 
 	def on_dest_remote_changed(self, *args):
 		self.widgets["dest_remote_light1"].set_from_stock( gtk.STOCK_DIALOG_WARNING , gtk.ICON_SIZE_BUTTON)
-		gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], "Please test writability of the target directory by pressing \"Test\" button on the right.")
+		gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], _("Please test writability of the target directory by pressing \"Test\" button on the right."))
 		self.configman.set( "general", "target", self.widgets['dest_remote'].get_text() )
 
 	#----------------------------------------------------------------------
@@ -1249,21 +1250,20 @@ class SBconfigGTK(GladeWindow):
 		_fusefam = FuseFAM()
 		try :
 			if (_fusefam.testFusePlugins(self.widgets['dest_remote'].get_text())) :
-				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format="Test Succeeded !")
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Test Succeeded !"))
 				dialog.run()
 				dialog.destroy()
 				
 				self.widgets["dest_unusable"].hide()
 				self.widgets["dest_remote_light1"].set_from_stock( gtk.STOCK_YES , gtk.ICON_SIZE_BUTTON )
-				gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], "Target directory is writable.")
-				
+				gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], _("Target directory is writable."))				
 		except Exception, e: 
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
 				dialog.destroy()
 				
 				self.widgets["dest_remote_light1"].set_from_stock( gtk.STOCK_DIALOG_ERROR , gtk.ICON_SIZE_BUTTON )
-				gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], "Please change target directory and test writability of the target directory by pressing \"Test\" button on the right.")
+				gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], _("Please change target directory and test writability of the target directory by pressing \"Test\" button on the right."))
 				self.widgets["dest_unusable"].show()
 	
 	#----------------------------------------------------------------------
@@ -1363,4 +1363,8 @@ def main(argv):
 #----------------------------------------------------------------------
 
 if __name__ == '__main__':
+	# i18n init
+	gettext.textdomain("nssbackup")
+	application = 'nssbackup'
+	gettext.install(application)
 	main(sys.argv)

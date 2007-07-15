@@ -15,6 +15,7 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
+from gettext import gettext as _
 from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
@@ -58,7 +59,7 @@ class RestoreManager :
 		
 		# restore
 		if not snapshot.getFilesList().has_key(_file) :
-			raise SBException("File '%s' not found in the backup snapshot files list"% _file)
+			raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
 		
 		now = datetime.datetime.now().isoformat("_").replace( ":", "." )
 		suffix = ".before_restore_"+now

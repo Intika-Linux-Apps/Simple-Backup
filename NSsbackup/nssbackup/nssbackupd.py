@@ -19,7 +19,8 @@ import traceback
 import smtplib
 import socket
 import datetime
-
+import gettext
+from gettext import gettext as _
 from util.log import getLogger
 from util.exceptions import SBException
 import managers.FileAccessManager as FAM
@@ -48,17 +49,17 @@ class NSsbackupd () :
 		if self.__bm.config.has_option("report","from") :
 			_from =self.__bm.config.get("report","from")
 		else :
-			_from = "NSsbackup Daemon <%s@%s>" % (os.getlogin(), socket.gethostname())
+			_from = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {'login' : os.getlogin(), 'hostname': socket.gethostname()}
 		
 		_to = self.__bm.config.get("report","to")
-		_title = "[NSsbackup] Report of %s" % datetime.datetime.now()
+		_title = _("[NSsbackup] Report of %(date)s") % {'date': datetime.datetime.now()}
 		if self.__bm.config.has_option("log","file") :
 			_content = FAM.readfile(self.__bm.config.get("log","file"))
 		else :
 			if FAM.exists("nssbackup.log") :
 				_content = FAM.readfile("nssbackup.log")
 			else :
-				_content = "I didn't find the log file. Please set it up in sbackup.conf "
+				_content = _("I didn't find the log file. Please set it up in sbackup.conf ")
 		
 		server = smtplib.SMTP()
 		
@@ -119,14 +120,14 @@ class NSsbackupd () :
 							n = pynotify.Notification("NSsbackup", "CRASH : '%s'" % str(e))
 							n.show()
 						else:
-							getLogger().warning("there was a problem initializing the pynotify module")
+							getLogger().warning(_("there was a problem initializing the pynotify module"))
 					except Exception, e1:
 						getLogger().warning(str(e1))
 				getLogger().error(str(e))
 				getLogger().error(traceback.format_exc())
 				# remove any left lockfile
 				if self.__bm and self.__bm.config.has_option("general","lockfile") and FAM.exists(self.__bm.config.get("general","lockfile")) :
-					getLogger().info("Session of backup is finished (lockfile is removed) ")
+					getLogger().info(_("Session of backup is finished (lockfile is removed) "))
 					FAM.delete(self.__bm.config.get("general","lockfile"))
 			finally :
 				# send the mail
@@ -136,5 +137,7 @@ class NSsbackupd () :
 			getLogger().error(str(e))
 			getLogger().error(traceback.format_exc())
 
+application = 'nssbackup'
+gettext.install(application)
 sbd = NSsbackupd()
 sbd.run()

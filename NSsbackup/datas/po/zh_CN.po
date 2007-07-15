@@ -1,0 +1,562 @@
+# Chinese (China) translation for sbackup
+# Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
+# This file is distributed under the same license as the sbackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2007.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sbackup\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2007-05-08 23:03+0200\n"
+"PO-Revision-Date: 2007-04-15 15:08+0000\n"
+"Last-Translator: rainofchaos <rainofchaos@gmail.com>\n"
+"Language-Team: Chinese (China) <zh_CN@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Rosetta-Export-Date: 2007-06-03 13:28:22+0000\n"
+
+#: simple-backup-config.py:66
+msgid "MP3 Music"
+msgstr "MP3 音乐"
+
+#: simple-backup-config.py:66
+msgid "AVI Video"
+msgstr "AVI 视频"
+
+#: simple-backup-config.py:66
+msgid "MPEG Video"
+msgstr "MPEG 视频"
+
+#: simple-backup-config.py:66
+#, fuzzy
+msgid "Matrjoshka Video"
+msgstr "Matrjoshka 视频"
+
+#: simple-backup-config.py:66
+#, fuzzy
+msgid "OGG Multimedia container"
+msgstr "OGG 多媒体容器"
+
+#: simple-backup-config.py:66
+msgid "CD Images"
+msgstr "CD 镜像"
+
+#: simple-backup-config.py:348 simple-backup-config.py:705
+msgid "Custom"
+msgstr "定制"
+
+#: simple-backup-config.py:411
+msgid "Already included item !"
+msgstr ""
+
+#: simple-backup-config.py:426
+msgid "Already excluded item !"
+msgstr ""
+
+#: simple-backup-config.py:437
+msgid "Simple Backup Suite"
+msgstr "简单备份工具"
+
+#: simple-backup-config.py:439
+msgid ""
+"This is a user friendly backup solution for common desktop needs. The "
+"project was was sponsored by Google during Google Summer of Code 2005 and "
+"mentored by Ubuntu."
+msgstr "这是一个针对普通桌面系统的备份工具，简单易用。此项目被谷歌的2005年暑期编程计划资助，在Ubuntu的指导下完成。"
+
+#: simple-backup-config.py:442 simple-backup-config.py:445
+msgid "translator-credits"
+msgstr ""
+"翻译-致谢\n"
+"冯超 <rainofchaos@gmail.com>, 2007"
+
+#: simple-backup-config.py:445
+msgid "Translators : "
+msgstr ""
+
+#: simple-backup-config.py:454
+msgid "A backup run is initiated in the background. The process id is: "
+msgstr "备份程序已经在后台启动，进程的ID为： "
+
+#: simple-backup-config.py:552
+msgid "Configuration save successful"
+msgstr "配置成功保存"
+
+#: simple-backup-config.py:623
+msgid "Include file ..."
+msgstr "包括文件..."
+
+#: simple-backup-config.py:626 simple-backup-config.py:661
+msgid "All files"
+msgstr "所有文件"
+
+#: simple-backup-config.py:639
+msgid "Include folder ..."
+msgstr "包括文件夹 ..."
+
+#: simple-backup-config.py:658
+msgid "Exclude file ..."
+msgstr "排除文件..."
+
+#: simple-backup-config.py:674
+msgid "Exclude folder ..."
+msgstr "排除文件夹..."
+
+#: simple-backup-config.py:750
+msgid "Empty expression. Please enter a valid regular expression."
+msgstr "表达式为空。请输入合法的正则表达式。"
+
+#: simple-backup-config.py:767
+msgid "Empty filename or path. Please enter a valid filename or path."
+msgstr "文件名或路径为空。清输入合法的文件名或路径。"
+
+#: simple-backup-config.py:773
+msgid ""
+"It seems the path you entered does not exists. Do you want to add this wrong "
+"path?"
+msgstr "您输入的路径不存在。仍然包括此路径么？"
+
+#: simple-backup-config.py:995
+msgid "Currently backup configuration is only runnable by root"
+msgstr "目前的备份配置只能由root执行"
+
+#: simple-restore-gnome.py:137
+msgid "Path"
+msgstr "路径"
+
+#: simple-restore-gnome.py:171 simple-restore-gnome.py:175
+msgid "Error: backups directory does not exist!"
+msgstr "错误: 备份目录不存在!"
+
+#: simple-restore-gnome.py:215
+msgid ""
+"Some of your backups are in an old backup format. Do you want to upgrade "
+"them?\n"
+"It should take only a few minutes."
+msgstr ""
+"你的一些备份文件属于旧格式。需要升级它们么?\n"
+"这将要化一些时间。"
+
+#: simple-restore-gnome.py:235
+msgid "Error: no backups found in the target directory"
+msgstr "错误: 目标文件夹中未发现任何备份"
+
+#: simple-restore-gnome.py:252
+msgid ""
+"Select any of the available backups to see list of files that can be "
+"restored."
+msgstr "选择任意备份文件，可以查看能够恢复的文件列表。"
+
+#: simple-restore-gnome.py:257
+msgid "Choose a source folder"
+msgstr "选择源文件夹"
+
+#: simple-restore-gnome.py:337
+msgid "Loading ..."
+msgstr "正在载入..."
+
+#: simple-restore-gnome.py:378
+msgid "Sorry, help is not implemented yet."
+msgstr "对不起，现在没有提供帮助。"
+
+#: simple-restore-gnome.py:390
+#, python-format
+msgid "Do you really want to restore backuped copy of '%s' to '%s' ?"
+msgstr "你确定要将备份从 '%s' 恢复到 '%s' 么 ?"
+
+#: simple-restore-gnome.py:395
+msgid "Restoring ..."
+msgstr "恢复..."
+
+#: simple-restore-gnome.py:413 simple-restore-gnome.py:422
+msgid "Select restore location"
+msgstr "选择恢复位置"
+
+#: srestore.py:74
+msgid "E: File not found in the backup snapshot"
+msgstr "E: 在备份快照中未发现文件"
+
+#: srestore.py:149
+msgid "Simple Backup suit command line restore utility\n"
+msgstr "简单备份程序的命令行恢复工具\n"
+
+#: srestore.py:150
+msgid ""
+" Usage: simple-restore backup-url file-or-dir-to-restore [target-file-or-dir]"
+msgstr ""
+" 用法: simple-restore backup-url file-or-dir-to-restore [target-file-or-dir]"
+
+#: srestore.py:151
+msgid ""
+" Note: backup-url must include the snapshot subdirectory name, for example:"
+msgstr " 注意: backup-url 必须包括快照的子目录, 例如:"
+
+#: srestore.py:153
+msgid " Use simple-restore-gnome for more ease of use.\n"
+msgstr " 使用更方便的 simple-restore-gnome 。\n"
+
+#: srestore.py:162
+msgid "Restore FAILED! Please check you parameters."
+msgstr "恢复失败！请检查使用的参数。"
+
+#: upgrade_backups.py:73
+#, python-format
+msgid "I: Upgrading from v1.0 to v1.2: %s"
+msgstr "I: 从 v1.0 升级到 v1.2: %s"
+
+#: upgrade_backups.py:91
+#, python-format
+msgid "I: Upgrading to v1.3: %s"
+msgstr ""
+
+#: upgrade_backups.py:98
+#, python-format
+msgid "I: Upgrading to v1.4: %s"
+msgstr ""
+
+#: upgrade_backups.py:134 upgrade_backups.py:145
+#, python-format
+msgid "W: Damaged backup metainfo - disabling %s"
+msgstr ""
+
+#: upgrade_backups.py:331
+msgid ""
+"\n"
+"Simple Backup suit command line backup format upgrade\n"
+"Usage: upgrade-backup backup-target-url\n"
+"Note: backup-target-url must not include the snapshot subdirectory name, for "
+"example:\n"
+"\n"
+"   /var/backup/\n"
+"\n"
+"Use simple-restore-gnome for more ease of use.\n"
+msgstr ""
+
+#: simple-backup-config.glade:9
+msgid "Backup Properties"
+msgstr "备份属性"
+
+#: simple-backup-config.glade:53
+msgid ""
+"Do backup now, with configuration above. Don't forget to save any "
+"modification before click this button."
+msgstr "立即使用上面的设置执行备份。点击此按钮之前，不要忘了保存设置。"
+
+#: simple-backup-config.glade:99
+msgid "_Backup Now!"
+msgstr "立即备份(_B)!"
+
+#: simple-backup-config.glade:130
+msgid "Saves any modification made in the backup configuration above."
+msgstr "保存备份设置中做得修改。"
+
+#: simple-backup-config.glade:189
+msgid "Use recommended backup settings"
+msgstr "使用推荐的备份设置"
+
+#: simple-backup-config.glade:240
+msgid ""
+"<small>Do standard backups.\n"
+"Defaults: daily incremental and weekly full backup to /var/backup of all "
+"user files, /etc, /usr/local and /var. \n"
+"Multimedia files, temporary files and files larger than 100 Mb are "
+"excluded.</small>"
+msgstr ""
+"<small>进行标准备份.\n"
+"默认: 每天增量备份，每周完全备份 “用户文件, /etc, /usr/local 和 /var”，保存到/var/backup \n"
+"多媒体文件, 临时文件和大小超过100Mb的文件不备份。</small>"
+
+#: simple-backup-config.glade:275
+msgid "Use custom backup settings"
+msgstr "使用自定义的备份设置"
+
+#: simple-backup-config.glade:327
+msgid ""
+"<small>Do backups according to the settings defined on the next pages of "
+"this dialog.</small>"
+msgstr "<small>使用此对话框下一页的设置进行备份。</small>"
+
+#: simple-backup-config.glade:360
+msgid "Manual backups only"
+msgstr "仅进行手动备份"
+
+#: simple-backup-config.glade:412
+msgid ""
+"<small>Do not backup your data automatically. Note: this does not prevent "
+"doing manual backups.</small>"
+msgstr "<small>不自动备份您的数据。注意: 这并不组织手动备份</small>"
+
+#: simple-backup-config.glade:450
+msgid "General"
+msgstr "普通"
+
+#: simple-backup-config.glade:562 simple-backup-config.glade:817
+msgid "Add File"
+msgstr "添加文件"
+
+#: simple-backup-config.glade:637 simple-backup-config.glade:892
+msgid "Add Directory"
+msgstr "添加目录"
+
+#: simple-backup-config.glade:695
+msgid "Include"
+msgstr "包括"
+
+#: simple-backup-config.glade:950
+msgid "Paths"
+msgstr "路径"
+
+#: simple-backup-config.glade:1056
+msgid "File types"
+msgstr "文件类型"
+
+#: simple-backup-config.glade:1162
+msgid "Regex"
+msgstr "正则表达式"
+
+#: simple-backup-config.glade:1202
+msgid "Do not backup files bigger than "
+msgstr "不备份文件，如果大小超过 "
+
+#: simple-backup-config.glade:1241
+msgid "Mb"
+msgstr "Mb"
+
+#: simple-backup-config.glade:1303
+msgid "Max size"
+msgstr "最大大小"
+
+#: simple-backup-config.glade:1332
+msgid "Exclude"
+msgstr "排除"
+
+#: simple-backup-config.glade:1362
+msgid "Use default backup directory (/var/backup)"
+msgstr "使用默认备份目录 (/var/backup)"
+
+#: simple-backup-config.glade:1382
+msgid "Use custom local backup directory"
+msgstr "使用自定义备份目录"
+
+#: simple-backup-config.glade:1425
+msgid "Select the destination folder"
+msgstr "选择目标文件夹"
+
+#: simple-backup-config.glade:1451
+msgid "Use a remote directory (SSH or FTP)"
+msgstr "使用远程目录 (SSH or FTP)"
+
+#: simple-backup-config.glade:1477
+msgid ""
+"Please test writability of the target directory by pressing \"Test\" button "
+"on the right."
+msgstr "请按下 “测试”按钮测试目标目录的可写性。"
+
+#: simple-backup-config.glade:1507
+msgid "ssh://username:password@example.com/remote/dir/"
+msgstr "ssh://username:password@example.com/remote/dir/"
+
+#: simple-backup-config.glade:1567
+msgid "Test"
+msgstr "测试"
+
+#: simple-backup-config.glade:1636
+msgid ""
+"<i>The selected destination is not writtable with current permissions.\n"
+"The backups can not be written there.</i>"
+msgstr ""
+"<i>目前的权限无法写入选择的目录。\n"
+"备份无法写入.</i>"
+
+#: simple-backup-config.glade:1680
+msgid "Destination"
+msgstr "目标"
+
+#: simple-backup-config.glade:1719
+msgid "Do backups "
+msgstr "开始备份 "
+
+#: simple-backup-config.glade:1745
+msgid ""
+"never\n"
+"hourly\n"
+"daily\n"
+"weekly\n"
+"monthly\n"
+"custom"
+msgstr ""
+"从不\n"
+"每小时\n"
+"每天\n"
+"每周\n"
+"每月\n"
+"自定义"
+
+#: simple-backup-config.glade:1767
+msgid "simply"
+msgstr ""
+
+#: simple-backup-config.glade:1788
+msgid "precisely"
+msgstr ""
+
+#: simple-backup-config.glade:1808
+msgid "at:"
+msgstr "于:"
+
+#: simple-backup-config.glade:1849
+#, fuzzy
+msgid "Day of month:"
+msgstr "日期:"
+
+#: simple-backup-config.glade:1877
+msgid "Day of week:"
+msgstr "星期:"
+
+#: simple-backup-config.glade:1905
+msgid "Hour"
+msgstr "小时"
+
+#: simple-backup-config.glade:1933
+msgid "Minute"
+msgstr "分"
+
+#: simple-backup-config.glade:2085
+msgid "Custom cron time definition: "
+msgstr "自定义 cron 时间定义: "
+
+#: simple-backup-config.glade:2148
+msgid "Do a full backup at least once every"
+msgstr "进行备份，至少每"
+
+#: simple-backup-config.glade:2193 simple-backup-config.glade:2410
+msgid "days"
+msgstr "天"
+
+#: simple-backup-config.glade:2248
+msgid ""
+"<small>You can configure how often to start a backup run and when to do it.\n"
+"Unless a set number of days has passed since the last full backup, "
+"incremental backups will be done.\n"
+"See \"man 5 crontab\" for cron time definition format.</small>"
+msgstr ""
+"<small>你可以配置备份频率和时间。\n"
+"默认采用增量备份，除非超过设定的时间。\n"
+"查看 \"man 5 crontab\" 以获得 cron 的时间格式.</small>"
+
+#: simple-backup-config.glade:2288
+msgid "Time"
+msgstr ""
+
+#: simple-backup-config.glade:2318
+msgid "Enable purging of old and incomplete backups"
+msgstr "清除旧的和不完整的备份"
+
+#: simple-backup-config.glade:2370
+msgid "Simple cutoff: Erase all backups older than "
+msgstr "简单截断:删除备份，如果晚于 "
+
+#: simple-backup-config.glade:2475
+msgid "Logarithmic (Recommended)"
+msgstr "逻辑算术 (推荐)"
+
+#: simple-backup-config.glade:2496
+msgid ""
+"<small>Keep progressivelly less backups into the past:\n"
+"Keep all backups from yesterday.\n"
+"Keep one backup per day from last week.\n"
+"Keep one backup per week from last month.\n"
+"Keep one backup per month from last year.\n"
+"Keep one backup per year further into past.\n"
+"Erase all other backups.</small>\n"
+msgstr ""
+
+#: simple-backup-config.glade:2558
+msgid ""
+"<small>Note: Additionally all incomplete and irrecoverable backups will be "
+"erased as long as there is a complete backup snapshot made later on.</small>"
+msgstr "<small>注意:如果存在新的备份快照，将会删除额外的不完全和不可恢复的备份</small>"
+
+#: simple-backup-config.glade:2596
+msgid "Purging"
+msgstr "清除"
+
+#: simple-backup-config.glade:2611
+msgid "Cleaning old backups"
+msgstr "清除陈旧的备份"
+
+#: simple-backup-config.glade:2630
+msgid "Exclude file type"
+msgstr "排除的文件类型"
+
+#: simple-backup-config.glade:2701
+msgid "Standard file types:"
+msgstr "标准文件类型"
+
+#: simple-backup-config.glade:2747
+msgid "Custom defined file type with "
+msgstr "自定义文件类型 "
+
+#: simple-backup-config.glade:2787
+msgid "file extension"
+msgstr "文件后缀"
+
+#: simple-backup-config.glade:2827
+msgid "Exclude by regex"
+msgstr "通过正则表达式排除"
+
+#: simple-backup-config.glade:2899
+msgid ""
+"Enter a regular expression.\n"
+"Files and directories matching this expression will be excluded from backup."
+msgstr ""
+"输入正则表达式。\n"
+"符合此表达式的文件和目录不会被备份。"
+
+#: simple-restore.glade:8
+msgid "Restore files/directories"
+msgstr "恢复文件/目录"
+
+#: simple-restore.glade:42
+msgid "<b>Restore Source Folder</b>"
+msgstr "<b>恢复原始文件夹</b>"
+
+#: simple-restore.glade:113
+msgid "Use default:"
+msgstr "使用默认:"
+
+#: simple-restore.glade:136
+msgid "Use custom:"
+msgstr "使用自定义:"
+
+#: simple-restore.glade:194
+msgid ""
+"Type in this box text like that:\n"
+"\n"
+"/home/user/folder - To use a local folder\n"
+"ssh://user:password@machine:/remote/folder - To use a ssh location\n"
+"ssh://user:password@machine:/remote/folder - To use a ftp location"
+msgstr ""
+"向下面这样输入:\n"
+"\n"
+"/home/user/folder - 备份到本地目录\n"
+"ssh://user:password@machine:/remote/folder - 备份到 ssh \n"
+"ssh://user:password@machine:/remote/folder - 备份到 ftp"
+
+#: simple-restore.glade:273
+msgid "Available backups:"
+msgstr "可用的备份:"
+
+#: simple-restore.glade:360
+msgid "<b>Files and Folders to restore</b>"
+msgstr "<b>要恢复的文件和文件夹</b>"
+
+#: simple-restore.glade:544
+msgid "Restore"
+msgstr "恢复"
+
+#: simple-restore.glade:620
+msgid "Restore As..."
+msgstr "恢复为..."

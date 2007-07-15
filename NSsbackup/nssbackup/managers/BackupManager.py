@@ -60,7 +60,7 @@ class BackupManager :
 			self.config = ConfigManager()
 		
 		self.__fusefam = FuseFAM(self.config)
-		getLogger().info("BackupManager created ")
+		getLogger().info(_("BackupManager created "))
 		
 	def makeBackup(self ):
 		"""
@@ -71,20 +71,20 @@ class BackupManager :
 		try:
 			import pynotify
 			if pynotify.init("nssbackup"):
-				n = pynotify.Notification("nssbackup", "Starting Backup Session")
+				n = pynotify.Notification("nssbackup", _("Starting backup Session"))
 				n.show()
 			else:
-				getLogger().warning("there was a problem initializing the pynotify module")
+				getLogger().warning(_("there was a problem initializing the pynotify module"))
 		except Exception, e:
 			getLogger().warning(str(e))
 		
 		
-		getLogger().info("Starting backup")
+		getLogger().info(_("Starting backup"))
 		
 		# set the lockfile
 		self.__setlockfile()
 		
-		getLogger().info("Initializing FUSE FILE ACCESS MANAGER !")
+		getLogger().info(_("Initializing FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.initialize()
 		
 		self.__snpman = SnapshotManager(self.config.get("general","target"))
@@ -159,10 +159,10 @@ class BackupManager :
 			try:
 				import pynotify
 				if pynotify.init("nssbackup"):
-					n = pynotify.Notification("nssbackup", "File list ready , Committing to disk")
+					n = pynotify.Notification("nssbackup", _("File list ready , Committing to disk"))
 					n.show()
 				else:
-					getLogger().warning("there was a problem initializing the pynotify module")
+					getLogger().warning(_("there was a problem initializing the pynotify module"))
 			except Exception, e:
 				getLogger().warning(str(e))
 				
@@ -318,7 +318,7 @@ class BackupManager :
 		if self.config.has_section( "dirconfig" ):
 			if not len(self.config.items("dirconfig")) :
 				includelist, excludelist = {},{}
-				getLogger().warning("No directories to backup !")
+				getLogger().warning(_("No directories to backup !"))
 			else :
 				includelist, excludelist = {},{}
 				for k,v in self.config.items("dirconfig") :
@@ -349,7 +349,7 @@ class BackupManager :
 		getLogger().debug("Free size required is '%s' " % str(fullsize))
 		vstat = os.statvfs( self.__actualSnapshot.getPath() )
 		if (vstat.f_bavail * vstat.f_bsize) <= fullsize:
-			raise SBException("Not enough free space on the target directory for the planned backup (%d <= %d)" % ((vstat.f_bavail * vstat.f_bsize), self.__fullsize))
+			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': self.__fullsize})
 	
 	
 	def __setlockfile(self):
@@ -358,7 +358,7 @@ class BackupManager :
 		if self.config.has_option("general", "lockfile") :
 			self.__lockfile = self.config.get("general", "lockfile")
 		else :
-			getLogger().info("no lockfile in config, default will be used ")
+			getLogger().debug("no lockfile in config, the default will be used ")
 			self.__lockfile = "/var/lock/nssbackup.lock"
 		
 		# Create the lockfile so none disturbs us
@@ -366,12 +366,12 @@ class BackupManager :
 			# the lockfile exists, is it valid ?
 			last_sb_pid = FAM.readfile(self.__lockfile)
 			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read()) ) :
-				raise SBException("Another Simple Backup daemon already running (pid = %s )!" % last_sb_pid )
+				raise SBException(_("Another Simple Backup daemon already running (pid = %s )!") % last_sb_pid )
 			else :
 				FAM.delete(self.__lockfile)
 		
 		lock = FAM.writetofile(self.__lockfile, str(os.getpid()) )
-		getLogger().info("Created lockfile at '%s' with info '%s'"% (self.__lockfile, str(os.getpid()) ) )
+		getLogger().debug("Created lockfile at '%s' with info '%s'"% (self.__lockfile, str(os.getpid()) ) )
 
 	def __endSBsession(self):
 		"""
@@ -381,25 +381,25 @@ class BackupManager :
 		"""
 		
 		FAM.delete(self.__lockfile)
-		getLogger().info("Session of backup is finished (%s is removed) " % self.__lockfile)
+		getLogger().info(_("Session of backup is finished (%s is removed) ") % self.__lockfile)
 		
 		if self.config.has_option("log","file") and FAM.exists(self.config.get("log","file")):
 			FAM.copyfile(self.config.get("log","file"), self.__actualSnapshot.getPath()+"/nssbackup.log")
 		elif FAM.exists("nssbackup.log") : 
 			FAM.copyfile(os.path.abspath("nssbackup.log"), self.__actualSnapshot.getPath()+"/nssbackup.log")
 		else :
-			getLogger().warning("I didn't find the logfile to copy into snapshot")
+			getLogger().warning(_("I didn't find the logfile to copy into snapshot"))
 			
-		getLogger().info("Terminating FUSE FILE ACCESS MANAGER !")
+		getLogger().info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.terminate()
 		if os.getuid() != 0 :
 			try:
 				import pynotify
 				if pynotify.init("nssbackup"):
-					n = pynotify.Notification("nssbackup", "Ending Backup Session")
+					n = pynotify.Notification("nssbackup", _("Ending Backup Session"))
 					n.show()
 				else:
-					getLogger().warning("there was a problem initializing the pynotify module")
+					getLogger().warning(_("there was a problem initializing the pynotify module"))
 			except Exception, e:
 				getLogger().warning(str(e))
 			
@@ -409,11 +409,11 @@ class BackupManager :
 		"""
 		# Check if the mandatory target option exists
 		if not self.config.has_option("general","target") :
-			raise SBException ("Option target is missing, aborting.")
+			raise SBException (_("Option 'target' is missing, aborting."))
 		
 		# Check if the target dir exists or create it
 		if not FAM.exists(self.config.get("general","target")) :
-			getLogger().info("Creating the target dir '%s'" % self.config.get("general","target"))
+			getLogger().info(_("Creating the target dir '%s'") % self.config.get("general","target"))
 			FAM.makedir(self.config.get("general","target"))
 		
 		# Try to write inside so that we don't work for nothing
@@ -458,7 +458,7 @@ class BackupManager :
 							if not prev.has_key(a) : # We always keep the newer incremental file info
 								prev[a]=b
 					except Exception, e :  # One of the incremental backups is bad -> make a new full one
-						getLogger().warning("One of the incremental backups (%s) is bad -> make a new full one : %s " % (i.getName(), str(e)))
+						getLogger().warning(_("One of the incremental backups (%(bad_one)s) is bad -> make a new full one : %(error_cause)s ") % {'bad_one' : i.getName(), 'error_cause' : str(e)})
 						increment = 0
 						break
 					

@@ -74,7 +74,7 @@ class GladeWindow(object):
             search_path = './'
 
         fname = search_file(filename, search_path)
-        self.xml = gtk.glade.XML(fname)
+        self.xml = gtk.glade.XML(fname,domain='nssbackup')
 
         # connect callbacks
         self.cb_dict = {}

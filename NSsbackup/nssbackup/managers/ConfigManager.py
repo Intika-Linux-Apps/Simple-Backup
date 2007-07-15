@@ -19,6 +19,7 @@ import os.path
 import ConfigParser
 import traceback
 import smtplib
+from gettext import gettext as _
 from optparse import OptionParser
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import *
@@ -276,7 +277,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
-				raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (r,remotes))
+				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
 			if not remotes.has_key(option) :
 				# then it wasn't for us , fall back on the parent
 				return ConfigParser.ConfigParser.has_option(self, section, option)
@@ -296,7 +297,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
-				raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (r,remotes))
+				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
 			# we have that key
 			return remotes[option]
 		elif section == "dirconfig" and option == 'remote' :
@@ -304,7 +305,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
-				raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (r,remotes))
+				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
 			return remotes
 		else :
 			#fall back in parent behaviour
@@ -319,7 +320,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		"""
 		if section == "dirconfig" and option == "remote" :
 			if type(value) != dict :
-				raise SBException("You must provide a dictionary" )
+				raise SBException(_("You must provide a dictionary"))
 			if not self.has_option(section, option) :
 				ConfigParser.ConfigParser.set(self, section, option, value)
 			else :
@@ -344,7 +345,6 @@ class ConfigManager (ConfigParser.ConfigParser):
 			#search through remote option to get the option
 			if not self.has_option("dirconfig", "remote"):
 				#fall back in parent behaviour
-				getLogger().debug("fall back in parent behaviour")
 				ConfigParser.ConfigParser.remove_option(self, section, option)
 			else :
 				getLogger().debug("search through remote option to get the option")
@@ -363,7 +363,6 @@ class ConfigManager (ConfigParser.ConfigParser):
 					ConfigParser.ConfigParser.set(self, section, "remote", remotes)
 		else :
 			#fall back in parent behaviour
-			getLogger().debug("fall back in parent behaviour")
 			ConfigParser.ConfigParser.remove_option(self, section, option)
 			
 	
@@ -384,7 +383,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		else :
 			getLogger()
 		if len(retValue) == 0 :
-			raise SBException("The config file '%s' couldn't be read !" % self.conffile )
+			raise SBException(_("The config file '%s' couldn't be read !") % self.conffile )
 		if self.valid_options: self.validateConfigFileOpts()
 		return retValue
 
@@ -407,10 +406,10 @@ class ConfigManager (ConfigParser.ConfigParser):
 			try:
 				for key in self.options(section):
 					if (not self.valid_options.has_key(section)):
-						raise NotValidSectionException ("section [%s] in '%s' should not exist, aborting" % (section, self.conffile))
+						raise NotValidSectionException (_("section [%(section)s] in '%(configfile)s' should not exist, aborting") % {'section': section, 'configfile' :self.conffile})
 					if (self.valid_options[section].has_key(key) or self.valid_options[section].has_key('*')):
 						continue
-					raise NonValidOptionException ("key '%s' in section '%s' in file '%s' is not known,\na typo possibly?" % (key, section, self.conffile))
+					raise NonValidOptionException ("key '%s' in section '%s' in file '%s' is not known, a typo possibly?" % (key, section, self.conffile))
 			except SBException, e:
 				getLogger().error(str(e))
 				raise e
@@ -624,17 +623,17 @@ class ConfigManager (ConfigParser.ConfigParser):
 		@raise SBException: catch this to get the error message of why it didn't run
 		"""
 		if not self.has_option("report", "to"):
-			raise SBException ("Set the reciever of this mail")
+			raise SBException (_("Set the reciever of this mail"))
 		if not self.has_option("report","smtpserver") :
-			raise SBException ("Set the SMTP server")
+			raise SBException (_("Set the SMTP server"))
 		if (self.has_option("report","smtpuser") and not self.has_option("report","smtppassword") ) \
 			or (not self.has_option("report","smtpuser") and self.has_option("report","smtppassword") ) :
-			raise SBException ("When setting a username (resp password), password (resp username) is mandatory")
+			raise SBException (_("When setting a username (resp password), password (resp username) is mandatory"))
 		if not self.has_option("report", "smtptls") and (self.has_option("report", "smtpcert") or self.has_option("report","smtpkey)") ) :
-			raise SBException ("Choose the SSL option (smtptls=1) to be able to use Cert and Key")
+			raise SBException (_("Choose the SSL option (smtptls=1) to be able to use Cert and Key"))
 		if self.has_option("report", "smtptls") and ((self.has_option("report","smtpcert") and not self.has_option("report","smtpkey") ) \
 			or (not self.has_option("report","smtpcert") and self.has_option("report","smtpkey") ) ):
-			raise SBException ("When setting a ssl certificate (resp key), key (resp certificate) is mandatory")
+			raise SBException (_("When setting a ssl certificate (resp key), key (resp certificate) is mandatory"))
 		
 		try :
 			server = smtplib.SMTP()

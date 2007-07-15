@@ -2,6 +2,7 @@ ifndef DESTDIR
 	DESTDIR = /usr/local
 endif 
 
+PO = pt_BR lv nl es sv fr
 PREFIX = /usr/local
 BIN = $(DESTDIR)/bin/
 SUPPORT = $(DESTDIR)/share/nssbackup/
@@ -29,7 +30,7 @@ else
 	@echo "$(DESTDIR)/share/applications/" >>  nssbackup/ressources
 endif
 	cp -rf nssbackup/* $(CLSDIR)
-	chmod +x  $(CLSDIR)/managers/UpgradeManager.py $(CLSDIR)/nssbackupd.py $(CLSDIR)/ui/SBConfigGTK.py $(CLSDIR)/ui/SBRestoreGTK.py $(CLSDIR)/srestore.py
+	chmod +x  $(CLSDIR)/managers/UpgradeManager.py $(CLSDIR)/nssbackupd.py $(CLSDIR)/ui/SBConfigGTK.py $(CLSDIR)/ui/SBRestoreGTK.py
 	ln -s ../$(SUBCLSDIR)/nssbackupd.py $(BIN)/nssbackupd
 	ln -s ../$(SUBCLSDIR)/ui/SBConfigGTK.py $(BIN)/simple-backup-config
 	ln -s ../$(SUBCLSDIR)/ui/SBRestoreGTK.py $(BIN)/simple-restore-gnome
@@ -60,23 +61,23 @@ uninstall:
 
 clean:
 	@echo "" > nssbackup/ressources
-	for lang in $(PO); do rm -rf po/$$lang ; done
+	for lang in $(PO); do rm -rf datas/po/$$lang ; done
 	find ./ -name *.pyc -exec rm -f '{}' \;
-	-rm -f po/*~
-	-rm -f *.gladep
-	-rm -f *~ *.bak
+	-rm -f datas/po/*~
+	-rm -f datas/*.gladep
+	-rm -f datas/*~ datas/*.bak *~
 
 install-po:
 	for lang in $(PO); do install -d $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
-	for lang in $(PO); do install -m 644 po/$$lang/LC_MESSAGES/* $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
+	for lang in $(PO); do install -m 644 datas/po/$$lang/LC_MESSAGES/* $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
 
 po-dir:
-	for lang in $(PO); do mkdir -p po/$$lang/LC_MESSAGES/ ; done
+	for lang in $(PO); do mkdir -p datas/po/$$lang/LC_MESSAGES/ ; done
 
 po-data: po-dir
-	for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/sbackup.mo ; done
+	for lang in $(PO); do msgfmt datas/po/$$lang.po -o datas/po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 
 po-gen:
-	xgettext -k_ -kN_ -o po/messages.pot -L Python simple-backup-config.py simple-restore-gnome.py srestore.py upgrade_backups.py 
-	xgettext -k_ -kN_ -o po/messages.pot -j -L Glade simple-backup-config.glade simple-restore.glade
-	for lang in $(PO); do msgmerge -U po/$$lang.po po/messages.pot; done
+	xgettext -k_ -kN_ -o datas/po/messages.pot -L Python nssbackup/*.py nssbackup/managers/*.py nssbackup/ui/*.py nssbackup/util/*.py nssbackup/plugins/*.py
+	xgettext -k_ -kN_ -o datas/po/messages.pot -j -L Glade datas/*.glade
+	for lang in $(PO); do msgmerge -U datas/po/$$lang.po datas/po/messages.pot; done

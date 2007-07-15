@@ -1,0 +1,541 @@
+# Turkish translation for sbackup
+# Copyright (c) (c) 2006 Canonical Ltd, and Rosetta Contributors 2006
+# This file is distributed under the same license as the sbackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2006.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sbackup\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2007-05-08 23:03+0200\n"
+"PO-Revision-Date: 2007-05-01 06:51+0000\n"
+"Last-Translator: webdr <drumut@gmail.com>\n"
+"Language-Team: Turkish <tr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Rosetta-Export-Date: 2007-06-03 13:28:17+0000\n"
+
+#: simple-backup-config.py:66
+msgid "MP3 Music"
+msgstr "MP3 Müziği"
+
+#: simple-backup-config.py:66
+msgid "AVI Video"
+msgstr "AVI Vidyosu"
+
+#: simple-backup-config.py:66
+msgid "MPEG Video"
+msgstr "MPEG Vidyosu"
+
+#: simple-backup-config.py:66
+msgid "Matrjoshka Video"
+msgstr "Matrjoshka Vidyosu"
+
+#: simple-backup-config.py:66
+msgid "OGG Multimedia container"
+msgstr "OGG Çokluortam kapsayıcısı"
+
+#: simple-backup-config.py:66
+msgid "CD Images"
+msgstr "CD Görüntüleri"
+
+#: simple-backup-config.py:348 simple-backup-config.py:705
+msgid "Custom"
+msgstr "Özel"
+
+#: simple-backup-config.py:411
+msgid "Already included item !"
+msgstr ""
+
+#: simple-backup-config.py:426
+msgid "Already excluded item !"
+msgstr ""
+
+#: simple-backup-config.py:437
+msgid "Simple Backup Suite"
+msgstr "Simple Backup Suite"
+
+#: simple-backup-config.py:439
+msgid ""
+"This is a user friendly backup solution for common desktop needs. The "
+"project was was sponsored by Google during Google Summer of Code 2005 and "
+"mentored by Ubuntu."
+msgstr ""
+
+#: simple-backup-config.py:442 simple-backup-config.py:445
+msgid "translator-credits"
+msgstr "çevirmen-teşekkürler"
+
+#: simple-backup-config.py:445
+msgid "Translators : "
+msgstr ""
+
+#: simple-backup-config.py:454
+msgid "A backup run is initiated in the background. The process id is: "
+msgstr ""
+
+#: simple-backup-config.py:552
+msgid "Configuration save successful"
+msgstr "Yapılandırma kaydı başarılı"
+
+#: simple-backup-config.py:623
+msgid "Include file ..."
+msgstr "Dosya içer..."
+
+#: simple-backup-config.py:626 simple-backup-config.py:661
+msgid "All files"
+msgstr "Tüm dosyalar"
+
+#: simple-backup-config.py:639
+msgid "Include folder ..."
+msgstr "Klasör içer..."
+
+#: simple-backup-config.py:658
+msgid "Exclude file ..."
+msgstr "Dosyayı dışarda bırak..."
+
+#: simple-backup-config.py:674
+msgid "Exclude folder ..."
+msgstr "Klasörü dışarda bırak..."
+
+#: simple-backup-config.py:750
+msgid "Empty expression. Please enter a valid regular expression."
+msgstr ""
+
+#: simple-backup-config.py:767
+msgid "Empty filename or path. Please enter a valid filename or path."
+msgstr ""
+
+#: simple-backup-config.py:773
+msgid ""
+"It seems the path you entered does not exists. Do you want to add this wrong "
+"path?"
+msgstr ""
+
+#: simple-backup-config.py:995
+msgid "Currently backup configuration is only runnable by root"
+msgstr ""
+
+#: simple-restore-gnome.py:137
+msgid "Path"
+msgstr "Yol"
+
+#: simple-restore-gnome.py:171 simple-restore-gnome.py:175
+msgid "Error: backups directory does not exist!"
+msgstr "Hata: yedekler dizini yok!"
+
+#: simple-restore-gnome.py:215
+msgid ""
+"Some of your backups are in an old backup format. Do you want to upgrade "
+"them?\n"
+"It should take only a few minutes."
+msgstr ""
+
+#: simple-restore-gnome.py:235
+msgid "Error: no backups found in the target directory"
+msgstr "Hata : Hedef dizinde herhangi bir yedek bulunamadı"
+
+#: simple-restore-gnome.py:252
+msgid ""
+"Select any of the available backups to see list of files that can be "
+"restored."
+msgstr ""
+"Geri yüklenibilir konumdaki dosyaların bir listesini görmek için yedeklerden "
+"herhangi birini seçin."
+
+#: simple-restore-gnome.py:257
+msgid "Choose a source folder"
+msgstr "Bir kaynak klasörü seçin"
+
+#: simple-restore-gnome.py:337
+msgid "Loading ..."
+msgstr "Yükleniyor..."
+
+#: simple-restore-gnome.py:378
+msgid "Sorry, help is not implemented yet."
+msgstr "Üzgünüm, henüz yardım eklenmedi."
+
+#: simple-restore-gnome.py:390
+#, python-format
+msgid "Do you really want to restore backuped copy of '%s' to '%s' ?"
+msgstr ""
+
+#: simple-restore-gnome.py:395
+msgid "Restoring ..."
+msgstr "Geri yükleniyor..."
+
+#: simple-restore-gnome.py:413 simple-restore-gnome.py:422
+msgid "Select restore location"
+msgstr "Geri yükleme konumunu seçin"
+
+#: srestore.py:74
+msgid "E: File not found in the backup snapshot"
+msgstr ""
+
+#: srestore.py:149
+msgid "Simple Backup suit command line restore utility\n"
+msgstr ""
+
+#: srestore.py:150
+msgid ""
+" Usage: simple-restore backup-url file-or-dir-to-restore [target-file-or-dir]"
+msgstr ""
+
+#: srestore.py:151
+msgid ""
+" Note: backup-url must include the snapshot subdirectory name, for example:"
+msgstr ""
+
+#: srestore.py:153
+msgid " Use simple-restore-gnome for more ease of use.\n"
+msgstr ""
+
+#: srestore.py:162
+msgid "Restore FAILED! Please check you parameters."
+msgstr "Geri yükleme BAŞARISIZ! Lütfen parametrelerinizi kontrol ediniz."
+
+#: upgrade_backups.py:73
+#, python-format
+msgid "I: Upgrading from v1.0 to v1.2: %s"
+msgstr ""
+
+#: upgrade_backups.py:91
+#, python-format
+msgid "I: Upgrading to v1.3: %s"
+msgstr ""
+
+#: upgrade_backups.py:98
+#, python-format
+msgid "I: Upgrading to v1.4: %s"
+msgstr ""
+
+#: upgrade_backups.py:134 upgrade_backups.py:145
+#, python-format
+msgid "W: Damaged backup metainfo - disabling %s"
+msgstr ""
+
+#: upgrade_backups.py:331
+msgid ""
+"\n"
+"Simple Backup suit command line backup format upgrade\n"
+"Usage: upgrade-backup backup-target-url\n"
+"Note: backup-target-url must not include the snapshot subdirectory name, for "
+"example:\n"
+"\n"
+"   /var/backup/\n"
+"\n"
+"Use simple-restore-gnome for more ease of use.\n"
+msgstr ""
+
+#: simple-backup-config.glade:9
+msgid "Backup Properties"
+msgstr "Yedek Özellikleri"
+
+#: simple-backup-config.glade:53
+msgid ""
+"Do backup now, with configuration above. Don't forget to save any "
+"modification before click this button."
+msgstr ""
+
+#: simple-backup-config.glade:99
+msgid "_Backup Now!"
+msgstr ""
+
+#: simple-backup-config.glade:130
+msgid "Saves any modification made in the backup configuration above."
+msgstr ""
+
+#: simple-backup-config.glade:189
+msgid "Use recommended backup settings"
+msgstr "Tavsiye edilen yedekleme ayarlarını kullan"
+
+#: simple-backup-config.glade:240
+msgid ""
+"<small>Do standard backups.\n"
+"Defaults: daily incremental and weekly full backup to /var/backup of all "
+"user files, /etc, /usr/local and /var. \n"
+"Multimedia files, temporary files and files larger than 100 Mb are "
+"excluded.</small>"
+msgstr ""
+
+#: simple-backup-config.glade:275
+msgid "Use custom backup settings"
+msgstr "Özel yedekleme ayarları kullan"
+
+#: simple-backup-config.glade:327
+msgid ""
+"<small>Do backups according to the settings defined on the next pages of "
+"this dialog.</small>"
+msgstr ""
+
+#: simple-backup-config.glade:360
+msgid "Manual backups only"
+msgstr "Sadece elle alınan yedekler"
+
+#: simple-backup-config.glade:412
+msgid ""
+"<small>Do not backup your data automatically. Note: this does not prevent "
+"doing manual backups.</small>"
+msgstr ""
+
+#: simple-backup-config.glade:450
+msgid "General"
+msgstr "Genel"
+
+#: simple-backup-config.glade:562 simple-backup-config.glade:817
+msgid "Add File"
+msgstr "Dosya Ekle"
+
+#: simple-backup-config.glade:637 simple-backup-config.glade:892
+msgid "Add Directory"
+msgstr "Dizin Ekle"
+
+#: simple-backup-config.glade:695
+msgid "Include"
+msgstr "İçer"
+
+#: simple-backup-config.glade:950
+msgid "Paths"
+msgstr "Yollar"
+
+#: simple-backup-config.glade:1056
+msgid "File types"
+msgstr "Dosya türleri"
+
+#: simple-backup-config.glade:1162
+msgid "Regex"
+msgstr "Regex"
+
+#: simple-backup-config.glade:1202
+msgid "Do not backup files bigger than "
+msgstr "Şundan daha büyük dosyaları yedekleme: "
+
+#: simple-backup-config.glade:1241
+msgid "Mb"
+msgstr "Mb"
+
+#: simple-backup-config.glade:1303
+msgid "Max size"
+msgstr "En yüksek boyut"
+
+#: simple-backup-config.glade:1332
+msgid "Exclude"
+msgstr "Dışarda bırak"
+
+#: simple-backup-config.glade:1362
+msgid "Use default backup directory (/var/backup)"
+msgstr "Öntanımlı yedekleme dizininin kullan (/var/backup)"
+
+#: simple-backup-config.glade:1382
+msgid "Use custom local backup directory"
+msgstr "Özel yerel yedekleme dizinini kullan"
+
+#: simple-backup-config.glade:1425
+msgid "Select the destination folder"
+msgstr ""
+
+#: simple-backup-config.glade:1451
+msgid "Use a remote directory (SSH or FTP)"
+msgstr ""
+
+#: simple-backup-config.glade:1477
+msgid ""
+"Please test writability of the target directory by pressing \"Test\" button "
+"on the right."
+msgstr ""
+
+#: simple-backup-config.glade:1507
+msgid "ssh://username:password@example.com/remote/dir/"
+msgstr "ssh://kullanıcıadı:parola@deneme.com/remote/dir/"
+
+#: simple-backup-config.glade:1567
+msgid "Test"
+msgstr "Sına"
+
+#: simple-backup-config.glade:1636
+msgid ""
+"<i>The selected destination is not writtable with current permissions.\n"
+"The backups can not be written there.</i>"
+msgstr ""
+
+#: simple-backup-config.glade:1680
+msgid "Destination"
+msgstr "Hedef"
+
+#: simple-backup-config.glade:1719
+msgid "Do backups "
+msgstr "Yedekleme yap "
+
+#: simple-backup-config.glade:1745
+msgid ""
+"never\n"
+"hourly\n"
+"daily\n"
+"weekly\n"
+"monthly\n"
+"custom"
+msgstr ""
+"asla\n"
+"saatlik\n"
+"günlük\n"
+"haftalık\n"
+"aylık\n"
+"özel"
+
+#: simple-backup-config.glade:1767
+msgid "simply"
+msgstr ""
+
+#: simple-backup-config.glade:1788
+msgid "precisely"
+msgstr ""
+
+#: simple-backup-config.glade:1808
+msgid "at:"
+msgstr "şu saatte:"
+
+#: simple-backup-config.glade:1849
+msgid "Day of month:"
+msgstr "Ayın şu günü:"
+
+#: simple-backup-config.glade:1877
+msgid "Day of week:"
+msgstr "Haftanın şu günü:"
+
+#: simple-backup-config.glade:1905
+msgid "Hour"
+msgstr "Saat:"
+
+#: simple-backup-config.glade:1933
+msgid "Minute"
+msgstr "Dakika"
+
+#: simple-backup-config.glade:2085
+msgid "Custom cron time definition: "
+msgstr ""
+
+#: simple-backup-config.glade:2148
+msgid "Do a full backup at least once every"
+msgstr ""
+
+#: simple-backup-config.glade:2193 simple-backup-config.glade:2410
+msgid "days"
+msgstr "gün"
+
+#: simple-backup-config.glade:2248
+msgid ""
+"<small>You can configure how often to start a backup run and when to do it.\n"
+"Unless a set number of days has passed since the last full backup, "
+"incremental backups will be done.\n"
+"See \"man 5 crontab\" for cron time definition format.</small>"
+msgstr ""
+
+#: simple-backup-config.glade:2288
+msgid "Time"
+msgstr "Zaman"
+
+#: simple-backup-config.glade:2318
+msgid "Enable purging of old and incomplete backups"
+msgstr "Eski ve eksik yedeklerin temizlenmesini aç"
+
+#: simple-backup-config.glade:2370
+msgid "Simple cutoff: Erase all backups older than "
+msgstr ""
+
+#: simple-backup-config.glade:2475
+msgid "Logarithmic (Recommended)"
+msgstr "Logaritmik (Tavsiye edilen)"
+
+#: simple-backup-config.glade:2496
+msgid ""
+"<small>Keep progressivelly less backups into the past:\n"
+"Keep all backups from yesterday.\n"
+"Keep one backup per day from last week.\n"
+"Keep one backup per week from last month.\n"
+"Keep one backup per month from last year.\n"
+"Keep one backup per year further into past.\n"
+"Erase all other backups.</small>\n"
+msgstr ""
+
+#: simple-backup-config.glade:2558
+msgid ""
+"<small>Note: Additionally all incomplete and irrecoverable backups will be "
+"erased as long as there is a complete backup snapshot made later on.</small>"
+msgstr ""
+
+#: simple-backup-config.glade:2596
+msgid "Purging"
+msgstr ""
+
+#: simple-backup-config.glade:2611
+msgid "Cleaning old backups"
+msgstr "Eski yedekler temizleniyor"
+
+#: simple-backup-config.glade:2630
+msgid "Exclude file type"
+msgstr "Dosya türünü dahil etme"
+
+#: simple-backup-config.glade:2701
+msgid "Standard file types:"
+msgstr "Standart dosya türleri:"
+
+#: simple-backup-config.glade:2747
+msgid "Custom defined file type with "
+msgstr ""
+
+#: simple-backup-config.glade:2787
+msgid "file extension"
+msgstr "dosya uzantısı"
+
+#: simple-backup-config.glade:2827
+msgid "Exclude by regex"
+msgstr ""
+
+#: simple-backup-config.glade:2899
+msgid ""
+"Enter a regular expression.\n"
+"Files and directories matching this expression will be excluded from backup."
+msgstr ""
+
+#: simple-restore.glade:8
+msgid "Restore files/directories"
+msgstr ""
+
+#: simple-restore.glade:42
+msgid "<b>Restore Source Folder</b>"
+msgstr ""
+
+#: simple-restore.glade:113
+msgid "Use default:"
+msgstr ""
+
+#: simple-restore.glade:136
+msgid "Use custom:"
+msgstr "Özel kullan:"
+
+#: simple-restore.glade:194
+msgid ""
+"Type in this box text like that:\n"
+"\n"
+"/home/user/folder - To use a local folder\n"
+"ssh://user:password@machine:/remote/folder - To use a ssh location\n"
+"ssh://user:password@machine:/remote/folder - To use a ftp location"
+msgstr ""
+
+#: simple-restore.glade:273
+msgid "Available backups:"
+msgstr "Kullanılabilir yedekler:"
+
+#: simple-restore.glade:360
+msgid "<b>Files and Folders to restore</b>"
+msgstr "<b>Geri yüklenecek Dosyalar ve Klasörler</b>"
+
+#: simple-restore.glade:544
+msgid "Restore"
+msgstr "Geri yükle"
+
+#: simple-restore.glade:620
+msgid "Restore As..."
+msgstr "Farklı Geri Yükle..."

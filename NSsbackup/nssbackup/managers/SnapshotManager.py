@@ -20,6 +20,7 @@ import re
 import datetime
 import time
 import FileAccessManager as FAM
+from gettext import gettext as _
 from nssbackup.util.structs import SBdict
 from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.exceptions import *
@@ -41,7 +42,7 @@ class SnapshotManager :
 	def __init__(self,targetDir):
 		global __targetDir
 		if not targetDir or not FAM.exists(targetDir) :
-			raise SBException("Invalid Value of targetDir : " + targetDir)
+			raise SBException(_("Invalid value of the target directory : ") + targetDir)
 		self.__targetDir = targetDir
 	
 	
@@ -53,7 +54,7 @@ class SnapshotManager :
 		for snp in self.getSnapshots() :
 			if snp.getName() == name :
 				return snp
-		raise SBException("snapshot '%s' not found " % name)
+		raise SBException(_("Snapshot '%s' not found ") % name)
 	
 	def getSnapshots(self, fromDate=None, toDate=None, byDate=None):
 		"""
@@ -118,10 +119,10 @@ class SnapshotManager :
 		"""
 		#if the snapshot to rebase is full, no need to do the operation. 
 		if torebase.isfull() : 
-			raise SBException("No need to rebase full snapshot '%s'"% torebase.getName()) 
+			raise SBException(_("No need to rebase a full snapshot '%s'") % torebase.getName()) 
 		# if the new base is earlier, t
 		if newbase and torebase.getName() <= newbase.getName() :
-			raise SBException("Cannot rebase a snapshot on an earlier one : '%s' <= '%s' "% (torebase.getName(), newbase.getName())) 
+			raise SBException(_("Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")% {'snapshotToRebase':torebase.getName(), 'NewBaseSnapshot': newbase.getName()}) 
 		# to rebase, we get the revert state to update the snapshot
 	
 	
@@ -157,7 +158,7 @@ class SnapshotManager :
 		the files and properties coming from snapshot 'snapshotName' and that must be include in the revert state.
 		"""
 		if not snapshot.getFilesList().has_key(path) : 
-			raise SBException("'%s' not found in snapshot"% path)
+			raise SBException(_("The file '%s' is not found in snapshot") % path)
 		# keep all the snapshot infos
 		contents = SBdict()
 		contents[path] = snapshot.getFilesList()[path]
@@ -212,7 +213,7 @@ class SnapshotManager :
 			try :
 				snapshots.append(Snapshot( self.__targetDir+os.sep+str(dir) ))
 			except NotValidSnapshotException, e :
-				getLogger().info("got non valid snapshot '%s' , removing : %s " % (str(dir),e.message))
+				getLogger().info(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(dir),'error_cause' :e.message})
 				FAM.delete(self.__targetDir+os.sep+str(dir))
 		
 		# now purge according to date

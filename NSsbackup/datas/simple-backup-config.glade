@@ -205,7 +205,7 @@ Files and directories matching this expression will be excluded from backup.</pr
   </widget>
   <widget class="GtkWindow" id="backup_properties_dialog">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-    <property name="title" translatable="yes">SBackup Config</property>
+    <property name="title" translatable="yes">NSsbackup Config</property>
     <signal name="destroy" handler="gtk_main_quit"/>
     <child>
       <widget class="GtkVBox" id="vbox17">
@@ -229,7 +229,7 @@ Files and directories matching this expression will be excluded from backup.</pr
                       <widget class="GtkImageMenuItem" id="save">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">gtk-save</property>
+                        <property name="label" >gtk-save</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_save_activate"/>
@@ -239,7 +239,7 @@ Files and directories matching this expression will be excluded from backup.</pr
                       <widget class="GtkImageMenuItem" id="save_as">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">gtk-save-as</property>
+                        <property name="label">gtk-save-as</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_save_as_activate"/>
@@ -279,7 +279,7 @@ Files and directories matching this expression will be excluded from backup.</pr
                       <widget class="GtkImageMenuItem" id="about">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">gtk-about</property>
+                        <property name="label" >gtk-about</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="on_about_activate"/>
@@ -703,7 +703,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="label" translatable="yes">gtk-add</property>
+                            <property name="label">gtk-add</property>
                             <property name="use_stock">True</property>
                             <signal name="clicked" handler="on_remote_inc_add_clicked"/>
                           </widget>
@@ -714,7 +714,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="label" translatable="yes">gtk-remove</property>
+                            <property name="label">gtk-remove</property>
                             <property name="use_stock">True</property>
                             <signal name="clicked" handler="on_remote_inc_del_clicked"/>
                           </widget>
@@ -2376,7 +2376,7 @@ Error</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                                    <property name="label" translatable="yes">TLS</property>
+                                                    <property name="label">TLS</property>
                                                     <property name="active">True</property>
                                                     <property name="draw_indicator">True</property>
                                                     <signal name="toggled" handler="on_TLSradiobutton_toggled"/>
@@ -2387,7 +2387,7 @@ Error</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                                    <property name="label" translatable="yes">SSL</property>
+                                                    <property name="label" >SSL</property>
                                                     <property name="active">True</property>
                                                     <property name="draw_indicator">True</property>
                                                     <property name="group">TLSradiobutton</property>
@@ -2639,7 +2639,7 @@ Error</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
-                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="label">gtk-ok</property>
                 <property name="use_stock">True</property>
                 <property name="response_id">-5</property>
               </widget>
@@ -2649,7 +2649,7 @@ Error</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
-                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
                 <property name="response_id">-6</property>
                 <signal name="clicked" handler="gtk_widget_hide"/>
