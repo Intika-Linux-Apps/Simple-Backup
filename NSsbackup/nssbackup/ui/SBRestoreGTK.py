@@ -63,7 +63,8 @@ class SBRestoreGTK(GladeWindow):
 		self.flisttreestore = gtk.TreeStore( str )
 		# self.flisttreemodelsort = gtk.TreeModelSort(self.flisttreestore)
 		# self.flisttreemodelsort.set_sort_column_id(1, gtk.SORT_ASCENDING)
-		self.widgets['filelisttreeview'].set_model( self.flisttreemodelsort )
+		# self.widgets['filelisttreeview'].set_model( self.flisttreemodelsort )
+		self.widgets['filelisttreeview'].set_model( self.flisttreestore )
 		acolumn1 = gtk.TreeViewColumn(_("Path"), gtk.CellRendererText(), text=0 )
 		self.widgets['filelisttreeview'].append_column( acolumn1 )
 		
