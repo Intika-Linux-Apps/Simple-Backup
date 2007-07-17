@@ -50,7 +50,7 @@ class SBconfigGTK(GladeWindow):
 			else :
 				self.configman = ConfigManager()
 			
-		filename = Util.getResource('simple-backup-config.glade')
+		filename = Util.getResource('nssbackup-config.glade')
 
 		widget_list = [
 			'remote_inc_dialog',
@@ -259,7 +259,7 @@ class SBconfigGTK(GladeWindow):
 
 		top_window = 'backup_properties_dialog'
 		GladeWindow.__init__(self, filename, top_window, widget_list, handlers)
-		self.widgets[top_window].set_icon_from_file(Util.getResource("sbackup-conf.png"))
+		self.widgets[top_window].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
 		# Initiate all data structures
 		# Paths to be included or excluded
 		self.include = gtk.ListStore( str )
@@ -617,7 +617,7 @@ class SBconfigGTK(GladeWindow):
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
 		about.set_website("https://launchpad.net/nssbackup/")
-		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("sbackup-conf.png")))
+		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
 		about.run()
 		about.destroy()
 

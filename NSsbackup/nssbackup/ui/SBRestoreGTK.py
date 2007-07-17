@@ -80,7 +80,7 @@ class SBRestoreGTK(GladeWindow):
 
 	def init(self):
 
-		filename = Util.getResource('simple-restore-gnome.glade')
+		filename = Util.getResource('nssbackup-restore.glade')
 
 		widget_list = [
 			'restorewindow',

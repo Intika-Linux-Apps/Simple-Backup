@@ -1,14 +1,14 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=Simple Backup Restore
-Comment=Restore tool for Simple Backups Suite
-Exec=simple-restore-gnome
+Name=NSsbackup Restoration GUI
+Comment=Restore tool for NSsbackup
+Exec=nssbackup-restore-gui
 Terminal=false
 Type=Application
 Categories=Application;System;Settings
 StartupNotify=true
-Icon=sbackup-restore.png
+Icon=nssbackup-restore.png
 Name[pt_BR]=Restauração de Backup
 Comment[pt_BR]=Restaure seu backup feito anteriormente
 GenericName[fr_FR]=Utilitaire de restauration

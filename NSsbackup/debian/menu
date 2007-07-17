@@ -1,4 +1,4 @@
 ?package(nssbackup):needs="X11" section="Apps/System"\
-  title="Simple Backup Config" command="/usr/bin/simple-backup-config"
+  title="NSsbackup Configuration GUI" command="/usr/bin/nssbackup-config-gui"
 ?package(nssbackup):needs="X11" section="Apps/System"\
-  title="Simple Restore" command="/usr/bin/simple-restore-gnome"
+  title="NSsbackup Restoration GUI" command="/usr/bin/nssbackup-restore-gui"

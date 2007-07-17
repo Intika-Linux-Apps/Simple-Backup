@@ -57,13 +57,7 @@ install: build
 	# Add here commands to install the package into debian/sbackup.
 	find ./ -name *.pyc -exec rm -f '{}' \;
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/nssbackup/usr INSTALL=deb
-	install -d $(CURDIR)/debian/nssbackup/usr/share/man/man8/
-	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/nssbackupd.8.gz
-	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/srestore.py.8.gz
-	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/simple-backup-config.8.gz
-	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/simple-restore-gnome.8.gz
-	ln -s simple-backup.8.gz debian/nssbackup/usr/share/man/man8/upgrade_backups.py.8.gz
-
+	
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -86,7 +80,7 @@ binary-arch: build install
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
-	dh_installman datas/simple-backup.8
+#	dh_installman
 	dh_link
 	dh_strip
 	dh_compress

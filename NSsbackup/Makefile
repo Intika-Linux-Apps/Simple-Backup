@@ -32,16 +32,15 @@ endif
 	cp -rf nssbackup/* $(CLSDIR)
 	chmod +x  $(CLSDIR)/managers/UpgradeManager.py $(CLSDIR)/nssbackupd.py $(CLSDIR)/ui/SBConfigGTK.py $(CLSDIR)/ui/SBRestoreGTK.py
 	ln -s ../$(SUBCLSDIR)/nssbackupd.py $(BIN)/nssbackupd
-	ln -s ../$(SUBCLSDIR)/ui/SBConfigGTK.py $(BIN)/simple-backup-config
-	ln -s ../$(SUBCLSDIR)/ui/SBRestoreGTK.py $(BIN)/simple-restore-gnome
-	ln -s ../$(SUBCLSDIR)/srestore.py $(BIN)/srestore
+	ln -s ../$(SUBCLSDIR)/ui/SBConfigGTK.py $(BIN)/nssbackup-config-gui
+	ln -s ../$(SUBCLSDIR)/ui/SBRestoreGTK.py $(BIN)/nssbackup-restore-gui
 	ln -s ../$(SUBCLSDIR)/managers/UpgradeManager.py $(BIN)/upgrade-backups
-	install -m644 -D ./datas/simple-backup-config.glade $(SUPPORT)
-	install -m644 -D ./datas/sbackup-conf.png $(PIXDIR)
-	install -m644 -D ./datas/sbackup-restore.png $(PIXDIR)
-	install -m644 -D ./datas/nssbackup.desktop $(DESTDIR)/share/applications/
-	install -m644 -D ./datas/srestore.desktop $(DESTDIR)/share/applications/
-	install -m644 -D ./datas/simple-restore-gnome.glade $(SUPPORT)
+	install -m644 -D ./datas/nssbackup-config.glade $(SUPPORT)
+	install -m644 -D ./datas/nssbackup-conf.png $(PIXDIR)
+	install -m644 -D ./datas/nssbackup-restore.png $(PIXDIR)
+	install -m644 -D ./datas/nssbackup-config.desktop $(DESTDIR)/share/applications/
+	install -m644 -D ./datas/nssbackup-restore.desktop $(DESTDIR)/share/applications/
+	install -m644 -D ./datas/nssbackup-restore.glade $(SUPPORT)
 	install ./datas/nssbackup $(SUPPORT)
 ifeq ($(DESTDIR),/usr/local)
 	install -b -m600 datas/nssbackup.conf.example /etc/nssbackup.conf
@@ -49,15 +48,16 @@ endif
 
 uninstall:
 	rm -f $(BIN)/nssbackupd
-	rm -f $(BIN)/simple-backup-config
-	rm -f $(BIN)/simple-restore-gnome
-	rm -f $(BIN)/srestore
-	rm -f $(BIN)/upgrade-backups
+	rm -f $(BIN)/nssbackup-config-gui
+	rm -f $(BIN)/nssbackup-restore-gui
 	rm -rf $(SUPPORT)
 	rm -rf $(DOC)
-	rm -f $(DESTDIR)/share/applications/nssbackup.desktop
-	rm -f $(DESTDIR)/share/applications/srestore.desktop
+	rm -f $(DESTDIR)/share/applications/nssbackup-config.desktop
+	rm -f $(DESTDIR)/share/applications/nssbackup-restore.desktop
 	rm -rf $(CLSDIR)
+	rm -f $(PIXDIR)/nssbackup-conf.png
+	rm -f $(PIXDIR)/nssbackup-restore.png
+	find $(DESTDIR)/share/locale/ -name nssbackup.mo -exec rm -rf '{}' \;
 
 clean:
 	@echo "" > nssbackup/ressources

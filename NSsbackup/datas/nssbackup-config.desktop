@@ -1,15 +1,15 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=Simple Backup Config
-Comment=Configuration tool for Simple Backups Suite
-Exec=simple-backup-config
+Name=NSsbackup Configuration GUI
+Comment=Configuration tool for NSsbackup
+Exec=nssbackup-config-gui
 Terminal=false
 Type=Application
 Categories=Application;System;Settings
 StartupNotify=true
-Icon=sbackup-conf.png
+Icon=nssbackup-conf.png
 Name[pt_BR]=Configuração do Backup
 Comment[pt_BR]=Configure como seus backups são feitos
 GenericName[en_GB]=
-GenericName[fr_FR]=Configurateur de la Suite Simple Backup
+GenericName[fr_FR]=Configurateur de la Suite NSsbackup
