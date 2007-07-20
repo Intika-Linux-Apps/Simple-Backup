@@ -192,20 +192,20 @@ class BackupManager :
 		# -----------------------------------------------------------------
 		# sub routines 
 		
-		def searchInStored(_file):
+		def searchInStored(_file1):
 			"""
 			search for a file in stored list
 			@return: the properties if found , None if not
 			"""
 			for name,sbdict in alreadyStored.iteritems() :
-				getLogger().debug("Searching for '%s' in '%s'" % (_file, name))
-				if sbdict.has_key(_file) :
+				getLogger().debug("Searching for '%s' in '%s'" % (_file1, name))
+				if sbdict.has_key(_file1) :
 					getLogger().debug("found in '%s' " % name)
-					return sbdict[_file]
+					return sbdict[_file1]
 			# not found
 			return None 
 		
-		def isexcludedbyconf(_file):
+		def isexcludedbyconf(_file2):
 			"""
 			This will decide whether or not a file is to be excluded (by the configuration)
 			This will not dicide for the incremental exclusion.
@@ -213,52 +213,55 @@ class BackupManager :
 			@note: param to be defined (rexclude, excludelist) , excludelist is a dictionary
 			"""
 			# excude target
-			if _file == self.config.get("general","target") :
+			if _file2 == self.config.get("general","target") :
 				getLogger().debug("target dir is excluded ")
 				return True
 			
 			# return true if the file doesn't exist
-			if not os.path.exists(_file):
-				getLogger().debug("'%s' doesn't exist, it has to be exclude " % _file )
-				return True
-			
-			# refuse a file if we don't have read access
-			if not os.access(_file, os.R_OK):
-				getLogger().debug("We don't have read access to '%s', it has to be exclude " % _file )
+			if not os.path.exists(_file2):
+				getLogger().debug("'%s' doesn't exist, it has to be exclude " % _file2 )
 				return True
 			
 			# get the stats, If not possible , the file has to be exclude , return True
-			try: s = os.lstat( _file )
+			try: s = os.lstat( _file2 )
 			except Exception, e :
-				getLogger().debug("Problem with '%s' : %s " % (_file, str(e) ) )
+				getLogger().debug("Problem with '%s' : %s " % (_file2, str(e) ) )
 				return True
+			
+			# refuse a file if we don't have read access
+			try : 
+				fd = os.open(_file2, os.R_OK)
+				os.close(fd)
+			except OSError, e:
+				getLogger().debug("We don't have read access to '%s', it has to be exclude : %s " % (_file2,str(e)) )
+				return True		
 			
 			#if the file is too big
 			if self.config.has_option("exclude","maxsize") and s.st_size > int(self.config.get("exclude","maxsize")) > 0 :
-				getLogger().debug("'%s' size is higher than the specified one ( %s > %s), it has to be exclude " % (_file,str(s.st_size), str(self.config.get("exclude","maxsize"))) )
+				getLogger().debug("'%s' size is higher than the specified one ( %s > %s), it has to be exclude " % (_file2,str(s.st_size), str(self.config.get("exclude","maxsize"))) )
 				return True
 			
 			# if the file matches an exclude regexp, return true
 			for r in rexclude:
-				if r.search( _file ):
+				if r.search( _file2 ):
 					return True
 					
 			# if the file is in exclude list, return true
-			if excludelist.has_key(_file) :
+			if excludelist.has_key(_file2) :
 				return True
 			
 			#all tests passed
 			return False
 		
-		def isexcludedbyinc(_file):
+		def isexcludedbyinc(_file3):
 			"""
 			Check if a file is to be exclude because of incremental policies.
 			Don't check if the file was exclude by conf ( it's mandatory the check that before)
 			@return: True if the file has to be excluded, the props if not
 			"""
 			# file is a path of a file or dir to include 
-			isstored =  searchInStored( incl )
-			s = os.lstat(_file)
+			isstored =  searchInStored( _file3 )
+			s = os.lstat(_file3)
 			props = str(s.st_mode)+str(s.st_uid)+str(s.st_gid)+str(s.st_size)+str(s.st_mtime)
 			if not isstored :
 				# file wasn't inside
@@ -277,28 +280,42 @@ class BackupManager :
 			"""
 			global fullsize
 			# add _file and then check if it's a dir to add the contents , We won't follow links
-			self.__actualSnapshot.addFile(_file, props)
-			fullsize += os.lstat(_file).st_size
-			if not os.path.islink(_file.rstrip(os.sep)) and os.path.isdir(_file) :
-				try :
-					for contents in FAM.listdir(_file) :
-						# contents is a path of a file or dir to include 
-						contents = os.path.normpath( os.sep.join([_file,contents]) )
-						# in dirconfig, directories always end with an os.sep and files not.
-						if os.path.isdir(contents) and not contents.endswith(os.sep) :
-							contents = contents + os.sep
-						elif not os.path.isdir(contents) :
-							contents.rstrip(os.sep)
-						
-						if not isexcludedbyconf( contents ) :
-							cprops = isexcludedbyinc(contents)
-							if cprops != True and type(cprops) == str: 
-								addtobackup( contents, cprops )
-				except OSError, e :
-					getLogger().warning("got an error with '%s' : %s" % (_file, str(e)))
-					if self.__actualSnapshot.getFilesList().has_key(_file) :
-						del self.__actualSnapshot.getFilesList()[_file]
-								
+			if not os.path.islink(_file.rstrip(os.sep)) :
+				if not os.path.isdir(_file) :
+					# don't add dirs 
+					self.__actualSnapshot.addFile(_file, props)
+					fullsize += os.lstat(_file).st_size
+				else :
+					# file is dir , search in the content
+					try :
+						for contents in FAM.listdir(_file) :
+							# contents is a path of a file or dir to include 
+							contents = os.path.normpath( os.sep.join([_file,contents]) )
+							# in dirconfig, directories always end with an os.sep and files not.
+							if os.path.isdir(contents) :
+								if not contents.endswith(os.sep) :
+									contents = contents + os.sep
+								# we don't check dir prop as the content seems to 
+								# change without modifying the parent dir
+								if not isexcludedbyconf( contents ) :
+									addtobackup( contents, None )
+								else : getLogger().debug("Excluding '%s' (directory is excluded by conf )" % contents)
+							else :
+								# found a file
+								contents.rstrip(os.sep)							
+								if not isexcludedbyconf( contents ) :
+									cprops = isexcludedbyinc(contents)
+									if cprops != True and type(cprops) == str: 
+										addtobackup( contents, cprops )
+									else :
+										getLogger().debug("Excluding '%s' (File didn't change )" % contents)
+								else : 
+									getLogger().debug("Excluding '%s' (file is excluded by conf )" % contents)
+					except OSError, e :
+						getLogger().warning("got an error with '%s' : %s" % (_file, str(e)))
+						if self.__actualSnapshot.getFilesList().has_key(_file) :
+							del self.__actualSnapshot.getFilesList()[_file]
+									
 		# End of Subroutines
 		# -----------------------------------------------------------------
 		
@@ -336,11 +353,14 @@ class BackupManager :
 		for incl in includelist.iterkeys() :
 			# incl is a path of a file or dir to include 
 			if not isexcludedbyconf( incl ) :
-				props = isexcludedbyinc(incl)
-				if props != True and type(props) == str: 
-					addtobackup( incl, props )
+				if os.path.isdir(incl):
+					addtobackup( incl, None )
 				else :
-					getLogger().debug("Excluding '%s' (File didn't change )" % incl)
+					props = isexcludedbyinc(incl)
+					if props != True and type(props) == str: 
+						addtobackup( incl, props )
+					else :
+						getLogger().debug("Excluding '%s' (File didn't change )" % incl)
 			else :
 				getLogger().debug("Excluding '%s' (File excluded by conf)" % incl)
 

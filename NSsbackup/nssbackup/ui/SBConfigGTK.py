@@ -430,13 +430,13 @@ class SBconfigGTK(GladeWindow):
 		if self.configman.has_option("log", "level") :
 			self.widgets["loglevelcombobox"].set_active(self.loglevels[self.configman.get("log", "level")][1])
 		else :
-			self.widgets["loglevelcombobox"].set_active(self.loglevels['Info'])
+			self.widgets["loglevelcombobox"].set_active(self.loglevels['20'][1])
 		
 		if self.configman.has_option("log", "file") :
 			self.widgets["logfilechooser"].set_current_folder(os.path.dirname(self.configman.get("log", "file")) )
 		else : 
 			if os.getuid() == 0 :
-				self.widgets["logfilechooser"].set_current_folder(os.sep.join("","var","log") )
+				self.widgets["logfilechooser"].set_current_folder(os.sep.join(["","var","log"]) )
 			else :
 				self.widgets["logfilechooser"].set_current_folder(getUserConfDir())
 				

@@ -25,7 +25,11 @@ case "$1" in
     
     ;;
 
-    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    remove)
+
+	rm -rf /usr/lib/python2.5/site-packages/nssbackup
+
+    upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
 
 
     ;;

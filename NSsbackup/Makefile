@@ -50,6 +50,7 @@ uninstall:
 	rm -f $(BIN)/nssbackupd
 	rm -f $(BIN)/nssbackup-config-gui
 	rm -f $(BIN)/nssbackup-restore-gui
+	rm -f $(BIN)/upgrade-backups
 	rm -rf $(SUPPORT)
 	rm -rf $(DOC)
 	rm -f $(DESTDIR)/share/applications/nssbackup-config.desktop
