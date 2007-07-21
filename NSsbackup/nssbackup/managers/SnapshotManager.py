@@ -180,7 +180,8 @@ class SnapshotManager :
 					#getLogger().debug("found in '%s' " % cursnp.getName())
 					result = cursnp.getFilesList()[_file][0]
 				else : 
-					cursnp = cursnp.getBaseSnapshot()
+					if not cursnp.isfull() :
+						cursnp = cursnp.getBaseSnapshot()
 			
 			return result
 	
