@@ -147,6 +147,43 @@ class SnapshotManager :
 		files. The format is {"file" : ("propsnap1|propsnap2",sonsbdict)}.
 		"""
 	
+	def isAlreadyStored(self,snapshot, _file, lastsnapshot=None):
+		"""
+		for a file , check if it's already stored in a last snapshot
+		@param snapshot: The first snapshot in wih to look
+		@param file: The file to look for
+		@param lastsnapshot(=None): The lastsnapshot in wich to search (default is last Full one)
+		@return: None if file not inside, (the file props if it was stored) 
+		"""
+		# keep all the snapshot infos
+		#getLogger().debug("Searching for '%s' from '%s'" % (_file, snapshot.getName()))
+		result = None
+		
+		if snapshot.isfull() :
+			#getLogger().debug("Snapshot '%s' is full, no need to go further " % snapshot.getName())
+			if snapshot.getFilesList().has_key(_file) :
+				#getLogger().debug("found in '%s' " % snapshot.getName())
+				result = snapshot.getFilesList()[_file][0]
+			return result
+		else :
+			getLogger().debug("Snapshot '%s' is inc" % snapshot.getName())
+			# snapshot is inc
+			# till we reach full base add the non existing files
+			endpointfound = False
+			cursnp = snapshot
+			while endpointfound is False and result is None :
+				#getLogger().debug("Searching for '%s' from '%s'" % (_file, cursnp.getName()))
+				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
+					#getLogger().debug("stop point found '%s'" % cursnp.getName())
+					endpointfound = True
+				if cursnp.getFilesList().has_key(_file) :
+					#getLogger().debug("found in '%s' " % cursnp.getName())
+					result = cursnp.getFilesList()[_file][0]
+				else : 
+					cursnp = cursnp.getBaseSnapshot()
+			
+			return result
+	
 	def getRevertState(self,snapshot, path, lastsnapshot=None):
 		"""
 		gets the revert state ie the state of the files at the snapshot time. 
@@ -155,7 +192,7 @@ class SnapshotManager :
 		@param path: the path to get the revert state.
 		@param lastsnapshot : The snapshot on which one to stop  
 		@return: a dict {snapshotPath : SBdict } where SBdict is filled with 
-		the files and properties coming from snapshot 'snapshotName' and that must be include in the revert state.
+		the files and properties coming from snapshot 'snapshot' and that must be include in the revert state.
 		"""
 		if not snapshot.getFilesList().has_key(path) : 
 			raise SBException(_("The file '%s' is not found in snapshot") % path)
@@ -196,9 +233,8 @@ class SnapshotManager :
 								# It means that it's the newer version of that file ,
 								#add the file 
 								result[cursnp.getPath()][file] = props
-								#getLogger().debug(" %s " % result)
 				# processing finished for this snapshot
-			getLogger().debug(result)
+				getLogger().debug("processing finished for snapshot %s " % str(cursnp))
 			return result
 			
 	def purge(self, purge="30"):
@@ -235,5 +271,6 @@ class SnapshotManager :
 						topurge.append(snp.getPath())
 		
 		for adir in topurge:
-		    FAM.delete( adir )
+			getLogger().warning("Deleting '%(dir)s' for purge !" % {'dir' : adir })
+			FAM.delete( adir )
 		

@@ -119,9 +119,6 @@ class BackupManager :
 		# Is Inc or Full ? 
 		(name, base, prev, increment) = self.__isIncOrFull(listing)
 		
-		# We don't need listing anymore (let's free some memory )
-		del listing
-		
 		# Create snapshot
 		self.__actualSnapshot = Snapshot(name)
 		getLogger().info("Starting snapshot %s " % str(self.__actualSnapshot))
@@ -192,19 +189,6 @@ class BackupManager :
 		# -----------------------------------------------------------------
 		# sub routines 
 		
-		def searchInStored(_file1):
-			"""
-			search for a file in stored list
-			@return: the properties if found , None if not
-			"""
-			for name,sbdict in alreadyStored.iteritems() :
-				getLogger().debug("Searching for '%s' in '%s'" % (_file1, name))
-				if sbdict.has_key(_file1) :
-					getLogger().debug("found in '%s' " % name)
-					return sbdict[_file1]
-			# not found
-			return None 
-		
 		def isexcludedbyconf(_file2):
 			"""
 			This will decide whether or not a file is to be excluded (by the configuration)
@@ -214,18 +198,18 @@ class BackupManager :
 			"""
 			# excude target
 			if _file2 == self.config.get("general","target") :
-				getLogger().debug("target dir is excluded ")
+				getLogger().info("target dir is excluded ")
 				return True
 			
 			# return true if the file doesn't exist
 			if not os.path.exists(_file2):
-				getLogger().debug("'%s' doesn't exist, it has to be exclude " % _file2 )
+				getLogger().warning("'%s' doesn't exist, it has to be exclude " % _file2 )
 				return True
 			
 			# get the stats, If not possible , the file has to be exclude , return True
 			try: s = os.lstat( _file2 )
 			except Exception, e :
-				getLogger().debug("Problem with '%s' : %s " % (_file2, str(e) ) )
+				getLogger().warning("Problem with '%s' : %s " % (_file2, str(e) ) )
 				return True
 			
 			# refuse a file if we don't have read access
@@ -233,12 +217,12 @@ class BackupManager :
 				fd = os.open(_file2, os.R_OK)
 				os.close(fd)
 			except OSError, e:
-				getLogger().debug("We don't have read access to '%s', it has to be exclude : %s " % (_file2,str(e)) )
+				getLogger().warning("We don't have read access to '%s', it has to be exclude : %s " % (_file2,str(e)) )
 				return True		
 			
 			#if the file is too big
 			if self.config.has_option("exclude","maxsize") and s.st_size > int(self.config.get("exclude","maxsize")) > 0 :
-				getLogger().debug("'%s' size is higher than the specified one ( %s > %s), it has to be exclude " % (_file2,str(s.st_size), str(self.config.get("exclude","maxsize"))) )
+				getLogger().info("'%s' size is higher than the specified one ( %s > %s), it has to be exclude " % (_file2,str(s.st_size), str(self.config.get("exclude","maxsize"))) )
 				return True
 			
 			# if the file matches an exclude regexp, return true
@@ -260,7 +244,13 @@ class BackupManager :
 			@return: True if the file has to be excluded, the props if not
 			"""
 			# file is a path of a file or dir to include 
-			isstored =  searchInStored( _file3 )
+			#isstored =  searchInStored( _file3 )
+			if self.__actualSnapshot.isfull() :
+				s = os.lstat(_file3)
+				props = str(s.st_mode)+str(s.st_uid)+str(s.st_gid)+str(s.st_size)+str(s.st_mtime)
+				return props
+			
+			isstored = self.__snpman.isAlreadyStored(self.__actualSnapshot.getBaseSnapshot(),_file3)
 			s = os.lstat(_file3)
 			props = str(s.st_mode)+str(s.st_uid)+str(s.st_gid)+str(s.st_size)+str(s.st_mtime)
 			if not isstored :
@@ -268,7 +258,7 @@ class BackupManager :
 				return props
 			else :
 				# file was inside so isstored is a list [existingprops, sonSBdict]the existing properties.
-				if isstored[0] != props :
+				if isstored != props :
 					# then the file has changed
 					return props
 			
@@ -319,19 +309,15 @@ class BackupManager :
 		# End of Subroutines
 		# -----------------------------------------------------------------
 		
-		# -> Get the list of already stored files in successive snapshots.
-		if not self.__actualSnapshot.isfull() :
-			alreadyStored = self.__snpman.getRevertState(self.__actualSnapshot.getBaseSnapshot(), os.sep )
-		else :
-			alreadyStored = {}
-		
 		# regexp to be used for excluding files from flist
+		getLogger().debug("getting exclude list for actual snapshot")
 		rexclude = [ re.compile(p) for p in self.__actualSnapshot.getExcludes() if len(p)>0]
 		
 		# Use this for getting the size limit 
 		fullsize = 0L
 		
 		# set the list to backup and to exclude
+		getLogger().debug("set the list to backup and to exclude")
 		if self.config.has_section( "dirconfig" ):
 			if not len(self.config.items("dirconfig")) :
 				includelist, excludelist = {},{}
@@ -347,9 +333,10 @@ class BackupManager :
 				excludelist.update([("",0), ("/dev/",0), ("/proc/",0), ("/sys/",0), ("/tmp/",0),(self.config.get("general","target"),0)])
 		else :
 			includelist, excludelist = {},{}
-			getLogger().warning("No directories to backup !")	
+			getLogger().warning(_("No directories to backup !"))	
 		
 		# We have now every thing we need , the rexclude, excludelist, includelist and already stored 
+		getLogger().debug("We have now every thing we need, starting the creation of the Flist " )
 		for incl in includelist.iterkeys() :
 			# incl is a path of a file or dir to include 
 			if not isexcludedbyconf( incl ) :

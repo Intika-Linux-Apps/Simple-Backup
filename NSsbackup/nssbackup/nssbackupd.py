@@ -21,11 +21,11 @@ import socket
 import datetime
 import gettext
 from gettext import gettext as _
-from util.log import getLogger
-from util.exceptions import SBException
-import managers.FileAccessManager as FAM
-from managers.ConfigManager import ConfigManager, getUserConfDir
-from managers.BackupManager import BackupManager
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import SBException
+import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir
+from nssbackup.managers.BackupManager import BackupManager
 
 ##
 #This class is intended to be a wrapper of nssbackup instances . 

@@ -5,4 +5,5 @@
 if [ -x /usr/bin/nssbackupd ]
 then /usr/bin/nssbackupd
 elif [ -x /usr/local/bin/nssbackupd ]
+then /usr/local/bin/nssbackupd
 fi

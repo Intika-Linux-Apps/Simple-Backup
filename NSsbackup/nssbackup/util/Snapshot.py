@@ -38,6 +38,8 @@ class Snapshot :
 	__version = False
 	__snapshotpath = False
 	
+	__baseSnapshot = None
+	
 	__validname_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})_(\d{2})[\:\.](\d{2})[\:\.](\d{2})\.\d+\..*?\.(.+)$")
 	
 	# Constructor
@@ -134,8 +136,12 @@ class Snapshot :
 		Return the base snapshot (as a Snapshot ) not only the name
 		@return: Snapshot
 		"""
-		path = os.path.dirname(self.getPath())
-		return Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])) )
+		global __baseSnapshot
+		if self.__baseSnapshot : return self.__baseSnapshot
+		else :
+			path = os.path.dirname(self.getPath())
+			self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])) )
+			return self.__baseSnapshot
 	
 	
 	def getFileProps(self, item) :

@@ -359,7 +359,7 @@ class SBconfigGTK(GladeWindow):
 				self.on_time_freq_changed()
 		else :
 			self.widgets['main_radio3'].set_active(True)
-			self.on_main_radio_toggled()
+			#self.on_main_radio_toggled()
 			
 		#Include and exclude tabs
 		self.include.clear()
@@ -424,7 +424,7 @@ class SBconfigGTK(GladeWindow):
 			self.widgets["dest1"].set_active( True )
 			self.widgets["hbox9"].set_sensitive( False )
 			self.widgets["hbox10"].set_sensitive( False )
-			self.on_dest1_toggled()
+			#self.on_dest1_toggled()
 		
 		# log
 		if self.configman.has_option("log", "level") :
@@ -493,7 +493,23 @@ class SBconfigGTK(GladeWindow):
 			self.widgets['TLSinfos'].set_sensitive(False)
 			unfillreportentries()
 			
-		self.on_purgecheckbox_toggled()
+		# Purge setting 
+		if self.configman.has_option("general", "purge") :
+			getLogger().debug("setting purge")
+			if self.configman.get("general", "purge") == "log" :
+				self.widgets['logpurgeradiobutton'].set_active(True)
+			else:
+				try : 
+					purge = int(self.configman.get("general", "purge"))
+				except Exception,e:
+					getLogger().error("Purge value '%s' is invalide" %self.configman.get("general", "purge"))	
+					purge = 30
+				self.widgets['purgedays'].set_text(str(purge))
+				self.widgets['purgeradiobutton'].set_active(True)
+				self.widgets["purgedays"].set_sensitive( True )
+				self.on_purgedays_changed()
+			self.widgets['purgecheckbox'].set_active(True)
+		
 	#----------------------------------------------------------------------
 	
 	#   configlist is like self.conf.items( "dirconfig" ) 
