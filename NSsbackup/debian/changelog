@@ -1,3 +1,19 @@
+nssbackup (0.1-1~beta2) gutsy; urgency=low
+
+  * Added an help to config GUI for simply option
+  * ported some log from debug to info
+  * Fixed a typo on nssbackupd ( sbackup.conf => nssbackup.conf )
+  * when searching  for a file in existing snapshots, prevent to call getBaseSnapshot() on a full snapshot
+  * Improved backup process speed
+  * in Config Gui fixed a bug that was resetting purge option
+  * Snapshot.getBaseSnapshot doesn't create a snapshot each time ( improves memory comsumption)
+  * remove script now, erase /usr/lib/python2.5/site-packages/nssbackup dir
+  * nssbackup script fixed
+  * Bug #126952 in Launchpad
+  * Bug #126546 and Bug #126544 on Launchpad
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 22 Jul 2007 11:39:47 +0200
+
 nssbackup (0.1-1~beta1) gutsy; urgency=low
 
   * Initial release
