@@ -59,7 +59,7 @@ class NSsbackupd () :
 			if FAM.exists("nssbackup.log") :
 				_content = FAM.readfile("nssbackup.log")
 			else :
-				_content = _("I didn't find the log file. Please set it up in sbackup.conf ")
+				_content = _("I didn't find the log file. Please set it up in nssbackup.conf ")
 		
 		server = smtplib.SMTP()
 		

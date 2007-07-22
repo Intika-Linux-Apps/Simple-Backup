@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SBackup 0.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-15 22:21+0200\n"
+"POT-Creation-Date: 2007-07-22 11:34+0200\n"
 "PO-Revision-Date: 2007-05-20 17:10+0000\n"
 "Last-Translator: Aigars Mahinovs <aigarius@debian.org>\n"
 "Language-Team: Latvian\n"
@@ -17,27 +17,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Rosetta-Export-Date: 2007-06-03 13:28:15+0000\n"
 
-#: nssbackup/nssbackupd.py:51
+#: nssbackup/nssbackupd.py:52
 #, python-format
 msgid "NSsbackup Daemon <%(login)s@%(hostname)s>"
 msgstr ""
 
-#: nssbackup/nssbackupd.py:54
+#: nssbackup/nssbackupd.py:55
 #, python-format
 msgid "[NSsbackup] Report of %(date)s"
 msgstr ""
 
-#: nssbackup/nssbackupd.py:61
-msgid "I didn't find the log file. Please set it up in sbackup.conf "
+#: nssbackup/nssbackupd.py:62
+msgid "I didn't find the log file. Please set it up in nssbackup.conf "
 msgstr ""
 
-#: nssbackup/nssbackupd.py:122 nssbackup/managers/BackupManager.py:77
-#: nssbackup/managers/BackupManager.py:165
-#: nssbackup/managers/BackupManager.py:402
+#: nssbackup/nssbackupd.py:123 nssbackup/managers/BackupManager.py:77
+#: nssbackup/managers/BackupManager.py:162
+#: nssbackup/managers/BackupManager.py:409
 msgid "there was a problem initializing the pynotify module"
 msgstr ""
 
-#: nssbackup/nssbackupd.py:129
+#: nssbackup/nssbackupd.py:130
 msgid "Session of backup is finished (lockfile is removed) "
 msgstr ""
 
@@ -58,53 +58,120 @@ msgstr "Veco rezerves kopiju dzēsšana"
 msgid "Initializing FUSE FILE ACCESS MANAGER !"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:162
+#: nssbackup/managers/BackupManager.py:98
+msgid "Failed to set the gid to 'admin' one :"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:124
+#, python-format
+msgid "Starting snapshot %(name)s "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:128
+#, python-format
+msgid "Setting Base to '%(value)s' "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:134
+msgid "Setting packages File "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:141
+msgid "Problem when setting the packages : "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:145
+#, fuzzy
+msgid "Setting Excludes File "
+msgstr "Neiekļaut failu ..."
+
+#: nssbackup/managers/BackupManager.py:159
 msgid "File list ready , Committing to disk"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:321
+#: nssbackup/managers/BackupManager.py:201
+msgid "target directory is excluded"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:206
+#, python-format
+msgid "'%(file)s' doesn't exist, it has to be exclude "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:212
+#, python-format
+msgid "Problem with '%(file)s' : %(error)s "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:220
+#, python-format
+msgid ""
+"We don't have read access to '%(file)s', it has to be exclude : %(error)s "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:225
+#, python-format
+msgid ""
+"'%(file)s' size is higher than the specified one ( %(filesize)s > %(maxsize)"
+"s), it has to be exclude "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:305
+#, python-format
+msgid "got an error with '%(file)s' : %(error)s"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:324
+msgid "No directory to backup !"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:336
 msgid "No directories to backup !"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:352
+#: nssbackup/managers/BackupManager.py:359
 #, python-format
 msgid ""
 "Not enough free space on the target directory for the planned backup (%"
 "(freespace)d <= %(neededspace)d)"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:369
+#: nssbackup/managers/BackupManager.py:376
 #, python-format
-msgid "Another Simple Backup daemon already running (pid = %s )!"
+msgid "Another NSsbackup daemon already running (pid = %s )!"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:384
+#: nssbackup/managers/BackupManager.py:391
 #, python-format
 msgid "Session of backup is finished (%s is removed) "
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:391
+#: nssbackup/managers/BackupManager.py:398
 msgid "I didn't find the logfile to copy into snapshot"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:393
+#: nssbackup/managers/BackupManager.py:400
 msgid "Terminating FUSE FILE ACCESS MANAGER !"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:399
+#: nssbackup/managers/BackupManager.py:406
 msgid "Ending Backup Session"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:412
+#: nssbackup/managers/BackupManager.py:419
 msgid "Option 'target' is missing, aborting."
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:416
+#: nssbackup/managers/BackupManager.py:423
 #, python-format
 msgid "Creating the target dir '%s'"
 msgstr ""
 
-#: nssbackup/managers/BackupManager.py:461
+#: nssbackup/managers/BackupManager.py:431
+msgid "Target not writable : "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:468
 #, python-format
 msgid ""
 "One of the incremental backups (%(bad_one)s) is bad -> make a new full one : "
@@ -184,12 +251,12 @@ msgid ""
 "(NewBaseSnapshot)s' "
 msgstr ""
 
-#: nssbackup/managers/SnapshotManager.py:161
+#: nssbackup/managers/SnapshotManager.py:199
 #, python-format
 msgid "The file '%s' is not found in snapshot"
 msgstr ""
 
-#: nssbackup/managers/SnapshotManager.py:216
+#: nssbackup/managers/SnapshotManager.py:253
 #, python-format
 msgid "Got a non valid snapshot '%(name)s' , removing : %(error_cause)s "
 msgstr ""
@@ -207,62 +274,62 @@ msgid ""
 "Use simple-restore-gnome for more ease of use.\n"
 msgstr ""
 
-#: nssbackup/ui/SBConfigGTK.py:270 nssbackup/ui/SBConfigGTK.py:279
-#: nssbackup/ui/SBConfigGTK.py:308 nssbackup/ui/SBConfigGTK.py:316
-#: nssbackup/ui/SBConfigGTK.py:327
+#: nssbackup/ui/SBConfigGTK.py:271 nssbackup/ui/SBConfigGTK.py:280
+#: nssbackup/ui/SBConfigGTK.py:309 nssbackup/ui/SBConfigGTK.py:317
+#: nssbackup/ui/SBConfigGTK.py:328
 msgid "Name"
 msgstr ""
 
-#: nssbackup/ui/SBConfigGTK.py:287
+#: nssbackup/ui/SBConfigGTK.py:288
 #, fuzzy
 msgid "File Type"
 msgstr "Failu tipi"
 
-#: nssbackup/ui/SBConfigGTK.py:330
+#: nssbackup/ui/SBConfigGTK.py:331
 msgid "MP3 Music"
 msgstr "MP3 mūzika"
 
-#: nssbackup/ui/SBConfigGTK.py:330
+#: nssbackup/ui/SBConfigGTK.py:331
 msgid "AVI Video"
 msgstr "AVI video"
 
-#: nssbackup/ui/SBConfigGTK.py:330
+#: nssbackup/ui/SBConfigGTK.py:331
 msgid "MPEG Video"
 msgstr "MPEG video"
 
-#: nssbackup/ui/SBConfigGTK.py:330
+#: nssbackup/ui/SBConfigGTK.py:331
 msgid "Matrjoshka Video"
 msgstr "Matrjoshka video"
 
-#: nssbackup/ui/SBConfigGTK.py:330
+#: nssbackup/ui/SBConfigGTK.py:331
 msgid "OGG Multimedia container"
 msgstr "OGG multimedijas konteineris"
 
-#: nssbackup/ui/SBConfigGTK.py:330
+#: nssbackup/ui/SBConfigGTK.py:331
 msgid "CD Images"
 msgstr "CD attēlfaili"
 
-#: nssbackup/ui/SBConfigGTK.py:391 nssbackup/ui/SBConfigGTK.py:1171
+#: nssbackup/ui/SBConfigGTK.py:392 nssbackup/ui/SBConfigGTK.py:1188
 msgid "Custom"
 msgstr "Specifisks"
 
-#: nssbackup/ui/SBConfigGTK.py:506
+#: nssbackup/ui/SBConfigGTK.py:523
 msgid "Already included item !"
 msgstr "Šis ieraksts jau ir iekļauts!"
 
-#: nssbackup/ui/SBConfigGTK.py:521
+#: nssbackup/ui/SBConfigGTK.py:538
 msgid "Already excluded item !"
 msgstr "Šis ieraksts jau ir izkļauts!"
 
-#: nssbackup/ui/SBConfigGTK.py:533 nssbackup/ui/SBConfigGTK.py:563
+#: nssbackup/ui/SBConfigGTK.py:550 nssbackup/ui/SBConfigGTK.py:580
 msgid "Empty filename or path. Please enter a valid filename or path."
 msgstr "Tukš faila vai mapes vārds. Lūdzu ievadiet faila vai mapes vārdu."
 
-#: nssbackup/ui/SBConfigGTK.py:546
+#: nssbackup/ui/SBConfigGTK.py:563
 msgid "Empty expression. Please enter a valid regular expression."
 msgstr "Tukšs regulārais izteikums. Lūdzu ievadiet regulāru izteikumu."
 
-#: nssbackup/ui/SBConfigGTK.py:569
+#: nssbackup/ui/SBConfigGTK.py:586
 msgid ""
 "It seems the path you entered does not exists. Do you want to add this wrong "
 "path?"
@@ -270,49 +337,49 @@ msgstr ""
 "Izskatās, ka jūsu ievadītais fails/mape neeksistē. Vai jūs tiešām vēlaties "
 "pievienot šo neeksistējošo ceļu?"
 
-#: nssbackup/ui/SBConfigGTK.py:598
+#: nssbackup/ui/SBConfigGTK.py:615
 #, fuzzy
 msgid "Save to file ..."
 msgstr "Iekļaut failu ..."
 
-#: nssbackup/ui/SBConfigGTK.py:614
+#: nssbackup/ui/SBConfigGTK.py:631
 msgid "This is a user friendly backup solution for common desktop needs."
 msgstr ""
 
-#: nssbackup/ui/SBConfigGTK.py:617
+#: nssbackup/ui/SBConfigGTK.py:634
 msgid "translator-credits"
 msgstr "Latviešu tulkojums: Aigars Mahinovs"
 
-#: nssbackup/ui/SBConfigGTK.py:644
+#: nssbackup/ui/SBConfigGTK.py:661
 msgid "A backup run is initiated in the background. The process id is: "
 msgstr "Rezerves kopēšana ir uzsākta fonā. Procesa identifikators ir "
 
-#: nssbackup/ui/SBConfigGTK.py:703 nssbackup/ui/SBConfigGTK.py:841
+#: nssbackup/ui/SBConfigGTK.py:720 nssbackup/ui/SBConfigGTK.py:858
 msgid "Include file ..."
 msgstr "Iekļaut failu ..."
 
-#: nssbackup/ui/SBConfigGTK.py:706 nssbackup/ui/SBConfigGTK.py:844
+#: nssbackup/ui/SBConfigGTK.py:723 nssbackup/ui/SBConfigGTK.py:861
 msgid "All files"
 msgstr "Visus failus"
 
-#: nssbackup/ui/SBConfigGTK.py:719
+#: nssbackup/ui/SBConfigGTK.py:736
 msgid "Include folder ..."
 msgstr "Iekļaut mapi ..."
 
-#: nssbackup/ui/SBConfigGTK.py:836
+#: nssbackup/ui/SBConfigGTK.py:853
 #, python-format
 msgid "'%d' test(s) didn't succeed !"
 msgstr ""
 
-#: nssbackup/ui/SBConfigGTK.py:857
+#: nssbackup/ui/SBConfigGTK.py:874
 msgid "Exclude folder ..."
 msgstr "Neiekļaut mapi ..."
 
-#: nssbackup/ui/SBConfigGTK.py:1098 nssbackup/ui/SBConfigGTK.py:1252
+#: nssbackup/ui/SBConfigGTK.py:1115 nssbackup/ui/SBConfigGTK.py:1269
 msgid "Test Succeeded !"
 msgstr ""
 
-#: nssbackup/ui/SBConfigGTK.py:1243 datas/simple-backup-config.glade:1286
+#: nssbackup/ui/SBConfigGTK.py:1260 datas/nssbackup-config.glade:1286
 msgid ""
 "Please test writability of the target directory by pressing \"Test\" button "
 "on the right."
@@ -320,11 +387,11 @@ msgstr ""
 "Lūdzu, pārbaudiet iespēju ierakstīt datus mērķa mapē, nospiežot \"Pārbaudīt"
 "\" pogu labajā pusē."
 
-#: nssbackup/ui/SBConfigGTK.py:1258
+#: nssbackup/ui/SBConfigGTK.py:1275
 msgid "Target directory is writable."
 msgstr ""
 
-#: nssbackup/ui/SBConfigGTK.py:1265
+#: nssbackup/ui/SBConfigGTK.py:1282
 #, fuzzy
 msgid ""
 "Please change target directory and test writability of the target directory "
@@ -333,36 +400,36 @@ msgstr ""
 "Lūdzu, pārbaudiet iespēju ierakstīt datus mērķa mapē, nospiežot \"Pārbaudīt"
 "\" pogu labajā pusē."
 
-#: nssbackup/ui/SBRestoreGTK.py:59
+#: nssbackup/ui/SBRestoreGTK.py:60
 msgid "Snapshots"
 msgstr ""
 
-#: nssbackup/ui/SBRestoreGTK.py:66
+#: nssbackup/ui/SBRestoreGTK.py:68
 msgid "Path"
 msgstr "Ceļš"
 
-#: nssbackup/ui/SBRestoreGTK.py:138
+#: nssbackup/ui/SBRestoreGTK.py:140
 msgid "Choose a source folder"
 msgstr "Izvēlieties atjaunošanas avotu"
 
-#: nssbackup/ui/SBRestoreGTK.py:207
+#: nssbackup/ui/SBRestoreGTK.py:209
 msgid "Loading ..."
 msgstr "Ielādēju ..."
 
-#: nssbackup/ui/SBRestoreGTK.py:255
+#: nssbackup/ui/SBRestoreGTK.py:257
 msgid "Select restore location"
 msgstr "Izvēlieties atjaunošanas vietu"
 
-#: nssbackup/ui/SBRestoreGTK.py:316
+#: nssbackup/ui/SBRestoreGTK.py:318
 #, fuzzy
 msgid "Select revert location"
 msgstr "Izvēlieties atjaunošanas vietu"
 
-#: nssbackup/ui/SBRestoreGTK.py:366
+#: nssbackup/ui/SBRestoreGTK.py:368
 msgid "This snapshot seems empty."
 msgstr ""
 
-#: nssbackup/ui/SBRestoreGTK.py:385
+#: nssbackup/ui/SBRestoreGTK.py:387
 msgid "No backups found for this day !"
 msgstr ""
 
@@ -371,27 +438,27 @@ msgstr ""
 msgid "Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s "
 msgstr ""
 
-#: datas/simple-backup-config.glade:6
+#: datas/nssbackup-config.glade:6
 msgid "Exclude file type"
 msgstr "Neiekļaut failu tipus"
 
-#: datas/simple-backup-config.glade:20
+#: datas/nssbackup-config.glade:20
 msgid "Standard file types:"
 msgstr "Standarta failu tipi:"
 
-#: datas/simple-backup-config.glade:52
+#: datas/nssbackup-config.glade:52
 msgid "Custom defined file type with "
 msgstr "Lietotāja definētais faila tips ar "
 
-#: datas/simple-backup-config.glade:78
+#: datas/nssbackup-config.glade:78
 msgid "file extension"
 msgstr "paplašinājumu"
 
-#: datas/simple-backup-config.glade:134
+#: datas/nssbackup-config.glade:134
 msgid "Exclude by regex"
 msgstr "Neiekļaut pēc regulārās izteiksmes"
 
-#: datas/simple-backup-config.glade:147
+#: datas/nssbackup-config.glade:147
 msgid ""
 "Enter a regular expression.\n"
 "Files and directories matching this expression will be excluded from backup."
@@ -400,27 +467,27 @@ msgstr ""
 "Faili un mapes, kas atbildīs šai izteiksmei, rezerves kopijās netiks "
 "iekļauti."
 
-#: datas/simple-backup-config.glade:208
+#: datas/nssbackup-config.glade:208
 msgid "NSsbackup Config"
 msgstr ""
 
-#: datas/simple-backup-config.glade:222
+#: datas/nssbackup-config.glade:222
 msgid "_Fichier"
 msgstr ""
 
-#: datas/simple-backup-config.glade:258
+#: datas/nssbackup-config.glade:258
 msgid "gtk-quit"
 msgstr ""
 
-#: datas/simple-backup-config.glade:272
+#: datas/nssbackup-config.glade:272
 msgid "Aid_e"
 msgstr ""
 
-#: datas/simple-backup-config.glade:371
+#: datas/nssbackup-config.glade:371
 msgid "Use recommended backup settings"
 msgstr "Lietot ieteicamos rezerves kopēšanas parametrus"
 
-#: datas/simple-backup-config.glade:400
+#: datas/nssbackup-config.glade:400
 msgid ""
 "<small>Do standard backups.\n"
 "Defaults: daily incremental and weekly full backup to /var/backup of all "
@@ -435,11 +502,11 @@ msgstr ""
 "Multimēdiju faili, pagaidu faili un faili, kas lielāki par 100 Mb, netiks "
 "iekļauti.</small>"
 
-#: datas/simple-backup-config.glade:419
+#: datas/nssbackup-config.glade:419
 msgid "Use custom backup settings"
 msgstr "Lietot lietotāja izvēlētos rezerves kopēšanas parametrus"
 
-#: datas/simple-backup-config.glade:450
+#: datas/nssbackup-config.glade:450
 msgid ""
 "<small>Do backups according to the settings defined on the next pages of "
 "this dialog.</small>"
@@ -447,11 +514,11 @@ msgstr ""
 "<small>Veikt rezerves kopēšanu atbilstoši parametriem, kas ir noteikti "
 "nākamajās šā dialoga lapās.</small>"
 
-#: datas/simple-backup-config.glade:468
+#: datas/nssbackup-config.glade:468
 msgid "Manual backups only"
 msgstr "Neveikt automātisku rezerves kopēšanu"
 
-#: datas/simple-backup-config.glade:499
+#: datas/nssbackup-config.glade:499
 msgid ""
 "<small>Do not backup your data automatically. Note: this does not prevent "
 "doing manual backups.</small>"
@@ -460,84 +527,84 @@ msgstr ""
 "kopēšanu tiešā veidā - nospiežot pogu \"Uzsākt tūlīt\" vai palaižot "
 "\"sbackupd\" no komandrindas.</small>"
 
-#: datas/simple-backup-config.glade:521
+#: datas/nssbackup-config.glade:521
 msgid "General"
 msgstr "Vispārīgi"
 
-#: datas/simple-backup-config.glade:583 datas/simple-backup-config.glade:849
+#: datas/nssbackup-config.glade:583 datas/nssbackup-config.glade:849
 msgid "Add File"
 msgstr "Pievienot failu"
 
-#: datas/simple-backup-config.glade:626 datas/simple-backup-config.glade:892
+#: datas/nssbackup-config.glade:626 datas/nssbackup-config.glade:892
 msgid "Add Directory"
 msgstr "Pievienot mapi"
 
-#: datas/simple-backup-config.glade:668
+#: datas/nssbackup-config.glade:668
 msgid "Add a remote source"
 msgstr ""
 
-#: datas/simple-backup-config.glade:751
+#: datas/nssbackup-config.glade:751
 #, fuzzy
 msgid "Test all"
 msgstr "Pārbaudīt"
 
-#: datas/simple-backup-config.glade:780
+#: datas/nssbackup-config.glade:780
 msgid "Include"
 msgstr "Iekļaut"
 
-#: datas/simple-backup-config.glade:939
+#: datas/nssbackup-config.glade:939
 msgid "Paths"
 msgstr "Faili/Mapes"
 
-#: datas/simple-backup-config.glade:1010
+#: datas/nssbackup-config.glade:1010
 msgid "File types"
 msgstr "Failu tipi"
 
-#: datas/simple-backup-config.glade:1082
+#: datas/nssbackup-config.glade:1082
 msgid "Regex"
 msgstr "Regulārā izteiksme (regex)"
 
-#: datas/simple-backup-config.glade:1105
+#: datas/nssbackup-config.glade:1105
 msgid "Do not backup files bigger than "
 msgstr "Neveikt rezerves kopēšanu failiem lielākiem par "
 
-#: datas/simple-backup-config.glade:1131
+#: datas/nssbackup-config.glade:1131
 msgid "Mb"
 msgstr "MB"
 
-#: datas/simple-backup-config.glade:1173
+#: datas/nssbackup-config.glade:1173
 msgid "Max size"
 msgstr "Maks. izm."
 
-#: datas/simple-backup-config.glade:1191
+#: datas/nssbackup-config.glade:1191
 msgid "Exclude"
 msgstr "Neiekļaut"
 
-#: datas/simple-backup-config.glade:1207
+#: datas/nssbackup-config.glade:1207
 msgid "Use default backup directory (/var/backup)"
 msgstr "Lietot rezerves kopiju mapi pēc noklusējuma (/var/backup)"
 
-#: datas/simple-backup-config.glade:1221
+#: datas/nssbackup-config.glade:1221
 msgid "Use custom local backup directory"
 msgstr "Lietot īpašu vietējo rezerves kopiju mapi"
 
-#: datas/simple-backup-config.glade:1251
+#: datas/nssbackup-config.glade:1251
 msgid "Select the destination folder"
 msgstr "Izvēlieties mērķa mapi"
 
-#: datas/simple-backup-config.glade:1268
+#: datas/nssbackup-config.glade:1268
 msgid "Use a remote directory (SSH or FTP)"
 msgstr "Lietot attālinātu mapi (SSH vai FTP)"
 
-#: datas/simple-backup-config.glade:1305
+#: datas/nssbackup-config.glade:1305
 msgid "ssh://username:password@example.com/remote/dir/"
 msgstr "ssh://username:password@example.com/remote/dir/"
 
-#: datas/simple-backup-config.glade:1341
+#: datas/nssbackup-config.glade:1341
 msgid "Test"
 msgstr "Pārbaudīt"
 
-#: datas/simple-backup-config.glade:1384
+#: datas/nssbackup-config.glade:1384
 msgid ""
 "<i>The selected destination is not writtable with current permissions.\n"
 "The backups can not be written there.</i>"
@@ -545,15 +612,15 @@ msgstr ""
 "<i>Izvēlētajā mērķa mapē nevar ierakstīt ar esošajām tiesībām.\n"
 "Rezerves kopiju ierakstīšana šajā mapē nav iespējama.</i>"
 
-#: datas/simple-backup-config.glade:1415
+#: datas/nssbackup-config.glade:1415
 msgid "Destination"
 msgstr "Mērķis"
 
-#: datas/simple-backup-config.glade:1437
+#: datas/nssbackup-config.glade:1437
 msgid "Do backups "
 msgstr "Veikt rezerves kopēšanu "
 
-#: datas/simple-backup-config.glade:1445
+#: datas/nssbackup-config.glade:1445
 msgid ""
 "never\n"
 "hourly\n"
@@ -569,47 +636,53 @@ msgstr ""
 "ik mēnesi\n"
 "specifiski"
 
-#: datas/simple-backup-config.glade:1463
+#: datas/nssbackup-config.glade:1462
+msgid ""
+"This option will make nssbackup make a backup not at a precise time but when "
+"the computer is up. "
+msgstr ""
+
+#: datas/nssbackup-config.glade:1464
 msgid "simply"
 msgstr "vienkāršoti"
 
-#: datas/simple-backup-config.glade:1479
+#: datas/nssbackup-config.glade:1480
 msgid "precisely"
 msgstr "tieši"
 
-#: datas/simple-backup-config.glade:1495
+#: datas/nssbackup-config.glade:1496
 msgid "at:"
 msgstr ":"
 
-#: datas/simple-backup-config.glade:1516
-msgid "Day of month:"
-msgstr "Mēneša dienā:"
-
-#: datas/simple-backup-config.glade:1528
-msgid "Day of week:"
-msgstr "Nedēļas dienā:"
-
-#: datas/simple-backup-config.glade:1541
-msgid "Hour"
-msgstr "Stundā"
-
-#: datas/simple-backup-config.glade:1554
+#: datas/nssbackup-config.glade:1596
 msgid "Minute"
 msgstr "Minūtē"
 
-#: datas/simple-backup-config.glade:1656
+#: datas/nssbackup-config.glade:1609
+msgid "Hour"
+msgstr "Stundā"
+
+#: datas/nssbackup-config.glade:1622
+msgid "Day of week:"
+msgstr "Nedēļas dienā:"
+
+#: datas/nssbackup-config.glade:1635
+msgid "Day of month:"
+msgstr "Mēneša dienā:"
+
+#: datas/nssbackup-config.glade:1657
 msgid "Custom cron time definition: "
 msgstr "Īpaša cron laika definīcija: "
 
-#: datas/simple-backup-config.glade:1692
+#: datas/nssbackup-config.glade:1693
 msgid "Do a full backup at least once every"
 msgstr "Veikt pilnu rezerves kopiju vismaz reizi"
 
-#: datas/simple-backup-config.glade:1712 datas/simple-backup-config.glade:1837
+#: datas/nssbackup-config.glade:1713 datas/nssbackup-config.glade:1838
 msgid "days"
 msgstr "dienās"
 
-#: datas/simple-backup-config.glade:1742
+#: datas/nssbackup-config.glade:1743
 msgid ""
 "<small>You can configure how often to start a backup run and when to do it.\n"
 "Unless a set number of days has passed since the last full backup, "
@@ -622,23 +695,23 @@ msgstr ""
 "noteiktais dienu skaits, tiks veikta inkrimentālā rezerves kopēšana.\n"
 "Skatiet \"man 5 crontab\" paskaidrojumiem par cron laika formātu.</small>"
 
-#: datas/simple-backup-config.glade:1767
+#: datas/nssbackup-config.glade:1768
 msgid "Time"
 msgstr "Laiks"
 
-#: datas/simple-backup-config.glade:1783
+#: datas/nssbackup-config.glade:1784
 msgid "Enable purging of old and incomplete backups"
 msgstr "Atļaut vecu un nepilnīgu rezerves kopiju dzēsšanu"
 
-#: datas/simple-backup-config.glade:1810
+#: datas/nssbackup-config.glade:1811
 msgid "Simple cutoff: Erase all backups older than "
 msgstr "Vienkāršs robeždatums: Dzēst visas rezerves kopijas, kas vecākas par "
 
-#: datas/simple-backup-config.glade:1867
+#: datas/nssbackup-config.glade:1868
 msgid "Logarithmic (Recommended)"
 msgstr "Logaritmiski (Ieteicams)"
 
-#: datas/simple-backup-config.glade:1884
+#: datas/nssbackup-config.glade:1885
 msgid ""
 "<small>Keep progressivelly less backups into the past:\n"
 "Keep all backups from yesterday.\n"
@@ -658,7 +731,7 @@ msgstr ""
 "Pārējās rezerves kopijas tiek dzēstas.\n"
 "</small>\n"
 
-#: datas/simple-backup-config.glade:1922
+#: datas/nssbackup-config.glade:1923
 msgid ""
 "<small>Note: Additionally all incomplete and irrecoverable backups will be "
 "erased as long as there is a complete backup snapshot made later on.</small>"
@@ -667,146 +740,156 @@ msgstr ""
 "neatjaunojami sabojātās rezerves kopijas, tiklīdz pec viņām tiek atrasta "
 "veiksmīgi pabeigta rezerves kopija.</small>"
 
-#: datas/simple-backup-config.glade:1947
+#: datas/nssbackup-config.glade:1948
 msgid "Purging"
 msgstr "Dzēsšana"
 
-#: datas/simple-backup-config.glade:1949
+#: datas/nssbackup-config.glade:1950
 msgid "Cleaning old backups"
 msgstr "Veco rezerves kopiju dzēsšana"
 
-#: datas/simple-backup-config.glade:1971
+#: datas/nssbackup-config.glade:1972
 msgid "Log settings"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2003
-msgid "Log level :"
-msgstr ""
-
-#: datas/simple-backup-config.glade:2025
+#: datas/nssbackup-config.glade:2019
 #, fuzzy
 msgid "Log file directory"
 msgstr "Atjaunot failus/mapes"
 
-#: datas/simple-backup-config.glade:2062
+#: datas/nssbackup-config.glade:2030
+msgid ""
+"Debug is just for debbuging purpose\n"
+"Info is the recommended setting"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2048
+msgid "Debug is just for debbuging purpose.Info is the recommended setting"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2049
+msgid "Log level :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2067
 msgid "Report by mail"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2170
-msgid "SMTP port :"
-msgstr ""
-
-#: datas/simple-backup-config.glade:2181
-msgid "SMTP server :"
-msgstr ""
-
-#: datas/simple-backup-config.glade:2192
+#: datas/nssbackup-config.glade:2118
 msgid "To :"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2203
+#: datas/nssbackup-config.glade:2129
 msgid "From [optional] :"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2221
+#: datas/nssbackup-config.glade:2136
+msgid "SMTP server :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2147
+msgid "SMTP port :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2226
 #, fuzzy
 msgid "Test mail settings"
 msgstr "Lietot lietotāja izvēlētos rezerves kopēšanas parametrus"
 
-#: datas/simple-backup-config.glade:2246
+#: datas/nssbackup-config.glade:2251
 msgid "Parameters"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2283
+#: datas/nssbackup-config.glade:2288
 msgid "Use a username and password"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2299
-msgid "Password"
-msgstr ""
-
-#: datas/simple-backup-config.glade:2310
+#: datas/nssbackup-config.glade:2332
 msgid "Username"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2360
+#: datas/nssbackup-config.glade:2339
+msgid "Password"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2365
 msgid "Use secured connexion"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2422
-msgid "Key"
-msgstr ""
-
-#: datas/simple-backup-config.glade:2433
+#: datas/nssbackup-config.glade:2429
 msgid "Certificate"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2473
+#: datas/nssbackup-config.glade:2436
+msgid "Key"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2478
 msgid "Security"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2502
+#: datas/nssbackup-config.glade:2507
 #, fuzzy
 msgid "Report"
 msgstr "Atjaunot"
 
-#: datas/simple-backup-config.glade:2530
+#: datas/nssbackup-config.glade:2535
 msgid "Enter the remote target to include"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2547
+#: datas/nssbackup-config.glade:2552
 msgid "Choose a plugin to get the format"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2558
+#: datas/nssbackup-config.glade:2563
 msgid "Choose your plugin :"
 msgstr ""
 
-#: datas/simple-backup-config.glade:2613
+#: datas/nssbackup-config.glade:2618
 msgid "Check"
 msgstr ""
 
-#: datas/simple-restore-gnome.glade:7
+#: datas/nssbackup-restore.glade:7
 msgid "NSsbackup Restoration GUI"
 msgstr ""
 
-#: datas/simple-restore-gnome.glade:94
+#: datas/nssbackup-restore.glade:94
 #, fuzzy
 msgid "Use a custom directory : "
 msgstr "Lietot īpašu vietējo rezerves kopiju mapi"
 
-#: datas/simple-restore-gnome.glade:110
+#: datas/nssbackup-restore.glade:110
 #, fuzzy
 msgid "Use the default directory : "
 msgstr "Lietot rezerves kopiju mapi pēc noklusējuma (/var/backup)"
 
-#: datas/simple-restore-gnome.glade:124
+#: datas/nssbackup-restore.glade:124
 msgid "<b>Snapshots directory</b>"
 msgstr ""
 
-#: datas/simple-restore-gnome.glade:196
+#: datas/nssbackup-restore.glade:196
 #, fuzzy
 msgid "<b>Available backups</b>"
 msgstr "Pieejamās rezerves kopijas:"
 
-#: datas/simple-restore-gnome.glade:251
+#: datas/nssbackup-restore.glade:251
 msgid "<b>Snapshot details</b>"
 msgstr ""
 
-#: datas/simple-restore-gnome.glade:298
+#: datas/nssbackup-restore.glade:298
 msgid "Restore"
 msgstr "Atjaunot"
 
-#: datas/simple-restore-gnome.glade:336
+#: datas/nssbackup-restore.glade:336
 #, fuzzy
 msgid "Restore As"
 msgstr "Atjaunot kā ..."
 
-#: datas/simple-restore-gnome.glade:389
+#: datas/nssbackup-restore.glade:389
 msgid "Revert"
 msgstr ""
 
-#: datas/simple-restore-gnome.glade:427
+#: datas/nssbackup-restore.glade:427
 msgid "Revert As"
 msgstr ""
 
@@ -851,9 +934,6 @@ msgstr ""
 
 #~ msgid "Configuration save successful"
 #~ msgstr "Konfigurācija saglabāta veiksmīgi"
-
-#~ msgid "Exclude file ..."
-#~ msgstr "Neiekļaut failu ..."
 
 #~ msgid "Currently backup configuration is only runnable by root"
 #~ msgstr ""

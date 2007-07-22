@@ -95,7 +95,7 @@ class BackupManager :
 				# The uid is still root and the gid is admin
 				os.setgid( grp.getgrnam("admin").gr_gid )
 			except Exception, e: 
-				getLogger().warning("Failed to set the gid to 'admin' one :" + str(e) )
+				getLogger().warning(_("Failed to set the gid to 'admin' one :") + str(e) )
 
 		# Check the target dir
 		self.__checkTarget()
@@ -121,28 +121,28 @@ class BackupManager :
 		
 		# Create snapshot
 		self.__actualSnapshot = Snapshot(name)
-		getLogger().info("Starting snapshot %s " % str(self.__actualSnapshot))
+		getLogger().info(_("Starting snapshot %(name)s ") % {'name' :str(self.__actualSnapshot)})
 		
 		# Set the base file
 		if base :
-			getLogger().info("Setting Base to '%s' " % str(base))
+			getLogger().info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
 			self.__actualSnapshot.setBase(base.getName())
 		del base
   
 		# Backup list of installed packages (Debian only part)
 		try:
-			getLogger().info("Setting packages File ")
+			getLogger().info(_("Setting packages File "))
 			command = "dpkg --get-selections"
 			s = os.popen( command )
 			pkg = s.read()
 			s.close()
 			self.__actualSnapshot.setPackages(pkg)
 		except Exception, e:
-			getLogger().warning("Problem when setting the packages : " + str(e))
+			getLogger().warning(_("Problem when setting the packages : ") + str(e))
 		
 		
 		# set Excludes
-		getLogger().info("Setting Excludes File ")
+		getLogger().info(_("Setting Excludes File "))
 		if self.config.has_option( "exclude", "regex" ):
 			gexclude = str(self.config.get( "exclude", "regex" )).split(",")
 		self.__actualSnapshot.setExcludes(gexclude)
@@ -198,18 +198,18 @@ class BackupManager :
 			"""
 			# excude target
 			if _file2 == self.config.get("general","target") :
-				getLogger().info("target dir is excluded ")
+				getLogger().info(_("target directory is excluded"))
 				return True
 			
 			# return true if the file doesn't exist
 			if not os.path.exists(_file2):
-				getLogger().warning("'%s' doesn't exist, it has to be exclude " % _file2 )
+				getLogger().warning(_("'%(file)s' doesn't exist, it has to be exclude ") % { 'file' : _file2 })
 				return True
 			
 			# get the stats, If not possible , the file has to be exclude , return True
 			try: s = os.lstat( _file2 )
 			except Exception, e :
-				getLogger().warning("Problem with '%s' : %s " % (_file2, str(e) ) )
+				getLogger().warning(_("Problem with '%(file)s' : %(error)s ") % {'file':_file2, 'error':str(e) } )
 				return True
 			
 			# refuse a file if we don't have read access
@@ -217,12 +217,12 @@ class BackupManager :
 				fd = os.open(_file2, os.R_OK)
 				os.close(fd)
 			except OSError, e:
-				getLogger().warning("We don't have read access to '%s', it has to be exclude : %s " % (_file2,str(e)) )
+				getLogger().warning(_("We don't have read access to '%(file)s', it has to be exclude : %(error)s ") % {'file':_file2, 'error':str(e) }  )
 				return True		
 			
 			#if the file is too big
 			if self.config.has_option("exclude","maxsize") and s.st_size > int(self.config.get("exclude","maxsize")) > 0 :
-				getLogger().info("'%s' size is higher than the specified one ( %s > %s), it has to be exclude " % (_file2,str(s.st_size), str(self.config.get("exclude","maxsize"))) )
+				getLogger().info(_("'%(file)s' size is higher than the specified one ( %(filesize)s > %(maxsize)s), it has to be exclude ") % {'file':_file2,'filesize':str(s.st_size), 'maxsize': str(self.config.get("exclude","maxsize"))} )
 				return True
 			
 			# if the file matches an exclude regexp, return true
@@ -302,7 +302,7 @@ class BackupManager :
 								else : 
 									getLogger().debug("Excluding '%s' (file is excluded by conf )" % contents)
 					except OSError, e :
-						getLogger().warning("got an error with '%s' : %s" % (_file, str(e)))
+						getLogger().warning(_("got an error with '%(file)s' : %(error)s") % {'file':_file, 'error' : str(e)})
 						if self.__actualSnapshot.getFilesList().has_key(_file) :
 							del self.__actualSnapshot.getFilesList()[_file]
 									
@@ -321,7 +321,7 @@ class BackupManager :
 		if self.config.has_section( "dirconfig" ):
 			if not len(self.config.items("dirconfig")) :
 				includelist, excludelist = {},{}
-				getLogger().warning(_("No directories to backup !"))
+				getLogger().warning(_("No directory to backup !"))
 			else :
 				includelist, excludelist = {},{}
 				for k,v in self.config.items("dirconfig") :
@@ -373,7 +373,7 @@ class BackupManager :
 			# the lockfile exists, is it valid ?
 			last_sb_pid = FAM.readfile(self.__lockfile)
 			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read()) ) :
-				raise SBException(_("Another Simple Backup daemon already running (pid = %s )!") % last_sb_pid )
+				raise SBException(_("Another NSsbackup daemon already running (pid = %s )!") % last_sb_pid )
 			else :
 				FAM.delete(self.__lockfile)
 		
@@ -428,7 +428,7 @@ class BackupManager :
 			FAM.writetofile(self.config.get("general","target")+"/test", "testWritable")
 			FAM.delete(self.config.get("general","target")+"/test")
 		except Exception, e :
-			getLogger().error("Target not writable : " + str(e))
+			getLogger().error(_("Target not writable : ") + str(e))
 			raise e
 	
 	def __isIncOrFull(self, listing ):
@@ -473,16 +473,16 @@ class BackupManager :
 						m = r.search( i.getName() )
 						if (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days <= self.config.get("general","maxincrement") :
 							# Last full backup is fresh -> make an increment
-							getLogger().debug("Last full backup is fresh (%d days old )-> make an increment" % (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days)
+							getLogger().info("Last full backup is fresh (%d days old )-> make an increment" % (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days)
 							m = r.search( listing[0].getName() )
 							increment = time.mktime((int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),int(m.group(6)),0,0,-1))
 							base = listing[0]
 						else: # Last full backup is old -> make a full backup
-							getLogger().debug("Last full backup is old -> make a full backup")
+							getLogger().info("Last full backup is old -> make a full backup")
 							increment = 0
 						break
 				else:
-					getLogger().debug(" No full backup found 8) -> lets make a full backup to be safe")
+					getLogger().info(" No full backup found -> lets make a full backup to be safe")
 					increment = 0            # No full backup found 8) -> lets make a full backup to be safe
 		
 		# Determine and create backup target directory
