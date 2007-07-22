@@ -124,7 +124,7 @@ class SBRestoreGTK(GladeWindow):
 
 		top_window = 'restorewindow'
 		GladeWindow.__init__(self, filename, top_window, widget_list, handlers)
-		self.widgets[top_window].set_icon_from_file(Util.getResource("sbackup-restore.png"))
+		self.widgets[top_window].set_icon_from_file(Util.getResource("nssbackup-restore.png"))
 	#----------------------------------------------------------------------
 
 	def on_defaultradiob_toggled(self, *args):

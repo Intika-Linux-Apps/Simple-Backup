@@ -445,7 +445,7 @@ class BackupManager :
 			m = r.search( listing[0].getName() )
 			if m.group( 7 ) == "ful":  # Last backup was full backup
 				getLogger().debug("Last (%s) was a full backup" % listing[0].getName())
-				if (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days <= self.config.get("general","maxincrement") :
+				if (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days < self.config.get("general","maxincrement") :
 			    	    # Less then maxincrement days passed since that -> make an increment
 					increment = time.mktime((int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),int(m.group(6)),0,0,-1))
 					base = listing[0]
@@ -455,6 +455,7 @@ class BackupManager :
 						getLogger().warning(str(e))
 						increment = 0  # Last backup is somehow damaged	
 				else:
+					getLogger().info("Last full backup is old -> make a full backup")
 					increment = 0      # Too old -> make full backup
 			else: # Last backup was an increment - lets search for the last full one
 				getLogger().debug(" Last backup (%s) was an increment - lets search for the last full one" % listing[0].getName())
@@ -471,7 +472,7 @@ class BackupManager :
 					
 					if r2.search( i.getName() ):
 						m = r.search( i.getName() )
-						if (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days <= self.config.get("general","maxincrement") :
+						if (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days < self.config.get("general","maxincrement") :
 							# Last full backup is fresh -> make an increment
 							getLogger().info("Last full backup is fresh (%d days old )-> make an increment" % (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days)
 							m = r.search( listing[0].getName() )
