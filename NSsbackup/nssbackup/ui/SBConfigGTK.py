@@ -51,7 +51,7 @@ class SBconfigGTK(GladeWindow):
 				self.configman = ConfigManager()
 			
 		filename = Util.getResource('nssbackup-config.glade')
-
+		
 		widget_list = [
 			'remote_inc_dialog',
 			'remote_inc_entry',
@@ -226,6 +226,7 @@ class SBconfigGTK(GladeWindow):
 			'on_ex_delftype_clicked',
 			'on_ex_addregex_clicked',
 			'on_ex_delregex_clicked',
+			'on_ex_max_toggled',
 			'on_ex_maxsize_value_changed',
 			'on_dest1_toggled',
 			'on_dest_localpath_selection_changed',
@@ -1235,13 +1236,16 @@ class SBconfigGTK(GladeWindow):
 
 	#----------------------------------------------------------------------
 
-	def on_ex_maxsize_value_changed(self, *args):
-		if not self.widgets["ex_max"].get_active():
-			self.widgets["ex_maxsize"].set_sensitive( False )
-			self.configman.set( "exclude", "maxsize", "-1" )
-		else:
+	def on_ex_max_toggled(self, *args):
+		if self.widgets["ex_max"].get_active():
 			self.widgets["ex_maxsize"].set_sensitive( True )
-			self.configman.set( "exclude", "maxsize", str(int(self.widgets["ex_maxsize"].get_value())*1024*1024) )
+			self.on_ex_maxsize_value_changed()
+		elif not self.widgets["ex_max"].get_active():
+			self.widgets["ex_maxsize"].set_sensitive( False )
+			self.configman.remove_option("exclude", "maxsize")
+
+	def on_ex_maxsize_value_changed(self, *args):
+		self.configman.set( "exclude", "maxsize", str(int(self.widgets["ex_maxsize"].get_value())*1024*1024) )
 	
 	#----------------------------------------------------------------------
 	

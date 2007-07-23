@@ -49,7 +49,12 @@ class NSsbackupd () :
 		if self.__bm.config.has_option("report","from") :
 			_from =self.__bm.config.get("report","from")
 		else :
-			_from = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {'login' : os.getlogin(), 'hostname': socket.gethostname()}
+			hostname = socket.gethostname()
+			if "." in hostname :
+				mailsuffix = hostname
+			else :
+				mailsuffix = hostname + ".ext"
+			_from = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {'login' : os.getenv("USERNAME"), 'hostname': mailsuffix}
 		
 		_to = self.__bm.config.get("report","to")
 		_title = _("[NSsbackup] Report of %(date)s") % {'date': datetime.datetime.now()}
