@@ -41,8 +41,8 @@ endif
 	install -m644 -D ./datas/nssbackup-restore.png $(PIXDIR)
 	install -m644 -D ./datas/nssbackup-config.desktop $(DESTDIR)/share/applications/
 	install -m644 -D ./datas/nssbackup-restore.desktop $(DESTDIR)/share/applications/
-	install -m644 -D ./datas/su-nssbackup-config.desktop $(DESTDIR)/share/applications/
-	install -m644 -D ./datas/su-nssbackup-restore.desktop $(DESTDIR)/share/applications/
+	install -m644 -D ./datas/nssbackup-config-su.desktop $(DESTDIR)/share/applications/
+	install -m644 -D ./datas/nssbackup-restore-su.desktop $(DESTDIR)/share/applications/
 	install -m644 -D ./datas/nssbackup-restore.glade $(SUPPORT)
 	install ./datas/nssbackup $(SUPPORT)
 #ifeq ($(DESTDIR),/usr/local)
@@ -58,8 +58,8 @@ uninstall:
 	rm -rf $(DOC)
 	rm -f $(DESTDIR)/share/applications/nssbackup-config.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-restore.desktop
-	rm -f $(DESTDIR)/share/applications/su-nssbackup-config.desktop
-	rm -f $(DESTDIR)/share/applications/su-nssbackup-restore.desktop
+	rm -f $(DESTDIR)/share/applications/nssbackup-config-su.desktop
+	rm -f $(DESTDIR)/share/applications/nssbackup-restore-su.desktop
 	rm -rf $(CLSDIR)
 	rm -f $(PIXDIR)/nssbackup-conf.png
 	rm -f $(PIXDIR)/nssbackup-restore.png
