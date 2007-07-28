@@ -7,6 +7,7 @@ Exec=gksu nssbackup-restore-gui
 Terminal=false
 Type=Application
 Categories=Application;System;Settings
+X-KDE-SubstituteUID = true
 StartupNotify=true
 Icon=nssbackup-restore.png
 Name[pt_BR]=Restauração de Backup

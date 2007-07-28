@@ -68,7 +68,11 @@ class RestoreManager :
 			# The target is given and exists
 			if os.path.isdir(target):
 				# the target is a dir 	
-				Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, target, bckupsuffix=suffix )
+				#create a temp file , extract inside then move the content
+				tmpdir = tempfile.mkdtemp(dir=target,prefix='nssbackup-restore_')
+				Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, tmpdir, bckupsuffix=suffix )
+				shutil.move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
+				shutil.rmtree(tmpdir)
 			else:
 				#the target is a file
 				parent = os.path.dirname(target)
@@ -77,7 +81,7 @@ class RestoreManager :
 			# target is set to None or target not exists
 			if target and not os.path.exists(target) :
 				#target != None but target doesn't exists
-				os.mkdir(target)
+				os.makedirs(target)
 				Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, target )
 			else :
 				# Target = None , extract at the place it belongs

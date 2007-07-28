@@ -13,3 +13,4 @@ Name[pt_BR]=Configuração do Backup
 Comment[pt_BR]=Configure como seus backups são feitos
 GenericName[en_GB]=
 GenericName[fr_FR]=Configurateur de la Suite NSsbackup
+X-KDE-SubstituteUID = true
