@@ -30,6 +30,7 @@ else
 	@echo "$(DESTDIR)/share/applications/" >>  nssbackup/ressources
 endif
 	cp -rf nssbackup/* $(CLSDIR)
+	@echo "" > nssbackup/ressources
 	chmod +x  $(CLSDIR)/managers/UpgradeManager.py $(CLSDIR)/nssbackupd.py $(CLSDIR)/ui/SBConfigGTK.py $(CLSDIR)/ui/SBRestoreGTK.py
 	ln -s ../$(SUBCLSDIR)/nssbackupd.py $(BIN)/nssbackupd
 	ln -s ../$(SUBCLSDIR)/ui/SBConfigGTK.py $(BIN)/nssbackup-config-gui
@@ -40,11 +41,13 @@ endif
 	install -m644 -D ./datas/nssbackup-restore.png $(PIXDIR)
 	install -m644 -D ./datas/nssbackup-config.desktop $(DESTDIR)/share/applications/
 	install -m644 -D ./datas/nssbackup-restore.desktop $(DESTDIR)/share/applications/
+	install -m644 -D ./datas/su-nssbackup-config.desktop $(DESTDIR)/share/applications/
+	install -m644 -D ./datas/su-nssbackup-restore.desktop $(DESTDIR)/share/applications/
 	install -m644 -D ./datas/nssbackup-restore.glade $(SUPPORT)
 	install ./datas/nssbackup $(SUPPORT)
-ifeq ($(DESTDIR),/usr/local)
-	install -b -m600 datas/nssbackup.conf.example /etc/nssbackup.conf
-endif
+#ifeq ($(DESTDIR),/usr/local)
+#	install -b -m600 datas/nssbackup.conf.example /etc/nssbackup.conf
+#endif
 
 uninstall:
 	rm -f $(BIN)/nssbackupd
@@ -55,6 +58,8 @@ uninstall:
 	rm -rf $(DOC)
 	rm -f $(DESTDIR)/share/applications/nssbackup-config.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-restore.desktop
+	rm -f $(DESTDIR)/share/applications/su-nssbackup-config.desktop
+	rm -f $(DESTDIR)/share/applications/su-nssbackup-restore.desktop
 	rm -rf $(CLSDIR)
 	rm -f $(PIXDIR)/nssbackup-conf.png
 	rm -f $(PIXDIR)/nssbackup-restore.png
