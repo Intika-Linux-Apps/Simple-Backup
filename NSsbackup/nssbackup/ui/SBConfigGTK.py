@@ -292,6 +292,11 @@ class SBconfigGTK(GladeWindow):
 		self.ex_ftypetv.append_column(column3)
 		self.ex_ftypetv.append_column(column2)
 
+		if os.getuid() == 0 :
+			self.widgets['dest1'].set_label(_("Use default backup directory (/var/backup)"))
+		else :
+			self.widgets['dest1'].set_label(_("Use default backup directory (%s)") % (getUserDatasDir()+"backups") )
+		
 		self.ex_regex = gtk.ListStore( str )
 		self.ex_regextv = self.widgets["ex_regextv"]
 		self.ex_regextv.set_model( self.ex_regex )
@@ -412,6 +417,8 @@ class SBconfigGTK(GladeWindow):
 		if self.configman.has_option("general", "target" ) :
 			ctarget = self.configman.get("general", "target" )
 			if ctarget.startswith(os.sep) :
+				if not os.path.exists(ctarget ): 
+					os.makedirs(ctarget)
 				self.widgets["dest2"].set_active( True )			
 				self.widgets["hbox9"].set_sensitive( True )
 				self.widgets["dest_localpath"].set_current_folder( ctarget )
@@ -900,7 +907,7 @@ class SBconfigGTK(GladeWindow):
 			if os.getuid() == 0 :
 				self.configman.set( "general", "target", "/var/backup/")
 			else :
-				self.configman.set( "general", "target", os.sep.join([os.getenv("HOME"),"backup"]))
+				self.configman.set( "general", "target", getUserDatasDir()+"backups")
 		elif self.widgets["dest2"].get_active():
 			self.widgets["hbox9"].set_sensitive( True )
 			self.widgets["hbox10"].set_sensitive( False )
