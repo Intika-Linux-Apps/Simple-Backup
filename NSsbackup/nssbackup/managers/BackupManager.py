@@ -163,7 +163,6 @@ class BackupManager :
 			except Exception, e:
 				getLogger().warning(str(e))
 				
-				
 		self.__actualSnapshot.commit()
 		
 		# End session
@@ -507,3 +506,9 @@ class BackupManager :
 		if self.__config : return self.__config
 		else :
 			self.__config = ConfigManager()
+
+	def getActualSnapshot(self):
+		"""
+		get the actual snapshot
+		"""
+		return self.__actualSnapshot

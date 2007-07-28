@@ -130,14 +130,33 @@ class NSsbackupd () :
 						getLogger().warning(str(e1))
 				getLogger().error(str(e))
 				getLogger().error(traceback.format_exc())
-				# remove any left lockfile
-				if self.__bm and self.__bm.config.has_option("general","lockfile") and FAM.exists(self.__bm.config.get("general","lockfile")) :
-					getLogger().info(_("Session of backup is finished (lockfile is removed) "))
-					FAM.delete(self.__bm.config.get("general","lockfile"))
+				
+				if self.__bm and self.__bm.config :
+					# remove any left lockfile
+					if self.__bm.config.has_option("general","lockfile") and FAM.exists(self.__bm.config.get("general","lockfile")) :
+						getLogger().info(_("Session of backup is finished (lockfile is removed) "))
+						FAM.delete(self.__bm.config.get("general","lockfile"))
+					
+					# put the logfile in the snapshotdir
+					logfile = None
+					if self.__bm.config.has_option("log","file") and FAM.exists(self.__bm.config.get("log","file")) :
+						logfile = self.__bm.config.get("log","file")
+					elif FAM.exists("nssbackup.log") :
+						logfile =os.path.abspath("nssbackup.log")
+					# check for the avaibility of the snapshot
+					snp = self.__bm.getActualSnapshot()
+					if snp and logfile :
+						import shutil
+						shutil.copy(logfile, snp.getPath())
+					else :
+						getLogger().error("Couldn't copy the logfile into the snapshotdir")
+					
 			finally :
-				# send the mail
-				if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
-					self.__sendEmail()
+				if self.__bm and self.__bm.config :
+					# send the mail
+					if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
+						self.__sendEmail()
+					
 		except Exception, e :
 			getLogger().error(str(e))
 			getLogger().error(traceback.format_exc())
