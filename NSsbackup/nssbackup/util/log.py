@@ -43,11 +43,11 @@ def getLogger( logfile=None, level=20 ) :
 			else :
 				# create the logfile
 				if not FAM.exists(logfile) :
-					FAM.writetofile(logfile, "SBackup Logger\r\n===========\r\n")
+					FAM.writetofile(logfile, "NSSBackup Logger\r\n==============\r\n")
 				else :
 					# clean the logfile
 					FAM.delete(logfile)
-					FAM.writetofile(logfile, "SBackup Logger\r\n===========\r\n")
+					FAM.writetofile(logfile, "NSSBackup Logger\r\n==============\r\n")
 				ch1 = logging.FileHandler(logfile)
 				ch1.setLevel(level)
 				ch1.setFormatter(formatter)
@@ -57,7 +57,7 @@ def getLogger( logfile=None, level=20 ) :
 			return logger
 	else :
 		#create logger
-		logger = logging.getLogger("Sbackup")
+		logger = logging.getLogger("NSSbackup")
 		logger.setLevel(level)
 		#create console handler and set level to debug
 		ch = logging.StreamHandler()
@@ -70,11 +70,11 @@ def getLogger( logfile=None, level=20 ) :
 		if logfile :
 			# create the logfile
 			if not os.path.exists(logfile) :
-				FAM.writetofile(logfile, "SBackup Logger\r\n===========\r\n")
+				FAM.writetofile(logfile, "NSSBackup Logger\r\n==============\r\n")
 			else :
 				# clean the logfile
 				FAM.delete(logfile)
-				FAM.writetofile(logfile, "SBackup Logger\r\n===========\r\n")
+				FAM.writetofile(logfile, "NSSBackup Logger\r\n==============\r\n")
 			ch1 = logging.FileHandler(logfile)
 			ch1.setLevel(level)
 			ch1.setFormatter(formatter)
