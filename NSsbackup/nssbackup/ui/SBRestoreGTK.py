@@ -61,13 +61,14 @@ class SBRestoreGTK(GladeWindow):
 		self.widgets['snplisttreeview'].append_column( acolumn )
 		
 		self.flisttreestore = gtk.TreeStore( str )
-		# self.flisttreemodelsort = gtk.TreeModelSort(self.flisttreestore)
-		# self.flisttreemodelsort.set_sort_column_id(1, gtk.SORT_ASCENDING)
-		# self.widgets['filelisttreeview'].set_model( self.flisttreemodelsort )
-		self.widgets['filelisttreeview'].set_model( self.flisttreestore )
+		self.flisttreesort =  gtk.TreeModelSort(self.flisttreestore)
+		self.flisttreesort.set_sort_column_id(0, gtk.SORT_ASCENDING)
+		# self.widgets['filelisttreeview'].set_model( self.flisttreestore )
+		self.widgets['filelisttreeview'].set_model( self.flisttreesort )
 		acolumn1 = gtk.TreeViewColumn(_("Path"), gtk.CellRendererText(), text=0 )
 		self.widgets['filelisttreeview'].append_column( acolumn1 )
-		
+		self.widgets['filelisttreeview'].set_search_column(0)
+		acolumn1.set_sort_column_id(0)
 		self.on_defaultradiob_toggled()
 		
 		# select the current day
@@ -83,6 +84,7 @@ class SBRestoreGTK(GladeWindow):
 		filename = Util.getResource('nssbackup-restore.glade')
 
 		widget_list = [
+			'progressbarDialog',
 			'restorewindow',
 			'defaultfolderlabel',
 			'defaultradiob',
@@ -176,9 +178,9 @@ class SBRestoreGTK(GladeWindow):
 		When a row in the file tree view is expanded, we populate
 		it with children (unless they are there already).
 		"""
-		if self.flisttreestore.iter_nth_child( iter, 1 ):
+		if self.flisttreestore.iter_nth_child( self.flisttreesort.convert_iter_to_child_iter(None,iter), 1 ):
 			return
-		self.show_dir( self.path_to_dir(path), iter )
+		self.show_dir( self.path_to_dir(path), self.flisttreesort.convert_iter_to_child_iter(None,iter) )
 	
 	def path_to_dir( self, path ):
 		"""
@@ -188,7 +190,7 @@ class SBRestoreGTK(GladeWindow):
 		g = list(path)
 		p = ""
 		while g != []:
-			i = self.flisttreestore.get_iter( tuple(g) )
+			i = self.flisttreestore.get_iter( self.flisttreesort.convert_path_to_child_path(tuple(g)) )
 			p = "/" + self.flisttreestore.get_value( i, 0 ) + p
 			g = g[:-1]
 		return p
@@ -234,15 +236,13 @@ class SBRestoreGTK(GladeWindow):
 			# TODO: put a progress bar here
 			progressbar = None
 			try :
-				progressbar = gtk.ProgressBar()
-				progressbar.pulse()
-				progressbar.show()
+				self.widgets['progressbarDialog'].show()
 				self.restoreman.restore(self.currentSnp, src)
-				progressbar.destroy()
+				self.widgets['progressbarDialog'].hide()
 			except Exception, e :
 				getLogger().error(str(e))
 				getLogger().error(traceback.format_exc())
-				if progressbar : progressbar.destroy()
+				self.widgets['progressbarDialog'].hide()
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
 				dialog.destroy()
@@ -267,17 +267,14 @@ class SBRestoreGTK(GladeWindow):
 			dialog.destroy()
 			if response == gtk.RESPONSE_YES:
 				# TODO: put a progress bar here
-				progressbar = None
 				try :
-					progressbar = gtk.ProgressBar()
-					progressbar.pulse()
-					progressbar.show()
+					self.widgets['progressbarDialog'].show()
 					self.restoreman.restoreAs(self.currentSnp, src, dirname)
-					progressbar.destroy()
+					self.widgets['progressbarDialog'].hide()
 				except Exception, e :
 					getLogger().error(str(e))
 					getLogger().error(traceback.format_exc())
-					if progressbar : progressbar.destroy()
+					self.widgets['progressbarDialog'].hide()
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 					dialog.run()
 					dialog.destroy()
@@ -296,15 +293,13 @@ class SBRestoreGTK(GladeWindow):
 			# TODO: put a progress bar here
 			progressbar = None
 			try :
-				progressbar = gtk.ProgressBar()
-				progressbar.pulse()
-				progressbar.show()
+				self.widgets['progressbarDialog'].show()
 				self.restoreman.revert(self.currentSnp, src)
-				progressbar.destroy()
+				self.widgets['progressbarDialog'].hide()
 			except Exception, e :
 				getLogger().error(str(e))
 				getLogger().error(traceback.format_exc())
-				if progressbar : progressbar.destroy()
+				self.widgets['progressbarDialog'].hide()
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
 				dialog.destroy()
@@ -330,15 +325,13 @@ class SBRestoreGTK(GladeWindow):
 				# TODO: put a progress bar here
 				progressbar = None
 				try :
-					progressbar = gtk.ProgressBar()
-					progressbar.pulse()
-					progressbar.show()
+					self.widgets['progressbarDialog'].show()
 					self.restoreman.revertAs(self.currentSnp, src,dirname)
-					progressbar.destroy()
+					self.widgets['progressbarDialog'].hide()
 				except Exception, e :
 					getLogger().error(str(e))
 					getLogger().error(traceback.format_exc())
-					if progressbar : progressbar.destroy()
+					self.widgets['progressbarDialog'].hide()
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 					dialog.run()
 					dialog.destroy()
@@ -354,6 +347,7 @@ class SBRestoreGTK(GladeWindow):
 	def load_filestree(self):
 		global currentsbdict
 		self.flisttreestore.clear()
+		self.widgets['progressbarDialog'].show()
 		self.widgets['buttonspool'].set_sensitive(False)
 		tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
 		self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
@@ -367,7 +361,7 @@ class SBRestoreGTK(GladeWindow):
 		else :
 			self.flisttreestore.append(None, [_("This snapshot seems empty.")])
 			self.widgets['snpdetails'].set_sensitive(False)
-		
+		self.widgets['progressbarDialog'].hide()
 
 	def load_snapshotslist(self, date):
 		"""
