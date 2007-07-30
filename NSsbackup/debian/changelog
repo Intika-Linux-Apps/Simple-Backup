@@ -1,3 +1,16 @@
+nssbackup (0.1-1~beta3) gutsy; urgency=low
+
+  * the file list is now sorted in Restore GUI
+  * Hide sudo menu entry for non admin
+  * improved restoreAs usability
+  * in Config GUI disabling maxsize didn't remove the option from the config file
+  * Backup report is sent by mail by default from <login@hostname> but some SMTP server check for the hostname to have a domain.  We set an ".ext" extention if the hostname doesn't have a dot
+  * LP Bug #128056
+  * LP Bug #128063
+  * LP Bug #128354
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Mon, 30 Jul 2007 06:48:06 +0200
+
 nssbackup (0.1-1~beta2) gutsy; urgency=low
 
   * Added an help to config GUI for simply option
