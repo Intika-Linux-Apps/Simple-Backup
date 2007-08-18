@@ -29,11 +29,14 @@ class SBconfigGTK(GladeWindow):
 	
 	configman = None
 	plugin_manager = None
+	configChanged = False
+	
     #----------------------------------------------------------------------
 
 	def __init__(self):
 		''' '''
 		self.init()
+		
 
     #----------------------------------------------------------------------
 
@@ -80,6 +83,7 @@ class SBconfigGTK(GladeWindow):
 			'vbox17',
 			'save',
 			'save_as',
+			'saveButton',
 			'exit',
 			'imagemenuitem6',
 			'imagemenuitem7',
@@ -343,12 +347,25 @@ class SBconfigGTK(GladeWindow):
 		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
 
 		self.prefillWindow()
+
 	#----------------------------------------------------------------------
-		
+	
+			
+	def setConfigChanged(self, trigger):
+		"""
+		@param trigger: True or False
+		"""
+		self.configChanged = trigger
+		self.widgets['save'].set_sensitive(trigger)
+		self.widgets['save_as'].set_sensitive(trigger)
+		self.widgets['saveButton'].set_sensitive(trigger)
+	
+	
 	def prefillWindow(self):
 		"""
 		Prefill the GTK window with config infos
 		"""
+		
 		# General tab
 		croninfos = self.configman.getSchedule()
 		if  croninfos :
@@ -518,6 +535,7 @@ class SBconfigGTK(GladeWindow):
 				self.on_purgedays_changed()
 			self.widgets['purgecheckbox'].set_active(True)
 		
+		self.setConfigChanged(False)
 	#----------------------------------------------------------------------
 	
 	#   configlist is like self.conf.items( "dirconfig" ) 
@@ -564,6 +582,7 @@ class SBconfigGTK(GladeWindow):
 		self.configman.remove_option(section, model[path][0])
 		model[path][0] = new_text
 		self.configman.set(section, "remote", {new_text: value})
+		self.setConfigChanged(True)
 	
 	def cell_regex_edited_callback(self, cell, path, new_text):
 		# Check if new path is empty
@@ -580,6 +599,7 @@ class SBconfigGTK(GladeWindow):
 		r = r + r"," + new_text.strip()
 		self.configman.set( "exclude", "regex", r )
 		self.ex_regex[path][0] = new_text
+		self.setConfigChanged(True)
 		
 
 	def cell_edited_callback(self, cell, path, new_text, data):
@@ -601,6 +621,7 @@ class SBconfigGTK(GladeWindow):
 		self.configman.remove_option(section, model[path][0])
 		model[path][0] = new_text
 		self.configman.set(section, new_text, value)
+		self.setConfigChanged(True)
 		
 	#----------------------------------------------------------------------
 
@@ -625,6 +646,7 @@ class SBconfigGTK(GladeWindow):
 		response = dialog.run()
 		if response == gtk.RESPONSE_OK :
 			self.configman.saveConf(dialog.get_filename())
+			self.setConfigChanged(False)
 		elif response == gtk.RESPONSE_CANCEL:
 		    pass
 		dialog.destroy()
@@ -656,14 +678,29 @@ class SBconfigGTK(GladeWindow):
 				self.configman = ConfigManager(getUserConfDir() +"nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
-		self.prefillWindow()		
+		self.prefillWindow()
+		self.setConfigChanged(False)
 		getLogger().debug("Config reloaded")
 
 	def on_save_clicked(self, *args):
 		getLogger().debug("Saving Config")
 		self.configman.saveConf()
+		self.setConfigChanged(False)
+		
 
 	def on_backup_clicked(self, *args):
+		
+		if self.configChanged :
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK), message_format=_("The configuration hasn't been saved. Do you want to save it ?"))
+			dialog.set_default_response(gtk.RESPONSE_OK)
+    		
+			response = dialog.run()
+			if response == gtk.RESPONSE_OK :
+				self.on_save_clicked()
+			elif response == gtk.RESPONSE_CANCEL:
+				pass
+			dialog.destroy()
+		
 		pid = subprocess.Popen(["nssbackupd"]).pid
 		
 		dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("A backup run is initiated in the background. The process id is: ")+str(pid)+".")
@@ -736,6 +773,7 @@ class SBconfigGTK(GladeWindow):
 		if response == gtk.RESPONSE_OK and not self.already_inc(self.configman.items( "dirconfig" ),dialog.get_filename()):
 			self.include.append( [dialog.get_filename()] )
 			self.configman.set( "dirconfig", dialog.get_filename(), "1" )
+			self.setConfigChanged(True)
 		elif response == gtk.RESPONSE_CANCEL:
 		    pass
 		dialog.destroy()
@@ -748,6 +786,7 @@ class SBconfigGTK(GladeWindow):
 		if response == gtk.RESPONSE_OK and not self.already_inc(self.configman.items( "dirconfig" ),dialog.get_filename()+"/"):
 			self.include.append( [dialog.get_filename()+"/"] )
 			self.configman.set( "dirconfig", dialog.get_filename()+"/", "1" )
+			self.setConfigChanged(True)
 		elif response == gtk.RESPONSE_CANCEL:
 		    pass
 		dialog.destroy()
@@ -757,6 +796,7 @@ class SBconfigGTK(GladeWindow):
 		if store and iter:
 			value = store.get_value( iter, 0 )
 			self.configman.remove_option( "dirconfig", value )
+			self.setConfigChanged(True)
 			store.remove( iter )
 
 	def on_remote_inc_add_clicked(self,*args):
@@ -784,6 +824,7 @@ class SBconfigGTK(GladeWindow):
 			getLogger().debug("Entry : '%s'"% entry)
 			self.remoteinc.append( [entry] )
 			self.configman.set( "dirconfig", "remote", {entry:1} )
+			self.setConfigChanged(True)
 			getLogger().debug("Entry in dirconf:'%s' " % self.configman.get("dirconfig", "remote"))
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
@@ -831,6 +872,7 @@ class SBconfigGTK(GladeWindow):
 		if store and iter:
 			value = store.get_value( iter, 0 )
 			self.configman.remove_option( "dirconfig", value )
+			self.setConfigChanged(True)
 			store.remove( iter )
 			getLogger().debug("Entry in dirconf:'%s' " % self.configman.get("dirconfig", "remote"))
 	
@@ -874,6 +916,7 @@ class SBconfigGTK(GladeWindow):
 		if response == gtk.RESPONSE_OK and not self.already_inc(self.configman.items( "dirconfig" ),dialog.get_filename()):
 			self.ex_paths.append( [dialog.get_filename()] )
 			self.configman.set( "dirconfig", dialog.get_filename(), "0" )
+			self.setConfigChanged(True)
 		elif response == gtk.RESPONSE_CANCEL:
 		    pass
 		dialog.destroy()
@@ -886,6 +929,7 @@ class SBconfigGTK(GladeWindow):
 		if response == gtk.RESPONSE_OK and not self.already_ex(self.configman.items( "dirconfig" ),dialog.get_filename()+"/"):
 			self.ex_paths.append( [dialog.get_filename()+"/"] )
 			self.configman.set( "dirconfig", dialog.get_filename()+"/", "0" )
+			self.setConfigChanged(True)
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
 		dialog.destroy()
@@ -895,6 +939,7 @@ class SBconfigGTK(GladeWindow):
 		if store and iter:
 			value = store.get_value( iter, 0 )
 			self.configman.remove_option( "dirconfig", value )
+			self.setConfigChanged(True)
 			store.remove( iter )
 
 	#----------------------------------------------------------------------
@@ -906,8 +951,10 @@ class SBconfigGTK(GladeWindow):
 			self.widgets["dest_unusable"].hide()
 			if os.getuid() == 0 :
 				self.configman.set( "general", "target", "/var/backup/")
+				self.setConfigChanged(True)
 			else :
 				self.configman.set( "general", "target", getUserDatasDir()+"backups")
+				self.setConfigChanged(True)
 		elif self.widgets["dest2"].get_active():
 			self.widgets["hbox9"].set_sensitive( True )
 			self.widgets["hbox10"].set_sensitive( False )
@@ -919,6 +966,7 @@ class SBconfigGTK(GladeWindow):
 
 	def on_ccronline_changed(self, *args):
 		self.configman.setSchedule(1, self.widgets['ccronline'].get_text())
+		self.setConfigChanged(True)
 		getLogger().debug("Cronline is " +self.configman.get("schedule", "cron"))
 		
 	
@@ -934,6 +982,7 @@ class SBconfigGTK(GladeWindow):
 				for option in self.configman.options("schedule") :
 					getLogger().debug("Removing ('schedule','%s') from config file " % option)
 					self.configman.remove_option("schedule", option)
+					self.setConfigChanged(True)
 		elif self.widgets["time_freq"].get_active()==5:
 			# In custom mode we can't use anacron
 			self.widgets["main_radio3"].set_active(False)
@@ -964,6 +1013,7 @@ class SBconfigGTK(GladeWindow):
 					cmin = str(int(self.widgets["time_min"].get_value()))
 					cronline = " ".join([cmin,"*","*","*","*"])
 					self.configman.setSchedule(1, cronline)
+					self.setConfigChanged(True)
 					
 				elif self.widgets["time_freq"].get_active()==2:
 					self.widgets["time_min"].set_sensitive( True )
@@ -975,6 +1025,7 @@ class SBconfigGTK(GladeWindow):
 					chour = str(int(self.widgets["time_hour"].get_value()))
 					cronline = " ".join([cmin,chour,"*","*","*"])
 					self.configman.setSchedule(1, cronline)
+					self.setConfigChanged(True)
 					
 				elif self.widgets["time_freq"].get_active()==3:
 					self.widgets["time_min"].set_sensitive( True )
@@ -989,6 +1040,7 @@ class SBconfigGTK(GladeWindow):
 					except: cdow = "1"
 					cronline = " ".join([cmin,chour,cdow,"*","*"])
 					self.configman.setSchedule(1, cronline)
+					self.setConfigChanged(True)
 					
 				elif self.widgets["time_freq"].get_active()==4:
 					self.widgets["time_min"].set_sensitive( True )
@@ -1003,6 +1055,7 @@ class SBconfigGTK(GladeWindow):
 					except: cdom = "1"
 					cronline = " ".join([cmin,chour,"*",cdom,"*"])
 					self.configman.setSchedule(1, cronline)
+					self.setConfigChanged(True)
 				# put current cronline into the ccronline widget here
 				self.widgets["ccronline"].set_text(cronline)
 			else :
@@ -1011,6 +1064,7 @@ class SBconfigGTK(GladeWindow):
 				self.widgets["ccronline"].set_sensitive( False )
 				if self.widgets["time_freq"].get_active()==1:			
 					self.configman.setSchedule(0, "hourly")
+					self.setConfigChanged(True)
 					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 				elif self.widgets["time_freq"].get_active()==2:
 					self.widgets["time_min"].set_sensitive( True )
@@ -1019,6 +1073,7 @@ class SBconfigGTK(GladeWindow):
 					self.widgets["scrolledwindow6"].set_sensitive( False )
 					self.widgets["ccronline"].set_sensitive( False )
 					self.configman.setSchedule(0, "daily")
+					self.setConfigChanged(True)
 					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 				elif self.widgets["time_freq"].get_active()==3:
 					self.widgets["time_min"].set_sensitive( True )
@@ -1027,6 +1082,7 @@ class SBconfigGTK(GladeWindow):
 					self.widgets["scrolledwindow5"].set_sensitive( False )
 					self.widgets["ccronline"].set_sensitive( False )
 					self.configman.setSchedule(0, "weekly")
+					self.setConfigChanged(True)
 					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 				elif self.widgets["time_freq"].get_active()==4:
 					self.widgets["time_min"].set_sensitive( True )
@@ -1035,6 +1091,7 @@ class SBconfigGTK(GladeWindow):
 					self.widgets["scrolledwindow5"].set_sensitive( True )
 					self.widgets["ccronline"].set_sensitive( False )
 					self.configman.setSchedule(0, "monthly")
+					self.setConfigChanged(True)
 					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 
 	#----------------------------------------------------------------------
@@ -1048,6 +1105,7 @@ class SBconfigGTK(GladeWindow):
 		except: cdom = "1"
 		cronline = " ".join([cmin,chour,"*",cdom,"*"])
 		self.configman.setSchedule(1, cronline)
+		self.setConfigChanged(True)
 		# put current cronline into the ccronline widget here
 		self.widgets["ccronline"].set_text(cronline)
 		
@@ -1061,6 +1119,7 @@ class SBconfigGTK(GladeWindow):
 		except: cdow = "1"
 		cronline = " ".join([cmin,chour,cdow,"*","*"])
 		self.configman.setSchedule(1, cronline)
+		self.setConfigChanged(True)
 		# put current cronline into the ccronline widget here
 		self.widgets["ccronline"].set_text(cronline)
 	
@@ -1087,6 +1146,7 @@ class SBconfigGTK(GladeWindow):
 			self.widgets['hbox16'].set_sensitive(False)
 			self.widgets['hbox17'].set_sensitive(False)
 			self.configman.remove_option( "general", "purge")
+			self.setConfigChanged(True)
 			
 	#----------------------------------------------------------------------
 
@@ -1098,15 +1158,18 @@ class SBconfigGTK(GladeWindow):
 		    if not ( i>0 and i<10000 ):	i=30
 		    self.widgets["purgedays"].set_text(str(i))
 		    self.configman.set( "general", "purge", str(i) )
+		    self.setConfigChanged(True)
 		elif self.widgets["logpurgeradiobutton"].get_active():
 		    self.widgets["purgedays"].set_sensitive( False )
 		    self.configman.set( "general", "purge", "log" )
+		    self.setConfigChanged(True)
 
 	def on_purgedays_changed( self, *args ):
 		try: i = int(self.widgets["purgedays"].get_text())
 		except: i = -1
 		if not ( i>0 and i<10000 ):	i=30
 		self.configman.set( "general", "purge", str(i) )
+		self.setConfigChanged(True)
 		
 	#----------------------------------------------------------------------
 
@@ -1133,13 +1196,16 @@ class SBconfigGTK(GladeWindow):
 				self.configman.remove_option("report", "smtpuser")
 			if self.configman.has_option("report", "smtppassword") :
 				self.configman.remove_option("report", "smtppassword")
+			self.setConfigChanged(True)
 		else :
 			self.widgets['smtplogininfo'].set_sensitive(True)
 			if self.widgets['smtplogin'].get_text() :
 				self.configman.set("report", "smtpuser",self.widgets['smtplogin'].get_text())
+				self.setConfigChanged(True)
 				getLogger().debug("login : " + self.configman.get("report", "smtpuser"))
 			if self.widgets['smtppassword'].get_text() :
 				self.configman.set("report", "smtpuser", self.widgets['smtppassword'].get_text())
+				self.setConfigChanged(True)
 				getLogger().debug("Password : " + self.configman.get("report", "smtppassword"))
 				
 	#----------------------------------------------------------------------
@@ -1155,8 +1221,10 @@ class SBconfigGTK(GladeWindow):
 				self.configman.remove_option("report", "smptkey")
 			if self.configman.has_option("report", "smtptls") :
 				self.configman.remove_option("report", "smtptls")
+			self.setConfigChanged(True)
 		else :
 			self.configman.set("report", "smtptls","1")
+			self.setConfigChanged(True)
 			self.widgets['TLSinfos'].set_sensitive(True)
 			self.on_TLSradiobutton_toggled()
 			
@@ -1170,6 +1238,7 @@ class SBconfigGTK(GladeWindow):
 				self.configman.remove_option("report", "smptcert")
 			if self.configman.has_option("report", "smptkey") :
 				self.configman.remove_option("report", "smptkey")
+			self.setConfigChanged(True)
 		elif self.widgets['SSLradiobutton'].get_active():
 			self.widgets['SSLinfos'].set_sensitive(True)
 			if self.widgets['crtfilechooser'].get_filename() :
@@ -1198,6 +1267,7 @@ class SBconfigGTK(GladeWindow):
 			r = self.configman.get( "exclude", "regex" )
 			r = r + r",\." + ftype.strip()
 			self.configman.set( "exclude", "regex", r )
+			self.setConfigChanged(True)
 		elif response == gtk.RESPONSE_CANCEL:
 			pass		                
 
@@ -1212,6 +1282,7 @@ class SBconfigGTK(GladeWindow):
 			r = re.sub( r",\\."+re.escape(value)+"," , ",", r )
 			r = r.lstrip( "," ).rstrip( "," )
 			self.configman.set( "exclude", "regex", r )
+			self.setConfigChanged(True)
 			store.remove( iter )		
 
 	#----------------------------------------------------------------------
@@ -1227,6 +1298,7 @@ class SBconfigGTK(GladeWindow):
 			r = self.configman.get( "exclude", "regex" )
 			r = r + r"," + regex.strip()
 			self.configman.set( "exclude", "regex", r )
+			self.setConfigChanged(True)
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
 	
@@ -1239,6 +1311,7 @@ class SBconfigGTK(GladeWindow):
 			r = self.configman.get( "exclude", "regex" )
 			r = re.sub( r","+re.escape(value) , "", r )
 			self.configman.set( "exclude", "regex", r )
+			self.setConfigChanged(True)
 			store.remove( iter )
 
 	#----------------------------------------------------------------------
@@ -1250,9 +1323,11 @@ class SBconfigGTK(GladeWindow):
 		elif not self.widgets["ex_max"].get_active():
 			self.widgets["ex_maxsize"].set_sensitive( False )
 			self.configman.remove_option("exclude", "maxsize")
+			self.setConfigChanged(True)
 
 	def on_ex_maxsize_value_changed(self, *args):
 		self.configman.set( "exclude", "maxsize", str(int(self.widgets["ex_maxsize"].get_value())*1024*1024) )
+		self.setConfigChanged(True)
 	
 	#----------------------------------------------------------------------
 	
@@ -1260,6 +1335,7 @@ class SBconfigGTK(GladeWindow):
 		t = self.widgets["dest_localpath"].get_filename()
 		if (os.path.isdir( t ) and os.access( t, os.R_OK | os.W_OK | os.X_OK ) ):
 			self.configman.set( "general", "target", t )
+			self.setConfigChanged(True)
 			self.widgets["dest_unusable"].hide()
 		else:
 			self.widgets["dest_unusable"].show()
@@ -1270,6 +1346,7 @@ class SBconfigGTK(GladeWindow):
 		self.widgets["dest_remote_light1"].set_from_stock( gtk.STOCK_DIALOG_WARNING , gtk.ICON_SIZE_BUTTON)
 		gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], _("Please test writability of the target directory by pressing \"Test\" button on the right."))
 		self.configman.set( "general", "target", self.widgets['dest_remote'].get_text() )
+		self.setConfigChanged(True)
 
 	#----------------------------------------------------------------------
 	
@@ -1297,6 +1374,7 @@ class SBconfigGTK(GladeWindow):
 
 	def on_logfilechooser_selection_changed(self, *args):
 		self.configman.set("log", "file", self.widgets['logfilechooser'].get_filename()+os.sep+"nssbackup.log")
+		self.setConfigChanged(True)
 		getLogger().debug("Log file : " + self.configman.get("log", "file"))
 
 	#----------------------------------------------------------------------
@@ -1304,15 +1382,19 @@ class SBconfigGTK(GladeWindow):
 	def on_loglevelcombobox_changed(self, *args):
 		if self.widgets['loglevelcombobox'].get_active_text() == "Info" :
 			self.configman.set("log", "level", "20")
+			self.setConfigChanged(True)
 			getLogger().debug("Log level : " + self.configman.get("log", "level"))
 		elif self.widgets['loglevelcombobox'].get_active_text() == "Debug" :
 			self.configman.set("log", "level", "10")
+			self.setConfigChanged(True)
 			getLogger().debug("Log level : " + self.configman.get("log", "level"))
 		elif self.widgets['loglevelcombobox'].get_active_text() == "Error" :
 			self.configman.set("log", "level", "50")
+			self.setConfigChanged(True)
 			getLogger().debug("Log level : " + self.configman.get("log", "level"))
 		elif self.widgets['loglevelcombobox'].get_active_text() == "Warning" :
 			self.configman.set("log", "level", "30")
+			self.setConfigChanged(True)
 			getLogger().debug("Log level : " + self.configman.get("log", "level"))
 
 	#----------------------------------------------------------------------
@@ -1320,57 +1402,71 @@ class SBconfigGTK(GladeWindow):
 	def on_smtpfrom_changed(self, *args):
 		if self.widgets['smtpfrom'].get_text() != "":
 			self.configman.set("report", "from", self.widgets['smtpfrom'].get_text())
+			self.setConfigChanged(True)
 		else :
 			self.configman.remove_option("report", "from")
+			self.setConfigChanged(True)
 
 	#----------------------------------------------------------------------
 
 	def on_smtpto_changed(self, *args):
 		if self.widgets['smtpto'].get_text() != "":
 			self.configman.set("report", "to", self.widgets['smtpto'].get_text())
+			self.setConfigChanged(True)
 		else :
 			self.configman.remove_option("report", "to")
+			self.setConfigChanged(True)
 	#----------------------------------------------------------------------
 
 	def on_smtpserver_changed(self, *args):
 		if self.widgets['smtpserver'].get_text() != "":
 			self.configman.set("report", "smtpserver", self.widgets['smtpserver'].get_text())
+			self.setConfigChanged(True)
 		else :
 			self.configman.remove_option("report", "smtpserver")
+			self.setConfigChanged(True)
 		
 	#----------------------------------------------------------------------
 
 	def on_smtpport_changed(self, *args):
 		if self.widgets['smtpport'].get_text() != "":
 			self.configman.set("report", "smtpport", self.widgets['smtpport'].get_text())
+			self.setConfigChanged(True)
 		else :
 			self.configman.remove_option("report", "smtpport")
+			self.setConfigChanged(True)
 		
 	#----------------------------------------------------------------------
 
 	def on_smtplogin_changed(self, *args):
 		if self.widgets['smtplogin'].get_text() != "":
 			self.configman.set("report", "smtpuser", self.widgets['smtplogin'].get_text())
+			self.setConfigChanged(True)
 		else :
 			self.configman.remove_option("report", "smtpuser")
+			self.setConfigChanged(True)
 		
 	#----------------------------------------------------------------------
 
 	def on_smtppassword_changed(self, *args):
 		if self.widgets['smtppassword'].get_text() != "":
 			self.configman.set("report", "smtppassword", self.widgets['smtppassword'].get_text())
+			self.setConfigChanged(True)
 		else :
 			self.configman.remove_option("report", "smtppassword")
+			self.setConfigChanged(True)
 	#----------------------------------------------------------------------
 
 	def on_crtfilechooser_selection_changed(self, *args):
 		self.configman.set("report", "smtpcert", self.widgets['crtfilechooser'].get_filename())
+		self.setConfigChanged(True)
 		getLogger().debug("Certificate : " + self.configman.get("report", "smtpcert"))
 
 	#----------------------------------------------------------------------
 
 	def on_keyfilechooser_selection_changed(self, *args):
 		self.configman.set("report", "smtpkey", self.widgets['keyfilechooser'].get_filename())
+		self.setConfigChanged(True)
 		getLogger().debug("Key : " + self.configman.get("report", "smtpkey"))
 
 	#----------------------------------------------------------------------

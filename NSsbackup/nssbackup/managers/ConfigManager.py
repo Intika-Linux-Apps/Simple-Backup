@@ -273,17 +273,20 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if option == "remote" :
 				return ConfigParser.ConfigParser.has_option(self, section, option)
 			#search through remote option to get the option
-			remotes = self.get("dirconfig", "remote")
-			if type(remotes) == str :
-				remotes = eval(remotes)
-			if type(remotes) != dict :
-				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
-			if not remotes.has_key(option) :
-				# then it wasn't for us , fall back on the parent
+			if ConfigParser.ConfigParser.has_option(self, "dirconfig", 'remote') :
+				remotes = self.get("dirconfig", "remote")
+				if type(remotes) == str :
+					remotes = eval(remotes)
+				if type(remotes) != dict :
+					raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
+				if not remotes.has_key(option) :
+					# then it wasn't for us , fall back on the parent
+					return ConfigParser.ConfigParser.has_option(self, section, option)
+				else :
+					# we have this key
+					return True
+			else : 
 				return ConfigParser.ConfigParser.has_option(self, section, option)
-			else :
-				# we have that key
-				return True
 		else :
 			#fall back in parent behaviour
 			return ConfigParser.ConfigParser.has_option(self, section, option)
@@ -291,7 +294,8 @@ class ConfigManager (ConfigParser.ConfigParser):
 	def get(self,section, option):
 		"""
 		"""
-		if section == "dirconfig" and not option == 'remote' and self.has_option(section, option) :
+		# if we have (dirconfig,opt), if opt=remote
+		if section == "dirconfig" and not option == 'remote' and self.has_option(section, option) and not ConfigParser.ConfigParser.has_option(self,section, option):
 			#search through remote option to get the option
 			remotes = ConfigParser.ConfigParser.get(self, "dirconfig", "remote")
 			if type(remotes) == str :
@@ -300,7 +304,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
 			# we have that key
 			return remotes[option]
-		elif section == "dirconfig" and option == 'remote' :
+		elif section == "dirconfig" and option == 'remote' and ConfigParser.ConfigParser.has_option(self,section, option):
 			remotes = ConfigParser.ConfigParser.get(self, "dirconfig", "remote")
 			if type(remotes) == str :
 				remotes = eval(remotes)
@@ -657,3 +661,26 @@ class ConfigManager (ConfigParser.ConfigParser):
 			return True
 		except Exception, e:
 			raise SBException(e)
+		
+	def isConfigEquals(self,config):
+		"""
+		a function to compare two configuration manager.
+		@param config : a configManager instance
+		@return: True if the config are equals, False otherwise
+		@rtype: boolean
+		"""
+		if not isinstance(config, ConfigManager) :
+			raise SBException("Can't compare a ConfigManager with type '%s'"% str(type(config)))
+		
+		for s in self.sections() :
+			if not config.has_section(s) :
+				return False
+			else :
+				for o in self.options(s) :
+					if not config.has_option(s, o):
+						return False
+					else :
+						if not self.get(s, o) == config.get(s, o) :
+							return False
+		return True
+		
