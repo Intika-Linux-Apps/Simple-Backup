@@ -1,3 +1,9 @@
+nssbackup (0.1-1~beta4) gutsy; urgency=low
+
+  * Solved Bug #130823 LP
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 19 Aug 2007 16:04:03 +0200
+
 nssbackup (0.1-1~beta3) gutsy; urgency=low
 
   * the file list is now sorted in Restore GUI
