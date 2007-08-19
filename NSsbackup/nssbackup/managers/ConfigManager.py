@@ -297,7 +297,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		# if we have (dirconfig,opt), if opt=remote
 		if section == "dirconfig" and not option == 'remote' and self.has_option(section, option) and not ConfigParser.ConfigParser.has_option(self,section, option):
 			#search through remote option to get the option
-			remotes = ConfigParser.ConfigParser.get(self, "dirconfig", "remote")
+			remotes = ConfigParser.ConfigParser.get(self, "dirconfig", "remote",True)
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
@@ -305,7 +305,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			# we have that key
 			return remotes[option]
 		elif section == "dirconfig" and option == 'remote' and ConfigParser.ConfigParser.has_option(self,section, option):
-			remotes = ConfigParser.ConfigParser.get(self, "dirconfig", "remote")
+			remotes = ConfigParser.ConfigParser.get(self, "dirconfig", "remote",True)
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
@@ -313,7 +313,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			return remotes
 		else :
 			#fall back in parent behaviour
-			return ConfigParser.ConfigParser.get(self, section, option)
+			return ConfigParser.ConfigParser.get(self, section, option,True)
 		
 	def set(self,section, option, value):
 		"""
@@ -328,7 +328,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if not self.has_option(section, option) :
 				ConfigParser.ConfigParser.set(self, section, option, value)
 			else :
-				remotes = ConfigParser.ConfigParser.get(self, section, option)
+				remotes = ConfigParser.ConfigParser.get(self, section, option,True)
 				if type(remotes) == str :
 					remotes = eval(remotes)
 				if type(remotes) != dict :
@@ -680,6 +680,22 @@ class ConfigManager (ConfigParser.ConfigParser):
 					if not config.has_option(s, o):
 						return False
 					else :
+						if type(self.get(s, o)) != type(config.get(s, o)) :
+							if type(self.get(s, o)) is not str :
+								self.set(s,o, repr(self.get(s, o)))
+							if type(config.get(s, o)) is not str :
+								config.set(s,o, repr(config.get(s, o)))
+						if not self.get(s, o) == config.get(s, o) :
+							return False
+				for o in config.options(s) :
+					if not self.has_option(s, o):
+						return False
+					else :
+						if type(self.get(s, o)) != type(config.get(s, o)) :
+							if type(self.get(s, o)) is not str :
+								self.set(s,o, repr(self.get(s, o)))
+							if type(config.get(s, o)) is not str :
+								config.set(s,o, repr(config.get(s, o)))
 						if not self.get(s, o) == config.get(s, o) :
 							return False
 		return True
