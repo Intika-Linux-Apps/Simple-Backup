@@ -2,7 +2,7 @@ ifndef DESTDIR
 	DESTDIR = /usr/local
 endif 
 
-PO = pt_BR lv nl es sv fr en_GB
+PO = `ls datas/po/*.po | sed s/"datas\/po\/"// | sed s/".po"//`
 PREFIX = /usr/local
 BIN = $(DESTDIR)/bin/
 SUPPORT = $(DESTDIR)/share/nssbackup/

@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sbackup\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2007-05-08 23:03+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-08-19 23:29+0200\n"
 "PO-Revision-Date: 2007-04-15 15:08+0000\n"
 "Last-Translator: rainofchaos <rainofchaos@gmail.com>\n"
 "Language-Team: Chinese (China) <zh_CN@li.org>\n"
@@ -17,211 +17,251 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Rosetta-Export-Date: 2007-06-03 13:28:22+0000\n"
 
-#: simple-backup-config.py:66
-msgid "MP3 Music"
-msgstr "MP3 音乐"
+#: nssbackup/nssbackupd.py:57
+#, python-format
+msgid "NSsbackup Daemon <%(login)s@%(hostname)s>"
+msgstr ""
 
-#: simple-backup-config.py:66
-msgid "AVI Video"
-msgstr "AVI 视频"
+#: nssbackup/nssbackupd.py:60
+#, python-format
+msgid "[NSsbackup] Report of %(date)s"
+msgstr ""
 
-#: simple-backup-config.py:66
-msgid "MPEG Video"
-msgstr "MPEG 视频"
+#: nssbackup/nssbackupd.py:67
+msgid "I didn't find the log file. Please set it up in nssbackup.conf "
+msgstr ""
 
-#: simple-backup-config.py:66
+#: nssbackup/nssbackupd.py:128 nssbackup/managers/BackupManager.py:77
+#: nssbackup/managers/BackupManager.py:162
+#: nssbackup/managers/BackupManager.py:408
+msgid "there was a problem initializing the pynotify module"
+msgstr ""
+
+#: nssbackup/nssbackupd.py:137
+msgid "Session of backup is finished (lockfile is removed) "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:63
+msgid "BackupManager created "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:74
+msgid "Starting backup Session"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:82
 #, fuzzy
-msgid "Matrjoshka Video"
-msgstr "Matrjoshka 视频"
+msgid "Starting backup"
+msgstr "清除陈旧的备份"
 
-#: simple-backup-config.py:66
+#: nssbackup/managers/BackupManager.py:87
+msgid "Initializing FUSE FILE ACCESS MANAGER !"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:98
+msgid "Failed to set the gid to 'admin' one :"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:124
+#, python-format
+msgid "Starting snapshot %(name)s "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:128
+#, python-format
+msgid "Setting Base to '%(value)s' "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:134
+msgid "Setting packages File "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:141
+msgid "Problem when setting the packages : "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:145
 #, fuzzy
-msgid "OGG Multimedia container"
-msgstr "OGG 多媒体容器"
-
-#: simple-backup-config.py:66
-msgid "CD Images"
-msgstr "CD 镜像"
-
-#: simple-backup-config.py:348 simple-backup-config.py:705
-msgid "Custom"
-msgstr "定制"
-
-#: simple-backup-config.py:411
-msgid "Already included item !"
-msgstr ""
-
-#: simple-backup-config.py:426
-msgid "Already excluded item !"
-msgstr ""
-
-#: simple-backup-config.py:437
-msgid "Simple Backup Suite"
-msgstr "简单备份工具"
-
-#: simple-backup-config.py:439
-msgid ""
-"This is a user friendly backup solution for common desktop needs. The "
-"project was was sponsored by Google during Google Summer of Code 2005 and "
-"mentored by Ubuntu."
-msgstr "这是一个针对普通桌面系统的备份工具，简单易用。此项目被谷歌的2005年暑期编程计划资助，在Ubuntu的指导下完成。"
-
-#: simple-backup-config.py:442 simple-backup-config.py:445
-msgid "translator-credits"
-msgstr ""
-"翻译-致谢\n"
-"冯超 <rainofchaos@gmail.com>, 2007"
-
-#: simple-backup-config.py:445
-msgid "Translators : "
-msgstr ""
-
-#: simple-backup-config.py:454
-msgid "A backup run is initiated in the background. The process id is: "
-msgstr "备份程序已经在后台启动，进程的ID为： "
-
-#: simple-backup-config.py:552
-msgid "Configuration save successful"
-msgstr "配置成功保存"
-
-#: simple-backup-config.py:623
-msgid "Include file ..."
-msgstr "包括文件..."
-
-#: simple-backup-config.py:626 simple-backup-config.py:661
-msgid "All files"
-msgstr "所有文件"
-
-#: simple-backup-config.py:639
-msgid "Include folder ..."
-msgstr "包括文件夹 ..."
-
-#: simple-backup-config.py:658
-msgid "Exclude file ..."
+msgid "Setting Excludes File "
 msgstr "排除文件..."
 
-#: simple-backup-config.py:674
-msgid "Exclude folder ..."
-msgstr "排除文件夹..."
-
-#: simple-backup-config.py:750
-msgid "Empty expression. Please enter a valid regular expression."
-msgstr "表达式为空。请输入合法的正则表达式。"
-
-#: simple-backup-config.py:767
-msgid "Empty filename or path. Please enter a valid filename or path."
-msgstr "文件名或路径为空。清输入合法的文件名或路径。"
-
-#: simple-backup-config.py:773
-msgid ""
-"It seems the path you entered does not exists. Do you want to add this wrong "
-"path?"
-msgstr "您输入的路径不存在。仍然包括此路径么？"
-
-#: simple-backup-config.py:995
-msgid "Currently backup configuration is only runnable by root"
-msgstr "目前的备份配置只能由root执行"
-
-#: simple-restore-gnome.py:137
-msgid "Path"
-msgstr "路径"
-
-#: simple-restore-gnome.py:171 simple-restore-gnome.py:175
-msgid "Error: backups directory does not exist!"
-msgstr "错误: 备份目录不存在!"
-
-#: simple-restore-gnome.py:215
-msgid ""
-"Some of your backups are in an old backup format. Do you want to upgrade "
-"them?\n"
-"It should take only a few minutes."
+#: nssbackup/managers/BackupManager.py:159
+msgid "File list ready , Committing to disk"
 msgstr ""
-"你的一些备份文件属于旧格式。需要升级它们么?\n"
-"这将要化一些时间。"
 
-#: simple-restore-gnome.py:235
-msgid "Error: no backups found in the target directory"
-msgstr "错误: 目标文件夹中未发现任何备份"
+#: nssbackup/managers/BackupManager.py:200
+msgid "target directory is excluded"
+msgstr ""
 
-#: simple-restore-gnome.py:252
-msgid ""
-"Select any of the available backups to see list of files that can be "
-"restored."
-msgstr "选择任意备份文件，可以查看能够恢复的文件列表。"
-
-#: simple-restore-gnome.py:257
-msgid "Choose a source folder"
-msgstr "选择源文件夹"
-
-#: simple-restore-gnome.py:337
-msgid "Loading ..."
-msgstr "正在载入..."
-
-#: simple-restore-gnome.py:378
-msgid "Sorry, help is not implemented yet."
-msgstr "对不起，现在没有提供帮助。"
-
-#: simple-restore-gnome.py:390
+#: nssbackup/managers/BackupManager.py:205
 #, python-format
-msgid "Do you really want to restore backuped copy of '%s' to '%s' ?"
-msgstr "你确定要将备份从 '%s' 恢复到 '%s' 么 ?"
+msgid "'%(file)s' doesn't exist, it has to be exclude "
+msgstr ""
 
-#: simple-restore-gnome.py:395
-msgid "Restoring ..."
-msgstr "恢复..."
+#: nssbackup/managers/BackupManager.py:211
+#, python-format
+msgid "Problem with '%(file)s' : %(error)s "
+msgstr ""
 
-#: simple-restore-gnome.py:413 simple-restore-gnome.py:422
-msgid "Select restore location"
-msgstr "选择恢复位置"
+#: nssbackup/managers/BackupManager.py:219
+#, python-format
+msgid ""
+"We don't have read access to '%(file)s', it has to be exclude : %(error)s "
+msgstr ""
 
-#: srestore.py:74
-msgid "E: File not found in the backup snapshot"
+#: nssbackup/managers/BackupManager.py:224
+#, python-format
+msgid ""
+"'%(file)s' size is higher than the specified one ( %(filesize)s > %(maxsize)"
+"s), it has to be exclude "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:304
+#, python-format
+msgid "got an error with '%(file)s' : %(error)s"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:323
+msgid "No directory to backup !"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:335
+msgid "No directories to backup !"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:358
+#, python-format
+msgid ""
+"Not enough free space on the target directory for the planned backup (%"
+"(freespace)d <= %(neededspace)d)"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:375
+#, python-format
+msgid "Another NSsbackup daemon already running (pid = %s )!"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:390
+#, python-format
+msgid "Session of backup is finished (%s is removed) "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:397
+msgid "I didn't find the logfile to copy into snapshot"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:399
+msgid "Terminating FUSE FILE ACCESS MANAGER !"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:405
+msgid "Ending Backup Session"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:418
+msgid "Option 'target' is missing, aborting."
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:422
+#, python-format
+msgid "Creating the target dir '%s'"
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:430
+msgid "Target not writable : "
+msgstr ""
+
+#: nssbackup/managers/BackupManager.py:468
+#, python-format
+msgid ""
+"One of the incremental backups (%(bad_one)s) is bad -> make a new full one : "
+"%(error_cause)s "
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:281
+#: nssbackup/managers/ConfigManager.py:304
+#: nssbackup/managers/ConfigManager.py:312
+#, python-format
+msgid ""
+"Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )"
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:327
+msgid "You must provide a dictionary"
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:390
+#, python-format
+msgid "The config file '%s' couldn't be read !"
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:413
+#, python-format
+msgid "section [%(section)s] in '%(configfile)s' should not exist, aborting"
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:630
+msgid "Set the reciever of this mail"
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:632
+msgid "Set the SMTP server"
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:635
+msgid ""
+"When setting a username (resp password), password (resp username) is "
+"mandatory"
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:637
+msgid "Choose the SSL option (smtptls=1) to be able to use Cert and Key"
+msgstr ""
+
+#: nssbackup/managers/ConfigManager.py:640
+msgid ""
+"When setting a ssl certificate (resp key), key (resp certificate) is "
+"mandatory"
+msgstr ""
+
+#: nssbackup/managers/RestoreManager.py:62
+#, fuzzy, python-format
+msgid "File '%s' not found in the backup snapshot files list"
 msgstr "E: 在备份快照中未发现文件"
 
-#: srestore.py:149
-msgid "Simple Backup suit command line restore utility\n"
-msgstr "简单备份程序的命令行恢复工具\n"
+#: nssbackup/managers/SnapshotManager.py:45
+#, fuzzy
+msgid "Invalid value of the target directory : "
+msgstr "错误: 目标文件夹中未发现任何备份"
 
-#: srestore.py:150
+#: nssbackup/managers/SnapshotManager.py:57
+#, python-format
+msgid "Snapshot '%s' not found "
+msgstr ""
+
+#: nssbackup/managers/SnapshotManager.py:122
+#, python-format
+msgid "No need to rebase a full snapshot '%s'"
+msgstr ""
+
+#: nssbackup/managers/SnapshotManager.py:125
+#, python-format
 msgid ""
-" Usage: simple-restore backup-url file-or-dir-to-restore [target-file-or-dir]"
-msgstr ""
-" 用法: simple-restore backup-url file-or-dir-to-restore [target-file-or-dir]"
-
-#: srestore.py:151
-msgid ""
-" Note: backup-url must include the snapshot subdirectory name, for example:"
-msgstr " 注意: backup-url 必须包括快照的子目录, 例如:"
-
-#: srestore.py:153
-msgid " Use simple-restore-gnome for more ease of use.\n"
-msgstr " 使用更方便的 simple-restore-gnome 。\n"
-
-#: srestore.py:162
-msgid "Restore FAILED! Please check you parameters."
-msgstr "恢复失败！请检查使用的参数。"
-
-#: upgrade_backups.py:73
-#, python-format
-msgid "I: Upgrading from v1.0 to v1.2: %s"
-msgstr "I: 从 v1.0 升级到 v1.2: %s"
-
-#: upgrade_backups.py:91
-#, python-format
-msgid "I: Upgrading to v1.3: %s"
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
+"(NewBaseSnapshot)s' "
 msgstr ""
 
-#: upgrade_backups.py:98
+#: nssbackup/managers/SnapshotManager.py:199
+#, fuzzy, python-format
+msgid "The file '%s' is not found in snapshot"
+msgstr "E: 在备份快照中未发现文件"
+
+#: nssbackup/managers/SnapshotManager.py:253
 #, python-format
-msgid "I: Upgrading to v1.4: %s"
+msgid "Got a non valid snapshot '%(name)s' , removing : %(error_cause)s "
 msgstr ""
 
-#: upgrade_backups.py:134 upgrade_backups.py:145
-#, python-format
-msgid "W: Damaged backup metainfo - disabling %s"
-msgstr ""
-
-#: upgrade_backups.py:331
+#: nssbackup/managers/UpgradeManager.py:196
 msgid ""
 "\n"
 "Simple Backup suit command line backup format upgrade\n"
@@ -234,135 +274,332 @@ msgid ""
 "Use simple-restore-gnome for more ease of use.\n"
 msgstr ""
 
-#: simple-backup-config.glade:9
-msgid "Backup Properties"
-msgstr "备份属性"
-
-#: simple-backup-config.glade:53
-msgid ""
-"Do backup now, with configuration above. Don't forget to save any "
-"modification before click this button."
-msgstr "立即使用上面的设置执行备份。点击此按钮之前，不要忘了保存设置。"
-
-#: simple-backup-config.glade:99
-msgid "_Backup Now!"
-msgstr "立即备份(_B)!"
-
-#: simple-backup-config.glade:130
-msgid "Saves any modification made in the backup configuration above."
-msgstr "保存备份设置中做得修改。"
-
-#: simple-backup-config.glade:189
-msgid "Use recommended backup settings"
-msgstr "使用推荐的备份设置"
-
-#: simple-backup-config.glade:240
-msgid ""
-"<small>Do standard backups.\n"
-"Defaults: daily incremental and weekly full backup to /var/backup of all "
-"user files, /etc, /usr/local and /var. \n"
-"Multimedia files, temporary files and files larger than 100 Mb are "
-"excluded.</small>"
+#: nssbackup/ui/SBConfigGTK.py:282 nssbackup/ui/SBConfigGTK.py:291
+#: nssbackup/ui/SBConfigGTK.py:325 nssbackup/ui/SBConfigGTK.py:333
+#: nssbackup/ui/SBConfigGTK.py:344
+msgid "Name"
 msgstr ""
-"<small>进行标准备份.\n"
-"默认: 每天增量备份，每周完全备份 “用户文件, /etc, /usr/local 和 /var”，保存到/var/backup \n"
-"多媒体文件, 临时文件和大小超过100Mb的文件不备份。</small>"
 
-#: simple-backup-config.glade:275
-msgid "Use custom backup settings"
-msgstr "使用自定义的备份设置"
-
-#: simple-backup-config.glade:327
-msgid ""
-"<small>Do backups according to the settings defined on the next pages of "
-"this dialog.</small>"
-msgstr "<small>使用此对话框下一页的设置进行备份。</small>"
-
-#: simple-backup-config.glade:360
-msgid "Manual backups only"
-msgstr "仅进行手动备份"
-
-#: simple-backup-config.glade:412
-msgid ""
-"<small>Do not backup your data automatically. Note: this does not prevent "
-"doing manual backups.</small>"
-msgstr "<small>不自动备份您的数据。注意: 这并不组织手动备份</small>"
-
-#: simple-backup-config.glade:450
-msgid "General"
-msgstr "普通"
-
-#: simple-backup-config.glade:562 simple-backup-config.glade:817
-msgid "Add File"
-msgstr "添加文件"
-
-#: simple-backup-config.glade:637 simple-backup-config.glade:892
-msgid "Add Directory"
-msgstr "添加目录"
-
-#: simple-backup-config.glade:695
-msgid "Include"
-msgstr "包括"
-
-#: simple-backup-config.glade:950
-msgid "Paths"
-msgstr "路径"
-
-#: simple-backup-config.glade:1056
-msgid "File types"
+#: nssbackup/ui/SBConfigGTK.py:299
+#, fuzzy
+msgid "File Type"
 msgstr "文件类型"
 
-#: simple-backup-config.glade:1162
-msgid "Regex"
-msgstr "正则表达式"
-
-#: simple-backup-config.glade:1202
-msgid "Do not backup files bigger than "
-msgstr "不备份文件，如果大小超过 "
-
-#: simple-backup-config.glade:1241
-msgid "Mb"
-msgstr "Mb"
-
-#: simple-backup-config.glade:1303
-msgid "Max size"
-msgstr "最大大小"
-
-#: simple-backup-config.glade:1332
-msgid "Exclude"
-msgstr "排除"
-
-#: simple-backup-config.glade:1362
+#: nssbackup/ui/SBConfigGTK.py:306 datas/nssbackup-config.glade:1208
 msgid "Use default backup directory (/var/backup)"
 msgstr "使用默认备份目录 (/var/backup)"
 
-#: simple-backup-config.glade:1382
-msgid "Use custom local backup directory"
-msgstr "使用自定义备份目录"
+#: nssbackup/ui/SBConfigGTK.py:308
+#, fuzzy, python-format
+msgid "Use default backup directory (%s)"
+msgstr "使用默认备份目录 (/var/backup)"
 
-#: simple-backup-config.glade:1425
-msgid "Select the destination folder"
-msgstr "选择目标文件夹"
+#: nssbackup/ui/SBConfigGTK.py:347
+msgid "MP3 Music"
+msgstr "MP3 音乐"
 
-#: simple-backup-config.glade:1451
-msgid "Use a remote directory (SSH or FTP)"
-msgstr "使用远程目录 (SSH or FTP)"
+#: nssbackup/ui/SBConfigGTK.py:347
+msgid "AVI Video"
+msgstr "AVI 视频"
 
-#: simple-backup-config.glade:1477
+#: nssbackup/ui/SBConfigGTK.py:347
+msgid "MPEG Video"
+msgstr "MPEG 视频"
+
+#: nssbackup/ui/SBConfigGTK.py:347
+#, fuzzy
+msgid "Matrjoshka Video"
+msgstr "Matrjoshka 视频"
+
+#: nssbackup/ui/SBConfigGTK.py:347
+#, fuzzy
+msgid "OGG Multimedia container"
+msgstr "OGG 多媒体容器"
+
+#: nssbackup/ui/SBConfigGTK.py:347
+msgid "CD Images"
+msgstr "CD 镜像"
+
+#: nssbackup/ui/SBConfigGTK.py:433 nssbackup/ui/SBConfigGTK.py:1273
+msgid "Custom"
+msgstr "定制"
+
+#: nssbackup/ui/SBConfigGTK.py:567
+msgid "Already included item !"
+msgstr ""
+
+#: nssbackup/ui/SBConfigGTK.py:582
+msgid "Already excluded item !"
+msgstr ""
+
+#: nssbackup/ui/SBConfigGTK.py:594 nssbackup/ui/SBConfigGTK.py:626
+msgid "Empty filename or path. Please enter a valid filename or path."
+msgstr "文件名或路径为空。清输入合法的文件名或路径。"
+
+#: nssbackup/ui/SBConfigGTK.py:608
+msgid "Empty expression. Please enter a valid regular expression."
+msgstr "表达式为空。请输入合法的正则表达式。"
+
+#: nssbackup/ui/SBConfigGTK.py:632
+msgid ""
+"It seems the path you entered does not exists. Do you want to add this wrong "
+"path?"
+msgstr "您输入的路径不存在。仍然包括此路径么？"
+
+#: nssbackup/ui/SBConfigGTK.py:662
+#, fuzzy
+msgid "Save to file ..."
+msgstr "包括文件..."
+
+#: nssbackup/ui/SBConfigGTK.py:679
+msgid "This is a user friendly backup solution for common desktop needs."
+msgstr ""
+
+#: nssbackup/ui/SBConfigGTK.py:682
+msgid "translator-credits"
+msgstr ""
+"翻译-致谢\r\n"
+"冯超 <rainofchaos@gmail.com>, 2007"
+
+#: nssbackup/ui/SBConfigGTK.py:707
+msgid "A backup run is initiated in the background. The process id is: "
+msgstr "备份程序已经在后台启动，进程的ID为： "
+
+#: nssbackup/ui/SBConfigGTK.py:773 nssbackup/ui/SBConfigGTK.py:916
+msgid "Include file ..."
+msgstr "包括文件..."
+
+#: nssbackup/ui/SBConfigGTK.py:776 nssbackup/ui/SBConfigGTK.py:919
+msgid "All files"
+msgstr "所有文件"
+
+#: nssbackup/ui/SBConfigGTK.py:790
+msgid "Include folder ..."
+msgstr "包括文件夹 ..."
+
+#: nssbackup/ui/SBConfigGTK.py:911
+#, python-format
+msgid "'%d' test(s) didn't succeed !"
+msgstr ""
+
+#: nssbackup/ui/SBConfigGTK.py:933
+msgid "Exclude folder ..."
+msgstr "排除文件夹..."
+
+#: nssbackup/ui/SBConfigGTK.py:1194 nssbackup/ui/SBConfigGTK.py:1365
+msgid "Test Succeeded !"
+msgstr ""
+
+#: nssbackup/ui/SBConfigGTK.py:1355 datas/nssbackup-config.glade:1289
 msgid ""
 "Please test writability of the target directory by pressing \"Test\" button "
 "on the right."
 msgstr "请按下 “测试”按钮测试目标目录的可写性。"
 
-#: simple-backup-config.glade:1507
+#: nssbackup/ui/SBConfigGTK.py:1371
+msgid "Target directory is writable."
+msgstr ""
+
+#: nssbackup/ui/SBConfigGTK.py:1378
+#, fuzzy
+msgid ""
+"Please change target directory and test writability of the target directory "
+"by pressing \"Test\" button on the right."
+msgstr "请按下 “测试”按钮测试目标目录的可写性。"
+
+#: nssbackup/ui/SBRestoreGTK.py:61
+msgid "Snapshots"
+msgstr ""
+
+#: nssbackup/ui/SBRestoreGTK.py:69
+msgid "Path"
+msgstr "路径"
+
+#: nssbackup/ui/SBRestoreGTK.py:143
+msgid "Choose a source folder"
+msgstr "选择源文件夹"
+
+#: nssbackup/ui/SBRestoreGTK.py:212
+msgid "Loading ..."
+msgstr "正在载入..."
+
+#: nssbackup/ui/SBRestoreGTK.py:258
+msgid "Select restore location"
+msgstr "选择恢复位置"
+
+#: nssbackup/ui/SBRestoreGTK.py:314
+#, fuzzy
+msgid "Select revert location"
+msgstr "选择恢复位置"
+
+#: nssbackup/ui/SBRestoreGTK.py:363
+msgid "This snapshot seems empty."
+msgstr ""
+
+#: nssbackup/ui/SBRestoreGTK.py:382
+msgid "No backups found for this day !"
+msgstr ""
+
+#: nssbackup/plugins/__init__.py:137
+#, python-format
+msgid "Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s "
+msgstr ""
+
+#: datas/nssbackup-config.glade:6
+msgid "Exclude file type"
+msgstr "排除的文件类型"
+
+#: datas/nssbackup-config.glade:20
+msgid "Standard file types:"
+msgstr "标准文件类型"
+
+#: datas/nssbackup-config.glade:52
+msgid "Custom defined file type with "
+msgstr "自定义文件类型 "
+
+#: datas/nssbackup-config.glade:78
+msgid "file extension"
+msgstr "文件后缀"
+
+#: datas/nssbackup-config.glade:134
+msgid "Exclude by regex"
+msgstr "通过正则表达式排除"
+
+#: datas/nssbackup-config.glade:147
+msgid ""
+"Enter a regular expression.\n"
+"Files and directories matching this expression will be excluded from backup."
+msgstr ""
+"输入正则表达式。\n"
+"符合此表达式的文件和目录不会被备份。"
+
+#: datas/nssbackup-config.glade:208
+msgid "NSsbackup Config"
+msgstr ""
+
+#: datas/nssbackup-config.glade:222
+msgid "_Fichier"
+msgstr ""
+
+#: datas/nssbackup-config.glade:258
+msgid "gtk-quit"
+msgstr ""
+
+#: datas/nssbackup-config.glade:272
+msgid "Aid_e"
+msgstr ""
+
+#: datas/nssbackup-config.glade:371
+msgid "Use recommended backup settings"
+msgstr "使用推荐的备份设置"
+
+#: datas/nssbackup-config.glade:400
+msgid ""
+"<small>Do standard backups.\n"
+"Defaults: daily incremental and weekly full backup to /var/backup of all "
+"user files, /etc, /usr/local and /var. \n"
+"Multimedia files, temporary files and files larger than 100 Mb are excluded."
+"</small>"
+msgstr ""
+"<small>进行标准备份.\n"
+"默认: 每天增量备份，每周完全备份 “用户文件, /etc, /usr/local 和 /var”，保存"
+"到/var/backup \n"
+"多媒体文件, 临时文件和大小超过100Mb的文件不备份。</small>"
+
+#: datas/nssbackup-config.glade:419
+msgid "Use custom backup settings"
+msgstr "使用自定义的备份设置"
+
+#: datas/nssbackup-config.glade:450
+msgid ""
+"<small>Do backups according to the settings defined on the next pages of "
+"this dialog.</small>"
+msgstr "<small>使用此对话框下一页的设置进行备份。</small>"
+
+#: datas/nssbackup-config.glade:468
+msgid "Manual backups only"
+msgstr "仅进行手动备份"
+
+#: datas/nssbackup-config.glade:499
+msgid ""
+"<small>Do not backup your data automatically. Note: this does not prevent "
+"doing manual backups.</small>"
+msgstr "<small>不自动备份您的数据。注意: 这并不组织手动备份</small>"
+
+#: datas/nssbackup-config.glade:521
+msgid "General"
+msgstr "普通"
+
+#: datas/nssbackup-config.glade:583 datas/nssbackup-config.glade:849
+msgid "Add File"
+msgstr "添加文件"
+
+#: datas/nssbackup-config.glade:626 datas/nssbackup-config.glade:892
+msgid "Add Directory"
+msgstr "添加目录"
+
+#: datas/nssbackup-config.glade:668
+msgid "Add a remote source"
+msgstr ""
+
+#: datas/nssbackup-config.glade:751
+#, fuzzy
+msgid "Test all"
+msgstr "测试"
+
+#: datas/nssbackup-config.glade:780
+msgid "Include"
+msgstr "包括"
+
+#: datas/nssbackup-config.glade:939
+msgid "Paths"
+msgstr "路径"
+
+#: datas/nssbackup-config.glade:1010
+msgid "File types"
+msgstr "文件类型"
+
+#: datas/nssbackup-config.glade:1082
+msgid "Regex"
+msgstr "正则表达式"
+
+#: datas/nssbackup-config.glade:1105
+msgid "Do not backup files bigger than "
+msgstr "不备份文件，如果大小超过 "
+
+#: datas/nssbackup-config.glade:1132
+msgid "Mb"
+msgstr "Mb"
+
+#: datas/nssbackup-config.glade:1174
+msgid "Max size"
+msgstr "最大大小"
+
+#: datas/nssbackup-config.glade:1192
+msgid "Exclude"
+msgstr "排除"
+
+#: datas/nssbackup-config.glade:1222
+msgid "Use custom local backup directory"
+msgstr "使用自定义备份目录"
+
+#: datas/nssbackup-config.glade:1254
+msgid "Select the destination folder"
+msgstr "选择目标文件夹"
+
+#: datas/nssbackup-config.glade:1271
+msgid "Use a remote directory (SSH or FTP)"
+msgstr "使用远程目录 (SSH or FTP)"
+
+#: datas/nssbackup-config.glade:1308
 msgid "ssh://username:password@example.com/remote/dir/"
 msgstr "ssh://username:password@example.com/remote/dir/"
 
-#: simple-backup-config.glade:1567
+#: datas/nssbackup-config.glade:1344
 msgid "Test"
 msgstr "测试"
 
-#: simple-backup-config.glade:1636
+#: datas/nssbackup-config.glade:1387
 msgid ""
 "<i>The selected destination is not writtable with current permissions.\n"
 "The backups can not be written there.</i>"
@@ -370,15 +607,15 @@ msgstr ""
 "<i>目前的权限无法写入选择的目录。\n"
 "备份无法写入.</i>"
 
-#: simple-backup-config.glade:1680
+#: datas/nssbackup-config.glade:1418
 msgid "Destination"
 msgstr "目标"
 
-#: simple-backup-config.glade:1719
+#: datas/nssbackup-config.glade:1440
 msgid "Do backups "
 msgstr "开始备份 "
 
-#: simple-backup-config.glade:1745
+#: datas/nssbackup-config.glade:1448
 msgid ""
 "never\n"
 "hourly\n"
@@ -394,48 +631,54 @@ msgstr ""
 "每月\n"
 "自定义"
 
-#: simple-backup-config.glade:1767
+#: datas/nssbackup-config.glade:1465
+msgid ""
+"This option will make nssbackup make a backup not at a precise time but when "
+"the computer is up. "
+msgstr ""
+
+#: datas/nssbackup-config.glade:1467
 msgid "simply"
 msgstr ""
 
-#: simple-backup-config.glade:1788
+#: datas/nssbackup-config.glade:1483
 msgid "precisely"
 msgstr ""
 
-#: simple-backup-config.glade:1808
+#: datas/nssbackup-config.glade:1499
 msgid "at:"
 msgstr "于:"
 
-#: simple-backup-config.glade:1849
+#: datas/nssbackup-config.glade:1520
 #, fuzzy
 msgid "Day of month:"
 msgstr "日期:"
 
-#: simple-backup-config.glade:1877
+#: datas/nssbackup-config.glade:1532
 msgid "Day of week:"
 msgstr "星期:"
 
-#: simple-backup-config.glade:1905
+#: datas/nssbackup-config.glade:1545
 msgid "Hour"
 msgstr "小时"
 
-#: simple-backup-config.glade:1933
+#: datas/nssbackup-config.glade:1558
 msgid "Minute"
 msgstr "分"
 
-#: simple-backup-config.glade:2085
+#: datas/nssbackup-config.glade:1660
 msgid "Custom cron time definition: "
 msgstr "自定义 cron 时间定义: "
 
-#: simple-backup-config.glade:2148
+#: datas/nssbackup-config.glade:1696
 msgid "Do a full backup at least once every"
 msgstr "进行备份，至少每"
 
-#: simple-backup-config.glade:2193 simple-backup-config.glade:2410
+#: datas/nssbackup-config.glade:1716 datas/nssbackup-config.glade:1841
 msgid "days"
 msgstr "天"
 
-#: simple-backup-config.glade:2248
+#: datas/nssbackup-config.glade:1746
 msgid ""
 "<small>You can configure how often to start a backup run and when to do it.\n"
 "Unless a set number of days has passed since the last full backup, "
@@ -446,23 +689,23 @@ msgstr ""
 "默认采用增量备份，除非超过设定的时间。\n"
 "查看 \"man 5 crontab\" 以获得 cron 的时间格式.</small>"
 
-#: simple-backup-config.glade:2288
+#: datas/nssbackup-config.glade:1771
 msgid "Time"
 msgstr ""
 
-#: simple-backup-config.glade:2318
+#: datas/nssbackup-config.glade:1787
 msgid "Enable purging of old and incomplete backups"
 msgstr "清除旧的和不完整的备份"
 
-#: simple-backup-config.glade:2370
+#: datas/nssbackup-config.glade:1814
 msgid "Simple cutoff: Erase all backups older than "
 msgstr "简单截断:删除备份，如果晚于 "
 
-#: simple-backup-config.glade:2475
+#: datas/nssbackup-config.glade:1871
 msgid "Logarithmic (Recommended)"
 msgstr "逻辑算术 (推荐)"
 
-#: simple-backup-config.glade:2496
+#: datas/nssbackup-config.glade:1888
 msgid ""
 "<small>Keep progressivelly less backups into the past:\n"
 "Keep all backups from yesterday.\n"
@@ -473,90 +716,289 @@ msgid ""
 "Erase all other backups.</small>\n"
 msgstr ""
 
-#: simple-backup-config.glade:2558
+#: datas/nssbackup-config.glade:1926
 msgid ""
 "<small>Note: Additionally all incomplete and irrecoverable backups will be "
 "erased as long as there is a complete backup snapshot made later on.</small>"
-msgstr "<small>注意:如果存在新的备份快照，将会删除额外的不完全和不可恢复的备份</small>"
+msgstr ""
+"<small>注意:如果存在新的备份快照，将会删除额外的不完全和不可恢复的备份</"
+"small>"
 
-#: simple-backup-config.glade:2596
+#: datas/nssbackup-config.glade:1951
 msgid "Purging"
 msgstr "清除"
 
-#: simple-backup-config.glade:2611
+#: datas/nssbackup-config.glade:1953
 msgid "Cleaning old backups"
 msgstr "清除陈旧的备份"
 
-#: simple-backup-config.glade:2630
-msgid "Exclude file type"
-msgstr "排除的文件类型"
-
-#: simple-backup-config.glade:2701
-msgid "Standard file types:"
-msgstr "标准文件类型"
-
-#: simple-backup-config.glade:2747
-msgid "Custom defined file type with "
-msgstr "自定义文件类型 "
-
-#: simple-backup-config.glade:2787
-msgid "file extension"
-msgstr "文件后缀"
-
-#: simple-backup-config.glade:2827
-msgid "Exclude by regex"
-msgstr "通过正则表达式排除"
-
-#: simple-backup-config.glade:2899
-msgid ""
-"Enter a regular expression.\n"
-"Files and directories matching this expression will be excluded from backup."
+#: datas/nssbackup-config.glade:1975
+msgid "Log settings"
 msgstr ""
-"输入正则表达式。\n"
-"符合此表达式的文件和目录不会被备份。"
 
-#: simple-restore.glade:8
-msgid "Restore files/directories"
+#: datas/nssbackup-config.glade:2008
+msgid "Debug is just for debbuging purpose.Info is the recommended setting"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2009
+msgid "Log level :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2016
+msgid ""
+"Debug is just for debbuging purpose\n"
+"Info is the recommended setting"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2033
+#, fuzzy
+msgid "Log file directory"
 msgstr "恢复文件/目录"
 
-#: simple-restore.glade:42
-msgid "<b>Restore Source Folder</b>"
-msgstr "<b>恢复原始文件夹</b>"
-
-#: simple-restore.glade:113
-msgid "Use default:"
-msgstr "使用默认:"
-
-#: simple-restore.glade:136
-msgid "Use custom:"
-msgstr "使用自定义:"
-
-#: simple-restore.glade:194
-msgid ""
-"Type in this box text like that:\n"
-"\n"
-"/home/user/folder - To use a local folder\n"
-"ssh://user:password@machine:/remote/folder - To use a ssh location\n"
-"ssh://user:password@machine:/remote/folder - To use a ftp location"
+#: datas/nssbackup-config.glade:2070
+msgid "Report by mail"
 msgstr ""
-"向下面这样输入:\n"
-"\n"
-"/home/user/folder - 备份到本地目录\n"
-"ssh://user:password@machine:/remote/folder - 备份到 ssh \n"
-"ssh://user:password@machine:/remote/folder - 备份到 ftp"
 
-#: simple-restore.glade:273
-msgid "Available backups:"
+#: datas/nssbackup-config.glade:2178
+msgid "SMTP port :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2189
+msgid "SMTP server :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2200
+msgid "From [optional] :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2207
+msgid "To :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2229
+#, fuzzy
+msgid "Test mail settings"
+msgstr "使用自定义的备份设置"
+
+#: datas/nssbackup-config.glade:2254
+msgid "Parameters"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2291
+msgid "Use a username and password"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2307
+msgid "Password"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2318
+msgid "Username"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2368
+msgid "Use secured connexion"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2430
+msgid "Key"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2441
+msgid "Certificate"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2481
+msgid "Security"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2510
+#, fuzzy
+msgid "Report"
+msgstr "恢复"
+
+#: datas/nssbackup-config.glade:2538
+msgid "Enter the remote target to include"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2555
+msgid "Choose a plugin to get the format"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2566
+msgid "Choose your plugin :"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2621
+msgid "Check"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2681
+msgid "Save the configuration ..."
+msgstr ""
+
+#: datas/nssbackup-config.glade:2695
+msgid ""
+"The configuration has changed.\n"
+"If you want to use the new configuration, you should save it. \n"
+"Do you want to save ?"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2715
+msgid "gtk-yes"
+msgstr ""
+
+#: datas/nssbackup-config.glade:2726
+msgid "gtk-no"
+msgstr ""
+
+#: datas/nssbackup-restore.glade:7
+msgid "NSsbackup Restoration GUI"
+msgstr ""
+
+#: datas/nssbackup-restore.glade:34
+#, fuzzy
+msgid "Use the default directory : "
+msgstr "使用默认备份目录 (/var/backup)"
+
+#: datas/nssbackup-restore.glade:45
+#, fuzzy
+msgid "Use a custom directory : "
+msgstr "使用自定义备份目录"
+
+#: datas/nssbackup-restore.glade:124
+msgid "<b>Snapshots directory</b>"
+msgstr ""
+
+#: datas/nssbackup-restore.glade:196
+#, fuzzy
+msgid "<b>Available backups</b>"
 msgstr "可用的备份:"
 
-#: simple-restore.glade:360
-msgid "<b>Files and Folders to restore</b>"
-msgstr "<b>要恢复的文件和文件夹</b>"
+#: datas/nssbackup-restore.glade:251
+msgid "<b>Snapshot details</b>"
+msgstr ""
 
-#: simple-restore.glade:544
+#: datas/nssbackup-restore.glade:298
 msgid "Restore"
 msgstr "恢复"
 
-#: simple-restore.glade:620
-msgid "Restore As..."
+#: datas/nssbackup-restore.glade:336
+#, fuzzy
+msgid "Restore As"
 msgstr "恢复为..."
+
+#: datas/nssbackup-restore.glade:389
+msgid "Revert"
+msgstr ""
+
+#: datas/nssbackup-restore.glade:427
+msgid "Revert As"
+msgstr ""
+
+#: datas/nssbackup-restore.glade:484
+#, fuzzy
+msgid "Processing ..."
+msgstr "恢复..."
+
+#~ msgid "Simple Backup Suite"
+#~ msgstr "简单备份工具"
+
+#~ msgid ""
+#~ "This is a user friendly backup solution for common desktop needs. The "
+#~ "project was was sponsored by Google during Google Summer of Code 2005 and "
+#~ "mentored by Ubuntu."
+#~ msgstr ""
+#~ "这是一个针对普通桌面系统的备份工具，简单易用。此项目被谷歌的2005年暑期编程"
+#~ "计划资助，在Ubuntu的指导下完成。"
+
+#~ msgid "Configuration save successful"
+#~ msgstr "配置成功保存"
+
+#~ msgid "Currently backup configuration is only runnable by root"
+#~ msgstr "目前的备份配置只能由root执行"
+
+#~ msgid "Error: backups directory does not exist!"
+#~ msgstr "错误: 备份目录不存在!"
+
+#~ msgid ""
+#~ "Some of your backups are in an old backup format. Do you want to upgrade "
+#~ "them?\n"
+#~ "It should take only a few minutes."
+#~ msgstr ""
+#~ "你的一些备份文件属于旧格式。需要升级它们么?\n"
+#~ "这将要化一些时间。"
+
+#~ msgid ""
+#~ "Select any of the available backups to see list of files that can be "
+#~ "restored."
+#~ msgstr "选择任意备份文件，可以查看能够恢复的文件列表。"
+
+#~ msgid "Sorry, help is not implemented yet."
+#~ msgstr "对不起，现在没有提供帮助。"
+
+#~ msgid "Do you really want to restore backuped copy of '%s' to '%s' ?"
+#~ msgstr "你确定要将备份从 '%s' 恢复到 '%s' 么 ?"
+
+#~ msgid "Simple Backup suit command line restore utility\n"
+#~ msgstr "简单备份程序的命令行恢复工具\n"
+
+#~ msgid ""
+#~ " Usage: simple-restore backup-url file-or-dir-to-restore [target-file-or-"
+#~ "dir]"
+#~ msgstr ""
+#~ " 用法: simple-restore backup-url file-or-dir-to-restore [target-file-or-"
+#~ "dir]"
+
+#~ msgid ""
+#~ " Note: backup-url must include the snapshot subdirectory name, for "
+#~ "example:"
+#~ msgstr " 注意: backup-url 必须包括快照的子目录, 例如:"
+
+#~ msgid " Use simple-restore-gnome for more ease of use.\n"
+#~ msgstr " 使用更方便的 simple-restore-gnome 。\n"
+
+#~ msgid "Restore FAILED! Please check you parameters."
+#~ msgstr "恢复失败！请检查使用的参数。"
+
+#~ msgid "I: Upgrading from v1.0 to v1.2: %s"
+#~ msgstr "I: 从 v1.0 升级到 v1.2: %s"
+
+#~ msgid "Backup Properties"
+#~ msgstr "备份属性"
+
+#~ msgid ""
+#~ "Do backup now, with configuration above. Don't forget to save any "
+#~ "modification before click this button."
+#~ msgstr "立即使用上面的设置执行备份。点击此按钮之前，不要忘了保存设置。"
+
+#~ msgid "_Backup Now!"
+#~ msgstr "立即备份(_B)!"
+
+#~ msgid "Saves any modification made in the backup configuration above."
+#~ msgstr "保存备份设置中做得修改。"
+
+#~ msgid "<b>Restore Source Folder</b>"
+#~ msgstr "<b>恢复原始文件夹</b>"
+
+#~ msgid "Use default:"
+#~ msgstr "使用默认:"
+
+#~ msgid "Use custom:"
+#~ msgstr "使用自定义:"
+
+#~ msgid ""
+#~ "Type in this box text like that:\n"
+#~ "\n"
+#~ "/home/user/folder - To use a local folder\n"
+#~ "ssh://user:password@machine:/remote/folder - To use a ssh location\n"
+#~ "ssh://user:password@machine:/remote/folder - To use a ftp location"
+#~ msgstr ""
+#~ "向下面这样输入:\n"
+#~ "\n"
+#~ "/home/user/folder - 备份到本地目录\n"
+#~ "ssh://user:password@machine:/remote/folder - 备份到 ssh \n"
+#~ "ssh://user:password@machine:/remote/folder - 备份到 ftp"
+
+#~ msgid "<b>Files and Folders to restore</b>"
+#~ msgstr "<b>要恢复的文件和文件夹</b>"

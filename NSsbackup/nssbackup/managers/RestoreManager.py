@@ -71,6 +71,8 @@ class RestoreManager :
 				#create a temp file , extract inside then move the content
 				tmpdir = tempfile.mkdtemp(dir=target,prefix='nssbackup-restore_')
 				Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, tmpdir, bckupsuffix=suffix )
+				if os.path.exists(target+os.sep+ os.path.basename(_file)) :
+					shutil.move(target+os.sep+ os.path.basename(_file), target+os.sep+ os.path.basename(_file)+suffix)
 				shutil.move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
 				shutil.rmtree(tmpdir)
 			else:

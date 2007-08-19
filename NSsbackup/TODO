@@ -18,13 +18,11 @@ For core
 * syslog logging
 * testable system
 
-DONE: 
-* add progress reporting whereever possible (via a toolbar applet) : using libnotify 
-* revert is implemented . 
-* plugins for special files/dirs (databases, ldif, cvs/svn, ...) : Fuse plugin system : we just nee to find the according FuseFS
 
 TODO :
-* Review the restore GUI
 * plugins for exporting snapshot (will be used for tape, CD ... )
 * encription will be via a FusePlugin , find the fuse encripted FS
 * Backup media management (via SnapshotManager )
+* (Ana)Cron for non root
+* progress bar on Restore
+* logarithmic purge 

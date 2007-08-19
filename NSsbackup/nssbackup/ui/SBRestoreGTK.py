@@ -19,6 +19,7 @@ from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.util.log import getLogger
 import nssbackup.util.Snapshot
 from nssbackup.util.Snapshot import Snapshot
+from nssbackup.util import ProgressBar
 
 #----------------------------------------------------------------------
 
@@ -267,10 +268,10 @@ class SBRestoreGTK(GladeWindow):
 			dialog.destroy()
 			if response == gtk.RESPONSE_YES:
 				# TODO: put a progress bar here
-				try :
-					self.widgets['progressbarDialog'].show()
+				try :	
+					pb = ProgressBar()
 					self.restoreman.restoreAs(self.currentSnp, src, dirname)
-					self.widgets['progressbarDialog'].hide()
+					pb.destroy_progress(None)
 				except Exception, e :
 					getLogger().error(str(e))
 					getLogger().error(traceback.format_exc())
