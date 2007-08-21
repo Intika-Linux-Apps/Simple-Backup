@@ -375,33 +375,32 @@ class SBconfigGTK(GladeWindow):
 			question.hide()
 			if response == gtk.RESPONSE_YES:
 				self.on_save_clicked()
-			elif response == gtk.RESPONSE_NO :
-				pass
 	
 	
-	def prefillWindow(self):
+	def prefillWindow(self, recommened_setting=False):
 		"""
 		Prefill the GTK window with config infos
 		"""
 		
 		# General tab
 		croninfos = self.configman.getSchedule()
-		if  croninfos :
-			self.widgets['main_radio2'].set_active(True)
-			if croninfos[0] == 1 :
-				self.widgets['time_freq'].set_active(5)
-				self.on_time_freq_changed()
-				self.widgets['ccronline'].set_text(croninfos[1])
-			elif croninfos[0] == 0 :
-				if croninfos[1] in self.timefreqs.keys():
-					self.widgets['time_freq'].set_active(self.timefreqs[croninfos[1]])
-				else :
-					self.widgets['time_freq'].set_active(self.timefreqs["never"])
-				self.on_time_freq_changed()
-		else :
-			self.widgets['main_radio3'].set_active(True)
-			#self.on_main_radio_toggled()
-			
+		if not recommened_setting :	
+			if  croninfos :
+				self.widgets['main_radio2'].set_active(True)
+				if croninfos[0] == 1 :
+					self.widgets['time_freq'].set_active(5)
+					self.on_time_freq_changed()
+					self.widgets['ccronline'].set_text(croninfos[1])
+				elif croninfos[0] == 0 :
+					if croninfos[1] in self.timefreqs.keys():
+						self.widgets['time_freq'].set_active(self.timefreqs[croninfos[1]])
+					else :
+						self.widgets['time_freq'].set_active(self.timefreqs["never"])
+					self.on_time_freq_changed()
+			else :
+				self.widgets['main_radio3'].set_active(True)
+				#self.on_main_radio_toggled()
+				
 		#Include and exclude tabs
 		self.include.clear()
 		self.ex_paths.clear()
@@ -452,12 +451,17 @@ class SBconfigGTK(GladeWindow):
 		if self.configman.has_option("general", "target" ) :
 			ctarget = self.configman.get("general", "target" )
 			if ctarget.startswith(os.sep) :
-				if not os.path.exists(ctarget ): 
-					os.makedirs(ctarget)
-				self.widgets["dest2"].set_active( True )			
-				self.widgets["hbox9"].set_sensitive( True )
-				self.widgets["dest_localpath"].set_current_folder( ctarget )
-				self.widgets["hbox10"].set_sensitive( False )
+				if (os.getuid() == 0 and ctarget == "/var/backup") or (os.getuid() != 0 and ctarget == getUserDatasDir()+"backups"):
+					self.widgets["dest1"].set_active( True )
+					self.widgets["hbox9"].set_sensitive( False )
+					self.widgets["hbox10"].set_sensitive( False )
+				else :
+					if not os.path.exists(ctarget ): 
+						os.makedirs(ctarget)
+					self.widgets["dest2"].set_active( True )			
+					self.widgets["hbox9"].set_sensitive( True )
+					self.widgets["dest_localpath"].set_current_folder( ctarget )
+					self.widgets["hbox10"].set_sensitive( False )
 			else :
 				self.widgets["dest3"].set_active( True )			
 				self.widgets["hbox9"].set_sensitive( False )
@@ -694,7 +698,7 @@ class SBconfigGTK(GladeWindow):
 	def on_save_clicked(self, *args):
 		getLogger().debug("Saving Config")
 		self.configman.saveConf()
-		self.orig_configman = ConfigManager(self.conffile)
+		self.orig_configman = ConfigManager(self.configman.conffile)
 		self.isConfigChanged()
 		
 
@@ -720,7 +724,7 @@ class SBconfigGTK(GladeWindow):
 			# set all values to defaults
 		
 			self.configman = ConfigManager()
-			
+			self.prefillWindow(True)
 			self.widgets["time_freq"].set_active( 2 )
 			# choose between anacron or cron here (old behaviour has been kept for the moment.
 			self.widgets["preciselyRadio"].set_active( True )

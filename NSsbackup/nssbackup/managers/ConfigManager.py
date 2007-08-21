@@ -218,6 +218,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		self.set("log", "file", getUserDatasDir()+"nssbackup.log" )
 		
 		# Section dirconfig
+		self.set("dirconfig",os.getenv("HOME")+os.sep,"1")
 		
 		# Section exclude
 		self.set("exclude", "regex", self.regex )
