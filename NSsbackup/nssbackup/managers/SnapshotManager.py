@@ -250,15 +250,18 @@ class SnapshotManager :
 			try :
 				snapshots.append(Snapshot( self.__targetDir+os.sep+str(dir) ))
 			except NotValidSnapshotException, e :
-				getLogger().info(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(dir),'error_cause' :e.message})
-				FAM.delete(self.__targetDir+os.sep+str(dir))
+				if isinstance(e, NotValidSnapshotNameException) :
+					getLogger().warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(dir),'error_cause' :e.message})
+				else : 
+					getLogger().info(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(dir),'error_cause' :e.message})
+					FAM.delete(self.__targetDir+os.sep+str(dir))
 		
 		# now purge according to date
 		topurge = []
 		if purge == "log":
 			# Logarithmic purge
 			# Determine which incremental backup snapshots to remove
-			getLogger().warning("Logarithmic purge not implemented yet !")
+			getLogger().warning(_("Logarithmic purge not implemented yet !"))
 			
 		else:
 			# Purge isn't logarithmic
@@ -272,6 +275,6 @@ class SnapshotManager :
 						topurge.append(snp.getPath())
 		
 		for adir in topurge:
-			getLogger().warning("Deleting '%(dir)s' for purge !" % {'dir' : adir })
+			getLogger().warning(_("Deleting '%(dir)s' for purge !") % {'dir' : adir })
 			FAM.delete( adir )
 		

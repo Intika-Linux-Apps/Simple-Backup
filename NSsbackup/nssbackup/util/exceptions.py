@@ -9,7 +9,13 @@ class NotValidSnapshotException(SBException) :
 	"""
 	This Exception is thrown by Snapshot validation.
 	"""
-
+	
+class NotValidSnapshotNameException(NotValidSnapshotException):
+	"""
+	Exception launched when the name of a snapshot is not valid
+	"""
+	
+	
 class NotValidSectionException(SBException) :
 	"""
 	This Exception is thrown by Config Section validation.

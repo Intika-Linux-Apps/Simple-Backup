@@ -62,7 +62,7 @@ class Snapshot :
 		else : # Snapshot for creation
 			# validate the name
 			if not self.__isValidName(self.__name) :
-				raise SBException ("Name of Snapshot not valid : %s" % self.__name)
+				raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
 			FAM.makedir(self.__snapshotpath)
 	
 	def __str__(self):
@@ -74,7 +74,7 @@ class Snapshot :
 	def getName(self) :
 		" return the name of the snapshot (ie the dir name)"
 		if not self.__name : 
-			raise SBException("Snapshot is inconsistant : __name is not set ")
+			raise SBException(_("Snapshot is inconsistant : __name is not set "))
 		else :
 			return self.__name
 
@@ -85,7 +85,7 @@ class Snapshot :
 		@return : a dictionary with the date time this snapshot has been taken.
 		"""
 		m = re.match(self.__validname_re , self.getName() )
-		if not m : raise NotValidSnapshotException("Name of snapshot '%s' doesn't match requirement" % self.getName())
+		if not m : raise NotValidSnapshotNameException(_("Name of snapshot '%s' doesn't match requirement") % self.getName())
 		date = {"year" : int(m.group(1)),"month":int(m.group(2)),"day":int(m.group(3)),
 			"hour":int(m.group(4)),"minute":int(m.group(5)),"second":int(m.group(6))}
 		return date
@@ -93,7 +93,7 @@ class Snapshot :
 	def getFilesList(self) :
 		"Returns a SBdict with key='the file name' and value='the file properties'"
 		global __filesList
-		if self.getVersion() and self.getVersion() != "1.4" : raise SBException("Please upgrade the snapshot (version '%s' found)"% self.getVersion())
+		if self.getVersion() and self.getVersion() != "1.4" : raise SBException(_("Please upgrade the snapshot (version '%s' found)") % self.getVersion())
 		if self.__filesList != None : return self.__filesList
 		else :
 			flist = self.__snapshotpath +os.sep +"flist"
@@ -101,9 +101,9 @@ class Snapshot :
 			if not FAM.exists(flist) and not FAM.exists(fprops) : 
 				return False
 			elif not FAM.exists(flist) :
-				raise NotValidSnapshotException("flist hasn't been found for snapshot '%s'" % self.getName())
+				raise NotValidSnapshotException(_("flist hasn't been found for snapshot '%s'") % self.getName())
 			elif not FAM.exists(fprops) :
-				raise NotValidSnapshotException("fprops hasn't been found for snapshot '%s'" % self.getName())
+				raise NotValidSnapshotException(_("fprops hasn't been found for snapshot '%s'") % self.getName())
 			else :
 				f1 = FAM.readfile(flist)
 				f2 = FAM.readfile(fprops)
@@ -113,7 +113,7 @@ class Snapshot :
 	def getPath(self) :
 		"return the complete path of the snapshot"
 		if not self.__snapshotpath : 
-			raise SBException("Snapshot is inconsistant : __snapshotpath is not set ")
+			raise SBException(_("Snapshot is inconsistant : __snapshotpath is not set "))
 		else :
 			return self.__snapshotpath
 	
@@ -166,7 +166,7 @@ class Snapshot :
 					minor = int(ver[2])
 				except Exception, e:
 					FAM.delete(self.getPath()+os.sep +"ver")
-					raise SBException (" %s"+ os.sep +"ver doesn't contain valid value ! Ignoring incomplete or non-backup directory. " % self.getPath())
+					raise SBException (_("%(file)s doesn't contain valid value ! Ignoring incomplete or non-backup directory. ") % {"file" : self.getPath()+ os.sep +"ver"})
 				self.__version = ver[:3]
 				return self.__version
 	
@@ -207,7 +207,7 @@ class Snapshot :
 		global __filesList
 		if not fileslist :
 			self.__filesList = SBdict()
-			getLogger().debug("set filelist to empty SBdict : "+ str(self.__filesList)) 
+			getLogger().debug(_("set filelist to empty SBdict : ")+ str(self.__filesList)) 
 		else :
 			self.__filesList = fileslist
 	
@@ -218,7 +218,7 @@ class Snapshot :
 		splited = str(self.__snapshotpath).split(os.sep)
 		name = splited[len(splited) - 1]
 		if not self.__isValidName(name) :
-			raise SBException ("Name of Snapshot not valid : %s" % self.__name)
+			raise SBException (_("Name of Snapshot not valid : %s") % self.__name)
 		else : 
 			self.__name = name
 		
@@ -227,7 +227,7 @@ class Snapshot :
 		"Set the name of the base snapshot of this snapshot"
 		global __base
 		if not self.__isValidName(baseName) :
-			raise SBException ("Name of base not valid : %s" % self.__name)
+			raise SBException (_("Name of base not valid : %s") % self.__name)
 		self.__base = baseName		
 	
 	def addFile(self, item, props) :
@@ -278,9 +278,9 @@ class Snapshot :
 		"""
 		# validate the name
 		if not self.__isValidName(self.__name) :
-			raise NotValidSnapshotException ("Name of Snapshot not valid : %s" % self.__name)
+			raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
 		if not FAM.exists( self.getPath()+os.sep +"flist" ) or not FAM.exists( self.getPath()+os.sep +"fprops" ) or not FAM.exists( self.getPath()+os.sep +"files.tgz" ) or not FAM.exists( self.getPath()+os.sep +"ver" ):
-			raise NotValidSnapshotException ("One of the mandatory files doesn't exist in [%s]" % self.getName())
+			raise NotValidSnapshotException (_("One of the mandatory files doesn't exist in [%s]") % self.getName())
 		
 	def __isValidName(self, name ) :
 		" Check if the snapshot name is valid "
@@ -299,7 +299,7 @@ class Snapshot :
 				FAM.writetofile(self.getPath()+os.sep +"base", self.getBase())
 		else : # base file was not found or base wasn't set. It MUST be a full backup
 			if self.getName()[-3:] != "ful" :
-				raise SBException("Base name must be set for inc backup !")
+				raise SBException(_("Base name must be set for inc backup !"))
 		
 	def __commitexcludefile(self):
 		"""
@@ -307,7 +307,7 @@ class Snapshot :
 		@raise SBException: if excludes hasn't been set 
 		"""
 		if not self.getExcludes() :
-			raise SBException("Excludes must be set !")
+			raise SBException(_(" 'excludes' must be set !"))
 		else :
 			FAM.pickledump( self.__excludes, self.getPath()+os.sep +"excludes" )
 		
@@ -336,7 +336,7 @@ class Snapshot :
 	def __makebackup(self):
 		" Make the backup on the disk "
 		
-		getLogger().info("Launching TAR to backup ")
+		getLogger().info(_("Launching TAR to backup "))
 		tdir = self.getPath().replace(" ", "\ ")
 		options = list()
 		options.extend(["-czS","--directory="+ os.sep , "--no-recursion", "--ignore-failed-read","--null","--files-from="+tdir+os.sep +"flist"])
@@ -347,7 +347,7 @@ class Snapshot :
 			outStr, errStr, retVal = Util.launch("tar", options)
 			getLogger().debug(outStr)
 			if retVal != 0 :
-				raise SBException("Couldn't make a proper backup : " + errStr )
+				raise SBException(_("Couldn't make a proper backup : ") + errStr )
 		else :
 			getLogger().debug("Tarline : " + "tar" + options )
 			turi = gnomevfs.URI( self.getPath()+os.sep +"files.tgz" )

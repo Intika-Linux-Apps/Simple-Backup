@@ -149,7 +149,7 @@ class NSsbackupd () :
 						import shutil
 						shutil.copy(logfile, snp.getPath())
 					else :
-						getLogger().error("Couldn't copy the logfile into the snapshotdir")
+						getLogger().error(_("Couldn't copy the logfile into the snapshot directory"))
 					
 			finally :
 				if self.__bm and self.__bm.config :
@@ -161,7 +161,10 @@ class NSsbackupd () :
 			getLogger().error(str(e))
 			getLogger().error(traceback.format_exc())
 
+# i18n init
+gettext.textdomain("nssbackup")
 application = 'nssbackup'
 gettext.install(application)
+
 sbd = NSsbackupd()
 sbd.run()
