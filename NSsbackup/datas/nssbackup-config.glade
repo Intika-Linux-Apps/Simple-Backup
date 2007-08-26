@@ -1249,8 +1249,8 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="border_width">10</property>
-                            <property name="show_hidden">True</property>
                             <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
+                            <property name="show_hidden">True</property>
                             <property name="title" translatable="yes">Select the destination folder</property>
                             <signal name="selection_changed" handler="on_dest_localpath_selection_changed"/>
                           </widget>
@@ -1768,7 +1768,7 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                 <child>
                   <widget class="GtkLabel" id="label30">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">Time</property>
+                    <property name="label" translatable="yes">Time (for admins only)</property>
                   </widget>
                   <packing>
                     <property name="type">tab</property>
@@ -1868,7 +1868,7 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                           <widget class="GtkRadioButton" id="logpurgeradiobutton">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="label" translatable="yes">Logarithmic (Recommended)</property>
+                            <property name="label" translatable="yes">Logarithmic (Not implemented yet)</property>
                             <property name="use_underline">True</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -2041,8 +2041,8 @@ Error</property>
                           <widget class="GtkFileChooserButton" id="logfilechooser">
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="show_hidden">True</property>
                             <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
+                            <property name="show_hidden">True</property>
                             <signal name="selection_changed" handler="on_logfilechooser_selection_changed"/>
                           </widget>
                           <packing>

@@ -679,11 +679,12 @@ class SBconfigGTK(GladeWindow):
 	def on_about_activate(self, *args):
 		about = gtk.AboutDialog()
 		about.set_name("Not So Simple Backup Suite")
-		about.set_version("0.1")
+		about.set_version("0.1-1")
 		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
 		about.set_transient_for(self.widgets["backup_properties_dialog"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
+		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>", "Mathias HOUNGBO <mathias.houngbo@gmail.com>"])
 		about.set_website("https://launchpad.net/nssbackup/")
 		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
 		about.run()

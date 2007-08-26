@@ -1,3 +1,12 @@
+nssbackup (0.1-1) gutsy; urgency=low
+
+  * Fixed Bug #134369 Launchpad
+  * Fixed a bug preventing to be sure that the config was saved, when clicking on save
+  * Changed a recommended setting
+  * Updated translations
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 26 Aug 2007 12:44:18 +0200
+
 nssbackup (0.1-1~beta4) gutsy; urgency=low
 
   * Solved Bug #130823 LP
