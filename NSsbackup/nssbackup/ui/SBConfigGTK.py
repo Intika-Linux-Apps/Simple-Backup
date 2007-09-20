@@ -1139,7 +1139,7 @@ class SBconfigGTK(GladeWindow):
         
 	def on_time_maxinc_changed(self,*args):
 		# add maxinc to the config
-		self.configman.set("general", "maxincrement", self.widgets["time_maxinc"].get_value()) 
+		self.configman.set("general", "maxincrement", int(self.widgets["time_maxinc"].get_value())) 
 		self.isConfigChanged()
 	
 	#----------------------------------------------------------------------
