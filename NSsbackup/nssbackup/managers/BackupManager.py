@@ -195,8 +195,8 @@ class BackupManager :
 			@note: param to be defined (rexclude, excludelist) , excludelist is a dictionary
 			"""
 			# excude target
-			if _file2 == self.config.get("general","target") :
-				getLogger().info(_("target directory is excluded"))
+			if _file2.rstrip(os.sep) == self.config.get("general","target").rstrip(os.sep) :
+				getLogger().info(_("Target '%s' directory is excluded") % self.config.get("general","target") )
 				return True
 			
 			# return true if the file doesn't exist
