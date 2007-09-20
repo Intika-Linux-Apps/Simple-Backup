@@ -247,6 +247,7 @@ class SBconfigGTK(GladeWindow):
 			'on_ccronline_changed',
 			'on_time_domtv_cursor_changed',
 			'on_time_dowtv_cursor_changed',
+            'on_time_maxinc_changed',
 			'on_purgecheckbox_toggled',
 			'on_purgeradiobutton_toggled',
 			'on_purgedays_changed',
@@ -1135,6 +1136,11 @@ class SBconfigGTK(GladeWindow):
 		self.isConfigChanged()
 		# put current cronline into the ccronline widget here
 		self.widgets["ccronline"].set_text(cronline)
+        
+	def on_time_maxinc_changed(self,*args):
+		# add maxinc to the config
+		self.configman.set("general", "maxincrement", self.widgets["time_maxinc"].get_value()) 
+		self.isConfigChanged()
 	
 	#----------------------------------------------------------------------
 
