@@ -126,7 +126,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	
 	regex = r"\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache"
 	dirconfig = {'/etc/': '1', '/var/': '1', '/home/': '1', '/var/cache/': '0', '/var/tmp/': '0', '/var/spool/': '0', '/usr/local/': '1', '/media/': '0'}
-	maxsize = str(10*1024*1024)
+	
 	mountdir = "/mnt/nssbackup"
 	target = "/var/backup"
 	maxincrement = str(7)
@@ -188,7 +188,6 @@ class ConfigManager (ConfigParser.ConfigParser):
 		
 		# Section exclude
 		self.set("exclude", "regex", self.regex )
-		self.set("exclude", "maxsize",self.maxsize )
 		
 		# Section places
 		self.set("places", "prefix", self.prefix)
@@ -222,7 +221,6 @@ class ConfigManager (ConfigParser.ConfigParser):
 		
 		# Section exclude
 		self.set("exclude", "regex", self.regex )
-		self.set("exclude", "maxsize",self.maxsize )
 		
 		# Section places
 		self.set("places", "prefix", self.prefix)

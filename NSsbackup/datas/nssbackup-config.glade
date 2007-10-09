@@ -19,6 +19,7 @@
                 <property name="can_focus">True</property>
                 <property name="label" translatable="yes">Standard file types:</property>
                 <property name="use_underline">True</property>
+                <property name="response_id">0</property>
                 <property name="draw_indicator">True</property>
                 <signal name="toggled" handler="on_ftype_toggled"/>
               </widget>
@@ -51,6 +52,7 @@ ogg
                     <property name="can_focus">True</property>
                     <property name="label" translatable="yes">Custom defined file type with </property>
                     <property name="use_underline">True</property>
+                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">ftype_st</property>
                     <signal name="toggled" handler="on_ftype_toggled"/>
@@ -309,6 +311,9 @@ Files and directories matching this expression will be excluded from backup.</pr
                     <property name="stock_id">gtk-refresh</property>
                     <signal name="clicked" handler="on_reload_clicked"/>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkToolButton" id="saveButton">
@@ -318,12 +323,19 @@ Files and directories matching this expression will be excluded from backup.</pr
                     <property name="stock_id">gtk-save</property>
                     <signal name="clicked" handler="on_save_clicked"/>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkSeparatorToolItem" id="sep1">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">False</property>
+                  </packing>
                 </child>
                 <child>
                   <widget class="GtkToolButton" id="backup">
@@ -333,6 +345,9 @@ Files and directories matching this expression will be excluded from backup.</pr
                     <property name="stock_id">gtk-harddisk</property>
                     <signal name="clicked" handler="on_backup_clicked"/>
                   </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                  </packing>
                 </child>
               </widget>
               <packing>
@@ -355,6 +370,7 @@ Files and directories matching this expression will be excluded from backup.</pr
                         <property name="border_width">2</property>
                         <property name="label" translatable="yes">Use recommended backup settings</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_main_radio_toggled"/>
                       </widget>
@@ -403,6 +419,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">Use custom backup settings</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">main_radio</property>
                         <signal name="toggled" handler="on_main_radio_toggled"/>
@@ -452,6 +469,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">Manual backups only</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">main_radio</property>
                         <signal name="toggled" handler="on_main_radio_toggled"/>
@@ -496,9 +514,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       </packing>
                     </child>
                   </widget>
-                  <packing>
-                    <property name="tab_expand">False</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkLabel" id="label7">
@@ -507,7 +522,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                   </widget>
                   <packing>
                     <property name="type">tab</property>
-                    <property name="tab_expand">False</property>
                     <property name="tab_fill">False</property>
                   </packing>
                 </child>
@@ -542,6 +556,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="can_default">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_inc_addfile_clicked"/>
                             <child>
                               <widget class="GtkAlignment" id="alignment1">
@@ -585,6 +600,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="can_default">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_inc_adddir_clicked"/>
                             <child>
                               <widget class="GtkAlignment" id="alignment2">
@@ -633,6 +649,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="can_default">True</property>
                             <property name="label">gtk-remove</property>
                             <property name="use_stock">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_inc_del_clicked"/>
                           </widget>
                           <packing>
@@ -690,6 +707,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="label">gtk-add</property>
                             <property name="use_stock">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_remote_inc_add_clicked"/>
                           </widget>
                         </child>
@@ -701,6 +719,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="label">gtk-remove</property>
                             <property name="use_stock">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_remote_inc_del_clicked"/>
                           </widget>
                           <packing>
@@ -713,6 +732,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_test_remote_clicked"/>
                             <child>
                               <widget class="GtkAlignment" id="alignment8">
@@ -756,7 +776,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                   </widget>
                   <packing>
                     <property name="position">1</property>
-                    <property name="tab_expand">False</property>
                   </packing>
                 </child>
                 <child>
@@ -767,7 +786,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                   <packing>
                     <property name="type">tab</property>
                     <property name="position">1</property>
-                    <property name="tab_expand">False</property>
                     <property name="tab_fill">False</property>
                   </packing>
                 </child>
@@ -808,6 +826,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_addfile_clicked"/>
                                 <child>
                                   <widget class="GtkAlignment" id="alignment3">
@@ -851,6 +870,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_adddir_clicked"/>
                                 <child>
                                   <widget class="GtkAlignment" id="alignment4">
@@ -899,6 +919,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                                 <property name="can_default">True</property>
                                 <property name="label">gtk-remove</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_delpath_clicked"/>
                               </widget>
                               <packing>
@@ -914,9 +935,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                           </packing>
                         </child>
                       </widget>
-                      <packing>
-                        <property name="tab_expand">False</property>
-                      </packing>
                     </child>
                     <child>
                       <widget class="GtkLabel" id="label13">
@@ -925,7 +943,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       </widget>
                       <packing>
                         <property name="type">tab</property>
-                        <property name="tab_expand">False</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>
@@ -960,6 +977,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                                 <property name="can_default">True</property>
                                 <property name="label">gtk-add</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_addftype_clicked"/>
                               </widget>
                             </child>
@@ -970,6 +988,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                                 <property name="can_default">True</property>
                                 <property name="label">gtk-remove</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_delftype_clicked"/>
                               </widget>
                               <packing>
@@ -986,7 +1005,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       </widget>
                       <packing>
                         <property name="position">1</property>
-                        <property name="tab_expand">False</property>
                       </packing>
                     </child>
                     <child>
@@ -997,7 +1015,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       <packing>
                         <property name="type">tab</property>
                         <property name="position">1</property>
-                        <property name="tab_expand">False</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>
@@ -1032,6 +1049,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                                 <property name="can_default">True</property>
                                 <property name="label">gtk-add</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_addregex_clicked"/>
                               </widget>
                             </child>
@@ -1042,6 +1060,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                                 <property name="can_default">True</property>
                                 <property name="label">gtk-remove</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_delregex_clicked"/>
                               </widget>
                               <packing>
@@ -1058,7 +1077,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       </widget>
                       <packing>
                         <property name="position">2</property>
-                        <property name="tab_expand">False</property>
                       </packing>
                     </child>
                     <child>
@@ -1069,7 +1087,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       <packing>
                         <property name="type">tab</property>
                         <property name="position">2</property>
-                        <property name="tab_expand">False</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>
@@ -1089,7 +1106,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                                 <property name="can_focus">True</property>
                                 <property name="label" translatable="yes">Do not backup files bigger than </property>
                                 <property name="use_underline">True</property>
-                                <property name="active">True</property>
+                                <property name="response_id">0</property>
                                 <property name="draw_indicator">True</property>
                                 <signal name="toggled" handler="on_ex_max_toggled"/>
                               </widget>
@@ -1150,7 +1167,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       </widget>
                       <packing>
                         <property name="position">3</property>
-                        <property name="tab_expand">False</property>
                       </packing>
                     </child>
                     <child>
@@ -1161,14 +1177,12 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       <packing>
                         <property name="type">tab</property>
                         <property name="position">3</property>
-                        <property name="tab_expand">False</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>
                   </widget>
                   <packing>
                     <property name="position">2</property>
-                    <property name="tab_expand">False</property>
                   </packing>
                 </child>
                 <child>
@@ -1179,7 +1193,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                   <packing>
                     <property name="type">tab</property>
                     <property name="position">2</property>
-                    <property name="tab_expand">False</property>
                     <property name="tab_fill">False</property>
                   </packing>
                 </child>
@@ -1192,6 +1205,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">Use default backup directory (/var/backup)</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_dest1_toggled"/>
                       </widget>
@@ -1206,6 +1220,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">Use custom local backup directory</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">dest1</property>
                         <signal name="toggled" handler="on_dest1_toggled"/>
@@ -1231,11 +1246,11 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         </child>
                         <child>
                           <widget class="GtkFileChooserButton" id="dest_localpath">
-                            <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
-                            <property name="show_hidden">True</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="border_width">10</property>
+                            <property name="show_hidden">True</property>
+                            <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                             <property name="title" translatable="yes">Select the destination folder</property>
                             <signal name="selection_changed" handler="on_dest_localpath_selection_changed"/>
                           </widget>
@@ -1255,6 +1270,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">Use a remote directory (SSH or FTP)</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">dest1</property>
                         <signal name="toggled" handler="on_dest1_toggled"/>
@@ -1275,7 +1291,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <child>
                               <widget class="GtkImage" id="dest_remote_light1">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-missing-image</property>
                                 <property name="icon_name">gtk-dialog-warning</property>
                               </widget>
                             </child>
@@ -1303,6 +1318,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="border_width">10</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_dest_remotetest_clicked"/>
                             <child>
                               <widget class="GtkAlignment" id="alignment5">
@@ -1394,7 +1410,6 @@ The backups can not be written there.&lt;/i&gt;</property>
                   </widget>
                   <packing>
                     <property name="position">3</property>
-                    <property name="tab_expand">False</property>
                   </packing>
                 </child>
                 <child>
@@ -1405,7 +1420,6 @@ The backups can not be written there.&lt;/i&gt;</property>
                   <packing>
                     <property name="type">tab</property>
                     <property name="position">3</property>
-                    <property name="tab_expand">False</property>
                     <property name="tab_fill">False</property>
                   </packing>
                 </child>
@@ -1447,11 +1461,12 @@ custom</property>
                           <widget class="GtkRadioButton" id="anacronRadio">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="tooltip" translatable="yes">This option will make nssbackup make a backup not at a precise time but when the computer is up. </property>
                             <property name="border_width">4</property>
                             <property name="label" translatable="yes">simply</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
-                            <property name="tooltip" translatable="yes">This option will make nssbackup make a backup not at a precise time but when the computer is up. </property>
                             <signal name="toggled" handler="on_anacronRadio_toggled"/>
                           </widget>
                           <packing>
@@ -1467,6 +1482,7 @@ custom</property>
                             <property name="border_width">2</property>
                             <property name="label" translatable="yes">precisely</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">anacronRadio</property>
                             <signal name="toggled" handler="on_anacronRadio_toggled"/>
@@ -1748,7 +1764,6 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                   </widget>
                   <packing>
                     <property name="position">4</property>
-                    <property name="tab_expand">False</property>
                   </packing>
                 </child>
                 <child>
@@ -1759,7 +1774,6 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                   <packing>
                     <property name="type">tab</property>
                     <property name="position">4</property>
-                    <property name="tab_expand">False</property>
                     <property name="tab_fill">False</property>
                   </packing>
                 </child>
@@ -1772,6 +1786,7 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                         <property name="can_focus">True</property>
                         <property name="label" translatable="yes">Enable purging of old and incomplete backups</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_purgecheckbox_toggled"/>
                       </widget>
@@ -1799,6 +1814,7 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                             <property name="can_focus">True</property>
                             <property name="label" translatable="yes">Simple cutoff: Erase all backups older than </property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="on_purgeradiobutton_toggled"/>
                           </widget>
@@ -1856,6 +1872,7 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                             <property name="can_focus">True</property>
                             <property name="label" translatable="yes">Logarithmic (Not implemented yet)</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">purgeradiobutton</property>
@@ -1928,7 +1945,6 @@ Erase all other backups.&lt;/small&gt;
                   </widget>
                   <packing>
                     <property name="position">5</property>
-                    <property name="tab_expand">False</property>
                   </packing>
                 </child>
                 <child>
@@ -1942,7 +1958,6 @@ Erase all other backups.&lt;/small&gt;
                   <packing>
                     <property name="type">tab</property>
                     <property name="position">5</property>
-                    <property name="tab_expand">False</property>
                     <property name="tab_fill">False</property>
                   </packing>
                 </child>
@@ -1988,10 +2003,10 @@ Erase all other backups.&lt;/small&gt;
                         <property name="homogeneous">True</property>
                         <child>
                           <widget class="GtkFileChooserButton" id="logfilechooser">
-                            <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
-                            <property name="show_hidden">True</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="show_hidden">True</property>
+                            <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                             <signal name="selection_changed" handler="on_logfilechooser_selection_changed"/>
                           </widget>
                           <packing>
@@ -2034,8 +2049,8 @@ Error</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
                             <property name="extension_events">GDK_EXTENSION_EVENTS_CURSOR</property>
-                            <property name="label" translatable="yes">Log level :</property>
                             <property name="tooltip" translatable="yes">Debug is just for debbuging purpose.Info is the recommended setting</property>
+                            <property name="label" translatable="yes">Log level :</property>
                           </widget>
                         </child>
                       </widget>
@@ -2213,6 +2228,7 @@ Error</property>
                                             <property name="receives_default">True</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                             <property name="label" translatable="yes">Test mail settings</property>
+                                            <property name="response_id">0</property>
                                             <signal name="clicked" handler="on_testMailButton_clicked"/>
                                           </widget>
                                           <packing>
@@ -2275,6 +2291,7 @@ Error</property>
                                             <property name="can_focus">True</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                             <property name="label" translatable="yes">Use a username and password</property>
+                                            <property name="response_id">0</property>
                                             <property name="draw_indicator">True</property>
                                             <signal name="toggled" handler="on_smtplogincheckbox_toggled"/>
                                           </widget>
@@ -2351,6 +2368,7 @@ Error</property>
                                             <property name="can_focus">True</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                             <property name="label" translatable="yes">Use secured connexion</property>
+                                            <property name="response_id">0</property>
                                             <property name="draw_indicator">True</property>
                                             <signal name="toggled" handler="on_TLScheckbutton_toggled"/>
                                           </widget>
@@ -2370,6 +2388,7 @@ Error</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                                     <property name="label">TLS</property>
+                                                    <property name="response_id">0</property>
                                                     <property name="active">True</property>
                                                     <property name="draw_indicator">True</property>
                                                     <signal name="toggled" handler="on_TLSradiobutton_toggled"/>
@@ -2381,6 +2400,7 @@ Error</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                                     <property name="label">SSL</property>
+                                                    <property name="response_id">0</property>
                                                     <property name="active">True</property>
                                                     <property name="draw_indicator">True</property>
                                                     <property name="group">TLSradiobutton</property>
@@ -2485,7 +2505,6 @@ Error</property>
                   </widget>
                   <packing>
                     <property name="position">6</property>
-                    <property name="tab_expand">False</property>
                   </packing>
                 </child>
                 <child>
@@ -2497,7 +2516,6 @@ Error</property>
                   <packing>
                     <property name="type">tab</property>
                     <property name="position">6</property>
-                    <property name="tab_expand">False</property>
                     <property name="tab_fill">False</property>
                   </packing>
                 </child>
@@ -2587,6 +2605,7 @@ Error</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_fusecheckbutton_clicked"/>
                 <child>
                   <widget class="GtkHBox" id="hbox26">

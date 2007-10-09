@@ -65,6 +65,8 @@ uninstall:
 	rm -f $(PIXDIR)/nssbackup-restore.png
 	find $(DESTDIR)/share/locale/ -name nssbackup.mo -exec rm -rf '{}' \;
 
+reinstall: uninstall install
+
 clean:
 	@echo "" > nssbackup/ressources
 	for lang in $(PO); do rm -rf datas/po/$$lang ; done
