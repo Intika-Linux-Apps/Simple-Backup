@@ -41,7 +41,7 @@ class RestoreManager :
 		"""
 		self.restoreAs(snapshot, _file, None)
 		
-	def restoreAs(self,snapshot,_file, target) :
+	def restoreAs(self,snapshot,_file, target, backupFlag=True,failOnNotFound=True) :
 		"""
 		Restore one file or directory from the backup tdir with name
 		file to target (or to its old location if None if given to target).
@@ -49,6 +49,8 @@ class RestoreManager :
 		@param snapshot:
 		@param file :  
 		@param target: 
+		@param backupFlag: Set to false to make no backup when restoring (default = True)
+		@param failOnNotFound: set to False if we don't want to fail if a file is not found (default is True)
 		"""
 		if not snapshot :
 			raise SBException("Please provide a Snapshot")
@@ -58,11 +60,17 @@ class RestoreManager :
 		_file = os.sep+_file.lstrip(os.sep)
 		
 		# restore
-		if not snapshot.getFilesList().has_key(_file) :
-			raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
+		if not snapshot.getFilesList().has_key(_file):
+			if failOnNotFound :
+				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
+			else : 
+				getLogger().warning(_("File '%s' not found in the backup snapshot [%s] files list, We'll not fail though !") % (_file,snapshot.getName()) )
+				return
 		
-		now = datetime.datetime.now().isoformat("_").replace( ":", "." )
-		suffix = ".before_restore_"+now
+		suffix = None
+		if backupFlag :
+			now = datetime.datetime.now().isoformat("_").replace( ":", "." )
+			suffix = ".before_restore_"+now
 		
 		if target and os.path.exists(target):
 			# The target is given and exists
@@ -71,10 +79,11 @@ class RestoreManager :
 				#create a temp file , extract inside then move the content
 				tmpdir = tempfile.mkdtemp(dir=target,prefix='nssbackup-restore_')
 				Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, tmpdir, bckupsuffix=suffix )
-				if os.path.exists(target+os.sep+ os.path.basename(_file)) :
-					shutil.move(target+os.sep+ os.path.basename(_file), target+os.sep+ os.path.basename(_file)+suffix)
-				shutil.move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
+				if os.path.exists(target+os.sep+ os.path.basename(_file)) and backupFlag:
+					Util.nssb_move(target+os.sep+ os.path.basename(_file), target+os.sep+ os.path.basename(_file)+suffix)
+				Util.nssb_move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
 				shutil.rmtree(tmpdir)
+				
 			else:
 				#the target is a file
 				parent = os.path.dirname(target)
@@ -104,28 +113,33 @@ class RestoreManager :
 		self.revertAs(snapshot, dir, None)
 		
 	
+	def __cleanBackupedFiles(self, dir , suffix):
+		"""
+		clean the backuped copies in the directory (dir) that ends with suffix
+		@param dir: directory to clean up
+		@param suffix: the suffix of backuped files
+		"""
+		
+	
 	def revertAs(self,snapshot, dir, targetdir):
 		"""
 		Revert a directory to its snapshot date state into a directory.
+		We will restore the directory starting from the base snapshot to the selected one and clean the restore directory each time.
 		@param snapshot : The snapshot from which to revert 
 		@param dir : the dir to revert, use os.sep for the whole snapshot
 		@param targetdir: The dir in which to restore files 
 		"""
+		if not snapshot :
+			raise SBException("Please provide a Snapshot")
+		if not dir :
+			raise SBException("Please provide a File/directory")
+		
+		#dir = os.sep+dir.lstrip(os.sep)
 		snpman = SnapshotManager(os.path.dirname(snapshot.getPath()))
-		revertState = snpman.getRevertState(snapshot, dir)
-		# revertState is a dictionnay with snapshot names as keys and contents as values
-		# we'll not recurse into a dir in revertState, tar wil do this job
-		tempfiles = []
-		for snppath, sbdict in revertState.iteritems() :
-			# set the temp file list
-			tmpfd, tmpname = tempfile.mkstemp(prefix="rvtlist_", dir=snppath)
-			for path in sbdict.iterkeys():
-				# we found an endpoint
-				if not sbdict.getSon(path) :
-					getLogger().debug("Adding %s to the extract list" % path.lstrip(os.sep))
-					os.write(tmpfd,path.lstrip(os.sep)+"\000")
-			os.close(tmpfd)
-			# extract now from archive
-			now = datetime.datetime.now().isoformat("_").replace( ":", "." )
-			suffix = ".before_restore_"+now
-			Util.extract2(os.sep.join([snppath,"files.tgz"]), tmpname, targetdir, bckupsuffix=suffix)
+		history = snpman.getSnpHistory(snapshot)
+		history.reverse()
+		
+		for snp in history :
+			getLogger().debug("Restoring '%s' from snapshot '%s' " % (dir, snp.getName()) )
+			self.restoreAs(snp, dir, targetdir, False,False)
+		

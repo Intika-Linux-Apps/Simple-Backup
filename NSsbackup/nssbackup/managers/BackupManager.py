@@ -443,14 +443,13 @@ class BackupManager :
 		else:
 			# we got some snaphots 
 			# we search for the last full 
-						
+			base = listing[0]
 			if listing[0].isfull() :  # Last backup was full backup
 				getLogger().debug("Last (%s) was a full backup" % listing[0].getName())
 				d = listing[0].getDate()
 				if ( datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days < self.config.get("general","maxincrement") :
 			    	# Less then maxincrement days passed since that -> make an increment
 					increment = True
-					base = listing[0]
 					try:
 						prev = base.getFilesList()
 					except Exception, e:
@@ -478,7 +477,6 @@ class BackupManager :
 							# Last full backup is fresh -> make an increment
 							getLogger().info("Last full backup is fresh (%d days old )-> make an increment" % age )
 							increment = True
-							base = i
 						else: # Last full backup is old -> make a full backup
 							getLogger().info("Last full backup is old -> make a full backup")
 							increment = False

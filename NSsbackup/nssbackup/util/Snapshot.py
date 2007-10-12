@@ -134,14 +134,19 @@ class Snapshot :
 	def getBaseSnapshot(self):
 		"""
 		Return the base snapshot (as a Snapshot ) not only the name
-		@return: Snapshot
+		@return: the base Snapshot if it exists or None otherwise (we are a full snapshot) 
 		"""
 		global __baseSnapshot
 		if self.__baseSnapshot : return self.__baseSnapshot
 		else :
-			path = os.path.dirname(self.getPath())
-			self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])) )
+			# check if we are not a full snapshot 
+			if self.getBase():
+				path = os.path.dirname(self.getPath())
+				self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])) )
+			else :
+				self.__baseSnapshot = None
 			return self.__baseSnapshot
+			
 	
 	
 	def getFileProps(self, item) :

@@ -21,7 +21,63 @@ import subprocess, nssbackup
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from tempfile import *
-import inspect
+import inspect, shutil
+from shutil import *
+
+
+def nssb_copytree(src, dst, symlinks=False):
+    """
+    mod of shutil.copytree 
+    This doesn't fail if the directory exists, it copies inside
+    """
+    names = os.listdir(src)
+    if not os.path.exists(dst) :
+     os.makedirs(dst)
+    errors = []
+    for name in names:
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        try:
+            if symlinks and os.path.islink(srcname):
+                linkto = os.readlink(srcname)
+                os.symlink(linkto, dstname)
+            elif os.path.isdir(srcname):
+                copytree(srcname, dstname, symlinks)
+            else:
+                copy2(srcname, dstname)
+            # XXX What about devices, sockets etc.?
+        except (IOError, os.error), why:
+            errors.append((srcname, dstname, str(why)))
+        # catch the Error from the recursive copytree so that we can
+        # continue with other files
+        except Error, err:
+            errors.extend(err.args[0])
+    try:
+        copystat(src, dst)
+    except WindowsError:
+        # can't copy file access times on Windows
+        pass
+    except OSError, why:
+        errors.extend((src, dst, str(why)))
+    if errors:
+        raise Error, errors
+
+def nssb_move(src, dst):
+    """
+    mod of shutil.move that uses nssb_copytree
+    """
+
+    try:
+        os.rename(src, dst)
+    except OSError:
+        if os.path.isdir(src):
+            if shutil.destinsrc(src, dst):
+                raise Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
+            nssb_copytree(src, dst, symlinks=True)
+            rmtree(src)
+        else:
+            copy2(src,dst)
+            os.unlink(src)
 
 def getResource(resourceName):
 	"""
@@ -47,7 +103,6 @@ def getResource(resourceName):
 		return os.path.normpath(devvalue + resourceName)
 	raise SBException("'%s' hasn't been found in the ressource list"% resourceName)
 					
-
 def launch(cmd, opts):
 	"""
 	launch a command and gets stdout and stderr
@@ -89,7 +144,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None):
 	file = file.lstrip(os.sep)
 	
 	options = ["-xzp", "--occurrence=1", "--ignore-failed-read", '--backup=existing']
-	if os.getuid() == 0 :
+	if os.getuid() != 0 :
 		options.append("--same-owner")
 	if dest :
 		options.append( "--directory="+dest )
@@ -115,7 +170,7 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	@param dest: destination
 	"""
 	options = ["-xzp", "--ignore-failed-read", '--backup=existing']
-	if os.getuid() == 0 :
+	if os.getuid() != 0 :
 		options.append("--same-owner")
 	if dest :
 		options.append( "--directory="+dest )
@@ -131,6 +186,10 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 		getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
 	getLogger().debug("output was : " + outStr)
+
+
+
+
 	
 import pygtk
 pygtk.require('2.0')

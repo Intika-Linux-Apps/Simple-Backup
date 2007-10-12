@@ -143,7 +143,7 @@ class SnapshotManager :
 				getLogger().debug("Rebasing '%s' to '%s' " % (snp.getName(), snapshot.getBaseSnapshot().getName()) )
 				self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
 		getLogger().debug("Removing '%s'" % snapshot.getName())
-		FAM.delete(snapshot.getPath())	
+		FAM.delete(snapshot.getPath())
 		
 	def compareSnapshots(self, snap1, snap2):
 		"""
@@ -241,6 +241,34 @@ class SnapshotManager :
 				# processing finished for this snapshot
 				getLogger().debug("processing finished for snapshot %s " % str(cursnp))
 			return result
+
+	def getSnpHistory(self,snapshot):
+		"""
+		gets the list of preceding snapshots till the last full one
+		@param snapshot : the given snapshot
+		@return: a list of Snapshots starting from the most recent one to the full one
+		@note: you'll need to reverse this list to make a revert 
+		"""
+		if not snapshot :
+			raise SBException("Please provide a snapshot to process")
+		
+		result = []
+		# add the first snapshot
+		result.append(snapshot)
+		current = snapshot
+		while (current.getBaseSnapshot()) :
+			current = current.getBaseSnapshot()
+			result.append(current)
+		
+		# Just for DEBUG
+		if getLogger().isEnabledFor(10) :
+			# get the history 
+			history = "\n[%s history]"% snapshot.getName()
+			for snp in result :
+				history += "\n- %s" % snp.getName()
+			getLogger().debug(history)
+		
+		return result
 			
 	def purge(self, purge="30"):
 		"""
