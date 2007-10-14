@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
-# Elisa - Home multimedia server
-# Copyright (C) 2006,2007 Fluendo Embedded S.L. (www.fluendo.com).
-# All rights reserved.
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 3 of the License, or
+#    (at your option) any later version.
 #
-# This file is available under one of two license agreements.
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 #
-# This file is licensed under the GPL version 2.
-# See "LICENSE.GPL" in the root of this distribution including a special
-# exception to use Elisa with Fluendo's plugins.
-#
-# The GPL part of Elisa is also available under a commercial licensing
-# agreement from Fluendo.
-# See "LICENSE.Elisa" in the root directory of this distribution package
-# for details on that license.
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+# Authors :
+#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 import logging
 import logging.handlers

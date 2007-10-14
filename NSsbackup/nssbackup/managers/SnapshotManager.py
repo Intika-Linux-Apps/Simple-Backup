@@ -58,10 +58,14 @@ class SnapshotManager :
 	
 	def getSnapshots(self, fromDate=None, toDate=None, byDate=None):
 		"""
+		Return a list with all the found snapshots (according to the options set).
+		This list is sorted from the latest snapshot to the earliest . 
+		0 => last snapshot 
+		len(list) => older one
 		@param fromDate : eg. 2007-02-17
 		@param toDate :  2007-02-17
 		@param byDate : 2007-02-17
-		@return: a list with all the found snapshots (according to the options set)
+		@return: 
 		"""
 		global __snapshots
 		snapshots = list()

@@ -249,6 +249,7 @@ class SBconfigGTK(GladeWindow):
 			'on_ccronline_changed',
 			'on_time_domtv_cursor_changed',
 			'on_time_dowtv_cursor_changed',
+            'on_time_maxinc_changed',
 			'on_purgecheckbox_toggled',
 			'on_purgeradiobutton_toggled',
 			'on_purgedays_changed',
@@ -691,11 +692,12 @@ class SBconfigGTK(GladeWindow):
 	def on_about_activate(self, *args):
 		about = gtk.AboutDialog()
 		about.set_name("Not So Simple Backup Suite")
-		about.set_version("0.1")
+		about.set_version("0.1-1")
 		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
 		about.set_transient_for(self.widgets["backup_properties_dialog"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
+		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>", "Mathias HOUNGBO <mathias.houngbo@gmail.com>"])
 		about.set_website("https://launchpad.net/nssbackup/")
 		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
 		about.run()
@@ -1158,6 +1160,11 @@ class SBconfigGTK(GladeWindow):
 		self.isConfigChanged()
 		# put current cronline into the ccronline widget here
 		self.widgets["ccronline"].set_text(cronline)
+        
+	def on_time_maxinc_changed(self,*args):
+		# add maxinc to the config
+		self.configman.set("general", "maxincrement", int(self.widgets["time_maxinc"].get_value())) 
+		self.isConfigChanged()
 	
 	#----------------------------------------------------------------------
 
