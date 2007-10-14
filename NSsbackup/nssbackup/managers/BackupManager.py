@@ -117,7 +117,7 @@ class BackupManager :
 		listing = self.__snpman.getSnapshots()
 		
 		# Is Inc or Full ? 
-		(name, base, prev, increment) = self.__isIncOrFull(listing)
+		(name, base, prev) = self.__isIncOrFull(listing)
 		
 		# Create snapshot
 		self.__actualSnapshot = Snapshot(name)
@@ -150,7 +150,7 @@ class BackupManager :
 		# Reduce the priority, so not to interfere with other processes
 		os.nice(20)
 		
-		self.__fillSnapshot(prev, increment)
+		self.__fillSnapshot(prev)
 		
 		if os.getuid() != 0 :
 			try:
@@ -168,7 +168,7 @@ class BackupManager :
 		# End session
 		self.__endSBsession()
 		
-	def __fillSnapshot(self, prev, increment):
+	def __fillSnapshot(self, prev):
 		"""
 		Fill the snapshot with informations.
 		-> Get the list of already stored files in successive snapshots.
@@ -181,7 +181,6 @@ class BackupManager :
 						-> if not changed : pass , don't backup it
 						-> if changed : add to the tobackuplist				
 		@param prev :
-		@param increment: 
 		"""
 		global fullsize
 		
@@ -196,8 +195,8 @@ class BackupManager :
 			@note: param to be defined (rexclude, excludelist) , excludelist is a dictionary
 			"""
 			# excude target
-			if _file2 == self.config.get("general","target") :
-				getLogger().info(_("target directory is excluded"))
+			if _file2.rstrip(os.sep) == self.config.get("general","target").rstrip(os.sep) :
+				getLogger().info(_("Target '%s' directory is excluded") % self.config.get("general","target") )
 				return True
 			
 			# return true if the file doesn't exist
@@ -433,32 +432,35 @@ class BackupManager :
 	def __isIncOrFull(self, listing ):
 		"""
 		@param listing: a list of snapshot
-		@return: a tuple (name, base, prev, increment)
+		@return: a tuple (name, base, prev)
 		""" 
 		r = re.compile(r"^(\d{4})-(\d{2})-(\d{2})_(\d{2})[\:\.](\d{2})[\:\.](\d{2})\.\d+\..*?\.(.+)$")
 		prev = {}
 		base = None
 		if len(listing) == 0 :
-			increment = 0
+			#no snapshots
+			increment = False
 		else:
-			m = r.search( listing[0].getName() )
-			if m.group( 7 ) == "ful":  # Last backup was full backup
+			# we got some snaphots 
+			# we search for the last full 
+						
+			if listing[0].isfull() :  # Last backup was full backup
 				getLogger().debug("Last (%s) was a full backup" % listing[0].getName())
-				if (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days < self.config.get("general","maxincrement") :
-			    	    # Less then maxincrement days passed since that -> make an increment
-					increment = time.mktime((int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),int(m.group(6)),0,0,-1))
+				d = listing[0].getDate()
+				if ( datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days < self.config.get("general","maxincrement") :
+			    	# Less then maxincrement days passed since that -> make an increment
+					increment = True
 					base = listing[0]
 					try:
 						prev = base.getFilesList()
 					except Exception, e:
 						getLogger().warning(str(e))
-						increment = 0  # Last backup is somehow damaged	
+						increment = False  # Last backup is somehow damaged	
 				else:
 					getLogger().info("Last full backup is old -> make a full backup")
-					increment = 0      # Too old -> make full backup
+					increment = False      # Too old -> make full backup
 			else: # Last backup was an increment - lets search for the last full one
 				getLogger().debug(" Last backup (%s) was an increment - lets search for the last full one" % listing[0].getName())
-				r2 = re.compile(r"ful$")
 				for i in listing :
 					try: 
 						for a,b in i.getFilesList().items() :
@@ -466,35 +468,35 @@ class BackupManager :
 								prev[a]=b
 					except Exception, e :  # One of the incremental backups is bad -> make a new full one
 						getLogger().warning(_("One of the incremental backups (%(bad_one)s) is bad -> make a new full one : %(error_cause)s ") % {'bad_one' : i.getName(), 'error_cause' : str(e)})
-						increment = 0
+						increment = False
 						break
 					
-					if r2.search( i.getName() ):
-						m = r.search( i.getName() )
-						if (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days < self.config.get("general","maxincrement") :
+					if i.isfull():
+						d = i.getDate()
+						age = (datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days
+						if  age < self.config.get("general","maxincrement") :
 							# Last full backup is fresh -> make an increment
-							getLogger().info("Last full backup is fresh (%d days old )-> make an increment" % (datetime.date.today() - datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3)) ) ).days)
-							m = r.search( listing[0].getName() )
-							increment = time.mktime((int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),int(m.group(6)),0,0,-1))
-							base = listing[0]
+							getLogger().info("Last full backup is fresh (%d days old )-> make an increment" % age )
+							increment = True
+							base = i
 						else: # Last full backup is old -> make a full backup
 							getLogger().info("Last full backup is old -> make a full backup")
-							increment = 0
+							increment = False
 						break
 				else:
 					getLogger().info(" No full backup found -> lets make a full backup to be safe")
-					increment = 0            # No full backup found 8) -> lets make a full backup to be safe
+					increment = False            # No full backup found 8) -> lets make a full backup to be safe
 		
 		# Determine and create backup target directory
 		hostname = socket.gethostname()
 		
 		tdir = self.config.get("general","target") + "/" + datetime.datetime.now().isoformat("_").replace( ":", "." ) + "." + hostname + "."
-		if increment != 0:
+		if increment:
 			tdir = tdir + "inc"
 		else:
 			tdir = tdir + "ful"
 			
-		return (tdir, base, prev, increment)
+		return (tdir, base, prev)
 	
 	
 	def getConfig(self) :

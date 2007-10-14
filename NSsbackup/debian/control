@@ -9,8 +9,8 @@ Package: nssbackup
 Architecture: any
 Depends: python, python-gnome2, python-glade2, fuse-utils, python-notify
 Description: Not So Simple Backup Suite 
- Not So Simple Backup Suite is a fork of Sbackup intended for desktop
- use. It has multiuser support with nice handling of logs . Italso has
- a plugin arhitecture that will allow you to extend its functionalities.
+ NSsbackup is a fork of Sbackup intended for desktop
+ use. It has multiuser support with nice handling of logs . It also has
+ a plugin architecture that will allow you to extend its functionalities.
  .
  
