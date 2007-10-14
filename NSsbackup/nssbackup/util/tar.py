@@ -60,7 +60,45 @@ def extract(sourcetgz, file, dest , bckupsuffix = None):
 		raise SBException("Error when extracting : " + errStr )
 	getLogger().debug("output was : " + outStr)
 	
+def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
+	"""
+	Extract the files listed in the 'fileslist' file to dest. This method 
+	has been created to optimize the time spent by giving to tar a complete 
+	list of file to extract. Use this if ever you have to extract more than 1 dir .
+	@param sourcetgz:
+	@param fileslist: a path to the file containing the list
+	@param dest: destination
+	"""
+	options = ["-xp", "--ignore-failed-read", '--backup=existing']
+	
+	archType = getArchiveType(sourcetgz)
+	if archType =="tar" :
+		pass
+	elif archType == "gzip" :
+		options.insert(1,"--gzip")
+	elif archType == "bzip2" :
+		options.insert(1,"--bzip2")
+	else :
+		raise SBException (_("Invalid Archive type"))
 		
+	if os.getuid() == 0 :
+		options.append("--same-owner")
+	if dest :
+		options.append( "--directory="+dest )
+	else : 
+		options.append( "--directory="+os.sep )
+	if bckupsuffix :
+		options.append("--suffix="+bckupsuffix)
+	
+	options.extend(['--file='+sourcetgz,'--null','--files-from='+os.path.normpath(fileslist)])
+	
+	outStr, errStr, retval = Util.launch("tar", options)
+	if retval != 0 :
+		getLogger().debug("output was : " + outStr)
+		raise SBException("Error when extracting : " + errStr )
+	getLogger().debug("output was : " + outStr)
+
+
 class Dumpdir():
 	"""
 	"""

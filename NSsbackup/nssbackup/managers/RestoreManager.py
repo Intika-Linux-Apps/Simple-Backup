@@ -129,4 +129,4 @@ class RestoreManager :
 			# extract now from archive
 			now = datetime.datetime.now().isoformat("_").replace( ":", "." )
 			suffix = ".before_restore_"+now
-			Util.extract2(Snapshot(snppath).getArchive(), tmpname, targetdir, bckupsuffix=suffix)
+			Tar.extract2(Snapshot(snppath).getArchive(), tmpname, targetdir, bckupsuffix=suffix)
