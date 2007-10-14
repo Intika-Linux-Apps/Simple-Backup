@@ -21,6 +21,7 @@ from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.SnapshotManager import SnapshotManager
 import nssbackup.util as Util
+import nssbackup.util.tar as Tar
 import tempfile, datetime,os, shutil
 
 class RestoreManager :
@@ -70,7 +71,7 @@ class RestoreManager :
 				# the target is a dir 	
 				#create a temp file , extract inside then move the content
 				tmpdir = tempfile.mkdtemp(dir=target,prefix='nssbackup-restore_')
-				Util.extract( snapshot.getArchive(), _file, tmpdir, bckupsuffix=suffix )
+				Tar.extract( snapshot.getArchive(), _file, tmpdir, bckupsuffix=suffix )
 				if os.path.exists(target+os.sep+ os.path.basename(_file)) :
 					shutil.move(target+os.sep+ os.path.basename(_file), target+os.sep+ os.path.basename(_file)+suffix)
 				shutil.move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
@@ -78,21 +79,21 @@ class RestoreManager :
 			else:
 				#the target is a file
 				parent = os.path.dirname(target)
-				Util.extract( snapshot.getArchive(), _file, parent, bckupsuffix=suffix )
+				Tar.extract( snapshot.getArchive(), _file, parent, bckupsuffix=suffix )
 		else:
 			# target is set to None or target not exists
 			if target and not os.path.exists(target) :
 				#target != None but target doesn't exists
 				os.makedirs(target)
-				Util.extract( snapshot.getArchive(), _file, target )
+				Tar.extract( snapshot.getArchive(), _file, target )
 			else :
 				# Target = None , extract at the place it belongs
 				if os.path.exists(_file) :
 					# file exist:
-					Util.extract(snapshot.getArchive(), _file, target, bckupsuffix=suffix)
+					Tar.extract(snapshot.getArchive(), _file, target, bckupsuffix=suffix)
 				else :
 					# file doesn't exist nothing to move, just extract
-					Util.extract(snapshot.getArchive(), _file, target )
+					Tar.extract(snapshot.getArchive(), _file, target )
 		
 		
 	def revert(self, snapshot, dir):
