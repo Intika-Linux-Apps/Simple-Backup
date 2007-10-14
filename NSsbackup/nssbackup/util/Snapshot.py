@@ -32,6 +32,7 @@ class Snapshot :
 	# Attributes
 	__name = False
 	__base = False
+	__format = "gzip" # default value
 	__excludes = False
 	__filesList = None
 	__packages = False
@@ -93,7 +94,7 @@ class Snapshot :
 	def getFilesList(self) :
 		"Returns a SBdict with key='the file name' and value='the file properties'"
 		global __filesList
-		if self.getVersion() and self.getVersion() != "1.4" : raise SBException(_("Please upgrade the snapshot (version '%s' found)") % self.getVersion())
+		if self.getVersion() and self.getVersion() < "1.4" : raise SBException(_("Please upgrade the snapshot (version '%s' found)") % self.getVersion())
 		if self.__filesList != None : return self.__filesList
 		else :
 			flist = self.__snapshotpath +os.sep +"flist"
@@ -116,6 +117,15 @@ class Snapshot :
 			raise SBException(_("Snapshot is inconsistant : __snapshotpath is not set "))
 		else :
 			return self.__snapshotpath
+	
+	def getFormat(self):
+		"""
+		Returns the compression format of the snapshot (from the "format" file or default to "gzip")
+		"""
+		global __format
+		if os.path.exists(os.sep.join([self.getPath(),"format"])):
+			self.__format = FAM.readfile(os.sep.join([self.getPath(),"format"])).strip()
+		return self.__format
 	
 	def getBase(self) :
 		"""
@@ -143,6 +153,36 @@ class Snapshot :
 			self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])) )
 			return self.__baseSnapshot
 	
+	def getArchive(self):
+		"""
+		Get the snapshot archive which depends on the Format
+		@raise NonValidSnapshotException: if the archive equivalent to the described format doesn't exist
+		@return: the path to the archive
+		"""
+		problem = False
+		if self.getFormat() == "none" :
+			if os.path.exists(self.getPath()+os.sep+"files.tar") :
+				return self.getPath()+os.sep+"files.tar"
+			else :
+				problem = True
+		elif self.getFormat() == "gzip" :
+			if os.path.exists(self.getPath()+os.sep+"files.tar.gz") :
+				return self.getPath()+os.sep+"files.tar.gz"
+			elif self.getVersion() == "1.4":
+				getLogger().warning("The tgz name is deprecated, please upgrade Snapshot to Version 1.5")
+				if os.path.exists(self.getPath()+os.sep+"files.tgz") :
+					return self.getPath()+os.sep+"files.tgz"
+				else :
+					problem = True
+			else :
+				problem = True
+		elif self.getFormat() == "bzip2" :
+			if os.path.exists(self.getPath()+os.sep+"files.tar.bz2") :
+				return self.getPath()+os.sep+"files.tar.bz2"
+			else :
+				problem = True
+		if problem : 
+			raise NotValidSnapshotException(_("The snapshot compression format is supposed to be '%s' but the corresponding well named file wasn't found") % self.getFormat())
 	
 	def getFileProps(self, item) :
 		"Returns for a certain item in the backup its properties"
@@ -190,6 +230,7 @@ class Snapshot :
 	def commit (self) :
 		"Commit the snapshot infos ( write to the disk )"
 		self.__commitbasefile()
+		self.__commitFormatfile()
 		self.__commitexcludefile()
 		self.__commitpackagefile()
 		self.__commitflistfiles()
@@ -197,6 +238,17 @@ class Snapshot :
 		self.__commitverfile()
 	
 	# Setters
+	
+	def setFormat(self,cformat=None):
+		"""
+		Sets the backup compression format
+		cformat : the format to set
+		"""
+		global __format
+		supported = ["none","bzip2", "gzip"]
+		if cformat and cformat in supported :
+			getLogger().debug("Set the compression format to %s" % cformat)
+			self.__format = cformat
 	
 	def setFilesList(self, fileslist=None) :
 		"""
@@ -242,7 +294,7 @@ class Snapshot :
 			self.setFilesList()
 		self.__filesList[item] = props
 	
-	def setVersion(self, ver="1.4") :
+	def setVersion(self, ver="1.5") :
 		"Set the version of the snapshot"
 		self.__version = ver
 	
@@ -279,12 +331,18 @@ class Snapshot :
 		# validate the name
 		if not self.__isValidName(self.__name) :
 			raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
-		if not FAM.exists( self.getPath()+os.sep +"flist" ) or not FAM.exists( self.getPath()+os.sep +"fprops" ) or not FAM.exists( self.getPath()+os.sep +"files.tgz" ) or not FAM.exists( self.getPath()+os.sep +"ver" ):
+		if not FAM.exists( self.getPath()+os.sep +"flist" ) or not FAM.exists( self.getPath()+os.sep +"fprops" ) or not self.getArchive() or not FAM.exists( self.getPath()+os.sep +"ver" ):
 			raise NotValidSnapshotException (_("One of the mandatory files doesn't exist in [%s]") % self.getName())
 		
 	def __isValidName(self, name ) :
 		" Check if the snapshot name is valid "
 		return str(re.match(self.__validname_re , name )) != "None"
+
+	def __commitFormatfile(self):
+		"""
+		writes the format file
+		"""
+		FAM.writetofile(self.getPath()+os.sep+"format", self.getFormat())
 
 	def __commitverfile(self) :
 		" Commit ver file on the disk "
@@ -325,7 +383,6 @@ class Snapshot :
 			FAM.writetofile(self.getPath()+os.sep +"flist", fl)
 			FAM.writetofile(self.getPath()+os.sep +"fprops", fp)
 		
-	
 	def __commitpackagefile(self):
 		" Commit packages file on the disk"
 		if not self.getPackages() :
@@ -339,10 +396,25 @@ class Snapshot :
 		getLogger().info(_("Launching TAR to backup "))
 		tdir = self.getPath().replace(" ", "\ ")
 		options = list()
-		options.extend(["-czS","--directory="+ os.sep , "--no-recursion", "--ignore-failed-read","--null","--files-from="+tdir+os.sep +"flist"])
+		options.extend(["-cS","--directory="+ os.sep , "--no-recursion", "--ignore-failed-read","--null","--files-from="+tdir+os.sep +"flist"])
+		
+		archivename = "files.tar"
+		if self.getFormat() == "gzip":
+			options.insert(1,"--gzip")
+			archivename+=".gz"
+		elif self.getFormat() == "bzip2":
+			options.insert(1,"--bzip2")
+			archivename+=".bz2"
+		elif self.getFormat() == "none":
+			pass
+		else :
+			getLogger().debug("Defaulting to gzip ! ")
+			options.insert(1,"--gzip")
+			archivename+=".gz"
+		
 		getLogger().debug(options)
 		if FAM.islocal(self.getPath()) :
-			options.extend(["--force-local", "--file="+tdir+os.sep +"files.tgz"])
+			options.extend(["--force-local", "--file="+tdir+os.sep +archivename])
 			getLogger().debug("Tarline : " + "tar" + str(options))
 			outStr, errStr, retVal = Util.launch("tar", options)
 			getLogger().debug(outStr)
@@ -350,7 +422,7 @@ class Snapshot :
 				raise SBException(_("Couldn't make a proper backup : ") + errStr )
 		else :
 			getLogger().debug("Tarline : " + "tar" + options )
-			turi = gnomevfs.URI( self.getPath()+os.sep +"files.tgz" )
+			turi = gnomevfs.URI( self.getPath()+os.sep +archivename )
 			tardst = gnomevfs.create( turi, 2 )
 			tarsrc = os.popen( "tar" + options )
 			shutil.copyfileobj( tarsrc, tardst, 100*1024 )

@@ -146,6 +146,12 @@ class BackupManager :
 		if self.config.has_option( "exclude", "regex" ):
 			gexclude = str(self.config.get( "exclude", "regex" )).split(",")
 		self.__actualSnapshot.setExcludes(gexclude)
+		
+		# set format
+		getLogger().info(_("Setting compression format "))
+		if self.config.has_option( "general", "format" ):
+			self.__actualSnapshot.setFormat(self.config.get("general","format"))
+		
 
 		# Reduce the priority, so not to interfere with other processes
 		os.nice(20)

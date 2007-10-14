@@ -70,7 +70,7 @@ class RestoreManager :
 				# the target is a dir 	
 				#create a temp file , extract inside then move the content
 				tmpdir = tempfile.mkdtemp(dir=target,prefix='nssbackup-restore_')
-				Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, tmpdir, bckupsuffix=suffix )
+				Util.extract( snapshot.getArchive(), _file, tmpdir, bckupsuffix=suffix )
 				if os.path.exists(target+os.sep+ os.path.basename(_file)) :
 					shutil.move(target+os.sep+ os.path.basename(_file), target+os.sep+ os.path.basename(_file)+suffix)
 				shutil.move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
@@ -78,21 +78,21 @@ class RestoreManager :
 			else:
 				#the target is a file
 				parent = os.path.dirname(target)
-				Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, parent, bckupsuffix=suffix )
+				Util.extract( snapshot.getArchive(), _file, parent, bckupsuffix=suffix )
 		else:
 			# target is set to None or target not exists
 			if target and not os.path.exists(target) :
 				#target != None but target doesn't exists
 				os.makedirs(target)
-				Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, target )
+				Util.extract( snapshot.getArchive(), _file, target )
 			else :
 				# Target = None , extract at the place it belongs
 				if os.path.exists(_file) :
 					# file exist:
-					Util.extract(os.sep.join([snapshot.getPath(),"files.tgz"]), _file, target, bckupsuffix=suffix)
+					Util.extract(snapshot.getArchive(), _file, target, bckupsuffix=suffix)
 				else :
 					# file doesn't exist nothing to move, just extract
-					Util.extract( os.sep.join([snapshot.getPath(),"files.tgz"]), _file, target )
+					Util.extract(snapshot.getArchive(), _file, target )
 		
 		
 	def revert(self, snapshot, dir):
@@ -128,4 +128,4 @@ class RestoreManager :
 			# extract now from archive
 			now = datetime.datetime.now().isoformat("_").replace( ":", "." )
 			suffix = ".before_restore_"+now
-			Util.extract2(os.sep.join([snppath,"files.tgz"]), tmpname, targetdir, bckupsuffix=suffix)
+			Util.extract2(Snapshot(snppath).getArchive(), tmpname, targetdir, bckupsuffix=suffix)

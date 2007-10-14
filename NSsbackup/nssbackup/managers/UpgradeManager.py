@@ -40,13 +40,13 @@ class UpgradeManager() :
 	"""
 	The UpgradeManager class
 	"""
-	__possibleVersion = ["1.0","1.1","1.2","1.3","1.4"]
+	__possibleVersion = ["1.0","1.1","1.2","1.3","1.4","1.5"]
 
-	def upgradeSnapshot(self, snapshot,version="1.4"):
+	def upgradeSnapshot(self, snapshot,version="1.5"):
 		"""
 		Upgrade a snapshot to a version. Default is the higher version available
 		@param snapshot: the snapshot to upgrade
-		@param version : default is 1.4
+		@param version : default is 1.5
 		"""
 		
 		if version not in self.__possibleVersion :
@@ -69,7 +69,9 @@ class UpgradeManager() :
 						self.__upgrade_v13(snapshot)
 					elif snapshot.getVersion() < "1.4" :
 						self.__upgrade_v14(snapshot)
-		if FAM.exists( tdir+os.sep +"flist" ) and FAM.exists( tdir+os.sep +"fprops" ) and FAM.exists( tdir+os.sep +"files.tgz" ) and FAM.exists( tdir+os.sep +"ver" ):
+					elif snapshot.getVersion() < "1.5" :
+						self.__upgrade_v15(snapshot)
+		if FAM.exists( tdir+os.sep +"flist" ) and FAM.exists( tdir+os.sep +"fprops" ) and FAM.exists( tdir+os.sep +"files.tar.gz" ) and FAM.exists( tdir+os.sep +"ver" ):
 			return	
 	
 	##
@@ -77,7 +79,7 @@ class UpgradeManager() :
 	#so that it would be possible to use it with a previous version of nssbackup
 	# @param snapshot : the snapshot to downgrade : 
 	# @param version : The version to which one the snapshot will be downgraded
-	def downgradeSnapshot(self,snapshot,version="1.4"):
+	def downgradeSnapshot(self,snapshot,version="1.5"):
 		getLogger().info("Downgrading snapshot '%s' to version '%s'" % (str(snapshot),str(version)) )
 		if version not in self.__possibleVersion :
 			raise SBException("Version should be in '%s' , got '%s' " % (str(self.__possibleVersion),str(version) ) )
@@ -103,7 +105,7 @@ class UpgradeManager() :
 		snapman = SnapshotManager(target)
 		snapshots= snapman.getSnapshots()
 		for s in snapshots :
-			if s.getVersion() < "1.4" :
+			if s.getVersion() < "1.5" :
 				self.upgradeSnapshot(s)
 	
 	
@@ -151,7 +153,21 @@ class UpgradeManager() :
 		if not FAM.exists( snapshot.getPath()+os.sep +"flist" ) or not FAM.exists( snapshot.getPath()+os.sep +"fprops" ) or not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" ) or not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
 			raise SBException ("Non complete Snapshot ! One of the essential files doesn't exist" )
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
-			
+		
+	def __upgrade_v15( self, snapshot ):
+		getLogger().info("Upgrading to v1.5: %s" % str(snapshot) )
+		FAM.delete( snapshot.getPath() + os.sep +"ver" )
+		
+		if not FAM.exists( snapshot.getPath()+os.sep +"flist" ) or not FAM.exists( snapshot.getPath()+os.sep +"fprops" ) or not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" ) or not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
+			raise SBException ("Non complete Snapshot ! One of the essential files doesn't exist" )
+		
+		getLogger().debug("renaming file.tgz to file.tar.gz")
+		os.rename(snapshot.getPath()+os.sep +"files.tgz", snapshot.getPath()+os.sep +"files.tar.gz") 
+		
+		getLogger().debug("creating 'format' file .")
+		FAM.writetofile(snapshot.getPath()+os.sep +"format", snapshot.getFormat())
+		
+		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.5\n" )
 			
 	def __downgrade_v12 (self,snapshot ):
 		getLogger().info("Downgrading to v1.2: %s" % str(snapshot) )
@@ -184,8 +200,18 @@ class UpgradeManager() :
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.3\n" )
 
 	def __downgrade_v14( self, snapshot ):
+		if snapshot.getFormat() != "gzip" :
+			raise SBException (_("Cannot downgrade other format than 'gzip' to 1.4"))
+		
 		getLogger().info("Downgrading to v1.4: %s" % str(snapshot) )
 		FAM.delete( snapshot.getPath() + os.sep +"ver" )
+		
+		getLogger().debug("renaming file.tar.gz to file.tgz")
+		os.rename(snapshot.getPath()+os.sep +"files.tar.gz", snapshot.getPath()+os.sep +"files.tgz") 
+		
+		getLogger().debug("removing 'format' file .")
+		FAM.writetofile(snapshot.getPath()+os.sep +"format", snapshot.getFormat())
+		
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
 
 if __name__ == "__main__" :

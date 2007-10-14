@@ -104,6 +104,7 @@ class SBconfigGTK(GladeWindow):
 			'main_radio2',
 			'hbox2',
 			'main_radio3',
+			'cformat',
 			'hbox3',
 			'vbox3',
 			'scrolledwindow1',
@@ -223,6 +224,7 @@ class SBconfigGTK(GladeWindow):
 			'on_save_clicked',
 			'on_backup_clicked',
 			'on_main_radio_toggled',
+			'on_cformat_changed',
 			'on_inc_addfile_clicked',
 			'on_inc_adddir_clicked',
 			'on_inc_del_clicked',
@@ -351,6 +353,7 @@ class SBconfigGTK(GladeWindow):
 			
 		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
 		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
+		self.cformat = {'none':0, 'gzip':1, 'bzip2':2}
 
 		self.prefillWindow()
 
@@ -400,6 +403,15 @@ class SBconfigGTK(GladeWindow):
 			else :
 				self.widgets['main_radio3'].set_active(True)
 				#self.on_main_radio_toggled()
+		if self.configman.has_option("general", "format") :
+			cformatOpt = self.configman.get("general", "format") 
+			if cformatOpt in ["none","gzip","bzip2"]:
+				getLogger().debug("Setting compression format to %s " % self.cformat[cformatOpt])
+				self.widgets["cformat"].set_active(self.cformat[cformatOpt])
+			else:
+				getLogger().debug("Setting compression format to %s " % self.cformat[1])
+				self.widgets["cformat"].set_active(self.cformat[1])
+			
 				
 		#Include and exclude tabs
 		self.include.clear()
@@ -417,7 +429,7 @@ class SBconfigGTK(GladeWindow):
 				if str(v) == "1":
 					self.remoteinc.append( [i] )
 				elif v =="0":
-					print ("TODO : add a remote ex widget")
+					print ("TODO: add a remote ex widget")
 					
 		# regexp
 		self.ex_ftype.clear()
@@ -772,6 +784,18 @@ class SBconfigGTK(GladeWindow):
 			self.widgets["ccronline"].set_sensitive( False )
 
 	#----------------------------------------------------------------------
+	
+	def on_cformat_changed(self, *args):
+		"""
+		handle that sets the compression format
+		"""
+		selected = self.widgets["cformat"].get_active_text()
+		if selected == "(none)" :
+			self.configman.remove_option("general", "format")
+		else :
+			self.configman.set("general", "format", selected )
+		self.isConfigChanged()
+	
 	
 	def on_inc_addfile_clicked(self, *args):
 		dialog = gtk.FileChooserDialog(_("Include file ..."), None, gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
