@@ -410,8 +410,8 @@ class SBconfigGTK(GladeWindow):
 				getLogger().debug("Setting compression format to %s " % self.cformat[cformatOpt])
 				self.widgets["cformat"].set_active(self.cformat[cformatOpt])
 			else:
-				getLogger().debug("Setting compression format to %s " % self.cformat[1])
-				self.widgets["cformat"].set_active(self.cformat[1])
+				getLogger().debug("Setting compression format to %s " % self.cformat['gzip'])
+				self.widgets["cformat"].set_active(self.cformat['gzip'])
 			
 				
 		#Include and exclude tabs
@@ -692,7 +692,7 @@ class SBconfigGTK(GladeWindow):
 	def on_about_activate(self, *args):
 		about = gtk.AboutDialog()
 		about.set_name("Not So Simple Backup Suite")
-		about.set_version("0.1-1")
+		about.set_version("0.2~devel")
 		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
 		about.set_transient_for(self.widgets["backup_properties_dialog"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
@@ -792,10 +792,10 @@ class SBconfigGTK(GladeWindow):
 		handle that sets the compression format
 		"""
 		selected = self.widgets["cformat"].get_active_text()
-		if selected == "(none)" :
-			self.configman.remove_option("general", "format")
-		else :
+		if selected in self.cformat.keys() :
 			self.configman.set("general", "format", selected )
+		else :
+			self.configman.remove_option("general", "format")
 		self.isConfigChanged()
 	
 	
