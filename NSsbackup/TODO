@@ -1,3 +1,5 @@
+Blueprints on : https://blueprints.edge.launchpad.net/nssbackup/
+
 For 0.10:
 + Check how sbackupd reacts if it can not get into a folder (FUSE used by a user)
 + Check filesizes (2 Gb and 4 Gb limits)
