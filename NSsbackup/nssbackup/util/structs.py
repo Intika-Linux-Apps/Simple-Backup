@@ -172,6 +172,9 @@ class SBdict (dict) :
 				else :
 					son = SBdict()
 			else:
+				# get the properties of the base dir
+				#s = os.lstat(splited[0])
+				#prop = str(s.st_mode)+str(s.st_uid)+str(s.st_gid)+str(s.st_size)+str(s.st_mtime)
 				prop = None
 				son = SBdict()
 			son.__setitem__(splited[1], value)

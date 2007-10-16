@@ -31,6 +31,8 @@ import datetime
 import os
 import os.path
 import sys
+import traceback
+
 try:
     import gnomevfs
 except ImportError:
@@ -71,7 +73,8 @@ class UpgradeManager() :
 						self.__upgrade_v14(snapshot)
 					elif snapshot.getVersion() < "1.5" :
 						self.__upgrade_v15(snapshot)
-		if FAM.exists( tdir+os.sep +"flist" ) and FAM.exists( tdir+os.sep +"fprops" ) and FAM.exists( tdir+os.sep +"files.tar.gz" ) and FAM.exists( tdir+os.sep +"ver" ):
+		tdir = snapshot.getPath()
+		if FAM.exists( tdir +os.sep +"flist" ) and FAM.exists( tdir+os.sep +"fprops" ) and FAM.exists( tdir+os.sep +"files.tar.gz" ) and FAM.exists( tdir+os.sep +"ver" ):
 			return	
 	
 	##
@@ -122,6 +125,7 @@ class UpgradeManager() :
 		n.close()
 		i.close()
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.2\n" )
+		snapshot.setVersion("1.2")
 		
 			
 	def __upgrade_v13( self, snapshot ):
@@ -142,6 +146,7 @@ class UpgradeManager() :
 				FAM.rename(snapshot.getPath()+os.sep +"fprops", "fprops.old")
 				FAM.rename(snapshot.getPath()+os.sep +"fprops.v13", "fprops")
 				FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.3\n" )
+				snapshot.setVersion("1.3")
 		else:
 			FAM.delete(snapshot.getPath()+os.sep +"ver")
 			raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath() )
@@ -153,6 +158,7 @@ class UpgradeManager() :
 		if not FAM.exists( snapshot.getPath()+os.sep +"flist" ) or not FAM.exists( snapshot.getPath()+os.sep +"fprops" ) or not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" ) or not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
 			raise SBException ("Non complete Snapshot ! One of the essential files doesn't exist" )
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
+		snapshot.setVersion("1.4")
 		
 	def __upgrade_v15( self, snapshot ):
 		getLogger().info("Upgrading to v1.5: %s" % str(snapshot) )
@@ -167,8 +173,12 @@ class UpgradeManager() :
 		getLogger().debug("creating 'format' file .")
 		FAM.writetofile(snapshot.getPath()+os.sep +"format", snapshot.getFormat())
 		
+		getLogger().debug("creating 'ver' file .")
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.5\n" )
-			
+		snapshot.setVersion("1.5")
+		if os.path.exists(snapshot.getPath()+os.sep +"ver") :
+			getLogger().debug("'ver' file created.")
+
 	def __downgrade_v12 (self,snapshot ):
 		getLogger().info("Downgrading to v1.2: %s" % str(snapshot) )
 		flist = FAM.readfile( snapshot.getPath()+os.sep +"flist" ).split( "\000" )
@@ -193,11 +203,13 @@ class UpgradeManager() :
 			raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath() )
 		FAM.delete( snapshot.getPath() + os.sep +"ver" )
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.2\n" )
+		snapshot.setVersion("1.2")
 	
 	def __downgrade_v13( self, snapshot ):
 		getLogger().info("Downgrading to v1.3: %s" % str(snapshot) )
 		FAM.delete( snapshot.getPath() + os.sep +"ver" )
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.3\n" )
+		snapshot.setVersion("1.3")
 
 	def __downgrade_v14( self, snapshot ):
 		if snapshot.getFormat() != "gzip" :
@@ -213,6 +225,7 @@ class UpgradeManager() :
 		FAM.writetofile(snapshot.getPath()+os.sep +"format", snapshot.getFormat())
 		
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
+		snapshot.setVersion("1.4")
 
 if __name__ == "__main__" :
 	# i18n init
