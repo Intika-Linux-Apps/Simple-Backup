@@ -1,0 +1,1 @@
+noinst_PYTHON = TestConfigManager.py testLog.py TestRevertManager.py TestSnapshotManager.py TestFuseFAM.py TestPluginManager.py TestSBdict.py TestSnapshot.py

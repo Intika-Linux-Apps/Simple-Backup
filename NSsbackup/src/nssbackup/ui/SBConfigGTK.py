@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-    
+
 #----------------------------------------------------------------------
 # SBConfigGTK.py
 # Ouattara Aziz
@@ -1503,12 +1502,3 @@ def main(argv):
 	w.show()
 	gtk.main()
 	
-
-#----------------------------------------------------------------------
-
-if __name__ == '__main__':
-	# i18n init
-	gettext.textdomain("nssbackup")
-	application = 'nssbackup'
-	gettext.install(application)
-	main(sys.argv)

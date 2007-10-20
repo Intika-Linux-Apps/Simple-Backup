@@ -311,10 +311,7 @@ class Snapshot :
 		Commit exclude file on the disk.
 		@raise SBException: if excludes hasn't been set 
 		"""
-		if not self.getExcludes() :
-			raise SBException(_(" 'excludes' must be set !"))
-		else :
-			FAM.pickledump( self.__excludes, self.getPath()+os.sep +"excludes" )
+		FAM.pickledump( self.__excludes, self.getPath()+os.sep +"excludes" )
 		
 	def __commitflistfiles(self):
 		" Commit flist and fprops on the disk "

@@ -145,6 +145,8 @@ class BackupManager :
 		getLogger().info(_("Setting Excludes File "))
 		if self.config.has_option( "exclude", "regex" ):
 			gexclude = str(self.config.get( "exclude", "regex" )).split(",")
+		else :
+			gexclude = ""
 		self.__actualSnapshot.setExcludes(gexclude)
 
 		# Reduce the priority, so not to interfere with other processes
@@ -309,7 +311,10 @@ class BackupManager :
 		
 		# regexp to be used for excluding files from flist
 		getLogger().debug("getting exclude list for actual snapshot")
-		rexclude = [ re.compile(p) for p in self.__actualSnapshot.getExcludes() if len(p)>0]
+		if self.__actualSnapshot.getExcludes() :
+			rexclude = [ re.compile(p) for p in self.__actualSnapshot.getExcludes() if len(p)>0]
+		else :
+			rexclude = []
 		
 		# Use this for getting the size limit 
 		fullsize = 0L

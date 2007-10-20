@@ -187,26 +187,3 @@ class UpgradeManager() :
 		getLogger().info("Downgrading to v1.4: %s" % str(snapshot) )
 		FAM.delete( snapshot.getPath() + os.sep +"ver" )
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
-
-if __name__ == "__main__" :
-	# i18n init
-	gettext.textdomain("nssbackup")
-	
-	if not len(sys.argv) in [2]:
-		print _("""
-Simple Backup suit command line backup format upgrade
-Usage: upgrade-backup backup-target-url
-Note: backup-target-url must not include the snapshot subdirectory name, for example:
-
-   /var/backup/
-
-Use simple-restore-gnome for more ease of use.
-""")
-		sys.exit(1)
-	
-	try : 
-		u = UpgradeManager()
-		u.upgradeAll(sys.argv[1])
-	except Exception, e :
-			getLogger().error(str(e))
-			getLogger().error(traceback.format_exc())

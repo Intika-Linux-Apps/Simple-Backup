@@ -1,0 +1,4 @@
+@prefix@/share/pixmaps/
+@prefix@/share/application/
+@prefix@/share/@PACKAGE@/
+@prefix@/share/doc/@PACKAGE@/
