@@ -2,3 +2,11 @@
 @prefix@/share/application/
 @prefix@/share/@PACKAGE@/
 @prefix@/share/doc/@PACKAGE@/
+/usr/local/share/pixmaps/
+/usr/local/share/application/
+/usr/local/share/@PACKAGE@/
+/usr/local/share/doc/@PACKAGE@/
+/usr/share/pixmaps/
+/usr/share/application/
+/usr/share/@PACKAGE@/
+/usr/share/doc/@PACKAGE@/

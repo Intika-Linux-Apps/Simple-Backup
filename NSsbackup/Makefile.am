@@ -11,5 +11,6 @@ DISTCLEANFILES =		\
 	intltool-update		\
 	po/.intltool-merge-cache
 
-
 ACLOCAL_AMFLAGS = -I m4
+
+doc_DATA = NEWS ChangeLog README AUTHORS TODO
