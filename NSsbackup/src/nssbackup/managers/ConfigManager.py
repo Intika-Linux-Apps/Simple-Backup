@@ -189,7 +189,6 @@ class ConfigManager (ConfigParser.ConfigParser):
 			self.set("dirconfig", a, b) 
 		
 		# Section exclude
-		self.set("exclude", "regex", self.regex )
 		
 		# Section places
 		self.set("places", "prefix", self.prefix)
@@ -222,7 +221,6 @@ class ConfigManager (ConfigParser.ConfigParser):
 		self.set("dirconfig",os.getenv("HOME")+os.sep,"1")
 		
 		# Section exclude
-		self.set("exclude", "regex", self.regex )
 		
 		# Section places
 		self.set("places", "prefix", self.prefix)

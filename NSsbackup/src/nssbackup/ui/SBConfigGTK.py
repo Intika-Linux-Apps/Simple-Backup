@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-    
+
 #----------------------------------------------------------------------
 # SBConfigGTK.py
 # Ouattara Aziz
@@ -692,6 +691,7 @@ class SBconfigGTK(GladeWindow):
 	def on_about_activate(self, *args):
 		about = gtk.AboutDialog()
 		about.set_name("Not So Simple Backup Suite")
+		# TODO: Always keep this updated
 		about.set_version("0.2~devel")
 		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
 		about.set_transient_for(self.widgets["backup_properties_dialog"])
@@ -1527,12 +1527,3 @@ def main(argv):
 	w.show()
 	gtk.main()
 	
-
-#----------------------------------------------------------------------
-
-if __name__ == '__main__':
-	# i18n init
-	gettext.textdomain("nssbackup")
-	application = 'nssbackup'
-	gettext.install(application)
-	main(sys.argv)
