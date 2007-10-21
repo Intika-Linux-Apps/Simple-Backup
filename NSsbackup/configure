@@ -682,16 +682,12 @@ pythondir
 pkgpythondir
 pyexecdir
 pkgpyexecdir
-PKG_CONFIG
-PYGTK_CFLAGS
-PYGTK_LIBS
-PKGCONFIG
-PYTHONPATH
 CRONTAB_CONFIG
 PYTHON_CONFIG
 SU_CONFIG
 tar_CONFIG
 GETTEXT_PACKAGE
+PKG_CONFIG
 HELP_DIR
 OMF_DIR
 DOC_USER_FORMATS
@@ -773,8 +769,6 @@ ac_subst_files=''
 host_alias
 target_alias
 PKG_CONFIG
-PYGTK_CFLAGS
-PYGTK_LIBS
 CC
 CFLAGS
 LDFLAGS
@@ -1374,9 +1368,6 @@ Optional Packages:
 
 Some influential environment variables:
   PKG_CONFIG  path to pkg-config utility
-  PYGTK_CFLAGS
-              C compiler flags for PYGTK, overriding pkg-config
-  PYGTK_LIBS  linker flags for PYGTK, overriding pkg-config
   CC          C compiler command
   CFLAGS      C compiler flags
   LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
@@ -2436,292 +2427,6 @@ echo "${ECHO_T}$am_cv_python_pyexecdir" >&6; }
 
 
 
-
-
-if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
-	if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
-set dummy ${ac_tool_prefix}pkg-config; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_PKG_CONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $PKG_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-PKG_CONFIG=$ac_cv_path_PKG_CONFIG
-if test -n "$PKG_CONFIG"; then
-  { echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
-echo "${ECHO_T}$PKG_CONFIG" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-
-fi
-if test -z "$ac_cv_path_PKG_CONFIG"; then
-  ac_pt_PKG_CONFIG=$PKG_CONFIG
-  # Extract the first word of "pkg-config", so it can be a program name with args.
-set dummy pkg-config; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_ac_pt_PKG_CONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $ac_pt_PKG_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_ac_pt_PKG_CONFIG="$ac_pt_PKG_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_ac_pt_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-ac_pt_PKG_CONFIG=$ac_cv_path_ac_pt_PKG_CONFIG
-if test -n "$ac_pt_PKG_CONFIG"; then
-  { echo "$as_me:$LINENO: result: $ac_pt_PKG_CONFIG" >&5
-echo "${ECHO_T}$ac_pt_PKG_CONFIG" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-  if test "x$ac_pt_PKG_CONFIG" = x; then
-    PKG_CONFIG=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
-whose name does not start with the host triplet.  If you think this
-configuration is useful to you, please write to autoconf@gnu.org." >&5
-echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
-whose name does not start with the host triplet.  If you think this
-configuration is useful to you, please write to autoconf@gnu.org." >&2;}
-ac_tool_warned=yes ;;
-esac
-    PKG_CONFIG=$ac_pt_PKG_CONFIG
-  fi
-else
-  PKG_CONFIG="$ac_cv_path_PKG_CONFIG"
-fi
-
-fi
-if test -n "$PKG_CONFIG"; then
-	_pkg_min_version=0.9.0
-	{ echo "$as_me:$LINENO: checking pkg-config is at least version $_pkg_min_version" >&5
-echo $ECHO_N "checking pkg-config is at least version $_pkg_min_version... $ECHO_C" >&6; }
-	if $PKG_CONFIG --atleast-pkgconfig-version $_pkg_min_version; then
-		{ echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }
-	else
-		{ echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-		PKG_CONFIG=""
-	fi
-
-fi
-
-pkg_failed=no
-{ echo "$as_me:$LINENO: checking for PYGTK" >&5
-echo $ECHO_N "checking for PYGTK... $ECHO_C" >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$PYGTK_CFLAGS"; then
-        pkg_cv_PYGTK_CFLAGS="$PYGTK_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"pygtk-2.0 >= 2.6\"") >&5
-  ($PKG_CONFIG --exists --print-errors "pygtk-2.0 >= 2.6") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_PYGTK_CFLAGS=`$PKG_CONFIG --cflags "pygtk-2.0 >= 2.6" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$PYGTK_LIBS"; then
-        pkg_cv_PYGTK_LIBS="$PYGTK_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"pygtk-2.0 >= 2.6\"") >&5
-  ($PKG_CONFIG --exists --print-errors "pygtk-2.0 >= 2.6") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_PYGTK_LIBS=`$PKG_CONFIG --libs "pygtk-2.0 >= 2.6" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        PYGTK_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "pygtk-2.0 >= 2.6"`
-        else
-	        PYGTK_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "pygtk-2.0 >= 2.6"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$PYGTK_PKG_ERRORS" >&5
-
-	{ { echo "$as_me:$LINENO: error: Package requirements (pygtk-2.0 >= 2.6) were not met:
-
-$PYGTK_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables PYGTK_CFLAGS
-and PYGTK_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" >&5
-echo "$as_me: error: Package requirements (pygtk-2.0 >= 2.6) were not met:
-
-$PYGTK_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables PYGTK_CFLAGS
-and PYGTK_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" >&2;}
-   { (exit 1); exit 1; }; }
-elif test $pkg_failed = untried; then
-	{ { echo "$as_me:$LINENO: error: The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables PYGTK_CFLAGS
-and PYGTK_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." >&5
-echo "$as_me: error: The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables PYGTK_CFLAGS
-and PYGTK_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-else
-	PYGTK_CFLAGS=$pkg_cv_PYGTK_CFLAGS
-	PYGTK_LIBS=$pkg_cv_PYGTK_LIBS
-        { echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }
-	:
-fi
-
-
-
-# Extract the first word of "pkg-config", so it can be a program name with args.
-set dummy pkg-config; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_PKGCONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $PKGCONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PKGCONFIG="$PKGCONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-as_dummy="$PATH:/usr/bin:/usr/local/bin"
-for as_dir in $as_dummy
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_PKGCONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_PKGCONFIG" && ac_cv_path_PKGCONFIG="no"
-  ;;
-esac
-fi
-PKGCONFIG=$ac_cv_path_PKGCONFIG
-if test -n "$PKGCONFIG"; then
-  { echo "$as_me:$LINENO: result: $PKGCONFIG" >&5
-echo "${ECHO_T}$PKGCONFIG" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-
-  if test "$PKGCONFIG" != "no" ; then
-    { echo "$as_me:$LINENO: checking PYTHONPATH env variable for PyGTK" >&5
-echo $ECHO_N "checking PYTHONPATH env variable for PyGTK... $ECHO_C" >&6; }
-    PYTHONPATH=$($PKGCONFIG --variable=pyexecdir pygtk-2.0)
-
-    { echo "$as_me:$LINENO: result: $PYTHONPATH" >&5
-echo "${ECHO_T}$PYTHONPATH" >&6; }
-  fi
-
-export PYTHONPATH=$PYGTK_DIR:$PYTHONPATH
 { echo "$as_me:$LINENO: checking for gtk.glade" >&5
 echo $ECHO_N "checking for gtk.glade... $ECHO_C" >&6; }
 prog="
@@ -2941,6 +2646,126 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+
+
+if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
+	if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}pkg-config; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
+echo "${ECHO_T}$PKG_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_PKG_CONFIG"; then
+  ac_pt_PKG_CONFIG=$PKG_CONFIG
+  # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_ac_pt_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ac_pt_PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_PKG_CONFIG="$ac_pt_PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_PKG_CONFIG=$ac_cv_path_ac_pt_PKG_CONFIG
+if test -n "$ac_pt_PKG_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $ac_pt_PKG_CONFIG" >&5
+echo "${ECHO_T}$ac_pt_PKG_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+  if test "x$ac_pt_PKG_CONFIG" = x; then
+    PKG_CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKG_CONFIG=$ac_pt_PKG_CONFIG
+  fi
+else
+  PKG_CONFIG="$ac_cv_path_PKG_CONFIG"
+fi
+
+fi
+if test -n "$PKG_CONFIG"; then
+	_pkg_min_version=0.9.0
+	{ echo "$as_me:$LINENO: checking pkg-config is at least version $_pkg_min_version" >&5
+echo $ECHO_N "checking pkg-config is at least version $_pkg_min_version... $ECHO_C" >&6; }
+	if $PKG_CONFIG --atleast-pkgconfig-version $_pkg_min_version; then
+		{ echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+	else
+		{ echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+		PKG_CONFIG=""
+	fi
+
+fi
 
 gdu_cv_version_required=0.3.2
 
@@ -7408,16 +7233,12 @@ pythondir!$pythondir$ac_delim
 pkgpythondir!$pkgpythondir$ac_delim
 pyexecdir!$pyexecdir$ac_delim
 pkgpyexecdir!$pkgpyexecdir$ac_delim
-PKG_CONFIG!$PKG_CONFIG$ac_delim
-PYGTK_CFLAGS!$PYGTK_CFLAGS$ac_delim
-PYGTK_LIBS!$PYGTK_LIBS$ac_delim
-PKGCONFIG!$PKGCONFIG$ac_delim
-PYTHONPATH!$PYTHONPATH$ac_delim
 CRONTAB_CONFIG!$CRONTAB_CONFIG$ac_delim
 PYTHON_CONFIG!$PYTHON_CONFIG$ac_delim
 SU_CONFIG!$SU_CONFIG$ac_delim
 tar_CONFIG!$tar_CONFIG$ac_delim
 GETTEXT_PACKAGE!$GETTEXT_PACKAGE$ac_delim
+PKG_CONFIG!$PKG_CONFIG$ac_delim
 HELP_DIR!$HELP_DIR$ac_delim
 OMF_DIR!$OMF_DIR$ac_delim
 DOC_USER_FORMATS!$DOC_USER_FORMATS$ac_delim
@@ -7437,6 +7258,10 @@ am__include!$am__include$ac_delim
 am__quote!$am__quote$ac_delim
 AMDEP_TRUE!$AMDEP_TRUE$ac_delim
 AMDEP_FALSE!$AMDEP_FALSE$ac_delim
+AMDEPBACKSLASH!$AMDEPBACKSLASH$ac_delim
+CCDEPMODE!$CCDEPMODE$ac_delim
+am__fastdepCC_TRUE!$am__fastdepCC_TRUE$ac_delim
+am__fastdepCC_FALSE!$am__fastdepCC_FALSE$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -7478,10 +7303,6 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
-AMDEPBACKSLASH!$AMDEPBACKSLASH$ac_delim
-CCDEPMODE!$CCDEPMODE$ac_delim
-am__fastdepCC_TRUE!$am__fastdepCC_TRUE$ac_delim
-am__fastdepCC_FALSE!$am__fastdepCC_FALSE$ac_delim
 CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
@@ -7537,7 +7358,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 57; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 53; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
