@@ -1,0 +1,63 @@
+nssbackup (0.1-2~ppa1) gutsy; urgency=low
+
+  * GNU packaging standardization
+  * Deleted unuseful documentation
+  * We don't exclude anything as a recommendation (Closes LP Bug #152861)
+  * Changed nssbackup icons
+  * changed the whole revert process ( closes LP Bug #146617 )
+  * base was always set as the last full snapshot
+  * Launchpad Bug #146618 : remove the file size limit recommendation
+  * LP #138750 & #138749 fixed
+
+ -- Oumar Aziz OUATTARA (alias wattazoum) <wattazoum@gmail.com>  Sun, 21 Oct 2007 07:42:55 +0200
+
+nssbackup (0.1-1) gutsy; urgency=low
+		
+  * Fixed Bug #134369 Launchpad
+  * Fixed a bug preventing to be sure that the config was saved, when clicking on save
+  * Changed a recommended setting
+  * Updated translations
+		
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 26 Aug 2007 12:44:18 +0200
+		
+nssbackup (0.1-1~beta4) gutsy; urgency=low
+ 		
+  * Solved Bug #130823 LP
+ 		
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 19 Aug 2007 16:04:03 +0200
+		
+nssbackup (0.1-1~beta3) gutsy; urgency=low
+		
+  * the file list is now sorted in Restore GUI
+  * Hide sudo menu entry for non admin
+  * improved restoreAs usability
+  * in Config GUI disabling maxsize didn't remove the option from the config file
+  * Backup report is sent by mail by default from <login@hostname> but some SMTP server check for the hostname to have a domain.  We set an ".ext" extention if the hostname doesn't have a dot
+  * LP Bug #128056
+  * LP Bug #128063
+  * LP Bug #128354
+	
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Mon, 30 Jul 2007 06:48:06 +0200
+	
+nssbackup (0.1-1~beta2) gutsy; urgency=low
+ 		
+  * Added an help to config GUI for simply option
+  * ported some log from debug to info
+  * Fixed a typo on nssbackupd ( sbackup.conf => nssbackup.conf )
+  * when searching  for a file in existing snapshots, prevent to call getBaseSnapshot() on a full snapshot
+  * Improved backup process speed
+  * in Config Gui fixed a bug that was resetting purge option
+  * Snapshot.getBaseSnapshot doesn't create a snapshot each time ( improves memory comsumption)
+  * remove script now, erase /usr/lib/python2.5/site-packages/nssbackup dir
+  * nssbackup script fixed
+  * Bug #126952 in Launchpad
+  * Bug #126546 and Bug #126544 on Launchpad
+		
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 22 Jul 2007 11:39:47 +0200
+
+nssbackup (0.1-1~beta1) gutsy; urgency=low
+	
+  * Initial release
+ 		
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat,  11 Jul 2007 00:14:07 +0200
+

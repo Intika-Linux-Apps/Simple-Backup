@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -226,26 +225,3 @@ class UpgradeManager() :
 		
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
 		snapshot.setVersion("1.4")
-
-if __name__ == "__main__" :
-	# i18n init
-	gettext.textdomain("nssbackup")
-	
-	if not len(sys.argv) in [2]:
-		print _("""
-Simple Backup suit command line backup format upgrade
-Usage: upgrade-backup backup-target-url
-Note: backup-target-url must not include the snapshot subdirectory name, for example:
-
-   /var/backup/
-
-Use simple-restore-gnome for more ease of use.
-""")
-		sys.exit(1)
-	
-	try : 
-		u = UpgradeManager()
-		u.upgradeAll(sys.argv[1])
-	except Exception, e :
-			getLogger().error(str(e))
-			getLogger().error(traceback.format_exc())

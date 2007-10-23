@@ -24,7 +24,7 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
-
+	./configure --prefix $(CURDIR)/debian/nssbackup/usr
 	touch configure-stamp
 
 
@@ -34,7 +34,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	#$(MAKE)
+	$(MAKE)
 
 	touch build-stamp
 
@@ -55,8 +55,7 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/sbackup.
-	find ./ -name *.pyc -exec rm -f '{}' \;
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/nssbackup/usr INSTALL=deb
+	$(MAKE) install
 	
 
 # Build architecture-independent files here.

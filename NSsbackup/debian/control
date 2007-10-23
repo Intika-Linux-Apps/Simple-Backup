@@ -1,5 +1,5 @@
 Source: nssbackup
-Section: admin
+Section: universe/devel
 Priority: optional
 Maintainer: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
 Build-Depends: debhelper (>= 5)

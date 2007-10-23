@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation; either version 2 of the License, or
@@ -160,11 +160,3 @@ class NSsbackupd () :
 		except Exception, e :
 			getLogger().error(str(e))
 			getLogger().error(traceback.format_exc())
-
-# i18n init
-gettext.textdomain("nssbackup")
-application = 'nssbackup'
-gettext.install(application)
-
-sbd = NSsbackupd()
-sbd.run()
