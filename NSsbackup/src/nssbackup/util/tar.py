@@ -1,4 +1,23 @@
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# Authors :
+#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+
+
 import os,re,tarfile, csv
+from gettext import gettext as _
 from nssbackup.util.log import getLogger
 import nssbackup.util as Util
 from nssbackup.util.exceptions import SBException
@@ -98,6 +117,89 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 		raise SBException("Error when extracting : " + errStr )
 	getLogger().debug("output was : " + outStr)
 
+
+def __prepareTarCommonOpts(snapshot):
+	"""
+	Prepare the options to fill tar in .
+	@param snapshot: The snapshot to fill in
+	@return: a list of options to be use to launch tar
+	"""
+	tdir = snapshot.getPath().replace(" ", "\ ")
+	options = list()
+	
+	#TODO: review the options to only use a minimal include file list and an exclude file list
+	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile().replace(" ", "\ ")])
+	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ "))
+	
+	archivename = "files.tar"
+	if snapshot.getFormat() == "gzip":
+		options.insert(1,"--gzip")
+		archivename+=".gz"
+	elif snapshot.getFormat() == "bzip2":
+		options.insert(1,"--bzip2")
+		archivename+=".bz2"
+	elif snapshot.getFormat() == "none":
+		pass
+	else :
+		getLogger().debug("Defaulting to gzip ! ")
+		options.insert(1,"--gzip")
+		archivename+=".gz"
+	
+	options.append("--file="+tdir+os.sep +archivename)
+	
+	getLogger().debug(options)
+	
+	getLogger().debug("Common TAR options : " + str(options))
+	
+	return options 
+	
+
+
+def makeTarIncBackup(snapshot):
+	"""
+	Launch a TAR incremental backup
+	@param snapshot: the snapshot in which to make the backup
+	@raise SBException: if there was a problem with tar
+	"""
+	getLogger().info(_("Launching TAR to make Inc backup "))
+	
+	options = __prepareTarCommonOpts(snapshot)
+	
+	# For a full backup the SNAR file shouldn't exists
+	if not os.path.exists(snapshot.getSnarFile()) :
+		getLogger().error("Unable to find the SNAR file to make an Incremental backup")
+		getLogger().error("Falling back to full backup")
+		makeTarFullBackup(snapshot)
+	else:
+		options.append("--listed-incremental="+snapshot.getSnarFile())
+		
+		outStr, errStr, retVal = Util.launch("tar", options)
+		getLogger().debug("TAR Output : " + outStr)
+		if retVal != 0 :
+			raise SBException(_("Couldn't make a proper backup : ") + errStr )
+		
+
+def makeTarFullBackup(snapshot):
+	"""
+	Launch a TAR full backup
+	@param snapshot: the snapshot in which to make the backup
+	@raise SBException: if there was a problem with tar
+	"""
+	getLogger().info(_("Launching TAR to make a Full backup "))
+	
+	options = __prepareTarCommonOpts(snapshot)
+	
+	# For a full backup the SNAR file shouldn't exists
+	if os.path.exists(snapshot.getSnarFile()) :
+		os.remove(snapshot.getSnarFile())
+	
+	options.append("--listed-incremental="+snapshot.getSnarFile())
+	
+	outStr, errStr, retVal = Util.launch("tar", options)
+	getLogger().debug("TAR Output : " + outStr)
+	if retVal != 0 :
+		raise SBException(_("Couldn't make a proper backup : ") + errStr )
+	
 
 class Dumpdir():
 	"""

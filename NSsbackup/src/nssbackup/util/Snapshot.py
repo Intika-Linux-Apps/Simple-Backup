@@ -20,12 +20,14 @@ import nssbackup.managers.FileAccessManager as FAM
 import re
 import os
 import subprocess
+from gettext import gettext as _
 from tempfile import *
 import cPickle as pickle
 from exceptions import * 
 from log import getLogger
 from structs import SBdict
 import nssbackup.util as Util
+import nssbackup.util.tar as TAR
 
 class Snapshot : 
 	"The snapshot class represents one snapshot in the backup directory"
@@ -33,8 +35,17 @@ class Snapshot :
 	__name = False
 	__base = False
 	__format = "gzip" # default value
+	
+
+	__snarfile = None
+	__includeFlist = list()
+	__includeFlistFile = None # Str
+	__excludeFlist = list()
+	__excludeFlistFile = None # Str
+	
+	
 	__excludes = False
-	__filesList = None
+	
 	__packages = False
 	__version = False
 	__snapshotpath = False
@@ -91,26 +102,41 @@ class Snapshot :
 			"hour":int(m.group(4)),"minute":int(m.group(5)),"second":int(m.group(6))}
 		return date
 		
-	def getFilesList(self) :
-		"Returns a SBdict with key='the file name' and value='the file properties'"
-		global __filesList
-		if self.getVersion() and self.getVersion() < "1.4" : raise SBException(_("Please upgrade the snapshot (version '%s' found)") % self.getVersion())
-		if self.__filesList != None : return self.__filesList
-		else :
-			flist = self.__snapshotpath +os.sep +"flist"
-			fprops = self.__snapshotpath +os.sep +"fprops"
-			if not FAM.exists(flist) and not FAM.exists(fprops) : 
-				return False
-			elif not FAM.exists(flist) :
-				raise NotValidSnapshotException(_("flist hasn't been found for snapshot '%s'") % self.getName())
-			elif not FAM.exists(fprops) :
-				raise NotValidSnapshotException(_("fprops hasn't been found for snapshot '%s'") % self.getName())
-			else :
-				f1 = FAM.readfile(flist)
-				f2 = FAM.readfile(fprops)
-				self.__filesList = SBdict(zip(f1.split( "\000" ),f2.split( "\000" )) )
-				return self.__filesList
-	
+	def getExcludeFListFile(self):
+		"""
+		@return: the path to the exclude file list file
+		@raise NotValidSnapshotNameException: if the excludeFlist is not set and the file doesn't exist
+		"""
+		global __excludeFlistFile
+		
+		if not self.__excludeFlistFile :
+			self.__excludeFlistFile = self.getPath()+os.sep+"exclude.list"
+			
+		return self.__excludeFlistFile
+
+	def getIncludeFListFile(self):
+		"""
+		@return: the path to the include file list file
+		@raise NotValidSnapshotNameException: if the includeFlist is not set and the file doesn't exist
+		"""
+		global __includeFlistFile
+		
+		if not self.__includeFlistFile :
+			self.__includeFlistFile = self.getPath()+os.sep+"include.list"
+			
+		return self.__includeFlistFile
+
+	def getSnarFile(self):
+		"""
+		@return: the path to the TAR SNAR file
+		"""
+		global __snarfile
+		
+		if not self.__snarfile : 
+			self.__snarfile = self.getPath()+os.sep+"files.snar"
+		return self.__snarfile
+
+
 	def getPath(self) :
 		"return the complete path of the snapshot"
 		if not self.__snapshotpath : 
@@ -189,10 +215,6 @@ class Snapshot :
 		if problem : 
 			raise NotValidSnapshotException(_("The snapshot compression format is supposed to be '%s' but the corresponding well named file wasn't found") % self.getFormat())
 	
-	def getFileProps(self, item) :
-		"Returns for a certain item in the backup its properties"
-		return self.getFilesList()[str(item)]
-	
 	def getVersion(self) :
 		"Return the version of the snapshot comming from the 'ver' file"
 		global __version
@@ -238,9 +260,39 @@ class Snapshot :
 		self.__commitFormatfile()
 		self.__commitexcludefile()
 		self.__commitpackagefile()
-		self.__commitflistfiles()
+		self.__commitflistFiles()
 		self.__makebackup()
 		self.__commitverfile()
+	
+	
+	#----------------------------
+	
+	def addToIncludeFlist (self, item) :
+		"""
+		Add an item to be backup into the snapshot.
+		 Usage :  addToIncludeFlist(item) where
+		 - item is the item to be add (file, dir, or link)
+		"""
+		global __includeFlist
+		
+		if not self.__includeFlist :
+			self.__includeFlist = list()
+		self.__includeFlist.append(item)
+	
+	def addToExcludeFlist (self, item) :
+		"""
+		Add an item to not be backup into the snapshot.
+		 Usage :  addToExcludeFlist(item) where
+		 - item is the item to be add (file, dir, or link)
+		"""
+		global __excludeFlist
+		
+		if not self.__excludeFlist :
+			self.__excludeFlist = list()
+		self.__excludeFlist.append(item)
+	
+	
+	#---------------------------------
 	
 	# Setters
 	
@@ -255,18 +307,6 @@ class Snapshot :
 			getLogger().debug("Set the compression format to %s" % cformat)
 			self.__format = cformat
 	
-	def setFilesList(self, fileslist=None) :
-		"""
-		Set a SBdictionary with key='the file name' and value='the file properties'
-		@param fileslist: is the new filesList SBdict (default is an empty SBdict)
-		ATTENTION : The snapshot fileList will be overwritten
-		"""
-		global __filesList
-		if not fileslist :
-			self.__filesList = SBdict()
-			getLogger().debug(_("set filelist to empty SBdict : ")+ str(self.__filesList)) 
-		else :
-			self.__filesList = fileslist
 	
 	def setPath(self, path) :
 		"Set the complete path of the snapshot. That path will be used to get the name of the snapshot"
@@ -287,17 +327,6 @@ class Snapshot :
 			raise SBException (_("Name of base not valid : %s") % self.__name)
 		self.__base = baseName		
 	
-	def addFile(self, item, props) :
-		"""
-		Add an item to be backup into the snapshot.
-		 Usage :  addFile(item, props) where
-		 - item is the item to be add (file, dir, or link)
-		 - props is this item properties
-		"""
-		global __filesList
-		if not self.getFilesList() :
-			self.setFilesList()
-		self.__filesList[item] = props
 	
 	def setVersion(self, ver="1.5") :
 		"Set the version of the snapshot"
@@ -370,20 +399,27 @@ class Snapshot :
 		@raise SBException: if excludes hasn't been set 
 		"""
 		FAM.pickledump( self.__excludes, self.getPath()+os.sep +"excludes" )
+	
+	
+	def __commitflistFiles(self):
+		"""
+		Commit the include.list and exclude.list to the disk
+		"""
+		if os.path.exists(self.getIncludeFListFile()) or os.path.exists(self.getIncludeFListFile()) :
+			raise SBException("include.list and exclude.list shouldn't exist at this stage")
 		
-	def __commitflistfiles(self):
-		" Commit flist and fprops on the disk "
-		if not self.getFilesList() :
-			FAM.writetofile(self.getPath()+os.sep +"flist", "")
-			FAM.writetofile(self.getPath()+os.sep +"fprops", "")
-		else :
-			fl, fp = "", ""
-			for (fli, fpi ) in self.__filesList.iteritems() :
-				if fli :
-					fl += str(fli)+"\000"
-					fp += str(fpi)+"\000"
-			FAM.writetofile(self.getPath()+os.sep +"flist", fl)
-			FAM.writetofile(self.getPath()+os.sep +"fprops", fp)
+		fi,fe = "",""
+		
+		# commit include.list
+		for f in self.__includeFlist :
+			fi += str(f) +"\n"
+		FAM.writetofile(self.getIncludeFListFile(), fi)
+		
+		# commit exclude.list
+		for f in self.__excludeFlist :
+			fe += str(f) +"\n"
+		FAM.writetofile(self.getExcludeFListFile(), fe)
+		
 		
 	def __commitpackagefile(self):
 		" Commit packages file on the disk"
@@ -395,39 +431,7 @@ class Snapshot :
 	def __makebackup(self):
 		" Make the backup on the disk "
 		
-		getLogger().info(_("Launching TAR to backup "))
-		tdir = self.getPath().replace(" ", "\ ")
-		options = list()
-		options.extend(["-cS","--directory="+ os.sep , "--no-recursion", "--ignore-failed-read","--null","--files-from="+tdir+os.sep +"flist"])
-		
-		archivename = "files.tar"
-		if self.getFormat() == "gzip":
-			options.insert(1,"--gzip")
-			archivename+=".gz"
-		elif self.getFormat() == "bzip2":
-			options.insert(1,"--bzip2")
-			archivename+=".bz2"
-		elif self.getFormat() == "none":
-			pass
+		if self.isfull() :
+			TAR.makeTarFullBackup(self)
 		else :
-			getLogger().debug("Defaulting to gzip ! ")
-			options.insert(1,"--gzip")
-			archivename+=".gz"
-		
-		getLogger().debug(options)
-		if FAM.islocal(self.getPath()) :
-			options.extend(["--force-local", "--file="+tdir+os.sep +archivename])
-			getLogger().debug("Tarline : " + "tar" + str(options))
-			outStr, errStr, retVal = Util.launch("tar", options)
-			getLogger().debug(outStr)
-			if retVal != 0 :
-				raise SBException(_("Couldn't make a proper backup : ") + errStr )
-		else :
-			getLogger().debug("Tarline : " + "tar" + options )
-			turi = gnomevfs.URI( self.getPath()+os.sep +archivename )
-			tardst = gnomevfs.create( turi, 2 )
-			tarsrc = os.popen( "tar" + options )
-			shutil.copyfileobj( tarsrc, tardst, 100*1024 )
-			tarsrc.close()
-			tardst.close()
-			
+			TAR.makeTarIncBackup(self)

@@ -20,7 +20,7 @@ import os
 import os.path
 import unittest
 import pickle
-from sbackup.util.exceptions import SBException
+from nssbackup.util.exceptions import SBException
 
 class TestSnapshot(unittest.TestCase):
 	
@@ -58,14 +58,7 @@ class TestSnapshot(unittest.TestCase):
 		"Full backups got no base file"
 		self.assertFalse(self.snapshot.getBase())
 
-	def testgetFilesList(self) :
-		"can compute flist and fprops "
-		self.assert_(self.snapshot.getFilesList())
 		
-	def testgetFileProps(self) :
-		" get the props of one item "
-		self.assertEqual(self.snapshot.getFileProps("/home/wattazoum/Desktop/sbackup-test/d9/d12/f6.txt"),"3318810001000131179399776.0")
-	
 	def testgetVersion(self) :
 		" Test if we get the version 1.4 "
 		self.assertEqual(self.snapshot.getVersion(), "1.4")
@@ -81,20 +74,22 @@ class TestSnapshot(unittest.TestCase):
 		"""
 		Commit the snapshot infos ( write to the disk )
 		"""
+		import socket,datetime
+		# Determine and create backup target directory
+		hostname = socket.gethostname()
+		
+		tdir = self.abspath+"/test-datas/backupdir/" + datetime.datetime.now().isoformat("_").replace( ":", "." ) + "." + hostname + ".ful"
+		snp = Snapshot.Snapshot(tdir)
+		snp.addToIncludeFlist("/home/wattazoum/Images/")
+		snp.addToIncludeFlist("/home/wattazoum/Images/143CANON/IMG_4313.JPG")
+		snp.addToExcludeFlist("/home/wattazoum/Images/143CANON")
+		snp.commit()
+		self.assertTrue(os.path.exists(tdir))
+		self.assertTrue(os.path.exists(tdir+os.sep+"ver"))
+		
 		
 	# Setters
 	
-	def testsetFilesList(self) :
-		" setFilesList with a dictionnary "
-		test = {'item1': 'v1','item2': 'v2','item3': 'v3'}
-		self.snapshot.setFilesList(test)
-		self.assertEqual(self.snapshot.getFilesList(),test)
-		l1 = ['item1','item2','item3']
-		l2 = ['111','222','333']
-		self.snapshot.setFilesList(dict(zip(l1, l2)))
-		self.assertEqual(self.snapshot.getFilesList(), dict(zip(l1,l2)))
-		for i in range(3) :
-			self.assertTrue(self.snapshot.getFilesList()[l1[i]] == l2[i])
 	
 	def testsetBase(self) :
 		"""
@@ -133,6 +128,3 @@ class TestSnapshot(unittest.TestCase):
 		toget = f.read()
 		f.close()
 		self.assertEqual(self.snapshot.getPackages(), toget)
-
-suite = unittest.TestLoader().loadTestsFromTestCase(TestSnapshot)
-unittest.TextTestRunner(verbosity=2).run(suite)
