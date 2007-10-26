@@ -209,15 +209,23 @@ class SBconfigGTK(GladeWindow):
 			'crtfilechooser',
 			'keyfilechooser',
 			'pluginscombobox',
+			'ProfileManagerDialog',
+			'profilesListTreeView',
+			'addProfileButton',
+			'removeProfileButton',
+			'editProfileButton',
+			'closeProfileManagerButton',
 			]
 
 		handlers = [
 			'gtk_main_quit',
 			'on_ftype_toggled',
 			'on_ftype_st_box_changed',
+			'on_ftype_custom_ex_changed',
 			'on_save_activate',
 			'on_save_as_activate',
 			'on_exit_activate',
+			'on_prfManager_activate',
 			'on_about_activate',
 			'on_reload_clicked',
 			'on_save_clicked',
@@ -268,6 +276,11 @@ class SBconfigGTK(GladeWindow):
 			'on_keyfilechooser_selection_changed',
 			'on_pluginscombobox_changed',
 			'on_fusecheckbutton_clicked',
+			'gtk_widget_hide',
+			'on_addProfileButton_clicked',
+			'on_removeProfileButton_clicked',
+			'on_editProfileButton_clicked',
+			'on_closeProfileManagerButton_clicked',
 			]
 
 		top_window = 'backup_properties_dialog'
@@ -1517,6 +1530,55 @@ class SBconfigGTK(GladeWindow):
 	def gtk_main_quit( self, *args):
 		self.askSaveConfig()
 		gtk.main_quit()
+
+	#----------------------------------------------------------------------
+
+	def on_ftype_custom_ex_changed(self, *args):
+		print("TODO: on_ftype_custom_ex_changed")
+		pass
+
+	#----------------------------------------------------------------------
+
+	def on_prfManager_activate(self, *args):
+		print("TODO: on_prfManager_activate")
+		dialog = self.widgets["ProfileManagerDialog"]
+		response = dialog.run()
+		dialog.hide()
+		if response == gtk.RESPONSE_CLOSE :
+			#TODO:
+			pass
+		
+
+	#----------------------------------------------------------------------
+
+	def gtk_widget_hide(self, *args):
+		print("TODO: gtk_widget_hide")
+		pass
+
+	#----------------------------------------------------------------------
+
+	def on_addProfileButton_clicked(self, *args):
+		print("TODO: on_addProfileButton_clicked")
+		pass
+
+	#----------------------------------------------------------------------
+
+	def on_removeProfileButton_clicked(self, *args):
+		print("TODO: on_removeProfileButton_clicked")
+		pass
+
+	#----------------------------------------------------------------------
+
+	def on_editProfileButton_clicked(self, *args):
+		print("TODO: on_editProfileButton_clicked : Load the new configuration and hide the dialog")
+		pass
+
+	#----------------------------------------------------------------------
+
+	def on_closeProfileManagerButton_clicked(self, *args):
+		print("TODO: on_closeProfileManagerButton_clicked : Load default profile nssbackup.conf")
+		pass
+
 
 
 #----------------------------------------------------------------------
