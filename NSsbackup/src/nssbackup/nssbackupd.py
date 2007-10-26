@@ -96,7 +96,7 @@ class NSsbackupd () :
 		
 	def run(self):
 		"""
-		Method used to run sbackupd
+		Method used to run nssbackupd
 		- checks for the user who called it
 	 	- if it's root, it makes a loop to run sbackup for all users that asked for it.
 	 	- if it's another user, launch BackupManager with the user configuration file
