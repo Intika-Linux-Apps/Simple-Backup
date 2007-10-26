@@ -20,6 +20,7 @@ import smtplib
 import socket
 import datetime
 import gettext
+import re
 from gettext import gettext as _
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
@@ -40,6 +41,8 @@ from nssbackup.managers.BackupManager import BackupManager
 class NSsbackupd () :
 	
 	__bm = None
+	
+	__confFilesRE = "nssbackup-.+?\.conf"
 
 	##
 	#Checks if the sent of emails is set in the config file 
@@ -102,20 +105,57 @@ class NSsbackupd () :
 		
 		try : 
 			try :
-				if os.getuid() == 0 : # we are root
+				
+				if os.getuid() == 0 : 
+					# --------------
+					# we are root
 					if os.path.exists("/etc/nssbackup.conf") :
+						# first launch the default config 
 						self.__bm = BackupManager("/etc/nssbackup.conf")
 					else :
 						self.__bm = BackupManager()
-					# TODO Find other users if the option is specified
-				else :  # we are others
+					# do the backup
+					self.__bm.makeBackup()
+					
+					# Now search for alternate configuration files
+					# They are located in /etc/nssbackup.d/
+					if os.path.exists("/etc/nssbackup.d") and os.path.isdir("/etc/nssbackup.d") :
+						# The path exists, search  inside
+						r = re.compile(self.__confFilesRE)
+						
+						for cf in os.listdir("/etc/nssbackup.d") :
+							if os.path.isfile(cf) :
+								m = r.match(cf)
+								if m : 
+									self.__bm = BackupManager("/etc/nssbackup.d/"+cf)
+									self.__bm.makeBackup()
+					
+					# ---------------------
+				else :  
+					# ---------------------
+					# we are others
 					if os.path.exists(getUserConfDir()+ "nssbackup.conf") :
 						self.__bm = BackupManager(getUserConfDir()+ "nssbackup.conf")
 					else :
 						self.__bm = BackupManager()
+					# do the backup
+					self.__bm.makeBackup()
 					
-				# do the backup
-				self.__bm.makeBackup()
+					# Now search for alternate configuration files
+					# They are located in getUserConfDir()+"/nssbackup.d"
+					if os.path.exists(getUserConfDir()+"/nssbackup.d") and os.path.isdir(getUserConfDir()+"/nssbackup.d") :
+						# The path exists, search  inside
+						r = re.compile(self.__confFilesRE)
+						
+						for cf in os.listdir(getUserConfDir()+"/nssbackup.d") :
+							if os.path.isfile(cf) :
+								m = r.match(cf)
+								if m : 
+									self.__bm = BackupManager(getUserConfDir()+"/nssbackup.d/"+cf)
+									self.__bm.makeBackup()
+									
+									
+					# ----------------
 				
 			except Exception, e :
 				if os.getuid() != 0 :

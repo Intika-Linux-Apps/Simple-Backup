@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <?eclipse-pydev version="1.0"?>
 
 <pydev_project>
@@ -8,10 +8,8 @@
   
 
   <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-
-<path>/nssbackup-devel/src</path>
-<path>/nssbackup-devel/tests</path>
-
+<path>/nssbackup-multi-conf/src</path>
+<path>/nssbackup-multi-conf/tests</path>
 </pydev_pathproperty>
   
 
