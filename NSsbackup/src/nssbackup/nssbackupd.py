@@ -44,10 +44,12 @@ class NSsbackupd () :
 	
 	__confFilesRE = "nssbackup-.+?\.conf"
 
-	##
-	#Checks if the sent of emails is set in the config file 
-	#then send an email with the 
+
 	def __sendEmail(self):
+		"""
+		Checks if the sent of emails is set in the config file 
+		then send an email with the report
+		"""
 		
 		if self.__bm.config.has_option("report","from") :
 			_from =self.__bm.config.get("report","from")
@@ -92,15 +94,15 @@ class NSsbackupd () :
 		server.close()
 	
 		
-	##
-	# Method used to run sbackupd
-	# - checks for the user who called it
-	# 	- if it's root, it makes a loop to run sbackup for all users that asked for it.
-	# 	- if it's another user, launch BackupManager with the user configuration file
-	# - catches all exceptions thrown and logs them (with stacktrace)
-	#
 	def run(self):
-
+		"""
+		Method used to run sbackupd
+		- checks for the user who called it
+	 	- if it's root, it makes a loop to run sbackup for all users that asked for it.
+	 	- if it's another user, launch BackupManager with the user configuration file
+		- catches all exceptions thrown and logs them (with stacktrace)
+		"""
+		
 		global __bm
 		
 		try : 
@@ -124,7 +126,7 @@ class NSsbackupd () :
 						r = re.compile(self.__confFilesRE)
 						
 						for cf in os.listdir("/etc/nssbackup.d") :
-							if os.path.isfile(cf) :
+							if os.path.isfile("/etc/nssbackup.d/"+cf) :
 								m = r.match(cf)
 								if m : 
 									self.__bm = BackupManager("/etc/nssbackup.d/"+cf)
@@ -148,7 +150,7 @@ class NSsbackupd () :
 						r = re.compile(self.__confFilesRE)
 						
 						for cf in os.listdir(getUserConfDir()+"/nssbackup.d") :
-							if os.path.isfile(cf) :
+							if os.path.isfile(getUserConfDir()+"/nssbackup.d/"+cf) :
 								m = r.match(cf)
 								if m : 
 									self.__bm = BackupManager(getUserConfDir()+"/nssbackup.d/"+cf)
