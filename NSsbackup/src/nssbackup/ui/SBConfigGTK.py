@@ -17,14 +17,14 @@ from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
-from GladeWindow import *
+from GladeGnomeApp import *
 import gettext
 from gettext import gettext as _
 import nssbackup.util as Util
 
 #----------------------------------------------------------------------
 
-class SBconfigGTK(GladeWindow):
+class SBconfigGTK(GladeGnomeApp):
 	
 	configman = None
 	conffile = None
@@ -84,7 +84,7 @@ class SBconfigGTK(GladeWindow):
 			'regex_box',
 			'cancelbutton2',
 			'okbutton2',
-			'backup_properties_dialog',
+			'nssbackupConfApp',
 			'vbox17',
 			'save',
 			'save_as',
@@ -285,8 +285,8 @@ class SBconfigGTK(GladeWindow):
 			'on_closeProfileManagerButton_clicked',
 			]
 
-		top_window = 'backup_properties_dialog'
-		GladeWindow.__init__(self, filename, top_window, widget_list, handlers)
+		top_window = 'nssbackupConfApp'
+		GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window, widget_list, handlers)
 		self.widgets[top_window].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
 		# ---
 		# Initiate all data structures
