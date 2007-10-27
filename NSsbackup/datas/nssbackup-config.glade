@@ -159,7 +159,7 @@ Files and directories matching this expression will be excluded from backup.</pr
               <widget class="GtkEntry" id="regex_box">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="text">$.*\.mp3^</property>
+                <property name="text">^.*\.mp3$</property>
               </widget>
               <packing>
                 <property name="position">1</property>
