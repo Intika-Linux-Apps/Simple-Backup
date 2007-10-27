@@ -30,11 +30,15 @@ def getUserConfDir():
 	"""
 	Get the user config dir using the XDG specification
 	"""
-	confdir = os.sep.join([os.getenv("XDG_CONFIG_DIR", 
-				os.path.normpath(os.sep.join( [os.getenv("HOME"),".config"] )) ),
-					"nssbackup/"])
+	if os.getuid() == 0 :
+		confdir = "/etc/"
+	else :
+		confdir = os.sep.join([os.getenv("XDG_CONFIG_DIR", 
+					os.path.normpath(os.sep.join( [os.getenv("HOME"),".config"] )) ),
+						"nssbackup/"])
 	if not os.path.exists(confdir) :
 		os.makedirs(confdir)
+	
 	return confdir
 
 def getUserDatasDir():
@@ -505,15 +509,12 @@ class ConfigManager (ConfigParser.ConfigParser):
 		Get the configuration profiles list 
 		@return: a dictionarity of { name: [path_to_conffile, enable] } 
 		"""
-		if os.getuid() == 0 :
-			prfDir = "/etc/nssbackup.d/"
-		else :
-			prfDir = getUserConfDir()+"nssbackup.d/"
+		prfDir = getUserConfDir()+"nssbackup.d/"
 		
 		getLogger().debug("Getting profiles from '%s'" % prfDir)
 		
 		if not os.path.exists(prfDir) or not os.path.isdir(prfDir) :
-			return None
+			return dict()
 		
 		profiles = dict()
 		

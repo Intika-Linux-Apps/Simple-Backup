@@ -215,6 +215,9 @@ class SBconfigGTK(GladeWindow):
 			'removeProfileButton',
 			'editProfileButton',
 			'closeProfileManagerButton',
+			'askNewPrfNameDialog',
+			'enableNewPrfCB',
+			'newPrfNameEntry',
 			]
 
 		handlers = [
@@ -276,7 +279,6 @@ class SBconfigGTK(GladeWindow):
 			'on_keyfilechooser_selection_changed',
 			'on_pluginscombobox_changed',
 			'on_fusecheckbutton_clicked',
-			'gtk_widget_hide',
 			'on_addProfileButton_clicked',
 			'on_removeProfileButton_clicked',
 			'on_editProfileButton_clicked',
@@ -1567,22 +1569,56 @@ class SBconfigGTK(GladeWindow):
 		self.askSaveConfig()
 		
 		dialog = self.widgets["ProfileManagerDialog"]
-		response = dialog.run()
+		dialog.run()
 		dialog.hide()
 
 
 	#----------------------------------------------------------------------
 
-	def gtk_widget_hide(self, *args):
-		print("TODO: gtk_widget_hide")
-		pass
-
-	#----------------------------------------------------------------------
-
 	def on_addProfileButton_clicked(self, *args):
-		print("TODO: on_addProfileButton_clicked")
-		pass
+		
+		prfDir = getUserConfDir()+"nssbackup.d/"
+		if not os.path.exists(prfDir):
+			os.makedirs(prfDir)
+		
+		dialog = self.widgets['askNewPrfNameDialog']
+		response = dialog.run()
+		dialog.hide()
+		
+		if response == gtk.RESPONSE_OK :
 
+			enable = self.widgets['enableNewPrfCB'].get_active()
+			prfName = self.widgets['newPrfNameEntry'].get_text()
+			prfConf = getUserConfDir()+"nssbackup.d/nssbackup-"+prfName.strip()+".conf"
+			
+			if not prfName or prfName is '' :
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+										 buttons=gtk.BUTTONS_CLOSE, message_format="Profile Name must not be empty ! " )
+				dialog.run()
+				dialog.destroy()
+			
+			elif os.path.exists(prfConf) :
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+										 buttons=gtk.BUTTONS_CLOSE, message_format="%s already exists . Please use 'Edit' instead of 'Add' !" % prfName )
+				dialog.run()
+				dialog.destroy()
+			else :
+					
+				getLogger().debug("Got new profile name '%s : enable=%r' " % (prfName,enable) )
+			
+				if not enable : 
+					prfConf += "-disable"
+				
+				confman = ConfigManager()
+				confman.saveConf(prfConf)
+				
+				self.profiles.append([enable, prfName, prfConf])
+		
+		elif response == gtk.RESPONSE_CANCEL :
+			pass
+		
+		
+		
 	#----------------------------------------------------------------------
 
 	def on_removeProfileButton_clicked(self, *args):
@@ -1604,8 +1640,12 @@ class SBconfigGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_closeProfileManagerButton_clicked(self, *args):
-		print("TODO: on_closeProfileManagerButton_clicked : Load default profile nssbackup.conf")
-		pass
+		"""
+		Load the default configuration file
+		"""
+		getLogger().debug("Load the default configuration file '%s'" % self.default_conffile)
+		self.conffile = self.default_conffile
+		self.on_reload_clicked()
 
 
 
