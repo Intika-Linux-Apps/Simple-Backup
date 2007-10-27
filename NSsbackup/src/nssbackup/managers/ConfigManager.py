@@ -14,7 +14,7 @@
 
 # Author: Ouattara Oumar Aziz <wattazoum@gmail.com>
 
-import os
+import os, re
 import os.path
 import ConfigParser
 import traceback
@@ -139,7 +139,10 @@ class ConfigManager (ConfigParser.ConfigParser):
 	
 	conffile = None
 	
-		# Default values, constants and the like
+	prfRE = re.compile('^nssbackup-(.+?).conf(-disable)?$')
+	
+	
+	# Default values, constants and the like
 	our_options = {
 	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : str, 'purge' : str, 'run4others' : int  },
 	 'log' : {'level' : int , 'file' : str },
@@ -495,6 +498,33 @@ class ConfigManager (ConfigParser.ConfigParser):
 				return (0, self.get("schedule", "anacron"))
 			else :
 				return None
+	
+			
+	def getProfiles(self):
+		"""
+		Get the configuration profiles list 
+		@return: a dictionarity of { name: [path_to_conffile, enable] } 
+		"""
+		if os.getuid() == 0 :
+			prfDir = "/etc/nssbackup.d/"
+		else :
+			prfDir = getUserConfDir()+"nssbackup.d/"
+		
+		getLogger().debug("Getting profiles from '%s'" % prfDir)
+		
+		if not os.path.exists(prfDir) or not os.path.isdir(prfDir) :
+			return None
+		
+		profiles = dict()
+		
+		for cf in os.listdir(prfDir) :
+			m = self.prfRE.match(cf)
+			if m : 
+				getLogger().debug("Found %s "% m.group(0))
+				name, path, enable = m.group(1), prfDir+m.group(0), (m.group(2) is None)
+				profiles[name] = [path,enable]
+		
+		return profiles
 		
 		
 	def setLogSection(self, level=2 , file=None ):

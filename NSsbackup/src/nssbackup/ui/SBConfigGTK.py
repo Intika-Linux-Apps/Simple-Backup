@@ -44,18 +44,18 @@ class SBconfigGTK(GladeWindow):
 		
 		if os.geteuid() == 0 :
 			if os.path.exists("/etc/nssbackup.conf") :
-				self.conffile = "/etc/nssbackup.conf"
+				self.default_conffile = "/etc/nssbackup.conf"
 				self.configman = ConfigManager("/etc/nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 		else :
 			if os.path.exists(getUserConfDir()+"nssbackup.conf") :
-				self.conffile = getUserConfDir()+"nssbackup.conf"
+				self.default_conffile = getUserConfDir()+"nssbackup.conf"
 				self.configman = ConfigManager(getUserConfDir()+"nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 		
-		self.orig_configman = ConfigManager(self.conffile)
+		self.orig_configman = ConfigManager(self.default_conffile)
 		
 		filename = Util.getResource('nssbackup-config.glade')
 		
@@ -286,6 +286,7 @@ class SBconfigGTK(GladeWindow):
 		top_window = 'backup_properties_dialog'
 		GladeWindow.__init__(self, filename, top_window, widget_list, handlers)
 		self.widgets[top_window].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
+		# ---
 		# Initiate all data structures
 		# Paths to be included or excluded
 		self.include = gtk.ListStore( str )
@@ -363,6 +364,25 @@ class SBconfigGTK(GladeWindow):
 		
 		for i in range(0,7):
 			self.time_dow.append([ time.strftime( "%A", (2000,1,1,1,1,1,i,1,1)) ])
+			
+		# Profile Manager
+		# [ enable , profilename, cfPath ]
+		self.profiles = gtk.ListStore( bool, str, str )
+		for i,v in self.configman.getProfiles().iteritems() :
+			self.profiles.append( [v[1], i, v[0]] )
+		self.profilestv = self.widgets['profilesListTreeView']
+		self.profilestv.set_model(self.profiles )
+		
+		cell8,cell9 = gtk.CellRendererToggle(), gtk.CellRendererText()
+		
+		enableCBColumn = gtk.TreeViewColumn(_("Enable"), cell8, active=0 ) 
+		prfNameColumn = gtk.TreeViewColumn(_("Profile Name"), cell9, text=1 )
+		
+		self.profilestv.append_column(enableCBColumn)
+		self.profilestv.append_column(prfNameColumn)
+		
+			
+		# ---
 			
 		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
 		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
@@ -718,9 +738,10 @@ class SBconfigGTK(GladeWindow):
 
 	def on_reload_clicked(self, *args):
 		self.configman = ConfigManager(self.conffile)
+		self.orig_configman = ConfigManager(self.conffile)
 		self.prefillWindow()
 		self.isConfigChanged()
-		getLogger().debug("Config reloaded")
+		getLogger().debug("Config '%s' loaded" % self.conffile)
 
 	def on_save_clicked(self, *args):
 		getLogger().debug("Saving Config")
@@ -1540,14 +1561,15 @@ class SBconfigGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_prfManager_activate(self, *args):
-		print("TODO: on_prfManager_activate")
+		"""
+		Launch Profile manager dialog
+		"""
+		self.askSaveConfig()
+		
 		dialog = self.widgets["ProfileManagerDialog"]
 		response = dialog.run()
 		dialog.hide()
-		if response == gtk.RESPONSE_CLOSE :
-			#TODO:
-			pass
-		
+
 
 	#----------------------------------------------------------------------
 
@@ -1570,8 +1592,14 @@ class SBconfigGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_editProfileButton_clicked(self, *args):
-		print("TODO: on_editProfileButton_clicked : Load the new configuration and hide the dialog")
-		pass
+		
+		tm, iter = self.profilestv.get_selection().get_selected()
+		prfName, prfConf = tm.get_value(iter,1), tm.get_value(iter,2)
+		getLogger().debug("Load Profile '%s' configuration" % prfName)
+		
+		self.conffile = prfConf
+		self.on_reload_clicked()
+		self.widgets["ProfileManagerDialog"].hide()
 
 	#----------------------------------------------------------------------
 
