@@ -8,6 +8,7 @@ Prerequist
 pynotify
 fuse
 gettext
+pyGTK (>= 2.10)
 
 Easiest way
 ===========

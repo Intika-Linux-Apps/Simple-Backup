@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(nssbackup, 0.1-2, https://bugs.launchpad.net/nssbackup/)
+AC_INIT(nssbackup, 0.2-0, https://bugs.launchpad.net/nssbackup/)
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
 
 dnl check for python

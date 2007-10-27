@@ -1622,8 +1622,32 @@ class SBconfigGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_removeProfileButton_clicked(self, *args):
-		print("TODO: on_removeProfileButton_clicked")
-		pass
+		
+		tm, iter = self.profilestv.get_selection().get_selected()
+		
+		if not iter :
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Please select a Profile !"))
+			dialog.run()
+			dialog.destroy()
+			return 
+		
+		prfName, prfConf = tm.get_value(iter,1), tm.get_value(iter,2)
+		
+		warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n <b>Are you sure to want to delete the '%(name)s' profile ?</b> " % {'name': prfName})
+		
+		dialog = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_YES_NO)
+		dialog.set_markup(warning)
+		response = dialog.run()
+		dialog.destroy()
+		
+		if response == gtk.RESPONSE_YES :
+			getLogger().debug("Remove Profile '%s' configuration" % prfName)
+			if os.path.exists(prfConf) :
+				os.remove(prfConf)
+			self.profiles.remove(iter)
+			
+		elif response == gtk.RESPONSE_NO :
+			pass
 
 	#----------------------------------------------------------------------
 
