@@ -42,7 +42,7 @@ class NSsbackupd () :
 	
 	__bm = None
 	
-	__confFilesRE = "nssbackup-.+?\.conf"
+	__confFilesRE = "^nssbackup-.+?\.conf$"
 
 
 	def __sendEmail(self):

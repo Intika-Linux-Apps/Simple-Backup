@@ -376,6 +376,9 @@ class SBconfigGTK(GladeWindow):
 		self.profilestv.set_model(self.profiles )
 		
 		cell8,cell9 = gtk.CellRendererToggle(), gtk.CellRendererText()
+		cell8.set_active(True)
+		cell8.connect("toggled", self.on_prfEnableCB_toggled)
+		
 		
 		enableCBColumn = gtk.TreeViewColumn(_("Enable"), cell8, active=0 ) 
 		prfNameColumn = gtk.TreeViewColumn(_("Profile Name"), cell9, text=1 )
@@ -1670,7 +1673,32 @@ class SBconfigGTK(GladeWindow):
 		getLogger().debug("Load the default configuration file '%s'" % self.default_conffile)
 		self.conffile = self.default_conffile
 		self.on_reload_clicked()
-
+		
+	#-----------------------------------------------------------------------
+	
+	def on_prfEnableCB_toggled(self,*args):
+		
+		tm, iter = self.profilestv.get_selection().get_selected()
+		enable, prfName, prfConf =tm.get_value(iter,0), tm.get_value(iter,1), tm.get_value(iter,2)
+		
+		dir, file = prfConf.rsplit(os.sep,1)
+		
+		# rename the file 
+		if enable :
+			# then disable
+			getLogger().debug("Disabling %s " % prfName )
+			os.rename(prfConf, prfConf+"-disable")
+			self.profiles.set_value(iter, 0, False)
+			self.profiles.set_value(iter, 2, prfConf+"-disable")
+			
+		else :
+			# enable it
+			getLogger().debug("Enabling %s " % prfName )
+			os.rename(prfConf, prfConf.rstrip("-disable"))
+			self.profiles.set_value(iter, 0, True)
+			self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
+		
+		
 
 
 #----------------------------------------------------------------------
