@@ -8,45 +8,6 @@ dnl check for python
 dnl AM_PATH_PYTHON
 AM_PATH_PYTHON
 
-dnl check for libglade
-AC_MSG_CHECKING(for gtk.glade)
-prog="
-import sys
-try:
-  import gtk.glade
-except RuntimeError:
-  sys.exit(0)
-except ImportError:
-  sys.exit(1)
-sys.exit(0)
-"
-
-if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
-then
-  AC_MSG_RESULT(found)
-else
-  AC_MSG_RESULT(not found)
-  AC_MSG_ERROR([You need to have python libglade bindings installed])
-fi
-AC_PATH_PROG(CRONTAB_CONFIG, crontab, no)
-if test x$CRONTAB_CONFIG = xno; then
-  AC_MSG_ERROR(Please install the application crontab)
-fi
-
-AC_PATH_PROG(PYTHON_CONFIG, python, no)
-if test x$PYTHON_CONFIG = xno; then
-  AC_MSG_ERROR(Please install the application python)
-fi
-
-AC_PATH_PROG(SU_CONFIG, su, no)
-if test x$BATCH_CONFIG = xno; then
-  AC_MSG_ERROR(Please install the application su)
-fi
-
-AC_PATH_PROG(tar_CONFIG, tar, no)
-if test x$CRONTAB_CONFIG = xno; then
-  AC_MSG_ERROR(Please install the application tar)
-fi
 
 dnl *******************************
 dnl Internationalization
@@ -66,8 +27,5 @@ AC_PROG_INTLTOOL
 
 AC_OUTPUT([ Makefile  
 po/Makefile.in
-datas/Makefile
-src/Makefile
 src/nssbackup/ressources
-tests/Makefile
 ])
