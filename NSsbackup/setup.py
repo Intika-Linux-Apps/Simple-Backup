@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from setuptools import setup, find_packages
+from distutils.core import setup
 
 def datas(path):
 	"""
@@ -27,6 +27,7 @@ setup(name="NSsbackup",
 			'nssbackup.managers',
 			'nssbackup.plugins'],
       package_dir = {'': 'src'},
+      package_data = {'nssbackup':['ressources']},
       data_files=[('share/pixmaps', [datas('nssbackup-restore.png'),
 									datas('nssbackup-conf.png')]),
                   ('share/applications', [datas('nssbackup-config.desktop'),
