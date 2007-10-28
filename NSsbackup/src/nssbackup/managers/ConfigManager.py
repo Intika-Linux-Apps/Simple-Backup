@@ -142,6 +142,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	format= "gzip"
 	
 	conffile = None
+	__profileName = None
 	
 	prfRE = re.compile('^nssbackup-(.+?).conf(-disable)?$')
 	
@@ -503,7 +504,31 @@ class ConfigManager (ConfigParser.ConfigParser):
 			else :
 				return None
 	
-			
+	
+	def getProfileName(self):
+		"""
+		Gets the current profile name for the current Config Manager
+		@return: the current profile name if the config file name match the naming convention or Unknow otherwise
+		@raise SBException: if the configfile isn't set
+		"""
+		if self.__profileName : 
+			return self.__profileName
+		if not self.conffile: 
+			raise SBException(_("The config file is not set yet into this ConfigManager"))
+		
+		# find the profile 
+		cfile = self.conffile.rsplit(os.sep)[-1]
+		if cfile == "nssbackup.conf" :
+			self.__profileName = _("Default Profile")
+		else :
+			m = self.prfRE.match(cfile)
+			if not m :
+				self.__profileName = _("Unknown Profile")
+			else :
+				self.__profileName = m.group(1)
+				
+		return self.__profileName
+	
 	def getProfiles(self):
 		"""
 		Get the configuration profiles list 

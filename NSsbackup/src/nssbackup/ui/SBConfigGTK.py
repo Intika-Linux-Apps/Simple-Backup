@@ -85,6 +85,7 @@ class SBconfigGTK(GladeGnomeApp):
 			'cancelbutton2',
 			'okbutton2',
 			'nssbackupConfApp',
+			'statusBar',
 			'vbox17',
 			'save',
 			'save_as',
@@ -606,6 +607,9 @@ class SBconfigGTK(GladeGnomeApp):
 				self.widgets["purgedays"].set_sensitive( True )
 				self.on_purgedays_changed()
 			self.widgets['purgecheckbox'].set_active(True)
+			
+		# set the profile name
+		self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
 		
 		self.isConfigChanged()
 	#----------------------------------------------------------------------
