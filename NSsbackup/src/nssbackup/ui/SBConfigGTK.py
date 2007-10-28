@@ -736,7 +736,7 @@ class SBconfigGTK(GladeGnomeApp):
 		# TODO: Always keep this updated
 		about.set_version("0.2~devel")
 		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
-		about.set_transient_for(self.widgets["backup_properties_dialog"])
+		about.set_transient_for(self.widgets["nssbackupConfApp"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
 		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>", "Mathias HOUNGBO <mathias.houngbo@gmail.com>"])
