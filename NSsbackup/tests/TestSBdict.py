@@ -37,6 +37,7 @@ class TestSBdict(unittest.TestCase):
 		self.sbd["/home/usr1/usr2/test/dir"] =  ["4",None]
 		self.sbd["/home/usr1/usr2/test/direrec"] =  ["4",None]
 		self.sbd["/home/usr1/usr2/test/dir/test/de/plus"] =  ["7",None]
+		self.sbd["/home/usr3/*"] =  None
 	
 	def testIteritems(self):
 		" IterItems () "

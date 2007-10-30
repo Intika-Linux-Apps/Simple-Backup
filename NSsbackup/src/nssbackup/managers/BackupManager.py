@@ -237,81 +237,42 @@ class BackupManager :
 					return True
 					
 			# if the file is in exclude list, return true
-			if excludelist.has_key(_file2) :
+			if self.__actualSnapshot.getExcludeFlist().has_key(_file2) :
 				return True
 			
 			#all tests passed
 			return False
-		
-		def isexcludedbyinc(_file3):
-			"""
-			Check if a file is to be exclude because of incremental policies.
-			Don't check if the file was exclude by conf ( it's mandatory the check that before)
-			@return: True if the file has to be excluded, the props if not
-			"""
-			# file is a path of a file or dir to include 
-			#isstored =  searchInStored( _file3 )
-			if self.__actualSnapshot.isfull() :
-				s = os.lstat(_file3)
-				props = str(s.st_mode)+str(s.st_uid)+str(s.st_gid)+str(s.st_size)+str(s.st_mtime)
-				return props
 			
-			isstored = self.__snpman.isAlreadyStored(self.__actualSnapshot.getBaseSnapshot(),_file3)
-			s = os.lstat(_file3)
-			props = str(s.st_mode)+str(s.st_uid)+str(s.st_gid)+str(s.st_size)+str(s.st_mtime)
-			if not isstored :
-				# file wasn't inside
-				return props
-			else :
-				# file was inside so isstored is a list [existingprops, sonSBdict]the existing properties.
-				if isstored != props :
-					# then the file has changed
-					return props
-			
-			return True
-			
-		def addtobackup(_file, props):
+		def checkForExclude( path ):
 			"""
-			Add a file to the backup list. This file could be a dir so we need to list the file inside
+			check for file to exclude into path and add them to the ExcludeFlist
+			We will enter in the directories , only when needed. Otherwise we will use a wildcard
+			@param path: The path to check for
 			"""
-			global fullsize
-			# add _file and then check if it's a dir to add the contents , We won't follow links
-			if not os.path.islink(_file.rstrip(os.sep)) :
-				if not os.path.isdir(_file) :
-					# don't add dirs 
-					self.__actualSnapshot.addFile(_file, props)
-					fullsize += os.lstat(_file).st_size
+			if isexcludedbyconf( path ) :
+				getLogger().debug("Excluding '%s' (File excluded by conf)" % incl)
+				# if it's a directory
+				if os.path.isdir(path):
+					# if the path is not a subdirectory of one of the included files,
+					# exclude the whole dir content
+					if not self.__actualSnapshot.getIncludeFlist().has_key(path) : 
+						self.__actualSnapshot.addToExcludeFlist(path.rstrip(os.sep)+os.sep+"*")
+					# other wise, enter in the directory
+					else :
+						try :
+							for contents in FAM.listdir(path) :
+								# contents is a path of a file or dir to include 
+								contents = os.path.normpath( os.sep.join([path,contents]) )
+								checkForExclude(contents)
+							
+						except OSError, e :
+							getLogger().warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
+							# Add to exclude file list
+							self.__actualSnapshot.addToExcludeFlist(path)
 				else :
-					# file is dir , search in the content
-					try :
-						for contents in FAM.listdir(_file) :
-							# contents is a path of a file or dir to include 
-							contents = os.path.normpath( os.sep.join([_file,contents]) )
-							# in dirconfig, directories always end with an os.sep and files not.
-							if os.path.isdir(contents) :
-								if not contents.endswith(os.sep) :
-									contents = contents + os.sep
-								# we don't check dir prop as the content seems to 
-								# change without modifying the parent dir
-								if not isexcludedbyconf( contents ) :
-									addtobackup( contents, None )
-								else : getLogger().debug("Excluding '%s' (directory is excluded by conf )" % contents)
-							else :
-								# found a file
-								contents.rstrip(os.sep)							
-								if not isexcludedbyconf( contents ) :
-									cprops = isexcludedbyinc(contents)
-									if cprops != True and type(cprops) == str: 
-										addtobackup( contents, cprops )
-									else :
-										getLogger().debug("Excluding '%s' (File didn't change )" % contents)
-								else : 
-									getLogger().debug("Excluding '%s' (file is excluded by conf )" % contents)
-					except OSError, e :
-						getLogger().warning(_("got an error with '%(file)s' : %(error)s") % {'file':_file, 'error' : str(e)})
-						if self.__actualSnapshot.getFilesList().has_key(_file) :
-							del self.__actualSnapshot.getFilesList()[_file]
-									
+					# add to exclude list
+					self.__actualSnapshot.addToExcludeFlist(path)
+
 		# End of Subroutines
 		# -----------------------------------------------------------------
 		
@@ -332,34 +293,24 @@ class BackupManager :
 				includelist, excludelist = {},{}
 				getLogger().warning(_("No directory to backup !"))
 			else :
-				includelist, excludelist = {},{}
+				includelist, excludelist = list(),list()
 				for k,v in self.config.items("dirconfig") :
 					if int(v) == 1 :
-						includelist[k] = 1 
+						self.__actualSnapshot.addToExcludeFlist(k)
 					elif int(v) == 0 :
-						excludelist[k] = 0
+						self.__actualSnapshot.addToExcludeFlist(k)
 				# add the default excluded ones
-				excludelist.update([("",0), ("/dev/",0), ("/proc/",0), ("/sys/",0), ("/tmp/",0),(self.config.get("general","target"),0)])
+				self.__actualSnapshot.addToExcludeFlist(["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*",self.config.get("general","target")])
 		else :
-			includelist, excludelist = {},{}
 			getLogger().warning(_("No directories to backup !"))	
 		
+		# TODO: FIXME Generate the exclude list and not the include one
 		# We have now every thing we need , the rexclude, excludelist, includelist and already stored 
-		getLogger().debug("We have now every thing we need, starting the creation of the Flist " )
-		for incl in includelist.iterkeys() :
-			# incl is a path of a file or dir to include 
-			if not isexcludedbyconf( incl ) :
-				if os.path.isdir(incl):
-					addtobackup( incl, None )
-				else :
-					props = isexcludedbyinc(incl)
-					if props != True and type(props) == str: 
-						addtobackup( incl, props )
-					else :
-						getLogger().debug("Excluding '%s' (File didn't change )" % incl)
-			else :
-				getLogger().debug("Excluding '%s' (File excluded by conf)" % incl)
-
+		getLogger().debug("We have now every thing we need, starting the creation of the complete exclude list " )
+		
+		for incl in self.__actualSnapshot.getIncludeFlist():
+			# check into incl for file to exclude
+			checkForExclude(incl)
 				
 		# check for the available size
 		getLogger().debug("Free size required is '%s' " % str(fullsize))

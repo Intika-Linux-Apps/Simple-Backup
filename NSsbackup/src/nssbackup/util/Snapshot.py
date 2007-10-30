@@ -36,11 +36,11 @@ class Snapshot :
 	__base = False
 	__format = "gzip" # default value
 	
-
+	# TODO (in|ex)cludeFlist should be an SBdict
 	__snarfile = None
-	__includeFlist = list()
+	__includeFlist = SBdict()
 	__includeFlistFile = None # Str
-	__excludeFlist = list()
+	__excludeFlist = SBdict()
 	__excludeFlistFile = None # Str
 	
 	
@@ -101,42 +101,46 @@ class Snapshot :
 		date = {"year" : int(m.group(1)),"month":int(m.group(2)),"day":int(m.group(3)),
 			"hour":int(m.group(4)),"minute":int(m.group(5)),"second":int(m.group(6))}
 		return date
-		
+	# ---
+	
+	def getIncludeFlist(self):
+		"""
+		get the Include file list
+		@rtype: list
+		"""
+		return self.__includeFlist
+	
+	def getExcludeFlist(self):
+		"""
+		get the Exclude file list
+		@rtype: list
+		"""
+		return self.__excludeFlist
+	
 	def getExcludeFListFile(self):
 		"""
 		@return: the path to the exclude file list file
-		@raise NotValidSnapshotNameException: if the excludeFlist is not set and the file doesn't exist
 		"""
 		global __excludeFlistFile
 		
 		if not self.__excludeFlistFile :
-			self.__excludeFlistFile = self.getPath()+os.sep+"exclude.list"
+			self.__excludeFlistFile = self.getPath()+os.sep+"excludes.list"
 			
 		return self.__excludeFlistFile
 
 	def getIncludeFListFile(self):
 		"""
 		@return: the path to the include file list file
-		@raise NotValidSnapshotNameException: if the includeFlist is not set and the file doesn't exist
 		"""
 		global __includeFlistFile
 		
 		if not self.__includeFlistFile :
-			self.__includeFlistFile = self.getPath()+os.sep+"include.list"
+			self.__includeFlistFile = self.getPath()+os.sep+"includes.list"
 			
 		return self.__includeFlistFile
 
-	def getSnarFile(self):
-		"""
-		@return: the path to the TAR SNAR file
-		"""
-		global __snarfile
-		
-		if not self.__snarfile : 
-			self.__snarfile = self.getPath()+os.sep+"files.snar"
-		return self.__snarfile
-
-
+	# ---
+	
 	def getPath(self) :
 		"return the complete path of the snapshot"
 		if not self.__snapshotpath : 
@@ -275,9 +279,7 @@ class Snapshot :
 		"""
 		global __includeFlist
 		
-		if not self.__includeFlist :
-			self.__includeFlist = list()
-		self.__includeFlist.append(item)
+		self.__includeFlist[item] = None
 	
 	def addToExcludeFlist (self, item) :
 		"""
@@ -287,9 +289,7 @@ class Snapshot :
 		"""
 		global __excludeFlist
 		
-		if not self.__excludeFlist :
-			self.__excludeFlist = list()
-		self.__excludeFlist.append(item)
+		self.__excludeFlist[item] = None
 	
 	
 	#---------------------------------
@@ -406,19 +406,19 @@ class Snapshot :
 		Commit the include.list and exclude.list to the disk
 		"""
 		if os.path.exists(self.getIncludeFListFile()) or os.path.exists(self.getIncludeFListFile()) :
-			raise SBException("include.list and exclude.list shouldn't exist at this stage")
-		
-		fi,fe = "",""
+			raise SBException("includes.list and excludes.list shouldn't exist at this stage")
 		
 		# commit include.list
-		for f in self.__includeFlist :
-			fi += str(f) +"\n"
-		FAM.writetofile(self.getIncludeFListFile(), fi)
+		fi = open(self.getIncludeFListFile())
+		for f in self.__includeFlist.iterkeys() :
+			fi.write(str(f) +"\n")
+		fi.close()
 		
 		# commit exclude.list
+		fe = open(self.getExcludeFListFile())
 		for f in self.__excludeFlist :
-			fe += str(f) +"\n"
-		FAM.writetofile(self.getExcludeFListFile(), fe)
+			fe.write(str(f) +"\n")
+		fe.close()
 		
 		
 	def __commitpackagefile(self):

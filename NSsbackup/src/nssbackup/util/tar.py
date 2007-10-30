@@ -16,7 +16,7 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 
-import os,re,tarfile, csv
+import os,re,tarfile, csv, shutil
 from gettext import gettext as _
 from nssbackup.util.log import getLogger
 import nssbackup.util as Util
@@ -165,12 +165,13 @@ def makeTarIncBackup(snapshot):
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
-	# For a full backup the SNAR file shouldn't exists
-	if not os.path.exists(snapshot.getSnarFile()) :
+	# For an INC backup the base SNAR file should exists
+	if not os.path.exists(snapshot.getBaseSnapshot().getSnarFile()) :
 		getLogger().error("Unable to find the SNAR file to make an Incremental backup")
 		getLogger().error("Falling back to full backup")
 		makeTarFullBackup(snapshot)
 	else:
+		shutil.copy(snapshot.getBaseSnapshot().getSnarFile(), snapshot.getSnarFile())
 		options.append("--listed-incremental="+snapshot.getSnarFile())
 		
 		outStr, errStr, retVal = Util.launch("tar", options)
