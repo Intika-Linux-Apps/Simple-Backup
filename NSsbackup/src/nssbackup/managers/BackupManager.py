@@ -296,11 +296,12 @@ class BackupManager :
 				includelist, excludelist = list(),list()
 				for k,v in self.config.items("dirconfig") :
 					if int(v) == 1 :
-						self.__actualSnapshot.addToExcludeFlist(k)
+						self.__actualSnapshot.addToIncludeFlist(k)
 					elif int(v) == 0 :
 						self.__actualSnapshot.addToExcludeFlist(k)
 				# add the default excluded ones
-				self.__actualSnapshot.addToExcludeFlist(["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*",self.config.get("general","target")])
+				for excl in ["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*",self.config.get("general","target")] :
+					self.__actualSnapshot.addToExcludeFlist(excl)
 		else :
 			getLogger().warning(_("No directories to backup !"))	
 		
@@ -308,15 +309,15 @@ class BackupManager :
 		# We have now every thing we need , the rexclude, excludelist, includelist and already stored 
 		getLogger().debug("We have now every thing we need, starting the creation of the complete exclude list " )
 		
-		for incl in self.__actualSnapshot.getIncludeFlist():
+		for incl in self.__actualSnapshot.getIncludeFlist().getEffectiveFileList():
 			# check into incl for file to exclude
 			checkForExclude(incl)
 				
 		# check for the available size
-		getLogger().debug("Free size required is '%s' " % str(fullsize))
-		vstat = os.statvfs( self.__actualSnapshot.getPath() )
-		if (vstat.f_bavail * vstat.f_bsize) <= fullsize:
-			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': self.__fullsize})
+#		getLogger().debug("Free size required is '%s' " % str(fullsize))
+#		vstat = os.statvfs( self.__actualSnapshot.getPath() )
+#		if (vstat.f_bavail * vstat.f_bsize) <= fullsize:
+#			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': self.__fullsize})
 	
 	
 	def __setlockfile(self):

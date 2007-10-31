@@ -139,6 +139,17 @@ class Snapshot :
 			
 		return self.__includeFlistFile
 
+	def getSnarFile(self):
+		"""
+		@return: the path to the TAR SNAR file
+		"""
+		global __snarfile
+		
+		if not self.__snarfile : 
+			self.__snarfile = self.getPath()+os.sep+"files.snar"
+		return self.__snarfile
+
+	
 	# ---
 	
 	def getPath(self) :
@@ -279,7 +290,7 @@ class Snapshot :
 		"""
 		global __includeFlist
 		
-		self.__includeFlist[item] = None
+		self.__includeFlist[item] = "1"
 	
 	def addToExcludeFlist (self, item) :
 		"""
@@ -289,7 +300,7 @@ class Snapshot :
 		"""
 		global __excludeFlist
 		
-		self.__excludeFlist[item] = None
+		self.__excludeFlist[item] = "0"
 	
 	
 	#---------------------------------
@@ -409,13 +420,13 @@ class Snapshot :
 			raise SBException("includes.list and excludes.list shouldn't exist at this stage")
 		
 		# commit include.list
-		fi = open(self.getIncludeFListFile())
+		fi = open(self.getIncludeFListFile(),"w")
 		for f in self.__includeFlist.getEffectiveFileList() :
 			fi.write(str(f) +"\n")
 		fi.close()
 		
 		# commit exclude.list
-		fe = open(self.getExcludeFListFile())
+		fe = open(self.getExcludeFListFile(),"w")
 		for f in self.__excludeFlist.getEffectiveFileList() :
 			fe.write(str(f) +"\n")
 		fe.close()
