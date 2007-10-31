@@ -270,3 +270,25 @@ class SBdict (dict) :
 					yield prop
 		if len(_path) > 0 :
 			_path.pop()
+			
+	def getEffectiveFileList(self,_path=None):
+		"""
+		an Iterator that return the effective files list. Unlike iterkeys, every sub path is not return
+		a file is considered as effective if the prop is set.
+		"""
+		for file,prop in self.iteritems(_path):
+			if prop is not None :
+				yield file 
+	
+	def hasFile(self,_file):
+		"""
+		Checks if the SBdict has a file. Unlike has_key, this will not match subdirectories name
+		"""
+		if not self.has_key(_file) :
+			return False
+		else :
+			if self.__getitem__(_file)[0] is None :
+				return False
+			else :
+				return True
+		

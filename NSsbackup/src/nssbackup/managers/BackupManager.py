@@ -237,7 +237,7 @@ class BackupManager :
 					return True
 					
 			# if the file is in exclude list, return true
-			if self.__actualSnapshot.getExcludeFlist().has_key(_file2) :
+			if self.__actualSnapshot.getExcludeFlist().hasFile(_file2) :
 				return True
 			
 			#all tests passed

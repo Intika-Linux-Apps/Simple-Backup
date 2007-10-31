@@ -410,13 +410,13 @@ class Snapshot :
 		
 		# commit include.list
 		fi = open(self.getIncludeFListFile())
-		for f in self.__includeFlist.iterkeys() :
+		for f in self.__includeFlist.getEffectiveFileList() :
 			fi.write(str(f) +"\n")
 		fi.close()
 		
 		# commit exclude.list
 		fe = open(self.getExcludeFListFile())
-		for f in self.__excludeFlist :
+		for f in self.__excludeFlist.getEffectiveFileList() :
 			fe.write(str(f) +"\n")
 		fe.close()
 		

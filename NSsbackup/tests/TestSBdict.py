@@ -29,28 +29,30 @@ class TestSBdict(unittest.TestCase):
 	def setUp(self):
 		""
 		self.sbd = SBdict()
-		self.sbd["home"] =  ["0",None]
 		self.sbd["/home/user"] =  "1"
 		self.sbd["/home/usr1"] =  ["1",None]
 		self.sbd["/home/usr1/usr2"] =  ["2",None]
-		self.sbd["/home/usr1/usr2/test"] =  ["3",None]
+		#self.sbd["/home/usr1/usr2/test"] =  ["3",None]
 		self.sbd["/home/usr1/usr2/test/dir"] =  ["4",None]
 		self.sbd["/home/usr1/usr2/test/direrec"] =  ["4",None]
 		self.sbd["/home/usr1/usr2/test/dir/test/de/plus"] =  ["7",None]
-		self.sbd["/home/usr3/*"] =  None
+		self.sbd["/home/usr3/*"] =  "1"
 	
 	def testIteritems(self):
 		" IterItems () "
+		print " IterItems () \n"
 		for k,v in self.sbd.iteritems() :
 			print k , v	
 		
 	def testIterkeys(self):
 		" Iterkeys () "
+		print "Iterkeys\n"
 		for k in self.sbd.iterkeys() :
 			print k
 	
 	def testItervalues(self):
 		""
+		print "IterValues\n"
 		for v in self.sbd.itervalues() :
 			print v
 		
@@ -60,5 +62,18 @@ class TestSBdict(unittest.TestCase):
 	def testDictCommonUsage(self):
 		""
 
+	def testGetEffectiveFileList(self):
+		"Get Effective FileList"
+		print "Get Effective FileList\n"
+		for v in self.sbd.getEffectiveFileList() :
+			print v
+	
+	def testHasFile(self):
+		""
+		self.assertFalse(self.sbd.hasFile("/home/usr1/usr2/test"))
+		self.assertTrue(self.sbd.hasFile("/home/usr1/usr2"))
+		self.assertFalse(self.sbd.hasFile("/home/usr1/usr2/test/dir/test/de"))
+		self.assertTrue(self.sbd.has_key("/home/usr1/usr2/test/dir/test/de"))
+		
 suite = unittest.TestLoader().loadTestsFromTestCase(TestSBdict)
 unittest.TextTestRunner(verbosity=2).run(suite)
