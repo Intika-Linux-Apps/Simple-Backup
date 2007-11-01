@@ -243,27 +243,33 @@ class BackupManager :
 			#all tests passed
 			return False
 			
-		def checkForExclude( path ):
+		def checkForExclude( path, forceExclusion=False ):
 			"""
 			check for file to exclude into path and add them to the ExcludeFlist
 			We will enter in the directories , only when needed. Otherwise we will use a wildcard
 			@param path: The path to check for
 			"""
-			if isexcludedbyconf( path ) :
-				getLogger().debug("Excluding '%s' (File excluded by conf)" % incl)
+			if isexcludedbyconf( path ) or forceExclusion or self.__actualSnapshot.getExcludeFlist().has_key(path):
+				
 				# if it's a directory
 				if os.path.isdir(path):
 					# if the path is not a subdirectory of one of the included files,
 					# exclude the whole dir content
-					if not self.__actualSnapshot.getIncludeFlist().has_key(path) : 
-						self.__actualSnapshot.addToExcludeFlist(path.rstrip(os.sep)+os.sep+"*")
+					if not self.__actualSnapshot.getIncludeFlist().has_key(path) :
+						if not self.__actualSnapshot.getExcludeFlist().hasFile(path):
+							self.__actualSnapshot.addToExcludeFlist(path.rstrip(os.sep)+os.sep+"*")
 					# other wise, enter in the directory
 					else :
+						# we remove the dir as an effective file of the exclude list
+						# This will prevent full exclusion of that directory
+						if self.__actualSnapshot.getExcludeFlist().hasFile(path):
+							self.__actualSnapshot.getExcludeFlist()[path][0] = None
 						try :
 							for contents in FAM.listdir(path) :
 								# contents is a path of a file or dir to include 
 								contents = os.path.normpath( os.sep.join([path,contents]) )
-								checkForExclude(contents)
+								# if the file is included precisely, don't force exclusion
+								checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
 							
 						except OSError, e :
 							getLogger().warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
@@ -271,7 +277,8 @@ class BackupManager :
 							self.__actualSnapshot.addToExcludeFlist(path)
 				else :
 					# add to exclude list
-					self.__actualSnapshot.addToExcludeFlist(path)
+					if not self.__actualSnapshot.getIncludeFlist().has_key(path):
+						self.__actualSnapshot.addToExcludeFlist(path)
 
 		# End of Subroutines
 		# -----------------------------------------------------------------
