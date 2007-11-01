@@ -70,8 +70,8 @@ class BackupManager :
 		
 		try:
 			import pynotify
-			if pynotify.init("nssbackup"):
-				n = pynotify.Notification("nssbackup", _("Starting backup Session"))
+			if pynotify.init("NSsbackup"):
+				n = pynotify.Notification("NSsbackup", _("Starting backup Session"))
 				n.show()
 			else:
 				getLogger().warning(_("there was a problem initializing the pynotify module"))
@@ -163,8 +163,8 @@ class BackupManager :
 		if os.getuid() != 0 :
 			try:
 				import pynotify
-				if pynotify.init("nssbackup"):
-					n = pynotify.Notification("nssbackup", _("File list ready , Committing to disk"))
+				if pynotify.init("NSsbackup"):
+					n = pynotify.Notification("NSsbackup", _("File list ready , Committing to disk"))
 					n.show()
 				else:
 					getLogger().warning(_("there was a problem initializing the pynotify module"))
@@ -370,8 +370,8 @@ class BackupManager :
 		if os.getuid() != 0 :
 			try:
 				import pynotify
-				if pynotify.init("nssbackup"):
-					n = pynotify.Notification("nssbackup", _("Ending Backup Session"))
+				if pynotify.init("NSsbackup"):
+					n = pynotify.Notification("NSsbackup", _("Ending Backup Session"))
 					n.show()
 				else:
 					getLogger().warning(_("there was a problem initializing the pynotify module"))

@@ -17,14 +17,14 @@ from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
-from GladeWindow import *
+from GladeGnomeApp import *
 import gettext
 from gettext import gettext as _
 import nssbackup.util as Util
 
 #----------------------------------------------------------------------
 
-class SBconfigGTK(GladeWindow):
+class SBconfigGTK(GladeGnomeApp):
 	
 	configman = None
 	conffile = None
@@ -44,18 +44,18 @@ class SBconfigGTK(GladeWindow):
 		
 		if os.geteuid() == 0 :
 			if os.path.exists("/etc/nssbackup.conf") :
-				self.conffile = "/etc/nssbackup.conf"
+				self.default_conffile = "/etc/nssbackup.conf"
 				self.configman = ConfigManager("/etc/nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 		else :
 			if os.path.exists(getUserConfDir()+"nssbackup.conf") :
-				self.conffile = getUserConfDir()+"nssbackup.conf"
+				self.default_conffile = getUserConfDir()+"nssbackup.conf"
 				self.configman = ConfigManager(getUserConfDir()+"nssbackup.conf")
 			else :
 				self.configman = ConfigManager()
 		
-		self.orig_configman = ConfigManager(self.conffile)
+		self.orig_configman = ConfigManager(self.default_conffile)
 		
 		filename = Util.getResource('nssbackup-config.glade')
 		
@@ -84,7 +84,8 @@ class SBconfigGTK(GladeWindow):
 			'regex_box',
 			'cancelbutton2',
 			'okbutton2',
-			'backup_properties_dialog',
+			'nssbackupConfApp',
+			'statusBar',
 			'vbox17',
 			'save',
 			'save_as',
@@ -209,15 +210,26 @@ class SBconfigGTK(GladeWindow):
 			'crtfilechooser',
 			'keyfilechooser',
 			'pluginscombobox',
+			'ProfileManagerDialog',
+			'profilesListTreeView',
+			'addProfileButton',
+			'removeProfileButton',
+			'editProfileButton',
+			'closeProfileManagerButton',
+			'askNewPrfNameDialog',
+			'enableNewPrfCB',
+			'newPrfNameEntry',
 			]
 
 		handlers = [
 			'gtk_main_quit',
 			'on_ftype_toggled',
 			'on_ftype_st_box_changed',
+			'on_ftype_custom_ex_changed',
 			'on_save_activate',
 			'on_save_as_activate',
 			'on_exit_activate',
+			'on_prfManager_activate',
 			'on_about_activate',
 			'on_reload_clicked',
 			'on_save_clicked',
@@ -268,11 +280,16 @@ class SBconfigGTK(GladeWindow):
 			'on_keyfilechooser_selection_changed',
 			'on_pluginscombobox_changed',
 			'on_fusecheckbutton_clicked',
+			'on_addProfileButton_clicked',
+			'on_removeProfileButton_clicked',
+			'on_editProfileButton_clicked',
+			'on_closeProfileManagerButton_clicked',
 			]
 
-		top_window = 'backup_properties_dialog'
-		GladeWindow.__init__(self, filename, top_window, widget_list, handlers)
+		top_window = 'nssbackupConfApp'
+		GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window, widget_list, handlers)
 		self.widgets[top_window].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
+		# ---
 		# Initiate all data structures
 		# Paths to be included or excluded
 		self.include = gtk.ListStore( str )
@@ -350,6 +367,28 @@ class SBconfigGTK(GladeWindow):
 		
 		for i in range(0,7):
 			self.time_dow.append([ time.strftime( "%A", (2000,1,1,1,1,1,i,1,1)) ])
+			
+		# Profile Manager
+		# [ enable , profilename, cfPath ]
+		self.profiles = gtk.ListStore( bool, str, str )
+		for i,v in self.configman.getProfiles().iteritems() :
+			self.profiles.append( [v[1], i, v[0]] )
+		self.profilestv = self.widgets['profilesListTreeView']
+		self.profilestv.set_model(self.profiles )
+		
+		cell8,cell9 = gtk.CellRendererToggle(), gtk.CellRendererText()
+		cell8.set_active(True)
+		cell8.connect("toggled", self.on_prfEnableCB_toggled)
+		
+		
+		enableCBColumn = gtk.TreeViewColumn(_("Enable"), cell8, active=0 ) 
+		prfNameColumn = gtk.TreeViewColumn(_("Profile Name"), cell9, text=1 )
+		
+		self.profilestv.append_column(enableCBColumn)
+		self.profilestv.append_column(prfNameColumn)
+		
+			
+		# ---
 			
 		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
 		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
@@ -568,6 +607,9 @@ class SBconfigGTK(GladeWindow):
 				self.widgets["purgedays"].set_sensitive( True )
 				self.on_purgedays_changed()
 			self.widgets['purgecheckbox'].set_active(True)
+			
+		# set the profile name
+		self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
 		
 		self.isConfigChanged()
 	#----------------------------------------------------------------------
@@ -694,7 +736,7 @@ class SBconfigGTK(GladeWindow):
 		# TODO: Always keep this updated
 		about.set_version("0.2~devel")
 		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
-		about.set_transient_for(self.widgets["backup_properties_dialog"])
+		about.set_transient_for(self.widgets["nssbackupConfApp"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
 		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>", "Mathias HOUNGBO <mathias.houngbo@gmail.com>"])
@@ -705,9 +747,10 @@ class SBconfigGTK(GladeWindow):
 
 	def on_reload_clicked(self, *args):
 		self.configman = ConfigManager(self.conffile)
+		self.orig_configman = ConfigManager(self.conffile)
 		self.prefillWindow()
 		self.isConfigChanged()
-		getLogger().debug("Config reloaded")
+		getLogger().debug("Config '%s' loaded" % self.conffile)
 
 	def on_save_clicked(self, *args):
 		getLogger().debug("Saving Config")
@@ -1517,6 +1560,149 @@ class SBconfigGTK(GladeWindow):
 	def gtk_main_quit( self, *args):
 		self.askSaveConfig()
 		gtk.main_quit()
+
+	#----------------------------------------------------------------------
+
+	def on_ftype_custom_ex_changed(self, *args):
+		print("TODO: on_ftype_custom_ex_changed")
+		pass
+
+	#----------------------------------------------------------------------
+
+	def on_prfManager_activate(self, *args):
+		"""
+		Launch Profile manager dialog
+		"""
+		self.askSaveConfig()
+		
+		dialog = self.widgets["ProfileManagerDialog"]
+		dialog.run()
+		dialog.hide()
+
+
+	#----------------------------------------------------------------------
+
+	def on_addProfileButton_clicked(self, *args):
+		
+		prfDir = getUserConfDir()+"nssbackup.d/"
+		if not os.path.exists(prfDir):
+			os.makedirs(prfDir)
+		
+		dialog = self.widgets['askNewPrfNameDialog']
+		response = dialog.run()
+		dialog.hide()
+		
+		if response == gtk.RESPONSE_OK :
+
+			enable = self.widgets['enableNewPrfCB'].get_active()
+			prfName = self.widgets['newPrfNameEntry'].get_text()
+			prfConf = getUserConfDir()+"nssbackup.d/nssbackup-"+prfName.strip()+".conf"
+			
+			if not prfName or prfName is '' :
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+										 buttons=gtk.BUTTONS_CLOSE, message_format="Profile Name must not be empty ! " )
+				dialog.run()
+				dialog.destroy()
+			
+			elif os.path.exists(prfConf) :
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+										 buttons=gtk.BUTTONS_CLOSE, message_format="%s already exists . Please use 'Edit' instead of 'Add' !" % prfName )
+				dialog.run()
+				dialog.destroy()
+			else :
+					
+				getLogger().debug("Got new profile name '%s : enable=%r' " % (prfName,enable) )
+			
+				if not enable : 
+					prfConf += "-disable"
+				
+				confman = ConfigManager()
+				confman.saveConf(prfConf)
+				
+				self.profiles.append([enable, prfName, prfConf])
+		
+		elif response == gtk.RESPONSE_CANCEL :
+			pass
+		
+		
+		
+	#----------------------------------------------------------------------
+
+	def on_removeProfileButton_clicked(self, *args):
+		
+		tm, iter = self.profilestv.get_selection().get_selected()
+		
+		if not iter :
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Please select a Profile !"))
+			dialog.run()
+			dialog.destroy()
+			return 
+		
+		prfName, prfConf = tm.get_value(iter,1), tm.get_value(iter,2)
+		
+		warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n <b>Are you sure to want to delete the '%(name)s' profile ?</b> " % {'name': prfName})
+		
+		dialog = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_YES_NO)
+		dialog.set_markup(warning)
+		response = dialog.run()
+		dialog.destroy()
+		
+		if response == gtk.RESPONSE_YES :
+			getLogger().debug("Remove Profile '%s' configuration" % prfName)
+			if os.path.exists(prfConf) :
+				os.remove(prfConf)
+			self.profiles.remove(iter)
+			
+		elif response == gtk.RESPONSE_NO :
+			pass
+
+	#----------------------------------------------------------------------
+
+	def on_editProfileButton_clicked(self, *args):
+		
+		tm, iter = self.profilestv.get_selection().get_selected()
+		prfName, prfConf = tm.get_value(iter,1), tm.get_value(iter,2)
+		getLogger().debug("Load Profile '%s' configuration" % prfName)
+		
+		self.conffile = prfConf
+		self.on_reload_clicked()
+		self.widgets["ProfileManagerDialog"].hide()
+
+	#----------------------------------------------------------------------
+
+	def on_closeProfileManagerButton_clicked(self, *args):
+		"""
+		Load the default configuration file
+		"""
+		getLogger().debug("Load the default configuration file '%s'" % self.default_conffile)
+		self.conffile = self.default_conffile
+		self.on_reload_clicked()
+		
+	#-----------------------------------------------------------------------
+	
+	def on_prfEnableCB_toggled(self,*args):
+		
+		tm, iter = self.profilestv.get_selection().get_selected()
+		enable, prfName, prfConf =tm.get_value(iter,0), tm.get_value(iter,1), tm.get_value(iter,2)
+		
+		dir, file = prfConf.rsplit(os.sep,1)
+		
+		# rename the file 
+		if enable :
+			# then disable
+			getLogger().debug("Disabling %s " % prfName )
+			os.rename(prfConf, prfConf+"-disable")
+			self.profiles.set_value(iter, 0, False)
+			self.profiles.set_value(iter, 2, prfConf+"-disable")
+			
+		else :
+			# enable it
+			getLogger().debug("Enabling %s " % prfName )
+			os.rename(prfConf, prfConf.rstrip("-disable"))
+			self.profiles.set_value(iter, 0, True)
+			self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
+		
+		
 
 
 #----------------------------------------------------------------------
