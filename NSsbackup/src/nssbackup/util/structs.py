@@ -280,6 +280,15 @@ class SBdict (dict) :
 			if prop is not None :
 				yield file 
 	
+	def getEffectiveFileListForTAR(self,_path=None):
+		"""
+		an Iterator that return the effective files list to give to TAR.
+		This means, some files won't appear because they are part of an included sub directory
+		"""
+		for file in self.getEffectiveFileList(_path):
+			if not self.hasParentDirIncluded(file) :
+				yield file
+	
 	def hasFile(self,_file):
 		"""
 		Checks if the SBdict has a file. Unlike has_key, this will not match subdirectories name
@@ -291,4 +300,20 @@ class SBdict (dict) :
 				return False
 			else :
 				return True
+			
+	def hasParentDirIncluded(self,path):
+		"""
+		Checks for a path if we have an effective parent dir
+		@param path: The path to check 
+		@type path: like /d/d1/d2
+		"""
+		if not path :
+			return False
+		
+		splited = path.rsplit(os.sep,1)		
+		
+		if self.__getitem__(splited[0])[0] is not None :
+			return True
+		else :
+			return self.hasParentDirIncluded(splited[0])
 		

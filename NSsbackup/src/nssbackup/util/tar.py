@@ -127,8 +127,7 @@ def __prepareTarCommonOpts(snapshot):
 	tdir = snapshot.getPath().replace(" ", "\ ")
 	options = list()
 	
-	#TODO: review the options to only use a minimal include file list and an exclude file list
-	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile().replace(" ", "\ ")])
+	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile().replace(" ", "\ ")+".tmp"])
 	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ "))
 	
 	archivename = "files.tar"

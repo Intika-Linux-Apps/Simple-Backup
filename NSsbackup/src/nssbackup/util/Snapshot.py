@@ -277,6 +277,7 @@ class Snapshot :
 		self.__commitpackagefile()
 		self.__commitflistFiles()
 		self.__makebackup()
+		self.__clean()
 		self.__commitverfile()
 	
 	
@@ -376,7 +377,11 @@ class Snapshot :
 		# validate the name
 		if not self.__isValidName(self.__name) :
 			raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
-		if not FAM.exists( self.getPath()+os.sep +"flist" ) or not FAM.exists( self.getPath()+os.sep +"fprops" ) or not self.getArchive() or not FAM.exists( self.getPath()+os.sep +"ver" ):
+		if not FAM.exists( self.getPath()+os.sep +"includes.list" ) \
+		or not FAM.exists( self.getPath()+os.sep +"excludes.list" ) \
+		or not FAM.exists( self.getPath()+os.sep +"files.snar" ) \
+		or not self.getArchive() \
+		or not FAM.exists( self.getPath()+os.sep +"ver" ):
 			raise NotValidSnapshotException (_("One of the mandatory files doesn't exist in [%s]") % self.getName())
 		
 	def __isValidName(self, name ) :
@@ -419,6 +424,12 @@ class Snapshot :
 		if os.path.exists(self.getIncludeFListFile()) or os.path.exists(self.getIncludeFListFile()) :
 			raise SBException("includes.list and excludes.list shouldn't exist at this stage")
 		
+		# commit include.list.tmp
+		fi = open(self.getIncludeFListFile()+".tmp","w")
+		for f in self.__includeFlist.getEffectiveFileListForTAR() :
+			fi.write(str(f) +"\n")
+		fi.close()
+		
 		# commit include.list
 		fi = open(self.getIncludeFListFile(),"w")
 		for f in self.__includeFlist.getEffectiveFileList() :
@@ -446,3 +457,11 @@ class Snapshot :
 			TAR.makeTarFullBackup(self)
 		else :
 			TAR.makeTarIncBackup(self)
+
+	def __clean(self):
+		"""
+		Clean operational temporary files
+		"""
+		# 
+		if os.path.exists(self.getIncludeFListFile()+".tmp") :
+			os.remove(self.getIncludeFListFile()+".tmp")

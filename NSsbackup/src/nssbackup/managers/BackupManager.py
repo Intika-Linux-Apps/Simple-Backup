@@ -420,26 +420,12 @@ class BackupManager :
 				if ( datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days < self.config.get("general","maxincrement") :
 			    	# Less then maxincrement days passed since that -> make an increment
 					increment = True
-					try:
-						prev = base.getFilesList()
-					except Exception, e:
-						getLogger().warning(str(e))
-						increment = False  # Last backup is somehow damaged	
 				else:
 					getLogger().info("Last full backup is old -> make a full backup")
 					increment = False      # Too old -> make full backup
 			else: # Last backup was an increment - lets search for the last full one
 				getLogger().debug(" Last backup (%s) was an increment - lets search for the last full one" % listing[0].getName())
 				for i in listing :
-					try: 
-						for a,b in i.getFilesList().items() :
-							if not prev.has_key(a) : # We always keep the newer incremental file info
-								prev[a]=b
-					except Exception, e :  # One of the incremental backups is bad -> make a new full one
-						getLogger().warning(_("One of the incremental backups (%(bad_one)s) is bad -> make a new full one : %(error_cause)s ") % {'bad_one' : i.getName(), 'error_cause' : str(e)})
-						increment = False
-						break
-					
 					if i.isfull():
 						d = i.getDate()
 						age = (datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days
