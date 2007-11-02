@@ -12,7 +12,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Author: Aigars Mahinovs <aigarius@debian.org>
+# Author: Oumar Aziz OUATTARA <wattazoum at gmail dot com>
 
 from gettext import gettext as _
 import os , grp
@@ -153,8 +153,12 @@ class BackupManager :
 		getLogger().info(_("Setting compression format "))
 		if self.config.has_option( "general", "format" ):
 			self.__actualSnapshot.setFormat(self.config.get("general","format"))
-		
-
+			
+		# set splited size
+		getLogger().info(_("Setting split size"))
+		if self.config.has_option( "general", "splitsize" ):
+			self.__actualSnapshot.setSplitedSize(int(self.config.get("general","splitsize")))
+			
 		# Reduce the priority, so not to interfere with other processes
 		os.nice(20)
 		
@@ -312,7 +316,6 @@ class BackupManager :
 		else :
 			getLogger().warning(_("No directories to backup !"))	
 		
-		# TODO: FIXME Generate the exclude list and not the include one
 		# We have now every thing we need , the rexclude, excludelist, includelist and already stored 
 		getLogger().debug("We have now every thing we need, starting the creation of the complete exclude list " )
 		

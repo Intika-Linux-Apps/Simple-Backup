@@ -73,6 +73,10 @@ class ConfigManager (ConfigParser.ConfigParser):
 	# bzip2 :use a tar.bz2 - All files are stored in the files.tar.bz2
 	format = gzip
 	
+	# For the split functionality :
+	# this should be an integer . It represent the size in KB of each archive (0 => unlimited)
+	splitsize = 0
+	
 	[log]
 	level = 20
 	file = nssbackup.log
@@ -149,7 +153,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	
 	# Default values, constants and the like
 	our_options = {
-	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : str, 'purge' : str, 'run4others' : int  },
+	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : str,'splitsize' : int, 'purge' : str, 'run4others' : int  },
 	 'log' : {'level' : int , 'file' : str },
 	 'report' : {'from' :str, 'to' : str,'smtpserver' : str,'smtpport' : int, 'smtpuser' : str,
 				'smtppassword' : str, 'smtptls' : int, 'smtpcert': str, 'smtpkey': str },
