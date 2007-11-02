@@ -59,6 +59,12 @@ class SBconfigGTK(GladeGnomeApp):
 		
 		filename = Util.getResource('nssbackup-config.glade')
 		
+		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
+		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
+		self.cformat = {'none':0, 'gzip':1, 'bzip2':2}
+		self.splitSize = {0:_('Unlimited'),100:_('100 MB'),250:_('250 MB'), 650 : _('650 MB'),2000 :_('2 GB (FAT16)'),4000 : _('4 GB (FAT32)'), -1: _('Custom')}
+		
+		
 		widget_list = [
 			'askSaveDialog',
 			'remote_inc_dialog',
@@ -105,6 +111,9 @@ class SBconfigGTK(GladeGnomeApp):
 			'hbox2',
 			'main_radio3',
 			'cformat',
+			'splitsizeCB',
+			'splitsizeSB',
+			'splitsizevbox',
 			'hbox3',
 			'vbox3',
 			'scrolledwindow1',
@@ -236,6 +245,8 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_backup_clicked',
 			'on_main_radio_toggled',
 			'on_cformat_changed',
+			'on_splitsizeCB_changed',
+			'on_splitsizeSB_value_changed',
 			'on_inc_addfile_clicked',
 			'on_inc_adddir_clicked',
 			'on_inc_del_clicked',
@@ -387,13 +398,24 @@ class SBconfigGTK(GladeGnomeApp):
 		self.profilestv.append_column(enableCBColumn)
 		self.profilestv.append_column(prfNameColumn)
 		
+		# The split size coices
+		self.splitSizeLS = gtk.ListStore( str, int )
+		values = []
+		for k in self.splitSize.keys() :
+			values.append(k)
+		values.sort()
+		
+		for k in values :
+			self.splitSizeLS.append([self.splitSize[k],k])
+		self.widgets['splitsizeCB'].set_model(self.splitSizeLS)
+		cell = gtk.CellRendererText()
+  		self.widgets['splitsizeCB'].pack_start(cell, True)
+		self.widgets['splitsizeCB'].add_attribute(cell, 'text', 0) 
+		self.widgets['splitsizeCB'].set_active(0)
 			
 		# ---
 			
-		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
-		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
-		self.cformat = {'none':0, 'gzip':1, 'bzip2':2}
-
+		
 		self.prefillWindow()
 
 	#----------------------------------------------------------------------
@@ -607,7 +629,19 @@ class SBconfigGTK(GladeGnomeApp):
 				self.widgets["purgedays"].set_sensitive( True )
 				self.on_purgedays_changed()
 			self.widgets['purgecheckbox'].set_active(True)
-			
+		
+		if self.configman.has_option("general", "splitsize") :
+			model = self.widgets["splitsizeCB"].get_model()
+			custom = True
+			for i in range(0,len(model)-1) :
+				if model[i][1] == int(self.configman.get("general", "splitsize")) / 1024 :
+					self.widgets["splitsizeCB"].set_active(i)
+					self.widgets["splitsizeSB"].set_sensitive(False)
+					custom =False
+			if custom :
+				self.widgets["splitsizeCB"].set_active(0)
+				self.widgets["splitsizeSB"].set_value(int(self.configman.get("general", "splitsize")) / 1024 )
+		
 		# set the profile name
 		self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
 		
@@ -839,6 +873,37 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.set("general", "format", selected )
 		else :
 			self.configman.remove_option("general", "format")
+		if selected == "none" :
+			# activate split functionality config
+			self.widgets['splitsizevbox'].set_sensitive(True)
+		else :
+			self.widgets['splitsizevbox'].set_sensitive(False)
+			if self.configman.has_option("general", "splitsize"):
+				self.configman.remove_option("general", "splitsize")
+		self.isConfigChanged()
+	
+	#----------------------------------------------------------------------
+	def on_splitsizeCB_changed(self, *args):
+		"""
+		"""
+		model = self.widgets["splitsizeCB"].get_model()
+		label,value = model[self.widgets["splitsizeCB"].get_active()]
+		if value != -1 :
+			self.widgets['splitsizeSB'].set_sensitive(False)
+			self.configman.set("general", "splitsize", value*1024)
+		else :
+			# activate Spin box
+			self.widgets['splitsizeSB'].set_sensitive(True)
+			val = self.widgets['splitsizeSB'].get_value_as_int()
+			self.configman.set("general", "splitsize", val)
+		self.isConfigChanged()
+		
+	
+	def on_splitsizeSB_value_changed(self, *args):
+		"""
+		"""
+		val = int(self.widgets['splitsizeSB'].get_value())
+		self.configman.set("general", "splitsize", val* 1024)
 		self.isConfigChanged()
 	
 	
@@ -1701,7 +1766,6 @@ class SBconfigGTK(GladeGnomeApp):
 			os.rename(prfConf, prfConf.rstrip("-disable"))
 			self.profiles.set_value(iter, 0, True)
 			self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
-		
 		
 
 

@@ -759,3 +759,13 @@ class ConfigManager (ConfigParser.ConfigParser):
 							return False
 		return True
 		
+class ConfigStaticDatas :
+	"""
+	Config Datas storage
+	"""
+	
+	loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
+	timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
+	cformat = {'none':0, 'gzip':1, 'bzip2':2}
+	
+	splitSize = {'Unlimited':0,'100 MB': 100,'250 MB':250,'650 MB': 650,'2 GB (FAT16)':2000,'2 GB (FAT16)': 4000, 'Custom': -1}
