@@ -877,9 +877,11 @@ class SBconfigGTK(GladeGnomeApp):
 			# activate split functionality config
 			self.widgets['splitsizevbox'].set_sensitive(True)
 		else :
+			self.widgets["splitsizeCB"].set_active(1)
 			self.widgets['splitsizevbox'].set_sensitive(False)
 			if self.configman.has_option("general", "splitsize"):
 				self.configman.remove_option("general", "splitsize")
+			self.on_splitsizeCB_changed()
 		self.isConfigChanged()
 	
 	#----------------------------------------------------------------------
