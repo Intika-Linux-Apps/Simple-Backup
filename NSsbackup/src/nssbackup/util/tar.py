@@ -41,12 +41,15 @@ def getArchiveType(archive):
 		return None
 	
 	
-def extract(sourcetgz, file, dest , bckupsuffix = None):
+def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	"""
 	Extract from source tar.gz the file "file" to dest.
 	@param source:
 	@param file:
 	@param dest:
+	@param bckupsuffix: If set a backup suffix option is set to backup existing files
+	@param splitsize: If set the split options are added supposing the size of the archives is this variable
+	@type splitsize: Integer in KB
 	"""
 	# strip leading sep
 	file = file.lstrip(os.sep)
@@ -71,6 +74,10 @@ def extract(sourcetgz, file, dest , bckupsuffix = None):
 		options.append( "--directory="+os.sep )
 	if bckupsuffix :
 		options.append("--suffix="+bckupsuffix)
+	
+	if splitsize :
+		options.extend(["-L "+ str(splitsize) , "-F "+ Util.getResource("multipleTarScript")])
+	
 	options.extend(['--file='+sourcetgz,file])
 	
 	outStr, errStr, retval = Util.launch("tar", options)
