@@ -12,7 +12,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Author: Aigars Mahinovs <aigarius@debian.org>
+# Author: Oumar Aziz OUATTARA <wattazoum at gmail dot com>
 
 from gettext import gettext as _
 import os , grp
@@ -153,8 +153,12 @@ class BackupManager :
 		getLogger().info(_("Setting compression format "))
 		if self.config.has_option( "general", "format" ):
 			self.__actualSnapshot.setFormat(self.config.get("general","format"))
-		
-
+			
+		# set splited size
+		getLogger().info(_("Setting split size"))
+		if self.config.has_option( "general", "splitsize" ):
+			self.__actualSnapshot.setSplitedSize(int(self.config.get("general","splitsize")))
+			
 		# Reduce the priority, so not to interfere with other processes
 		os.nice(20)
 		
@@ -237,81 +241,49 @@ class BackupManager :
 					return True
 					
 			# if the file is in exclude list, return true
-			if excludelist.has_key(_file2) :
+			if self.__actualSnapshot.getExcludeFlist().hasFile(_file2) :
 				return True
 			
 			#all tests passed
 			return False
-		
-		def isexcludedbyinc(_file3):
-			"""
-			Check if a file is to be exclude because of incremental policies.
-			Don't check if the file was exclude by conf ( it's mandatory the check that before)
-			@return: True if the file has to be excluded, the props if not
-			"""
-			# file is a path of a file or dir to include 
-			#isstored =  searchInStored( _file3 )
-			if self.__actualSnapshot.isfull() :
-				s = os.lstat(_file3)
-				props = str(s.st_mode)+str(s.st_uid)+str(s.st_gid)+str(s.st_size)+str(s.st_mtime)
-				return props
 			
-			isstored = self.__snpman.isAlreadyStored(self.__actualSnapshot.getBaseSnapshot(),_file3)
-			s = os.lstat(_file3)
-			props = str(s.st_mode)+str(s.st_uid)+str(s.st_gid)+str(s.st_size)+str(s.st_mtime)
-			if not isstored :
-				# file wasn't inside
-				return props
-			else :
-				# file was inside so isstored is a list [existingprops, sonSBdict]the existing properties.
-				if isstored != props :
-					# then the file has changed
-					return props
-			
-			return True
-			
-		def addtobackup(_file, props):
+		def checkForExclude( path, forceExclusion=False ):
 			"""
-			Add a file to the backup list. This file could be a dir so we need to list the file inside
+			check for file to exclude into path and add them to the ExcludeFlist
+			We will enter in the directories , only when needed. Otherwise we will use a wildcard
+			@param path: The path to check for
 			"""
-			global fullsize
-			# add _file and then check if it's a dir to add the contents , We won't follow links
-			if not os.path.islink(_file.rstrip(os.sep)) :
-				if not os.path.isdir(_file) :
-					# don't add dirs 
-					self.__actualSnapshot.addFile(_file, props)
-					fullsize += os.lstat(_file).st_size
+			if isexcludedbyconf( path ) or forceExclusion or self.__actualSnapshot.getExcludeFlist().has_key(path):
+				
+				# if it's a directory
+				if os.path.isdir(path):
+					# if the path is not a subdirectory of one of the included files,
+					# exclude the whole dir content
+					if not self.__actualSnapshot.getIncludeFlist().has_key(path) :
+						if not self.__actualSnapshot.getExcludeFlist().hasFile(path):
+							self.__actualSnapshot.addToExcludeFlist(path.rstrip(os.sep)+os.sep+"*")
+					# other wise, enter in the directory
+					else :
+						# we remove the dir as an effective file of the exclude list
+						# This will prevent full exclusion of that directory
+						if self.__actualSnapshot.getExcludeFlist().hasFile(path):
+							self.__actualSnapshot.getExcludeFlist()[path][0] = None
+						try :
+							for contents in FAM.listdir(path) :
+								# contents is a path of a file or dir to include 
+								contents = os.path.normpath( os.sep.join([path,contents]) )
+								# if the file is included precisely, don't force exclusion
+								checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
+							
+						except OSError, e :
+							getLogger().warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
+							# Add to exclude file list
+							self.__actualSnapshot.addToExcludeFlist(path)
 				else :
-					# file is dir , search in the content
-					try :
-						for contents in FAM.listdir(_file) :
-							# contents is a path of a file or dir to include 
-							contents = os.path.normpath( os.sep.join([_file,contents]) )
-							# in dirconfig, directories always end with an os.sep and files not.
-							if os.path.isdir(contents) :
-								if not contents.endswith(os.sep) :
-									contents = contents + os.sep
-								# we don't check dir prop as the content seems to 
-								# change without modifying the parent dir
-								if not isexcludedbyconf( contents ) :
-									addtobackup( contents, None )
-								else : getLogger().debug("Excluding '%s' (directory is excluded by conf )" % contents)
-							else :
-								# found a file
-								contents.rstrip(os.sep)							
-								if not isexcludedbyconf( contents ) :
-									cprops = isexcludedbyinc(contents)
-									if cprops != True and type(cprops) == str: 
-										addtobackup( contents, cprops )
-									else :
-										getLogger().debug("Excluding '%s' (File didn't change )" % contents)
-								else : 
-									getLogger().debug("Excluding '%s' (file is excluded by conf )" % contents)
-					except OSError, e :
-						getLogger().warning(_("got an error with '%(file)s' : %(error)s") % {'file':_file, 'error' : str(e)})
-						if self.__actualSnapshot.getFilesList().has_key(_file) :
-							del self.__actualSnapshot.getFilesList()[_file]
-									
+					# add to exclude list
+					if not self.__actualSnapshot.getIncludeFlist().has_key(path):
+						self.__actualSnapshot.addToExcludeFlist(path)
+
 		# End of Subroutines
 		# -----------------------------------------------------------------
 		
@@ -332,40 +304,30 @@ class BackupManager :
 				includelist, excludelist = {},{}
 				getLogger().warning(_("No directory to backup !"))
 			else :
-				includelist, excludelist = {},{}
+				includelist, excludelist = list(),list()
 				for k,v in self.config.items("dirconfig") :
 					if int(v) == 1 :
-						includelist[k] = 1 
+						self.__actualSnapshot.addToIncludeFlist(k)
 					elif int(v) == 0 :
-						excludelist[k] = 0
+						self.__actualSnapshot.addToExcludeFlist(k)
 				# add the default excluded ones
-				excludelist.update([("",0), ("/dev/",0), ("/proc/",0), ("/sys/",0), ("/tmp/",0),(self.config.get("general","target"),0)])
+				for excl in ["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*",self.config.get("general","target")] :
+					self.__actualSnapshot.addToExcludeFlist(excl)
 		else :
-			includelist, excludelist = {},{}
 			getLogger().warning(_("No directories to backup !"))	
 		
 		# We have now every thing we need , the rexclude, excludelist, includelist and already stored 
-		getLogger().debug("We have now every thing we need, starting the creation of the Flist " )
-		for incl in includelist.iterkeys() :
-			# incl is a path of a file or dir to include 
-			if not isexcludedbyconf( incl ) :
-				if os.path.isdir(incl):
-					addtobackup( incl, None )
-				else :
-					props = isexcludedbyinc(incl)
-					if props != True and type(props) == str: 
-						addtobackup( incl, props )
-					else :
-						getLogger().debug("Excluding '%s' (File didn't change )" % incl)
-			else :
-				getLogger().debug("Excluding '%s' (File excluded by conf)" % incl)
-
+		getLogger().debug("We have now every thing we need, starting the creation of the complete exclude list " )
+		
+		for incl in self.__actualSnapshot.getIncludeFlist().getEffectiveFileList():
+			# check into incl for file to exclude
+			checkForExclude(incl)
 				
 		# check for the available size
-		getLogger().debug("Free size required is '%s' " % str(fullsize))
-		vstat = os.statvfs( self.__actualSnapshot.getPath() )
-		if (vstat.f_bavail * vstat.f_bsize) <= fullsize:
-			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': self.__fullsize})
+#		getLogger().debug("Free size required is '%s' " % str(fullsize))
+#		vstat = os.statvfs( self.__actualSnapshot.getPath() )
+#		if (vstat.f_bavail * vstat.f_bsize) <= fullsize:
+#			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': self.__fullsize})
 	
 	
 	def __setlockfile(self):
@@ -461,26 +423,12 @@ class BackupManager :
 				if ( datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days < self.config.get("general","maxincrement") :
 			    	# Less then maxincrement days passed since that -> make an increment
 					increment = True
-					try:
-						prev = base.getFilesList()
-					except Exception, e:
-						getLogger().warning(str(e))
-						increment = False  # Last backup is somehow damaged	
 				else:
 					getLogger().info("Last full backup is old -> make a full backup")
 					increment = False      # Too old -> make full backup
 			else: # Last backup was an increment - lets search for the last full one
 				getLogger().debug(" Last backup (%s) was an increment - lets search for the last full one" % listing[0].getName())
 				for i in listing :
-					try: 
-						for a,b in i.getFilesList().items() :
-							if not prev.has_key(a) : # We always keep the newer incremental file info
-								prev[a]=b
-					except Exception, e :  # One of the incremental backups is bad -> make a new full one
-						getLogger().warning(_("One of the incremental backups (%(bad_one)s) is bad -> make a new full one : %(error_cause)s ") % {'bad_one' : i.getName(), 'error_cause' : str(e)})
-						increment = False
-						break
-					
 					if i.isfull():
 						d = i.getDate()
 						age = (datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days

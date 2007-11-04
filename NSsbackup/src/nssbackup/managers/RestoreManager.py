@@ -61,13 +61,13 @@ class RestoreManager :
 		_file = os.sep+_file.lstrip(os.sep)
 		
 		# restore
-		if not snapshot.getFilesList().has_key(_file):
-			if failOnNotFound :
-				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
-			else : 
-				getLogger().warning(_("File '%s' not found in the backup snapshot [%s] files list, We'll not fail though !") % (_file,snapshot.getName()) )
-				return
-		
+#		if not snapshot.getFilesList().has_key(_file):
+#			if failOnNotFound :
+#				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
+#			else : 
+#				getLogger().warning(_("File '%s' not found in the backup snapshot [%s] files list, We'll not fail though !") % (_file,snapshot.getName()) )
+#				return
+#		
 		suffix = None
 		if backupFlag :
 			now = datetime.datetime.now().isoformat("_").replace( ":", "." )
@@ -80,7 +80,7 @@ class RestoreManager :
 				#create a temp file , extract inside then move the content
 				tmpdir = tempfile.mkdtemp(dir=target,prefix='nssbackup-restore_')
 				
-				Tar.extract( snapshot.getArchive(), _file, tmpdir, bckupsuffix=suffix )
+				Tar.extract( snapshot.getArchive(), _file, tmpdir, bckupsuffix=suffix, splitsize=snapshot.getSplitedSize() )
 				if os.path.exists(target+os.sep+ os.path.basename(_file))  and backupFlag :
 					Util.nssb_move(target+os.sep+ os.path.basename(_file), target+os.sep+ os.path.basename(_file)+suffix)
 				Util.nssb_move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
@@ -89,21 +89,21 @@ class RestoreManager :
 			else:
 				#the target is a file
 				parent = os.path.dirname(target)
-				Tar.extract( snapshot.getArchive(), _file, parent, bckupsuffix=suffix )
+				Tar.extract( snapshot.getArchive(), _file, parent, bckupsuffix=suffix,splitsize=snapshot.getSplitedSize() )
 		else:
 			# target is set to None or target not exists
 			if target and not os.path.exists(target) :
 				#target != None but target doesn't exists
 				os.makedirs(target)
-				Tar.extract( snapshot.getArchive(), _file, target )
+				Tar.extract( snapshot.getArchive(), _file, target,splitsize=snapshot.getSplitedSize() )
 			else :
 				# Target = None , extract at the place it belongs
 				if os.path.exists(_file) :
 					# file exist:
-					Tar.extract(snapshot.getArchive(), _file, target, bckupsuffix=suffix)
+					Tar.extract(snapshot.getArchive(), _file, target, bckupsuffix=suffix,splitsize=snapshot.getSplitedSize())
 				else :
 					# file doesn't exist nothing to move, just extract
-					Tar.extract(snapshot.getArchive(), _file, target )
+					Tar.extract(snapshot.getArchive(), _file, target,splitsize=snapshot.getSplitedSize() )
 		
 		
 	def revert(self, snapshot, dir):

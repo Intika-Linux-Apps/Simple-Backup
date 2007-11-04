@@ -13,6 +13,7 @@ DISTCLEANFILES =		\
 
 install-exec-local:
 	$(PYTHON) setup.py install --prefix=$(prefix)
+	chmod +x $(bindir)/nssbackup* $(bindir)/upgrade-backups $(prefix)/share/nssbackup/multipleTarScript
 	
 uninstall-local: uninstall-local-bin uninstall-local-data
 

@@ -20,12 +20,14 @@ import nssbackup.managers.FileAccessManager as FAM
 import re
 import os
 import subprocess
+from gettext import gettext as _
 from tempfile import *
 import cPickle as pickle
 from exceptions import * 
 from log import getLogger
 from structs import SBdict
 import nssbackup.util as Util
+import nssbackup.util.tar as TAR
 
 class Snapshot : 
 	"The snapshot class represents one snapshot in the backup directory"
@@ -33,8 +35,17 @@ class Snapshot :
 	__name = False
 	__base = False
 	__format = "gzip" # default value
+	
+	# TODO (in|ex)cludeFlist should be an SBdict
+	__snarfile = None
+	__includeFlist = SBdict()
+	__includeFlistFile = None # Str
+	__excludeFlist = SBdict()
+	__excludeFlistFile = None # Str
+	
+	__splitedSize = 0
 	__excludes = False
-	__filesList = None
+	
 	__packages = False
 	__version = False
 	__snapshotpath = False
@@ -90,26 +101,56 @@ class Snapshot :
 		date = {"year" : int(m.group(1)),"month":int(m.group(2)),"day":int(m.group(3)),
 			"hour":int(m.group(4)),"minute":int(m.group(5)),"second":int(m.group(6))}
 		return date
+	# ---
+	
+	def getIncludeFlist(self):
+		"""
+		get the Include file list
+		@rtype: list
+		"""
+		return self.__includeFlist
+	
+	def getExcludeFlist(self):
+		"""
+		get the Exclude file list
+		@rtype: list
+		"""
+		return self.__excludeFlist
+	
+	def getExcludeFListFile(self):
+		"""
+		@return: the path to the exclude file list file
+		"""
+		global __excludeFlistFile
 		
-	def getFilesList(self) :
-		"Returns a SBdict with key='the file name' and value='the file properties'"
-		global __filesList
-		if self.getVersion() and self.getVersion() < "1.4" : raise SBException(_("Please upgrade the snapshot (version '%s' found)") % self.getVersion())
-		if self.__filesList != None : return self.__filesList
-		else :
-			flist = self.__snapshotpath +os.sep +"flist"
-			fprops = self.__snapshotpath +os.sep +"fprops"
-			if not FAM.exists(flist) and not FAM.exists(fprops) : 
-				return False
-			elif not FAM.exists(flist) :
-				raise NotValidSnapshotException(_("flist hasn't been found for snapshot '%s'") % self.getName())
-			elif not FAM.exists(fprops) :
-				raise NotValidSnapshotException(_("fprops hasn't been found for snapshot '%s'") % self.getName())
-			else :
-				f1 = FAM.readfile(flist)
-				f2 = FAM.readfile(fprops)
-				self.__filesList = SBdict(zip(f1.split( "\000" ),f2.split( "\000" )) )
-				return self.__filesList
+		if not self.__excludeFlistFile :
+			self.__excludeFlistFile = self.getPath()+os.sep+"excludes.list"
+			
+		return self.__excludeFlistFile
+
+	def getIncludeFListFile(self):
+		"""
+		@return: the path to the include file list file
+		"""
+		global __includeFlistFile
+		
+		if not self.__includeFlistFile :
+			self.__includeFlistFile = self.getPath()+os.sep+"includes.list"
+			
+		return self.__includeFlistFile
+
+	def getSnarFile(self):
+		"""
+		@return: the path to the TAR SNAR file
+		"""
+		global __snarfile
+		
+		if not self.__snarfile : 
+			self.__snarfile = self.getPath()+os.sep+"files.snar"
+		return self.__snarfile
+
+	
+	# ---
 	
 	def getPath(self) :
 		"return the complete path of the snapshot"
@@ -124,7 +165,7 @@ class Snapshot :
 		"""
 		global __format
 		if os.path.exists(os.sep.join([self.getPath(),"format"])):
-			self.__format = FAM.readfile(os.sep.join([self.getPath(),"format"])).strip()
+			self.__format = FAM.readfile(os.sep.join([self.getPath(),"format"])).split('\n')[0]
 		return self.__format
 	
 	def getBase(self) :
@@ -189,10 +230,6 @@ class Snapshot :
 		if problem : 
 			raise NotValidSnapshotException(_("The snapshot compression format is supposed to be '%s' but the corresponding well named file wasn't found") % self.getFormat())
 	
-	def getFileProps(self, item) :
-		"Returns for a certain item in the backup its properties"
-		return self.getFilesList()[str(item)]
-	
 	def getVersion(self) :
 		"Return the version of the snapshot comming from the 'ver' file"
 		global __version
@@ -232,15 +269,60 @@ class Snapshot :
 		"""
 		return self.getName().endswith(".ful")
 	
+	def getSplitedSize(self):
+		"""
+		@return: the size of each archive in the snapshot (0 means unlimited )
+		"""
+		if os.path.exists(os.sep.join([self.getPath(),"format"])):
+			self.__splitedSize = int(FAM.readfile(os.sep.join([self.getPath(),"format"])).split('\n')[1])
+		return self.__splitedSize
+	
 	def commit (self) :
 		"Commit the snapshot infos ( write to the disk )"
 		self.__commitbasefile()
 		self.__commitFormatfile()
 		self.__commitexcludefile()
 		self.__commitpackagefile()
-		self.__commitflistfiles()
+		self.__commitflistFiles()
 		self.__makebackup()
+		self.__clean()
 		self.__commitverfile()
+	
+	
+	#----------------------------
+	
+	def addToIncludeFlist (self, item) :
+		"""
+		Add an item to be backup into the snapshot.
+		 Usage :  addToIncludeFlist(item) where
+		 - item is the item to be add (file, dir, or link)
+		"""
+		global __includeFlist
+		
+		self.__includeFlist[item] = "1"
+	
+	def addToExcludeFlist (self, item) :
+		"""
+		Add an item to not be backup into the snapshot.
+		 Usage :  addToExcludeFlist(item) where
+		 - item is the item to be add (file, dir, or link)
+		"""
+		global __excludeFlist
+		
+		self.__excludeFlist[item] = "0"
+	
+	def getPackages(self) :
+		"Return the packages"
+		global __packages
+		if self.__packages : return self.__packages
+		else :
+			packagesfile = self.getPath() +os.sep +"packages"
+			if not FAM.exists(packagesfile) : return False
+			else :
+				self.__packages = FAM.readfile(packagesfile)
+				return self.__packages
+	
+	#---------------------------------
 	
 	# Setters
 	
@@ -255,18 +337,6 @@ class Snapshot :
 			getLogger().debug("Set the compression format to %s" % cformat)
 			self.__format = cformat
 	
-	def setFilesList(self, fileslist=None) :
-		"""
-		Set a SBdictionary with key='the file name' and value='the file properties'
-		@param fileslist: is the new filesList SBdict (default is an empty SBdict)
-		ATTENTION : The snapshot fileList will be overwritten
-		"""
-		global __filesList
-		if not fileslist :
-			self.__filesList = SBdict()
-			getLogger().debug(_("set filelist to empty SBdict : ")+ str(self.__filesList)) 
-		else :
-			self.__filesList = fileslist
 	
 	def setPath(self, path) :
 		"Set the complete path of the snapshot. That path will be used to get the name of the snapshot"
@@ -287,17 +357,6 @@ class Snapshot :
 			raise SBException (_("Name of base not valid : %s") % self.__name)
 		self.__base = baseName		
 	
-	def addFile(self, item, props) :
-		"""
-		Add an item to be backup into the snapshot.
-		 Usage :  addFile(item, props) where
-		 - item is the item to be add (file, dir, or link)
-		 - props is this item properties
-		"""
-		global __filesList
-		if not self.getFilesList() :
-			self.setFilesList()
-		self.__filesList[item] = props
 	
 	def setVersion(self, ver="1.5") :
 		"Set the version of the snapshot"
@@ -315,16 +374,15 @@ class Snapshot :
 		global __packages
 		self.__packages = packages
 	
-	def getPackages(self) :
-		"Return the packages"
-		global __packages
-		if self.__packages : return self.__packages
-		else :
-			packagesfile = self.getPath() +os.sep +"packages"
-			if not FAM.exists(packagesfile) : return False
-			else :
-				self.__packages = FAM.readfile(packagesfile)
-				return self.__packages
+	def setSplitedSize(self, size):
+		"""
+		@param size: The size in KB to set
+		"""
+		global __splitedSize
+		if type(size) != int :
+			raise SBException("The size parameter must be an integer")
+		self.__splitedSize = size
+	
 	
 	# Private
 	def __validateSnapshot(self,path, name):
@@ -336,7 +394,11 @@ class Snapshot :
 		# validate the name
 		if not self.__isValidName(self.__name) :
 			raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
-		if not FAM.exists( self.getPath()+os.sep +"flist" ) or not FAM.exists( self.getPath()+os.sep +"fprops" ) or not self.getArchive() or not FAM.exists( self.getPath()+os.sep +"ver" ):
+		if not FAM.exists( self.getPath()+os.sep +"includes.list" ) \
+		or not FAM.exists( self.getPath()+os.sep +"excludes.list" ) \
+		or not FAM.exists( self.getPath()+os.sep +"files.snar" ) \
+		or not self.getArchive() \
+		or not FAM.exists( self.getPath()+os.sep +"ver" ):
 			raise NotValidSnapshotException (_("One of the mandatory files doesn't exist in [%s]") % self.getName())
 		
 	def __isValidName(self, name ) :
@@ -347,7 +409,10 @@ class Snapshot :
 		"""
 		writes the format file
 		"""
-		FAM.writetofile(self.getPath()+os.sep+"format", self.getFormat())
+		formatInfos = self.getFormat()+"\n"
+		formatInfos += str(self.getSplitedSize())
+		
+		FAM.writetofile(self.getPath()+os.sep+"format", formatInfos)
 
 	def __commitverfile(self) :
 		" Commit ver file on the disk "
@@ -370,20 +435,33 @@ class Snapshot :
 		@raise SBException: if excludes hasn't been set 
 		"""
 		FAM.pickledump( self.__excludes, self.getPath()+os.sep +"excludes" )
+	
+	
+	def __commitflistFiles(self):
+		"""
+		Commit the include.list and exclude.list to the disk
+		"""
+		if os.path.exists(self.getIncludeFListFile()) or os.path.exists(self.getIncludeFListFile()) :
+			raise SBException("includes.list and excludes.list shouldn't exist at this stage")
 		
-	def __commitflistfiles(self):
-		" Commit flist and fprops on the disk "
-		if not self.getFilesList() :
-			FAM.writetofile(self.getPath()+os.sep +"flist", "")
-			FAM.writetofile(self.getPath()+os.sep +"fprops", "")
-		else :
-			fl, fp = "", ""
-			for (fli, fpi ) in self.__filesList.iteritems() :
-				if fli :
-					fl += str(fli)+"\000"
-					fp += str(fpi)+"\000"
-			FAM.writetofile(self.getPath()+os.sep +"flist", fl)
-			FAM.writetofile(self.getPath()+os.sep +"fprops", fp)
+		# commit include.list.tmp
+		fi = open(self.getIncludeFListFile()+".tmp","w")
+		for f in self.__includeFlist.getEffectiveFileListForTAR() :
+			fi.write(str(f) +"\n")
+		fi.close()
+		
+		# commit include.list
+		fi = open(self.getIncludeFListFile(),"w")
+		for f in self.__includeFlist.getEffectiveFileList() :
+			fi.write(str(f) +"\n")
+		fi.close()
+		
+		# commit exclude.list
+		fe = open(self.getExcludeFListFile(),"w")
+		for f in self.__excludeFlist.getEffectiveFileList() :
+			fe.write(str(f) +"\n")
+		fe.close()
+		
 		
 	def __commitpackagefile(self):
 		" Commit packages file on the disk"
@@ -395,39 +473,15 @@ class Snapshot :
 	def __makebackup(self):
 		" Make the backup on the disk "
 		
-		getLogger().info(_("Launching TAR to backup "))
-		tdir = self.getPath().replace(" ", "\ ")
-		options = list()
-		options.extend(["-cS","--directory="+ os.sep , "--no-recursion", "--ignore-failed-read","--null","--files-from="+tdir+os.sep +"flist"])
-		
-		archivename = "files.tar"
-		if self.getFormat() == "gzip":
-			options.insert(1,"--gzip")
-			archivename+=".gz"
-		elif self.getFormat() == "bzip2":
-			options.insert(1,"--bzip2")
-			archivename+=".bz2"
-		elif self.getFormat() == "none":
-			pass
+		if self.isfull() :
+			TAR.makeTarFullBackup(self)
 		else :
-			getLogger().debug("Defaulting to gzip ! ")
-			options.insert(1,"--gzip")
-			archivename+=".gz"
-		
-		getLogger().debug(options)
-		if FAM.islocal(self.getPath()) :
-			options.extend(["--force-local", "--file="+tdir+os.sep +archivename])
-			getLogger().debug("Tarline : " + "tar" + str(options))
-			outStr, errStr, retVal = Util.launch("tar", options)
-			getLogger().debug(outStr)
-			if retVal != 0 :
-				raise SBException(_("Couldn't make a proper backup : ") + errStr )
-		else :
-			getLogger().debug("Tarline : " + "tar" + options )
-			turi = gnomevfs.URI( self.getPath()+os.sep +archivename )
-			tardst = gnomevfs.create( turi, 2 )
-			tarsrc = os.popen( "tar" + options )
-			shutil.copyfileobj( tarsrc, tardst, 100*1024 )
-			tarsrc.close()
-			tardst.close()
-			
+			TAR.makeTarIncBackup(self)
+
+	def __clean(self):
+		"""
+		Clean operational temporary files
+		"""
+		# 
+		if os.path.exists(self.getIncludeFListFile()+".tmp") :
+			os.remove(self.getIncludeFListFile()+".tmp")

@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+import os, re, sys
+from gettext import gettext as _
+
+vol = os.getenv("TAR_VOLUME")
+archRE = re.compile("(.+?/)?files(-[0-9]+)*?\.tar")
+arch = os.getenv("TAR_ARCHIVE")
+name = "files"
+
+m = archRE.match(arch)
+if m and m.group(1):
+	path = m.group(1)
+	os.environ["TAR_ARCHIV_PATH"] = path
+else :
+	raise Exception(_("The name of the archive must meet '(+*?)/files.tar' : %s found") % arch)
+
+print "Preparing volume "+ vol + " of "+ name +"."
+
+origPath = os.getenv("TAR_ARCHIV_PATH","")
+
+if os.getenv("TAR_SUBCOMMAND") in ["-d","-x","-t"]:
+	if os.path.exists(origPath+os.sep+name+"-"+vol+".tar") :
+		fd = os.getenv("TAR_FD")
+		os.write(int(fd),origPath+os.sep+name+"-"+vol+".tar")
+		sys.exit()
+	else:
+		raise Exception (_("The file '%s' that was asked doesn't exist") % origPath+os.sep+name+"-"+vol+".tar" ) 
+elif os.getenv("TAR_SUBCOMMAND") == "-c" :
+	fd = os.getenv("TAR_FD")
+	os.write(int(fd),origPath+os.sep+name+"-"+vol+".tar")
+	sys.exit()
+else :
+	pass
