@@ -411,7 +411,6 @@ class SBconfigGTK(GladeGnomeApp):
 		cell = gtk.CellRendererText()
   		self.widgets['splitsizeCB'].pack_start(cell, True)
 		self.widgets['splitsizeCB'].add_attribute(cell, 'text', 0) 
-		self.widgets['splitsizeCB'].set_active(0)
 			
 		# ---
 			
@@ -633,14 +632,15 @@ class SBconfigGTK(GladeGnomeApp):
 		if self.configman.has_option("general", "splitsize") :
 			model = self.widgets["splitsizeCB"].get_model()
 			custom = True
-			for i in range(0,len(model)-1) :
+			for i in range(0,len(model)) :
 				if model[i][1] == int(self.configman.get("general", "splitsize")) / 1024 :
 					self.widgets["splitsizeCB"].set_active(i)
 					self.widgets["splitsizeSB"].set_sensitive(False)
 					custom =False
 			if custom :
-				self.widgets["splitsizeCB"].set_active(0)
+				# NOTE: if we don't do this is this order, the handler on splitsizeCB will overide splitsizeSB value
 				self.widgets["splitsizeSB"].set_value(int(self.configman.get("general", "splitsize")) / 1024 )
+				self.widgets["splitsizeCB"].set_active(0)
 		
 		# set the profile name
 		self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
@@ -897,7 +897,7 @@ class SBconfigGTK(GladeGnomeApp):
 			# activate Spin box
 			self.widgets['splitsizeSB'].set_sensitive(True)
 			val = self.widgets['splitsizeSB'].get_value_as_int()
-			self.configman.set("general", "splitsize", val)
+			self.configman.set("general", "splitsize", val * 1024)
 		self.isConfigChanged()
 		
 	
