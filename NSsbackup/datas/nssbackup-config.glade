@@ -922,6 +922,7 @@ Thanks to this you can configure backup of different kinds to different places.
                   </widget>
                   <packing>
                     <property name="expand">False</property>
+                    <property name="homogeneous">False</property>
                   </packing>
                 </child>
                 <child>
@@ -1104,42 +1105,95 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                       <widget class="GtkFrame" id="frame1">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="border_width">1</property>
                         <property name="label_xalign">0</property>
-                        <property name="shadow_type">GTK_SHADOW_NONE</property>
+                        <property name="shadow_type">GTK_SHADOW_ETCHED_OUT</property>
                         <child>
-                          <widget class="GtkAlignment" id="alignment9">
+                          <widget class="GtkTable" id="table1">
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="left_padding">12</property>
+                            <property name="n_rows">2</property>
+                            <property name="n_columns">2</property>
+                            <property name="row_spacing">10</property>
                             <child>
-                              <widget class="GtkHBox" id="hbox28">
+                              <widget class="GtkComboBox" id="cformat">
                                 <property name="visible">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                <property name="border_width">1</property>
-                                <child>
-                                  <widget class="GtkLabel" id="label55">
-                                    <property name="visible">True</property>
-                                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                    <property name="label" translatable="yes">Choose the compression format that you want to apply.
-Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                </child>
-                                <child>
-                                  <widget class="GtkComboBox" id="cformat">
-                                    <property name="visible">True</property>
-                                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                    <property name="active">1</property>
-                                    <property name="items" translatable="yes">none
+                                <property name="active">1</property>
+                                <property name="items" translatable="yes">none
 gzip
 bzip2</property>
-                                    <signal name="changed" handler="on_cformat_changed"/>
+                                <signal name="changed" handler="on_cformat_changed"/>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label55">
+                                <property name="visible">True</property>
+                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                <property name="xalign">0.11999999731779099</property>
+                                <property name="label" translatable="yes">Choose the compression format that you want to apply.
+Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
+                                <property name="use_markup">True</property>
+                                <property name="justify">GTK_JUSTIFY_FILL</property>
+                              </widget>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label60">
+                                <property name="visible">True</property>
+                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                <property name="xalign">0.11999999731779099</property>
+                                <property name="yalign">1</property>
+                                <property name="label" translatable="yes">Split the backup archive into small pieces (value in MB)
+&lt;small&gt;You can split the snapshot to make backup on some filesystem that doesn't support large files.&lt;/small&gt;
+&lt;b&gt;Note: This functionality is not compatible with compress !&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                                <property name="wrap">True</property>
+                                <property name="max_width_chars">0</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkVBox" id="splitsizevbox">
+                                <property name="visible">True</property>
+                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                <child>
+                                  <widget class="GtkComboBox" id="splitsizeCB">
+                                    <property name="visible">True</property>
+                                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                    <property name="column_span_column">0</property>
+                                    <signal name="changed" handler="on_splitsizeCB_changed"/>
+                                  </widget>
+                                  <packing>
+                                    <property name="fill">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkSpinButton" id="splitsizeSB">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                    <property name="adjustment">0 0 20480 1 10 10</property>
+                                    <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="on_splitsizeSB_value_changed"/>
                                   </widget>
                                   <packing>
                                     <property name="position">1</property>
                                   </packing>
                                 </child>
                               </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                              </packing>
                             </child>
                           </widget>
                         </child>

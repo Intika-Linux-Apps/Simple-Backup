@@ -73,6 +73,10 @@ class ConfigManager (ConfigParser.ConfigParser):
 	# bzip2 :use a tar.bz2 - All files are stored in the files.tar.bz2
 	format = gzip
 	
+	# For the split functionality :
+	# this should be an integer . It represent the size in KB of each archive (0 => unlimited)
+	splitsize = 0
+	
 	[log]
 	level = 20
 	file = nssbackup.log
@@ -149,7 +153,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	
 	# Default values, constants and the like
 	our_options = {
-	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : str, 'purge' : str, 'run4others' : int  },
+	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : str,'splitsize' : int, 'purge' : str, 'run4others' : int  },
 	 'log' : {'level' : int , 'file' : str },
 	 'report' : {'from' :str, 'to' : str,'smtpserver' : str,'smtpport' : int, 'smtpuser' : str,
 				'smtppassword' : str, 'smtptls' : int, 'smtpcert': str, 'smtpkey': str },
@@ -755,3 +759,13 @@ class ConfigManager (ConfigParser.ConfigParser):
 							return False
 		return True
 		
+class ConfigStaticDatas :
+	"""
+	Config Datas storage
+	"""
+	
+	loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
+	timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
+	cformat = {'none':0, 'gzip':1, 'bzip2':2}
+	
+	splitSize = {'Unlimited':0,'100 MB': 100,'250 MB':250,'650 MB': 650,'2 GB (FAT16)':2000,'2 GB (FAT16)': 4000, 'Custom': -1}

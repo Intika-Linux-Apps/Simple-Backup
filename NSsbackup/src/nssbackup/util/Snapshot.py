@@ -43,7 +43,7 @@ class Snapshot :
 	__excludeFlist = SBdict()
 	__excludeFlistFile = None # Str
 	
-	
+	__splitedSize = 0
 	__excludes = False
 	
 	__packages = False
@@ -165,7 +165,7 @@ class Snapshot :
 		"""
 		global __format
 		if os.path.exists(os.sep.join([self.getPath(),"format"])):
-			self.__format = FAM.readfile(os.sep.join([self.getPath(),"format"])).strip()
+			self.__format = FAM.readfile(os.sep.join([self.getPath(),"format"])).split('\n')[0]
 		return self.__format
 	
 	def getBase(self) :
@@ -269,6 +269,14 @@ class Snapshot :
 		"""
 		return self.getName().endswith(".ful")
 	
+	def getSplitedSize(self):
+		"""
+		@return: the size of each archive in the snapshot (0 means unlimited )
+		"""
+		if os.path.exists(os.sep.join([self.getPath(),"format"])):
+			self.__splitedSize = int(FAM.readfile(os.sep.join([self.getPath(),"format"])).split('\n')[1])
+		return self.__splitedSize
+	
 	def commit (self) :
 		"Commit the snapshot infos ( write to the disk )"
 		self.__commitbasefile()
@@ -303,6 +311,16 @@ class Snapshot :
 		
 		self.__excludeFlist[item] = "0"
 	
+	def getPackages(self) :
+		"Return the packages"
+		global __packages
+		if self.__packages : return self.__packages
+		else :
+			packagesfile = self.getPath() +os.sep +"packages"
+			if not FAM.exists(packagesfile) : return False
+			else :
+				self.__packages = FAM.readfile(packagesfile)
+				return self.__packages
 	
 	#---------------------------------
 	
@@ -356,16 +374,15 @@ class Snapshot :
 		global __packages
 		self.__packages = packages
 	
-	def getPackages(self) :
-		"Return the packages"
-		global __packages
-		if self.__packages : return self.__packages
-		else :
-			packagesfile = self.getPath() +os.sep +"packages"
-			if not FAM.exists(packagesfile) : return False
-			else :
-				self.__packages = FAM.readfile(packagesfile)
-				return self.__packages
+	def setSplitedSize(self, size):
+		"""
+		@param size: The size in KB to set
+		"""
+		global __splitedSize
+		if type(size) != int :
+			raise SBException("The size parameter must be an integer")
+		self.__splitedSize = size
+	
 	
 	# Private
 	def __validateSnapshot(self,path, name):
@@ -392,7 +409,10 @@ class Snapshot :
 		"""
 		writes the format file
 		"""
-		FAM.writetofile(self.getPath()+os.sep+"format", self.getFormat())
+		formatInfos = self.getFormat()+"\n"
+		formatInfos += str(self.getSplitedSize())
+		
+		FAM.writetofile(self.getPath()+os.sep+"format", formatInfos)
 
 	def __commitverfile(self) :
 		" Commit ver file on the disk "

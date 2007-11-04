@@ -41,12 +41,15 @@ def getArchiveType(archive):
 		return None
 	
 	
-def extract(sourcetgz, file, dest , bckupsuffix = None):
+def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	"""
 	Extract from source tar.gz the file "file" to dest.
 	@param source:
 	@param file:
 	@param dest:
+	@param bckupsuffix: If set a backup suffix option is set to backup existing files
+	@param splitsize: If set the split options are added supposing the size of the archives is this variable
+	@type splitsize: Integer in KB
 	"""
 	# strip leading sep
 	file = file.lstrip(os.sep)
@@ -71,6 +74,10 @@ def extract(sourcetgz, file, dest , bckupsuffix = None):
 		options.append( "--directory="+os.sep )
 	if bckupsuffix :
 		options.append("--suffix="+bckupsuffix)
+	
+	if splitsize :
+		options.extend(["-L "+ str(splitsize) , "-F "+ Util.getResource("multipleTarScript")])
+	
 	options.extend(['--file='+sourcetgz,file])
 	
 	outStr, errStr, retval = Util.launch("tar", options)
@@ -152,7 +159,22 @@ def __prepareTarCommonOpts(snapshot):
 	
 	return options 
 	
-
+def __addSplitOpts(snapshot, options, size):
+	"""
+	Compiles and add the split management options to the TAR line.
+	Valid for read and create actions
+	@param snapshot: The snapshot to process
+	@type snapshot: Snapshot
+	@param options: the option in which to append
+	@type options: list
+	@param size: the size of each part (in KB)
+	@type size: int
+	@raise SBException: if the snapshot format is other than none
+	"""
+	if snapshot.getFormat() != "none" :
+		raise SBException(_("For the moment split functionality is not compatible with compress option ! "))
+	options.extend(["-L "+ str(size) , "-F "+ Util.getResource("multipleTarScript")])
+	return options
 
 def makeTarIncBackup(snapshot):
 	"""
@@ -163,6 +185,10 @@ def makeTarIncBackup(snapshot):
 	getLogger().info(_("Launching TAR to make Inc backup "))
 	
 	options = __prepareTarCommonOpts(snapshot)
+	
+	splitSize = snapshot.getSplitedSize()
+	if splitSize :
+		options = __addSplitOpts(snapshot, options, splitSize)
 	
 	# For an INC backup the base SNAR file should exists
 	if not os.path.exists(snapshot.getBaseSnapshot().getSnarFile()) :
@@ -188,6 +214,10 @@ def makeTarFullBackup(snapshot):
 	getLogger().info(_("Launching TAR to make a Full backup "))
 	
 	options = __prepareTarCommonOpts(snapshot)
+	
+	splitSize = snapshot.getSplitedSize()
+	if splitSize :
+		options = __addSplitOpts(snapshot, options, splitSize)
 	
 	# For a full backup the SNAR file shouldn't exists
 	if os.path.exists(snapshot.getSnarFile()) :
