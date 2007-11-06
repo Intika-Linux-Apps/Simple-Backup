@@ -241,9 +241,10 @@ class Dumpdir():
 	@see: http://www.gnu.org/software/tar/manual/html_chapter/tar_13.html#SEC171
 	"""
 	
+	__HRCtrls = {'Y':_('Included'),'N':_('Unchanged'),'D':_('Directory')} #: The dictionary mapping control with their meanings
+	
 	control = None
 	filename = None
-	nul = '\0'
 	
 	def __init__(self, line):
 		"""
@@ -252,15 +253,14 @@ class Dumpdir():
 		@param line: the line (in dumpdir point of view ) to parse
 		@raise Exception: when the line doesn't have the requeried format
 		"""
+		if not line :
+			return None
 		
 		if (not isinstance(line,str)) :
 			raise Exception("Line must be a string")
 		
-		if line[-1] is not self.nul:
-			raise Exception("Incorrect format of line : Last character must be '\\0'(NUL) ")
-		
 		self.control = line[0]
-		self.filename = line[1:-1]
+		self.filename = line[1:]
 
 	def getFilename(self):
 		"""
@@ -275,7 +275,7 @@ class Dumpdir():
 		
 	def getControl(self):
 		"""
-		Get the control charactere from the DumpDir
+		Get the control character from the DumpDir
 		@return: control
 		@raise Exception: if the control is null 
 		"""
@@ -283,6 +283,16 @@ class Dumpdir():
 			return self.control
 		else :
 			raise Exception("Dumpdir inconsistancy : 'control' is empty")
+	
+	def getHumanReadableControl(self):
+		"""
+		Get the control character as a Human readable string from the DumpDir
+		"""
+		return self.__HRCtrls[self.getControl()]
+	
+	def __str__(self):
+		return self.filename + " " +self.getHumanReadableControl() 
+		
 		
 class SnapshotFile():
 	"""
@@ -302,7 +312,7 @@ class SnapshotFile():
 		if os.path.exists(filename) :
 			self.snpfile = os.path.abspath(filename)
 		else :
-			raise Exception ("'%s' doesn't exist "% filename)
+			raise Exception (_("'%s' doesn't exist ") % filename)
 
 	def getFormatVersion(self):
 		"""
@@ -325,7 +335,7 @@ class SnapshotFile():
 			# we are version 0
 			self.version = 0
 		
-		return self.version
+		return int(self.version)
 		
 	def __getHeaderInfos(self):
 		"""
@@ -382,15 +392,26 @@ class SnapshotFile():
 		"""
 		Iterator method that gives each line entry
 		@warning: only compatible tar version 2 of Tar format
-		@return: [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is Dumpdirs
+		@return: [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a list of Dumpdirs
 		"""
+		
+		def formatDumpDirs(content):
+			"""
+			Subroutine to format a content into dump dirs
+			"""
+			result = []
+			if content :
+				getLogger().debug("Content = "+content)
+				for d in content.rstrip('\0').split('\0'):
+					result.append(Dumpdir(d))
+			return result
 		
 		def format(line):
 			"""
 			subroutine to format a line including NUL char to have and array
 			"""
 			nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents = line.lstrip("\0").split("\0",6)
-			return (nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents)
+			return (nfs,mtime_sec,mtime_nano,dev_no,i_no,name,formatDumpDirs(contents))
 			
 			
 		fd = open(self.snpfile)
