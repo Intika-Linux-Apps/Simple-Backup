@@ -131,13 +131,11 @@ class SBdict (dict) :
 		@param value: Value must be None , a String or a 2 length list with None or an SBdict on the second member
 		@raise CorruptedSBdictException: 
 		"""
-		valIsStr = False
+		valIsSubtree = False
 		
 		if value != None :
-			if type(value) == str :
-				valIsStr = True
-			elif (type(value) != list or len(value) != 2 or (value[1] != None and (type(value[1]) != SBdict or value[1] == SBdict() )) ):
-				raise CorruptedSBdictException(" '%s' is not a valid value for an SBdic " % value)
+			if type(value) == list and len(value) == 2 and (value[1] is None or (value[1] != None and type(value[1]) == SBdict) )  :
+				valIsSubtree = True
 		
 		splited = key.split(os.sep,1)
 		
@@ -147,19 +145,22 @@ class SBdict (dict) :
 			if dict.has_key(self,splited[0]) :
 				# The key exists
 				item = dict.__getitem__(self,splited[0])
-				if valIsStr : prop = value
-				else : prop = value[0]
-				if valIsStr :
+				if not valIsSubtree : 
+					prop = value
 					dict.__setitem__(self,splited[0],[prop,item[1]])
-				else :
+				else : 
+					prop = value[0]
 					if value[1] == None :	
 						dict.__setitem__(self,splited[0],[prop,item[1]])
 					else :
 						dict.__setitem__(self,splited[0],value)
+					
 			else :
 				#the key doesn't exist
-				if valIsStr : dict.__setitem__(self,splited[0],[value,None])
-				else : dict.__setitem__(self,splited[0],value)
+				if not valIsSubtree : 
+					dict.__setitem__(self,splited[0],[value,None])
+				else : 
+					dict.__setitem__(self,splited[0],value)
 		else : # path is composed , 
 			# we check if the base dir exists and get the props infos
 			if dict.has_key(self,splited[0]) :
