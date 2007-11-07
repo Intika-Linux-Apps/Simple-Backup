@@ -15,7 +15,7 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from nssbackup.util.tar import SnapshotFile
+from nssbackup.util.tar import SnapshotFile, MemSnapshotFile
 from nssbackup.util.log import getLogger
 import unittest
 
@@ -28,12 +28,20 @@ class TestSnapshotManager(unittest.TestCase) :
 		self.snarSNPfile = SnapshotFile("test-datas/files.snar")
 		
 	def testGetFormatVersion(self):
+		" Get the SNAR file version"
 		self.assertEqual(self.snarSNPfile.getFormatVersion(),2)
 	
 	def testParseFormat2(self):
+		" Parse the SNAR file "
 		for f in self.snarSNPfile.parseFormat2():
 			print f[-2]+ "\t"
 			for d in f[-1] :
 				print str(d)
 	
+	def testMemSnasphotFile(self):
+		" Create and read a MemSnapshotFile "
+		msnpf = MemSnapshotFile(self.snarSNPfile)
+		for i in msnpf.getContent("/home/wattazoum/Images/camescope/2007-04-08--09.09.05") :
+			print str(i)
+		print msnpf
 	

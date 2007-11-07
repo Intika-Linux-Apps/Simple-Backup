@@ -322,6 +322,14 @@ class Snapshot :
 				self.__packages = FAM.readfile(packagesfile)
 				return self.__packages
 	
+	def getSnapshotFileInfos(self,useMem=False):
+		"""
+		TODO:
+		@param useMem: use or not the memory to store infos about the SNAR file
+		@type useMem: boolean
+		@return: the corresponding SnapshotFile (Mem ou Proc), the only method usable afterward is getContent(path) 
+		"""
+	
 	#---------------------------------
 	
 	# Setters

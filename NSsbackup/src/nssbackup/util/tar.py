@@ -20,6 +20,7 @@ import os,re,tarfile, csv, shutil
 from gettext import gettext as _
 from nssbackup.util.log import getLogger
 import nssbackup.util as Util
+from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
 
 def getArchiveType(archive):
@@ -230,6 +231,7 @@ def makeTarFullBackup(snapshot):
 	if retVal != 0 :
 		raise SBException(_("Couldn't make a proper backup : ") + errStr )
 	
+# ---
 
 class Dumpdir():
 	"""
@@ -293,7 +295,8 @@ class Dumpdir():
 	def __str__(self):
 		return self.filename + " " +self.getHumanReadableControl() 
 		
-		
+# ---
+
 class SnapshotFile():
 	"""
 	
@@ -441,5 +444,82 @@ class SnapshotFile():
 				last_c = c
 			c = fd.read(1)
 		
-		fd.close()
-	 	
+		fd.close
+
+# ----
+
+class MemSnapshotFile(SBdict):
+	"""
+	This is a representation in memory of a simplified SNAR file. The used structure is an SBDict.
+	The "prop" value is the content of the directory. wich is a list of L{Dumpdir}
+	"""
+	
+	def __init__(self,snapshotFile):
+		"""
+		load the snapshotFile in memory
+		@param snapshotFile: a SnapshotFile to convert in MemSnapshotFile
+		@type snapshotFile: nssbackup.util.tar.SnapshotFile
+		"""
+		if not isinstance(snapshotFile, SnapshotFile) :
+			raise Exception("A SnapshotFile is required")
+		
+		for f in snapshotFile.parseFormat2():
+			self[f[-2]] = f[-1]
+		
+	
+	def getContent(self,dirpath):
+		"""
+		convenance method to get the content of a directory.
+		@param dirpath: The directory absolute path to get
+		@type dirpath: str
+		@return: The content of the dir
+		@rtype: list
+		"""
+		return self[dirpath]
+	
+	def getFirstItems(self):
+		"""
+		TODO:
+		Get the first items in this SnapshotFile (the lower level dirs in the file)
+		@return: A list of paths
+		@rtype: list 
+		"""
+		
+		
+class ProcSnapshotFile :
+	"""
+	This is a Snapshotfile that will basically every time parse the snarfile for information
+	"""
+	
+	__snapshotFile = None
+	
+	def __init__(self,snapshotFile):
+		"""
+		load the snapshotFile to get a reference on it
+		@param snapshotFile: a SnapshotFile to convert in MemSnapshotFile
+		@type snapshotFile: nssbackup.util.tar.SnapshotFile
+		"""
+		if not isinstance(snapshotFile, SnapshotFile) :
+			raise Exception("A SnapshotFile is required")
+		
+		self.__snapshotFile = snapshotFile
+		
+	def getContent(self,dirpath):
+		"""
+		convenance method to get the content of a directory.
+		@param dirpath: The directory absolute path to get
+		@type dirpath: str
+		@return: The content of the dir
+		@rtype: list
+		"""
+		for f in self.__snapshotFile.parseFormat2():
+			if f[-2].rstrip(os.sep) == dirpath.rstrip(os.sep) :
+				return f[-1]
+			
+	def getFirstItems(self):
+		"""
+		TODO:
+		Get the first items in this SnapshotFile (the lower level dirs in the file)
+		@return: A list of paths
+		@rtype: list 
+		"""
