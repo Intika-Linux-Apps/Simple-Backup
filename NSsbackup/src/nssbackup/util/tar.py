@@ -256,7 +256,8 @@ class Dumpdir():
 		@raise Exception: when the line doesn't have the requeried format
 		"""
 		if not line :
-			return None
+			self = None
+			return
 		
 		if (not isinstance(line,str)) :
 			raise Exception("Line must be a string")
@@ -406,7 +407,8 @@ class SnapshotFile():
 			if content :
 				getLogger().debug("Content = "+content)
 				for d in content.rstrip('\0').split('\0'):
-					result.append(Dumpdir(d))
+					if d :
+						result.append(Dumpdir(d))
 			return result
 		
 		def format(line):
@@ -484,6 +486,9 @@ class MemSnapshotFile(SBdict):
 		@return: A list of paths
 		@rtype: list 
 		"""
+		result = list()
+		
+		
 		
 		
 class ProcSnapshotFile :
@@ -515,6 +520,7 @@ class ProcSnapshotFile :
 		for f in self.__snapshotFile.parseFormat2():
 			if f[-2].rstrip(os.sep) == dirpath.rstrip(os.sep) :
 				return f[-1]
+		raise SBException("Non existing directory : %s" % dirpath)
 			
 	def getFirstItems(self):
 		"""
@@ -523,3 +529,39 @@ class ProcSnapshotFile :
 		@return: A list of paths
 		@rtype: list 
 		"""
+		
+		def cleanDupl():
+			if result:
+				result.sort()
+				last = result[-1]
+				for i in range(len(result)-2, -1, -1):
+					if last == result[i]:
+						del result[i]
+					else:
+						last = result[i]
+			
+		result = list()
+		
+		for f in self.__snapshotFile.parseFormat2():
+			found = False
+			
+			for i in range(0,len(result)) :
+				if result[i] == f[-2] or f[-2].startswith(result[i]) : 
+					if found :
+						# then we are trying to overide
+						continue
+					else :
+						found = True
+						break
+				elif result[i].startswith(f[-2]):
+					# replace with f[-2]
+					result[i] = f[-2]
+					found = True
+					# don't break cause it's possible that some others entries need to be overiden
+			
+			if not found :
+				result.append(f[-2])
+			else :
+				cleanDupl()
+		
+		return result

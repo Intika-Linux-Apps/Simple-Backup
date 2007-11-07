@@ -15,17 +15,19 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from nssbackup.util.tar import SnapshotFile, MemSnapshotFile
+from nssbackup.util.tar import SnapshotFile, MemSnapshotFile,ProcSnapshotFile
 from nssbackup.util.log import getLogger
-import unittest
+import unittest,os
+from nssbackup.util.exceptions import *
 
 class TestSnapshotManager(unittest.TestCase) :
 	"""
 	"""
 	
 	def setUp(self):
-		getLogger(level=10)
-		self.snarSNPfile = SnapshotFile("test-datas/files.snar")
+		getLogger(level=20)
+		self.snarSNPfile = SnapshotFile("test-datas"+os.sep+"files.snar")
+		self.snarSNPfile2 = SnapshotFile("test-datas"+os.sep+"files-2.snar")
 		
 	def testGetFormatVersion(self):
 		" Get the SNAR file version"
@@ -44,4 +46,33 @@ class TestSnapshotManager(unittest.TestCase) :
 		for i in msnpf.getContent("/home/wattazoum/Images/camescope/2007-04-08--09.09.05") :
 			print str(i)
 		print msnpf
-	
+		
+	def testProcSnapshotFile(self):
+		" Create and read a ProcSnapshotFile "
+		psnpf = ProcSnapshotFile(self.snarSNPfile)
+		for i in psnpf.getContent("/home/wattazoum/Images/camescope/2007-04-08--09.09.05") :
+			print str(i)
+		print psnpf
+		
+		psnpf = ProcSnapshotFile(self.snarSNPfile2)
+		self.assertRaises(SBException,psnpf.getContent, "/home/wattazoum/Images/camescope/2007-04-08--09.09.05")
+		for i in psnpf.getContent("/home/wattazoum/Images") :
+			print str(i)
+		print psnpf
+		
+	def testGetFirstItems(self):
+		" Get the list of first items into a snarfile"
+		psnpf = ProcSnapshotFile(self.snarSNPfile)
+		print psnpf.getFirstItems()
+		self.assertEqual(len(psnpf.getFirstItems()),1)
+		self.assertEquals(psnpf.getFirstItems(),['/home/wattazoum/Images/camescope'])
+		
+		psnpf = ProcSnapshotFile(self.snarSNPfile2)
+		print psnpf.getFirstItems()
+		self.assertEqual(len(psnpf.getFirstItems()),4)
+		
+		msnpf = MemSnapshotFile(self.snarSNPfile2)
+		print msnpf
+		print msnpf.getFirstItems()
+		self.assertEqual(len(psnpf.getFirstItems()),4)
+		
