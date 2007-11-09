@@ -272,6 +272,27 @@ class SBdict (dict) :
 		if len(_path) > 0 :
 			_path.pop()
 			
+	def iterFirstItems(self,_path=None):
+		"""
+		an Iterator that gets recursively the path off first items
+		Should return props
+		"""
+		if _path is None: # initialization
+			_path = []
+		for dirname,(props, son) in dict.iteritems(self):
+			_path.append(dirname)
+			if props != None :
+				yield os.sep.join(_path)
+				_path.pop()
+			else:
+				if son is not None :
+					for path in son.iterFirstItems(_path):
+						yield path
+				else :
+					raise SBException("getting to an ending file without properties")
+		if len(_path) > 0 :
+			_path.pop()
+			
 	def getEffectiveFileList(self,_path=None):
 		"""
 		an Iterator that return the effective files list. Unlike iterkeys, every sub path is not return

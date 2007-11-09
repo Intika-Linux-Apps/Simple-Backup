@@ -311,7 +311,7 @@ class SnapshotFile():
 	def __init__(self, filename):
 		"""
 		Constructor 
-		@param filename: the snapshot file absolute file path to get the infos
+		@param filename: the snapshot file absolute file path to get the infos (SNAR file)
 		"""
 		if os.path.exists(filename) :
 			self.snpfile = os.path.abspath(filename)
@@ -481,14 +481,14 @@ class MemSnapshotFile(SBdict):
 	
 	def getFirstItems(self):
 		"""
-		TODO:
 		Get the first items in this SnapshotFile (the lower level dirs in the file)
 		@return: A list of paths
 		@rtype: list 
 		"""
 		result = list()
-		
-		
+		for f in self.iterFirstItems():
+			result.append(f)
+		return result
 		
 		
 class ProcSnapshotFile :
@@ -524,7 +524,6 @@ class ProcSnapshotFile :
 			
 	def getFirstItems(self):
 		"""
-		TODO:
 		Get the first items in this SnapshotFile (the lower level dirs in the file)
 		@return: A list of paths
 		@rtype: list 
@@ -565,3 +564,4 @@ class ProcSnapshotFile :
 				cleanDupl()
 		
 		return result
+	

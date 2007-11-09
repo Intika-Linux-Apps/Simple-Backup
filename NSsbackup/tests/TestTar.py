@@ -13,7 +13,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
 from nssbackup.util.tar import SnapshotFile, MemSnapshotFile,ProcSnapshotFile
 from nssbackup.util.log import getLogger
@@ -63,16 +63,17 @@ class TestSnapshotManager(unittest.TestCase) :
 	def testGetFirstItems(self):
 		" Get the list of first items into a snarfile"
 		psnpf = ProcSnapshotFile(self.snarSNPfile)
-		print psnpf.getFirstItems()
+		#print psnpf.getFirstItems()
 		self.assertEqual(len(psnpf.getFirstItems()),1)
 		self.assertEquals(psnpf.getFirstItems(),['/home/wattazoum/Images/camescope'])
 		
 		psnpf = ProcSnapshotFile(self.snarSNPfile2)
-		print psnpf.getFirstItems()
+		#print psnpf.getFirstItems()
 		self.assertEqual(len(psnpf.getFirstItems()),4)
 		
 		msnpf = MemSnapshotFile(self.snarSNPfile2)
-		print msnpf
-		print msnpf.getFirstItems()
-		self.assertEqual(len(psnpf.getFirstItems()),4)
-		
+		#print msnpf.getFirstItems()
+		self.assertEqual(len(msnpf.getFirstItems()),4)
+		self.assertEqual(msnpf.getFirstItems(),psnpf.getFirstItems())
+	
+	

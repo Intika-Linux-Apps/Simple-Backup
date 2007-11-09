@@ -28,6 +28,7 @@ from log import getLogger
 from structs import SBdict
 import nssbackup.util as Util
 import nssbackup.util.tar as TAR
+from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
 
 class Snapshot : 
 	"The snapshot class represents one snapshot in the backup directory"
@@ -324,11 +325,18 @@ class Snapshot :
 	
 	def getSnapshotFileInfos(self,useMem=False):
 		"""
-		TODO:
 		@param useMem: use or not the memory to store infos about the SNAR file
 		@type useMem: boolean
 		@return: the corresponding SnapshotFile (Mem ou Proc), the only method usable afterward is getContent(path) 
 		"""
+		snpfile = SnapshotFile(self.getSnarFile())
+		
+		if useMem :
+			snpfileInfo = MemSnapshotFile(snpfile)
+		else :
+			snpfileInfo = ProcSnapshotFile(snpfile)
+		
+		return snpfileInfo
 	
 	#---------------------------------
 	
