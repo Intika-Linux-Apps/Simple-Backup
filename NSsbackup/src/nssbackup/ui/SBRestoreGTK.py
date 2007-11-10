@@ -27,6 +27,7 @@ from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.util.log import getLogger
 import nssbackup.util.Snapshot
 from nssbackup.util.Snapshot import Snapshot
+import nssbackup.util.tar as TAR
 from nssbackup.util import ProgressBar
 
 #----------------------------------------------------------------------
@@ -35,6 +36,7 @@ class SBRestoreGTK(GladeWindow):
 	
 	currentSnp = None
 	currentsbdict = None
+	currSnpFilesInfos = None
 	restoreman = RestoreManager()
 
 	#----------------------------------------------------------------------
@@ -69,15 +71,19 @@ class SBRestoreGTK(GladeWindow):
 		acolumn = gtk.TreeViewColumn(_("Snapshots"), gtk.CellRendererText(), text=0 )
 		self.widgets['snplisttreeview'].append_column( acolumn )
 		
-		self.flisttreestore = gtk.TreeStore( str )
+		self.flisttreestore = gtk.TreeStore( str,str )
 		self.flisttreesort =  gtk.TreeModelSort(self.flisttreestore)
 		self.flisttreesort.set_sort_column_id(0, gtk.SORT_ASCENDING)
-		# self.widgets['filelisttreeview'].set_model( self.flisttreestore )
 		self.widgets['filelisttreeview'].set_model( self.flisttreesort )
+		
 		acolumn1 = gtk.TreeViewColumn(_("Path"), gtk.CellRendererText(), text=0 )
 		self.widgets['filelisttreeview'].append_column( acolumn1 )
 		self.widgets['filelisttreeview'].set_search_column(0)
 		acolumn1.set_sort_column_id(0)
+		
+		acolumn2 = gtk.TreeViewColumn(_("State"), gtk.CellRendererText(), text=1 )
+		self.widgets['filelisttreeview'].append_column( acolumn2 )
+		
 		self.on_defaultradiob_toggled()
 		
 		# select the current day
@@ -138,6 +144,42 @@ class SBRestoreGTK(GladeWindow):
 		self.widgets[top_window].set_icon_from_file(Util.getResource("nssbackup-restore.png"))
 	#----------------------------------------------------------------------
 
+	def fill_calendar(self):
+		"""
+		Fill the calendar with the snapshots of the month
+		"""
+		self.widgets['calendar'].clear_marks()
+		
+		date = self.widgets["calendar"].get_date()
+		fromDate = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"01"])
+		toDate = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"31"])
+		snplist = self.snpman.getSnapshots(fromDate, toDate)
+		
+		for snapshot in snplist :
+			self.widgets["calendar"].mark_day( int(snapshot.getDate()["day"]) )
+		
+		self.snplisttreestore.clear()
+		self.flisttreestore.clear()
+		self.widgets['buttonspool'].set_sensitive(False)
+		self.widgets['snpdetails'].set_sensitive(True)
+
+	def change_target(self, newtarget):
+		"""
+		"""
+		global snpman, target
+		try :
+			self.target =  self.fusefam.mount(newtarget)
+			self.snpman = SnapshotManager(self.target)
+			self.fill_calendar()
+		except Exception, e :
+			getLogger().error(str(e))
+			getLogger().error(traceback.format_exc())
+			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
+			dialog.run()
+			dialog.destroy()
+
+	# ---------------------------------------------------------------------
+	
 	def on_defaultradiob_toggled(self, *args):
 		if self.widgets['defaultradiob'].get_active() :
 			self.widgets['custominfos'].set_sensitive( False )
@@ -189,7 +231,7 @@ class SBRestoreGTK(GladeWindow):
 		"""
 		if self.flisttreestore.iter_nth_child( self.flisttreesort.convert_iter_to_child_iter(None,iter), 1 ):
 			return
-		self.show_dir( self.path_to_dir(path), self.flisttreesort.convert_iter_to_child_iter(None,iter) )
+		self.appendContent( self.path_to_dir(path), self.flisttreesort.convert_iter_to_child_iter(None,iter) )
 	
 	def path_to_dir( self, path ):
 		"""
@@ -200,7 +242,7 @@ class SBRestoreGTK(GladeWindow):
 		p = ""
 		while g != []:
 			i = self.flisttreestore.get_iter( self.flisttreesort.convert_path_to_child_path(tuple(g)) )
-			p = "/" + self.flisttreestore.get_value( i, 0 ) + p
+			p = os.sep + (self.flisttreestore.get_value( i, 0 ) + p).lstrip(os.sep)
 			g = g[:-1]
 		return p
 	
@@ -234,6 +276,82 @@ class SBRestoreGTK(GladeWindow):
 
 	#----------------------------------------------------------------------
 
+	def appendContent(self,path,rootiter):
+		"""
+		append the content in the tree store
+		@param path: The path to add the content of.
+		@param rootiter: the GTKIter that indexes the row
+		"""
+		dummy = self.flisttreestore.iter_children(rootiter)
+		
+		content = self.currSnpFilesInfos.getContent(path)
+		# content is a list of Dumpdirs
+		if not content :
+			# content is empty, do nothing
+			pass
+		else :
+			for f in content :
+				iter = self.flisttreestore.append( rootiter, [f.getFilename(),f.getHumanReadableControl()] )
+				if f.getControl() == TAR.Dumpdir.DIRECTORY :
+					self.flisttreestore.append( iter, [_("Loading ..."),None] )
+		if dummy :
+			self.flisttreestore.remove( dummy )
+		
+	def load_filestree(self):
+		"""
+		Load the files list 
+		"""
+		global currentsbdict
+		self.flisttreestore.clear()
+		#self.widgets['progressbarDialog'].show()
+		self.widgets['buttonspool'].set_sensitive(False)
+		tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
+		self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
+
+		self.currSnpFilesInfos = self.currentSnp.getSnapshotFileInfos()
+		
+		if self.currSnpFilesInfos :
+			# load the first items 
+			f1_items = self.currSnpFilesInfos.getFirstItems()
+			if not f1_items :
+				# first items is empty
+				self.flisttreestore.append(None, [_("This snapshot seems empty.")])
+				self.widgets['snpdetails'].set_sensitive(False)
+			else :
+				self.widgets['snpdetails'].set_sensitive(True)
+				for k in f1_items :
+					# add k and append the content if not empty
+					iter = self.flisttreestore.append(None, [k,TAR.Dumpdir.getHRCtrls()[TAR.Dumpdir.DIRECTORY]])
+					self.appendContent(k, iter)
+			
+		self.widgets['progressbarDialog'].hide()
+
+	def load_snapshotslist(self, date):
+		"""
+		load the snapshot list for that date
+		@param date: a tupe (year, month, day) using the Calendar.get_date convention ie month is 0-11
+		"""
+		day = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"%02d" % date[2]])
+		getLogger().debug("Selected day : " + day)
+		snplist = self.snpman.getSnapshots(byDate=day)
+		
+		self.snplisttreestore.clear()
+		self.flisttreestore.clear()
+		self.widgets['buttonspool'].set_sensitive(False)
+		self.widgets['snpdetails'].set_sensitive(True)
+		
+		if snplist == []:
+			self.snplisttreestore.append( None, [_("No backups found for this day !")])
+			self.widgets['snplist'].set_sensitive(False)
+		else:
+			self.widgets['snplist'].set_sensitive(True)
+			for snapshot in snplist:
+				self.snplisttreestore.append(None, [snapshot.getName()])
+
+	
+
+	#----------------------------------------------------------------------
+
 	def on_restore_clicked(self, *args):
 		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
 		src = self.path_to_dir( tstore.get_path( iter ) )
@@ -256,9 +374,6 @@ class SBRestoreGTK(GladeWindow):
 				dialog.run()
 				dialog.destroy()
 		
-
-	#----------------------------------------------------------------------
-
 	def on_restoreas_clicked(self, *args):
 		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
 		src = self.path_to_dir( tstore.get_path( iter ) )
@@ -351,82 +466,6 @@ class SBRestoreGTK(GladeWindow):
 		self.fusefam.terminate()
 		gtk.main_quit()
 
-#--------------------------------------------------------------------------
-
-	def load_filestree(self):
-		global currentsbdict
-		self.flisttreestore.clear()
-		self.widgets['progressbarDialog'].show()
-		self.widgets['buttonspool'].set_sensitive(False)
-		tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
-		self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
-		self.currentsbdict = self.currentSnp.getFilesList()
-		
-		if len(self.currentsbdict) > 0 and self.currentsbdict.getSon(os.sep) :
-			self.widgets['snpdetails'].set_sensitive(True)
-			for k in dict.iterkeys(self.currentsbdict.getSon(os.sep)) :
-				iter = self.flisttreestore.append(None, [k])
-				self.show_dir(os.sep+k, iter)
-		else :
-			self.flisttreestore.append(None, [_("This snapshot seems empty.")])
-			self.widgets['snpdetails'].set_sensitive(False)
-		self.widgets['progressbarDialog'].hide()
-
-	def load_snapshotslist(self, date):
-		"""
-		load the snapshot list for that date
-		@param date: a tupe (year, month, day) using the Calendar.get_date convention ie month is 0-11
-		"""
-		day = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"%02d" % date[2]])
-		getLogger().debug("Selected day : " + day)
-		snplist = self.snpman.getSnapshots(byDate=day)
-		
-		self.snplisttreestore.clear()
-		self.flisttreestore.clear()
-		self.widgets['buttonspool'].set_sensitive(False)
-		self.widgets['snpdetails'].set_sensitive(True)
-		
-		if snplist == []:
-			self.snplisttreestore.append( None, [_("No backups found for this day !")])
-			self.widgets['snplist'].set_sensitive(False)
-		else:
-			self.widgets['snplist'].set_sensitive(True)
-			for snapshot in snplist:
-				self.snplisttreestore.append(None, [snapshot.getName()])
-	
-	def fill_calendar(self):
-		"""
-		Fill the calendar with the snapshots of the month
-		"""
-		self.widgets['calendar'].clear_marks()
-		
-		date = self.widgets["calendar"].get_date()
-		fromDate = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"01"])
-		toDate = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"31"])
-		snplist = self.snpman.getSnapshots(fromDate, toDate)
-		
-		for snapshot in snplist :
-			self.widgets["calendar"].mark_day( int(snapshot.getDate()["day"]) )
-		
-		self.snplisttreestore.clear()
-		self.flisttreestore.clear()
-		self.widgets['buttonspool'].set_sensitive(False)
-		self.widgets['snpdetails'].set_sensitive(True)
-
-	def change_target(self, newtarget):
-		"""
-		"""
-		global snpman, target
-		try :
-			self.target =  self.fusefam.mount(newtarget)
-			self.snpman = SnapshotManager(self.target)
-			self.fill_calendar()
-		except Exception, e :
-			getLogger().error(str(e))
-			getLogger().error(traceback.format_exc())
-			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
-			dialog.run()
-			dialog.destroy()
 	
 #----------------------------------------------------------------------
 

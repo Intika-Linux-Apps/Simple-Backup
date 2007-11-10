@@ -13,7 +13,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
 # Imports
 import nssbackup.managers.FileAccessManager as FAM
@@ -28,6 +28,7 @@ from log import getLogger
 from structs import SBdict
 import nssbackup.util as Util
 import nssbackup.util.tar as TAR
+from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
 
 class Snapshot : 
 	"The snapshot class represents one snapshot in the backup directory"
@@ -148,9 +149,6 @@ class Snapshot :
 		if not self.__snarfile : 
 			self.__snarfile = self.getPath()+os.sep+"files.snar"
 		return self.__snarfile
-
-	
-	# ---
 	
 	def getPath(self) :
 		"return the complete path of the snapshot"
@@ -263,12 +261,36 @@ class Snapshot :
 				self.__excludes = FAM.pickleload(excludefile)
 				return self.__excludes
 	
-	def isfull(self):
-		"""
-		@return: True if the snapshot is full and false if inc
-		"""
-		return self.getName().endswith(".ful")
+		
+	def getPackages(self) :
+		"Return the packages"
+		global __packages
+		if self.__packages : return self.__packages
+		else :
+			packagesfile = self.getPath() +os.sep +"packages"
+			if not FAM.exists(packagesfile) : return False
+			else :
+				self.__packages = FAM.readfile(packagesfile)
+				return self.__packages
 	
+	def getSnapshotFileInfos(self,useMem=False):
+		"""
+		@param useMem: use or not the memory to store infos about the SNAR file
+		@type useMem: boolean
+		@return: the corresponding SnapshotFile (Mem ou Proc), the only method usable afterward is getContent(path) 
+		"""
+		snpfile = SnapshotFile(self.getSnarFile())
+		
+		snpfileInfo = None
+		
+		if useMem :
+			snpfileInfo = MemSnapshotFile(snpfile)
+		else :
+			snpfileInfo = ProcSnapshotFile(snpfile)
+		
+		return snpfileInfo
+	
+		
 	def getSplitedSize(self):
 		"""
 		@return: the size of each archive in the snapshot (0 means unlimited )
@@ -276,6 +298,13 @@ class Snapshot :
 		if os.path.exists(os.sep.join([self.getPath(),"format"])):
 			self.__splitedSize = int(FAM.readfile(os.sep.join([self.getPath(),"format"])).split('\n')[1])
 		return self.__splitedSize
+	
+	def isfull(self):
+		"""
+		@return: True if the snapshot is full and false if inc
+		"""
+		return self.getName().endswith(".ful")
+
 	
 	def commit (self) :
 		"Commit the snapshot infos ( write to the disk )"
@@ -310,17 +339,6 @@ class Snapshot :
 		global __excludeFlist
 		
 		self.__excludeFlist[item] = "0"
-	
-	def getPackages(self) :
-		"Return the packages"
-		global __packages
-		if self.__packages : return self.__packages
-		else :
-			packagesfile = self.getPath() +os.sep +"packages"
-			if not FAM.exists(packagesfile) : return False
-			else :
-				self.__packages = FAM.readfile(packagesfile)
-				return self.__packages
 	
 	#---------------------------------
 	

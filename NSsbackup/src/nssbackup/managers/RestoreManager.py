@@ -13,7 +13,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
 from gettext import gettext as _
 from nssbackup.util.Snapshot import Snapshot
@@ -61,13 +61,13 @@ class RestoreManager :
 		_file = os.sep+_file.lstrip(os.sep)
 		
 		# restore
-#		if not snapshot.getFilesList().has_key(_file):
-#			if failOnNotFound :
-#				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
-#			else : 
-#				getLogger().warning(_("File '%s' not found in the backup snapshot [%s] files list, We'll not fail though !") % (_file,snapshot.getName()) )
-#				return
-#		
+		if not snapshot.getSnapshotFileInfos().hasPath(_file):
+			if failOnNotFound :
+				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
+			else : 
+				getLogger().warning(_("File '%s' not found in the backup snapshot [%s] files list, We'll not fail though !") % (_file,snapshot.getName()) )
+				return
+		
 		suffix = None
 		if backupFlag :
 			now = datetime.datetime.now().isoformat("_").replace( ":", "." )

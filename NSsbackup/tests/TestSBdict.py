@@ -58,13 +58,18 @@ class TestSBdict(unittest.TestCase):
 		
 	def testGetSon(self):
 		""
+	
+	def testiterFirstItems(self):
+		" Get the list of first items "
+		for f in self.sbd.iterFirstItems() :
+			print f
+	
 		
 	def testDictCommonUsage(self):
 		""
 
 	def testGetEffectiveFileList(self):
 		"Get Effective FileList"
-		print "Get Effective FileList\n"
 		for v in self.sbd.getEffectiveFileList() :
 			print v
 	

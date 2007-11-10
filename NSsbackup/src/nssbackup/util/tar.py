@@ -20,6 +20,7 @@ import os,re,tarfile, csv, shutil
 from gettext import gettext as _
 from nssbackup.util.log import getLogger
 import nssbackup.util as Util
+from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
 
 def getArchiveType(archive):
@@ -54,7 +55,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	# strip leading sep
 	file = file.lstrip(os.sep)
 	
-	options = ["-xp", "--occurrence=1", "--ignore-failed-read", '--backup=existing']
+	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
 	archType = getArchiveType(sourcetgz)
 	if archType =="tar" :
@@ -80,6 +81,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	
 	options.extend(['--file='+sourcetgz,file])
 	
+	getLogger().debug("Launching TAR with options : %s" % options)
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
 		getLogger().debug("output was : " + outStr)
@@ -230,6 +232,7 @@ def makeTarFullBackup(snapshot):
 	if retVal != 0 :
 		raise SBException(_("Couldn't make a proper backup : ") + errStr )
 	
+# ---
 
 class Dumpdir():
 	"""
@@ -241,9 +244,14 @@ class Dumpdir():
 	@see: http://www.gnu.org/software/tar/manual/html_chapter/tar_13.html#SEC171
 	"""
 	
+	INCLUDED = 'Y'
+	UNCHANGED = 'N'
+	DIRECTORY = 'D'
+	
+	__HRCtrls = {'Y':_('Included'),'N':_('Unchanged'),'D':_('Directory')} #: The dictionary mapping control with their meanings
+	
 	control = None
 	filename = None
-	nul = '\0'
 	
 	def __init__(self, line):
 		"""
@@ -252,15 +260,15 @@ class Dumpdir():
 		@param line: the line (in dumpdir point of view ) to parse
 		@raise Exception: when the line doesn't have the requeried format
 		"""
+		if not line :
+			self = None
+			return
 		
 		if (not isinstance(line,str)) :
 			raise Exception("Line must be a string")
 		
-		if line[-1] is not self.nul:
-			raise Exception("Incorrect format of line : Last character must be '\\0'(NUL) ")
-		
 		self.control = line[0]
-		self.filename = line[1:-1]
+		self.filename = line[1:]
 
 	def getFilename(self):
 		"""
@@ -275,7 +283,7 @@ class Dumpdir():
 		
 	def getControl(self):
 		"""
-		Get the control charactere from the DumpDir
+		Get the control character from the DumpDir
 		@return: control
 		@raise Exception: if the control is null 
 		"""
@@ -283,7 +291,26 @@ class Dumpdir():
 			return self.control
 		else :
 			raise Exception("Dumpdir inconsistancy : 'control' is empty")
-		
+	
+	def getHumanReadableControl(self):
+		"""
+		Get the control character as a Human readable string from the DumpDir
+		"""
+		return self.__HRCtrls[self.getControl()]
+	
+	def __str__(self):
+		return self.filename + " " +self.getHumanReadableControl() 
+	
+	def getHRCtrls(Dumpdir):
+		"""
+		@return: The Human Readable control dictionary
+		@rtype: dict
+		"""
+		return Dumpdir.__HRCtrls
+	
+	getHRCtrls = classmethod(getHRCtrls)
+# ---
+
 class SnapshotFile():
 	"""
 	
@@ -297,12 +324,12 @@ class SnapshotFile():
 	def __init__(self, filename):
 		"""
 		Constructor 
-		@param filename: the snapshot file absolute file path to get the infos
+		@param filename: the snapshot file absolute file path to get the infos (SNAR file)
 		"""
 		if os.path.exists(filename) :
 			self.snpfile = os.path.abspath(filename)
 		else :
-			raise Exception ("'%s' doesn't exist "% filename)
+			raise Exception (_("'%s' doesn't exist ") % filename)
 
 	def getFormatVersion(self):
 		"""
@@ -325,7 +352,7 @@ class SnapshotFile():
 			# we are version 0
 			self.version = 0
 		
-		return self.version
+		return int(self.version)
 		
 	def __getHeaderInfos(self):
 		"""
@@ -382,15 +409,26 @@ class SnapshotFile():
 		"""
 		Iterator method that gives each line entry
 		@warning: only compatible tar version 2 of Tar format
-		@return: [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is Dumpdirs
+		@return: [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a list of Dumpdirs
 		"""
+		
+		def formatDumpDirs(content):
+			"""
+			Subroutine to format a content into dump dirs
+			"""
+			result = []
+			if content :
+				for d in content.rstrip('\0').split('\0'):
+					if d :
+						result.append(Dumpdir(d))
+			return result
 		
 		def format(line):
 			"""
 			subroutine to format a line including NUL char to have and array
 			"""
 			nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents = line.lstrip("\0").split("\0",6)
-			return (nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents)
+			return (nfs,mtime_sec,mtime_nano,dev_no,i_no,name,formatDumpDirs(contents))
 			
 			
 		fd = open(self.snpfile)
@@ -420,5 +458,145 @@ class SnapshotFile():
 				last_c = c
 			c = fd.read(1)
 		
-		fd.close()
-	 	
+		fd.close
+
+# ----
+
+class MemSnapshotFile(SBdict):
+	"""
+	This is a representation in memory of a simplified SNAR file. The used structure is an SBDict.
+	The "prop" value is the content of the directory. wich is a list of L{Dumpdir}
+	"""
+	
+	def __init__(self,snapshotFile):
+		"""
+		load the snapshotFile in memory
+		@param snapshotFile: a SnapshotFile to convert in MemSnapshotFile
+		@type snapshotFile: nssbackup.util.tar.SnapshotFile
+		"""
+		if not isinstance(snapshotFile, SnapshotFile) :
+			raise Exception("A SnapshotFile is required")
+		
+		for f in snapshotFile.parseFormat2():
+			self[f[-2]] = f[-1]
+		
+	def hasPath(self,path):
+		"""
+		Checks if a path is include in the SNAR file
+		@param path: The path to check
+		@return: True if the file is included, False otherwise
+		@rtype: boolean
+		"""
+		return self.has_key(path)
+	
+	
+	def getContent(self,dirpath):
+		"""
+		convenance method to get the content of a directory.
+		@param dirpath: The directory absolute path to get
+		@type dirpath: str
+		@return: The content of the dir
+		@rtype: list
+		"""
+		return self[dirpath]
+	
+	def getFirstItems(self):
+		"""
+		Get the first items in this SnapshotFile (the lower level dirs in the file)
+		@return: A list of paths
+		@rtype: list 
+		"""
+		result = list()
+		for f in self.iterFirstItems():
+			result.append(f)
+		return result
+		
+		
+class ProcSnapshotFile :
+	"""
+	This is a Snapshotfile that will basically every time parse the snarfile for information
+	"""
+	
+	__snapshotFile = None
+	
+	def __init__(self,snapshotFile):
+		"""
+		load the snapshotFile to get a reference on it
+		@param snapshotFile: a SnapshotFile to convert in MemSnapshotFile
+		@type snapshotFile: nssbackup.util.tar.SnapshotFile
+		"""
+		if not isinstance(snapshotFile, SnapshotFile) :
+			raise Exception("A SnapshotFile is required")
+		
+		self.__snapshotFile = snapshotFile
+		
+	def hasPath(self,path):
+		"""
+		Checks if a path is include in the SNAR file
+		@param path: The path to check
+		@return: True if the file is included, False otherwise
+		@rtype: boolean
+		"""
+		for f in self.__snapshotFile.parseFormat2():
+			if f[-2].rstrip(os.sep) == path.rstrip(os.sep) :
+				return True
+		return False
+	
+	
+	def getContent(self,dirpath):
+		"""
+		convenance method to get the content of a directory.
+		@param dirpath: The directory absolute path to get
+		@type dirpath: str
+		@return: The content of the dir
+		@rtype: list
+		@raise SBException: if the path isn't found in the snapshot file
+		"""
+		for f in self.__snapshotFile.parseFormat2():
+			if f[-2].rstrip(os.sep) == dirpath.rstrip(os.sep) :
+				return f[-1]
+		raise SBException("Non existing directory : %s" % dirpath)
+			
+	def getFirstItems(self):
+		"""
+		Get the first items in this SnapshotFile (the lower level dirs in the file)
+		@return: A list of paths
+		@rtype: list 
+		"""
+		
+		def cleanDupl():
+			if result:
+				result.sort()
+				last = result[-1]
+				for i in range(len(result)-2, -1, -1):
+					if last == result[i]:
+						del result[i]
+					else:
+						last = result[i]
+			
+		result = list()
+		
+		for f in self.__snapshotFile.parseFormat2():
+			found = False
+			
+			for i in range(0,len(result)) :
+				if result[i] == f[-2] or f[-2].startswith(result[i]) : 
+					if found :
+						# then we are trying to overide
+						continue
+					else :
+						found = True
+						break
+				elif result[i].startswith(f[-2]):
+					# replace with f[-2]
+					result[i] = f[-2]
+					found = True
+					# don't break cause it's possible that some others entries need to be overiden
+			
+			if not found :
+				result.append(f[-2])
+			else :
+				cleanDupl()
+		
+		return result
+	
