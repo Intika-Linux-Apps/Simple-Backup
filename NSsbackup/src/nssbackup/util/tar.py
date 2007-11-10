@@ -55,7 +55,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	# strip leading sep
 	file = file.lstrip(os.sep)
 	
-	options = ["-xp", "--occurrence=1", "--ignore-failed-read", '--backup=existing']
+	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
 	archType = getArchiveType(sourcetgz)
 	if archType =="tar" :
@@ -81,6 +81,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	
 	options.extend(['--file='+sourcetgz,file])
 	
+	getLogger().debug("Launching TAR with options : %s" % options)
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
 		getLogger().debug("output was : " + outStr)
@@ -243,6 +244,10 @@ class Dumpdir():
 	@see: http://www.gnu.org/software/tar/manual/html_chapter/tar_13.html#SEC171
 	"""
 	
+	INCLUDED = 'Y'
+	UNCHANGED = 'N'
+	DIRECTORY = 'D'
+	
 	__HRCtrls = {'Y':_('Included'),'N':_('Unchanged'),'D':_('Directory')} #: The dictionary mapping control with their meanings
 	
 	control = None
@@ -295,7 +300,15 @@ class Dumpdir():
 	
 	def __str__(self):
 		return self.filename + " " +self.getHumanReadableControl() 
-		
+	
+	def getHRCtrls(Dumpdir):
+		"""
+		@return: The Human Readable control dictionary
+		@rtype: dict
+		"""
+		return Dumpdir.__HRCtrls
+	
+	getHRCtrls = classmethod(getHRCtrls)
 # ---
 
 class SnapshotFile():
@@ -405,7 +418,6 @@ class SnapshotFile():
 			"""
 			result = []
 			if content :
-				getLogger().debug("Content = "+content)
 				for d in content.rstrip('\0').split('\0'):
 					if d :
 						result.append(Dumpdir(d))
@@ -468,6 +480,15 @@ class MemSnapshotFile(SBdict):
 		for f in snapshotFile.parseFormat2():
 			self[f[-2]] = f[-1]
 		
+	def hasPath(self,path):
+		"""
+		Checks if a path is include in the SNAR file
+		@param path: The path to check
+		@return: True if the file is included, False otherwise
+		@rtype: boolean
+		"""
+		return self.has_key(path)
+	
 	
 	def getContent(self,dirpath):
 		"""
@@ -509,6 +530,19 @@ class ProcSnapshotFile :
 		
 		self.__snapshotFile = snapshotFile
 		
+	def hasPath(self,path):
+		"""
+		Checks if a path is include in the SNAR file
+		@param path: The path to check
+		@return: True if the file is included, False otherwise
+		@rtype: boolean
+		"""
+		for f in self.__snapshotFile.parseFormat2():
+			if f[-2].rstrip(os.sep) == path.rstrip(os.sep) :
+				return True
+		return False
+	
+	
 	def getContent(self,dirpath):
 		"""
 		convenance method to get the content of a directory.
@@ -516,6 +550,7 @@ class ProcSnapshotFile :
 		@type dirpath: str
 		@return: The content of the dir
 		@rtype: list
+		@raise SBException: if the path isn't found in the snapshot file
 		"""
 		for f in self.__snapshotFile.parseFormat2():
 			if f[-2].rstrip(os.sep) == dirpath.rstrip(os.sep) :
