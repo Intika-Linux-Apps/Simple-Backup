@@ -61,7 +61,7 @@ class RestoreManager :
 		_file = os.sep+_file.lstrip(os.sep)
 		
 		# restore
-		if not snapshot.getSnapshotFileInfos().hasPath(_file):
+		if not snapshot.getSnapshotFileInfos().hasPath(_file) and not snapshot.getSnapshotFileInfos().hasFile(_file):
 			if failOnNotFound :
 				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
 			else : 

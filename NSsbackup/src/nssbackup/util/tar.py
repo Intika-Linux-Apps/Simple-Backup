@@ -194,8 +194,8 @@ def makeTarIncBackup(snapshot):
 	
 	# For an INC backup the base SNAR file should exists
 	if not os.path.exists(snapshot.getBaseSnapshot().getSnarFile()) :
-		getLogger().error("Unable to find the SNAR file to make an Incremental backup")
-		getLogger().error("Falling back to full backup")
+		getLogger().error(_("Unable to find the SNAR file to make an Incremental backup"))
+		getLogger().error(_("Falling back to full backup"))
 		makeTarFullBackup(snapshot)
 	else:
 		shutil.copy(snapshot.getBaseSnapshot().getSnarFile(), snapshot.getSnarFile())
@@ -265,7 +265,7 @@ class Dumpdir():
 			return
 		
 		if (not isinstance(line,str)) :
-			raise Exception("Line must be a string")
+			raise Exception(_("Line must be a string"))
 		
 		self.control = line[0]
 		self.filename = line[1:]
@@ -279,7 +279,7 @@ class Dumpdir():
 		if self.filename :
 			return self.filename
 		else :
-			raise Exception("Dumpdir inconsistancy : filename is empty")
+			raise Exception(_("Dumpdir inconsistancy : 'filename' is empty"))
 		
 	def getControl(self):
 		"""
@@ -290,7 +290,7 @@ class Dumpdir():
 		if self.control :
 			return self.control
 		else :
-			raise Exception("Dumpdir inconsistancy : 'control' is empty")
+			raise Exception(_("Dumpdir inconsistancy : 'control' is empty"))
 	
 	def getHumanReadableControl(self):
 		"""
@@ -526,19 +526,34 @@ class ProcSnapshotFile :
 		@type snapshotFile: nssbackup.util.tar.SnapshotFile
 		"""
 		if not isinstance(snapshotFile, SnapshotFile) :
-			raise Exception("A SnapshotFile is required")
+			raise Exception(_("A SnapshotFile is required"))
 		
 		self.__snapshotFile = snapshotFile
 		
 	def hasPath(self,path):
 		"""
-		Checks if a path is include in the SNAR file
+		Checks if a path is included in the SNAR file
 		@param path: The path to check
 		@return: True if the file is included, False otherwise
 		@rtype: boolean
 		"""
 		for f in self.__snapshotFile.parseFormat2():
 			if f[-2].rstrip(os.sep) == path.rstrip(os.sep) :
+				return True
+		return False
+	
+	def hasFile(self,_file):
+		"""
+		Checks if a file is included in the SNAR file. a file is in a directory thus in the content.
+		@param _file: The file to check. a complete path must be given
+		@return: True if the file is included, False otherwise
+		@rtype: boolean
+		"""
+		dir,inFile = _file.rsplit(os.sep,1)
+		if not self.hasPath(dir):
+			return False
+		for f in self.getContent(dir):
+			if f.getFilename() == inFile and f.getControl() != Dumpdir.UNCHANGED:
 				return True
 		return False
 	
@@ -555,7 +570,7 @@ class ProcSnapshotFile :
 		for f in self.__snapshotFile.parseFormat2():
 			if f[-2].rstrip(os.sep) == dirpath.rstrip(os.sep) :
 				return f[-1]
-		raise SBException("Non existing directory : %s" % dirpath)
+		raise SBException(_("Non existing directory : %s") % dirpath)
 			
 	def getFirstItems(self):
 		"""
