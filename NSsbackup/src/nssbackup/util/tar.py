@@ -22,6 +22,7 @@ from nssbackup.util.log import getLogger
 import nssbackup.util as Util
 from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
+from datetime import datetime
 
 def getArchiveType(archive):
 	"""
@@ -321,7 +322,7 @@ class SnapshotFile():
 	version = None
 	versionRE = re.compile("GNU tar-(.+?)-([0-9]+?)")
 
-	def __init__(self, filename):
+	def __init__(self, filename,writeFlag=False):
 		"""
 		Constructor 
 		@param filename: the snapshot file absolute file path to get the infos (SNAR file)
@@ -329,7 +330,12 @@ class SnapshotFile():
 		if os.path.exists(filename) :
 			self.snpfile = os.path.abspath(filename)
 		else :
-			raise Exception (_("'%s' doesn't exist ") % filename)
+			if writeFlag :
+				self.snpfile = os.path.abspath(filename)
+				fd = open(self.snpfile,'a+')
+				fd.close()
+			else :
+				raise Exception (_("'%s' doesn't exist ") % filename)
 
 	def getFormatVersion(self):
 		"""
@@ -460,6 +466,53 @@ class SnapshotFile():
 		
 		fd.close
 
+	# ---
+	
+	def setHeader(self,timeofBackup):
+		"""
+		TODO:
+		Sets the header of the snar File. 
+		GNU tar-1.19-2  -> in the first line
+		second line is timeofBackupInSec\000timeofBackupInNano
+		@param timeofBackup: The time to set in the snar file
+		@type timeofBackup: datetime
+		"""
+		if type(timeofBackup) != datetime :
+			raise SBException("timeofBackup must be a datetime")
+		fd = open(self.snpfile,'w')
+		
+		fd.write("GNU tar-1.19-2\n")
+		
+		
+		fd.close()
+		
+	def addRecord(self,record):
+		"""
+		TODO:
+		Write a record in the snar file. A record is a string with 6 entries separated by a NUL char 
+		+ a content composed of DumpDirs
+		@param record: A string that contains the record to add
+		"""
+		
+	def createContent(self,contentDict):
+		"""
+		create a content out of a dict of {file:'control'}
+		@param contentDict: the content dictionary
+		@type contentDict: dict
+		@return: a string containing the computed content
+		@rtype: string
+		"""
+		if type(contentDict) != dict :
+			raise SBException("contentDict must be a dictionary")
+		
+		result = ""
+		
+		for f,c in contentDict.iteritems():
+			result += c+f+'\0'
+		
+		return result
+		
+		
 # ----
 
 class MemSnapshotFile(SBdict):

@@ -8,9 +8,8 @@
   
 
   <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-
-<path>/nssbackup-devel/src</path>
-<path>/nssbackup-devel/tests</path>
+<path>/nssbackup-write-snar/src</path>
+<path>/nssbackup-write-snar/tests</path>
 </pydev_pathproperty>
   
 
