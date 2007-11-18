@@ -22,6 +22,8 @@ from nssbackup.util.log import getLogger
 import nssbackup.util as Util
 from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
+from datetime import datetime
+import time
 
 def getArchiveType(archive):
 	"""
@@ -320,8 +322,12 @@ class SnapshotFile():
 	snpfile = None
 	version = None
 	versionRE = re.compile("GNU tar-(.+?)-([0-9]+?)")
+	
+	__SEP = '\000'
+	__entrySEP = 2*__SEP
 
-	def __init__(self, filename):
+
+	def __init__(self, filename,writeFlag=False):
 		"""
 		Constructor 
 		@param filename: the snapshot file absolute file path to get the infos (SNAR file)
@@ -329,7 +335,12 @@ class SnapshotFile():
 		if os.path.exists(filename) :
 			self.snpfile = os.path.abspath(filename)
 		else :
-			raise Exception (_("'%s' doesn't exist ") % filename)
+			if writeFlag :
+				self.snpfile = os.path.abspath(filename)
+				fd = open(self.snpfile,'a+')
+				fd.close()
+			else :
+				raise Exception (_("'%s' doesn't exist ") % filename)
 
 	def getFormatVersion(self):
 		"""
@@ -460,6 +471,59 @@ class SnapshotFile():
 		
 		fd.close
 
+	# ---
+	
+	def setHeader(self,timeofBackup):
+		"""
+		Sets the header of the snar File. 
+		GNU tar-1.19-2  -> in the first line
+		second line is timeofBackupInSec\000timeofBackupInNano
+		@param timeofBackup: The time to set in the snar file
+		@type timeofBackup: datetime
+		"""
+		if type(timeofBackup) != datetime :
+			raise SBException("timeofBackup must be a datetime")
+		fd = open(self.snpfile,'w')
+		
+		fd.write("GNU tar-1.19-2\n")
+		t = int(time.mktime(timeofBackup.timetuple()))
+		fd.write(2*(str(t)+self.__SEP))
+		fd.close()
+		
+	def addRecord(self,record):
+		"""
+		Write a record in the snar file. A record is a tuple with 6 entries + a content that is a dict
+		@param record: A tuple that contains the record to add. [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a dict of {file:'control'}
+		"""
+		woContent,contents = record[:-1],record[-1]
+		# compute contents
+		strContent = self.createContent(contents)
+		toAdd = self.__SEP.join(woContent)+self.__SEP+strContent
+		
+		fd = open(self.snpfile,'a+')
+		fd.write(toAdd + self.__entrySEP)
+		fd.close()
+		
+		
+	def createContent(self,contentDict):
+		"""
+		create a content out of a dict of {file:'control'}
+		@param contentDict: the content dictionary
+		@type contentDict: dict
+		@return: a string containing the computed content
+		@rtype: string
+		"""
+		if type(contentDict) != dict :
+			raise SBException("contentDict must be a dictionary")
+		
+		result = ""
+		
+		for f,c in contentDict.iteritems():
+			result += c+f+self.__SEP
+		
+		return result
+		
+		
 # ----
 
 class MemSnapshotFile(SBdict):
