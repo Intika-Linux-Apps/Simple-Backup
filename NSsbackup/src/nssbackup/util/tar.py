@@ -23,6 +23,7 @@ import nssbackup.util as Util
 from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
 from datetime import datetime
+import time
 
 def getArchiveType(archive):
 	"""
@@ -321,6 +322,10 @@ class SnapshotFile():
 	snpfile = None
 	version = None
 	versionRE = re.compile("GNU tar-(.+?)-([0-9]+?)")
+	
+	__SEP = '\000'
+	__entrySEP = 2*__SEP
+
 
 	def __init__(self, filename,writeFlag=False):
 		"""
@@ -470,7 +475,6 @@ class SnapshotFile():
 	
 	def setHeader(self,timeofBackup):
 		"""
-		TODO:
 		Sets the header of the snar File. 
 		GNU tar-1.19-2  -> in the first line
 		second line is timeofBackupInSec\000timeofBackupInNano
@@ -482,17 +486,24 @@ class SnapshotFile():
 		fd = open(self.snpfile,'w')
 		
 		fd.write("GNU tar-1.19-2\n")
-		
-		
+		t = int(time.mktime(timeofBackup.timetuple()))
+		fd.write(2*(str(t)+self.__SEP))
 		fd.close()
 		
 	def addRecord(self,record):
 		"""
-		TODO:
-		Write a record in the snar file. A record is a string with 6 entries separated by a NUL char 
-		+ a content composed of DumpDirs
-		@param record: A string that contains the record to add
+		Write a record in the snar file. A record is a tuple with 6 entries + a content that is a dict
+		@param record: A tuple that contains the record to add. [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a dict of {file:'control'}
 		"""
+		woContent,contents = record[:-1],record[-1]
+		# compute contents
+		strContent = self.createContent(contents)
+		toAdd = self.__SEP.join(woContent)+self.__SEP+strContent
+		
+		fd = open(self.snpfile,'a+')
+		fd.write(toAdd + self.__entrySEP)
+		fd.close()
+		
 		
 	def createContent(self,contentDict):
 		"""
@@ -508,7 +519,7 @@ class SnapshotFile():
 		result = ""
 		
 		for f,c in contentDict.iteritems():
-			result += c+f+'\0'
+			result += c+f+self.__SEP
 		
 		return result
 		

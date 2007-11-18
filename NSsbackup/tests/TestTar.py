@@ -15,7 +15,7 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
-from nssbackup.util.tar import SnapshotFile, MemSnapshotFile,ProcSnapshotFile
+from nssbackup.util.tar import SnapshotFile, MemSnapshotFile,ProcSnapshotFile, Dumpdir
 from nssbackup.util.log import getLogger
 import unittest,os
 from nssbackup.util.exceptions import *
@@ -76,4 +76,20 @@ class TestSnapshotManager(unittest.TestCase) :
 		self.assertEqual(len(msnpf.getFirstItems()),4)
 		self.assertEqual(msnpf.getFirstItems(),psnpf.getFirstItems())
 	
-	
+	def testWriteSNARfile(self):
+		" Test the writng of SNARfile functionalities "
+		if os.path.exists("test-datas"+os.sep+"test-files.snar"):
+			os.remove("test-datas"+os.sep+"test-files.snar")
+		snpf = SnapshotFile("test-datas"+os.sep+"test-files.snar", True)
+		import datetime
+		snpf.setHeader(datetime.datetime.now())
+		self.assertEqual(snpf.getFormatVersion(),2)
+		entry=['0','1195399253','1195399253','2049','420738',"/home/wattazoum/Images",
+			{'camescope':Dumpdir.DIRECTORY,
+			'article.html':Dumpdir.INCLUDED}
+			]
+		snpf.addRecord(entry)
+		
+		snpf2 = ProcSnapshotFile(snpf)
+		self.assertTrue(snpf2.hasFile("/home/wattazoum/Images/article.html"))
+		self.assertTrue(snpf2.hasPath("/home/wattazoum/Images"))
