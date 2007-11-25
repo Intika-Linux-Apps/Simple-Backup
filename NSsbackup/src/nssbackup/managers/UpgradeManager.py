@@ -17,29 +17,33 @@
 #	Aigars Mahinovs <aigarius@debian.org>
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-import FileAccessManager as FAM
-import nssbackup.util as Util
-from SnapshotManager import SnapshotManager
-from nssbackup.util.log import getLogger
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.Snapshot import Snapshot
-from gettext import gettext as _
-import cPickle as pickle
-from nssbackup.util.tar import Dumpdir
-from nssbackup.util.structs import SBdict
-import datetime, time
-import os
-from stat import *
 
-try:
-    import gnomevfs
-except ImportError:
-    import gnome.vfs as gnomevfs
 
 class UpgradeManager() :
 	"""
 	The UpgradeManager class
 	"""
+	# IMPORTS #
+	import FileAccessManager as FAM
+	import nssbackup.util as Util
+	from SnapshotManager import SnapshotManager
+	from nssbackup.util.log import getLogger
+	from nssbackup.util.exceptions import SBException
+	from nssbackup.util.Snapshot import Snapshot
+	from gettext import gettext as _
+	import cPickle as pickle
+	from nssbackup.util.tar import Dumpdir
+	from nssbackup.util.structs import SBdict
+	import datetime, time
+	import os
+	from stat import *
+	
+	try:
+		import gnomevfs
+	except ImportError:
+		import gnome.vfs as gnomevfs
+	# ------------------ #
+	
 	__possibleVersion = ["1.0","1.1","1.2","1.3","1.4","1.5"]
 
 	def upgradeSnapshot(self, snapshot,version="1.5"):
@@ -163,11 +167,11 @@ class UpgradeManager() :
 		if not FAM.exists( snapshot.getPath()+os.sep +"flist" ) or not FAM.exists( snapshot.getPath()+os.sep +"fprops" ) or not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" ) or not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
 			raise SBException ("Non complete Snapshot ! One of the essential files doesn't exist" )
 		
-		getLogger().debug("renaming file.tgz to file.tar.gz")
+		getLogger().info("renaming file.tgz to file.tar.gz")
 		os.rename(snapshot.getPath()+os.sep +"files.tgz", snapshot.getPath()+os.sep +"files.tar.gz") 
 		
 		#TODO:
-		getLogger().debug("Creating includes.list")
+		getLogger().info("Creating includes.list")
 		flist = snapshot.getPath()+os.sep +"flist" 
 		fprops = snapshot.getPath()+os.sep +"fprops" 
 		
@@ -182,11 +186,17 @@ class UpgradeManager() :
 			fi.write(str(f) +"\n")
 		fi.close()
 		
-		getLogger().debug("Creating empty excludes.list")
+		getLogger().info("Creating empty excludes.list")
 		f1 = open(snapshot.getExcludeFListFile(),'w')
 		f1.close()
 		
-		getLogger().debug("Creating the SNAR file ")
+				
+		getLogger().info("creating 'format' file .")
+		formatInfos = snapshot.getFormat()+"\n"
+		formatInfos += str(snapshot.getSplitedSize())
+		FAM.writetofile(snapshot.getPath()+os.sep +"format", formatInfos)
+		
+		getLogger().info("Creating the SNAR file ")
 		if os.path.exists(snapshot.getSnarFile()) :
 			getLogger().warning(_("The SNAR file alredy exist for snapshot '%s', I'll not overide it") % str(snapshot))
 		else :
@@ -194,17 +204,24 @@ class UpgradeManager() :
 			datet = datetime.datetime(date['year'],date['month'],date['day'],date['hour'],date['minute'],date['second'])
 			snarfileinfo = snapshot.getSnapshotFileInfos(writeFlag=True)
 			snarfileinfo.setHeader(datet)
-			#header created, let's now add the directories from includes.list
 			
+			#header created, let's now add the directories from includes.list
+			last_parentdir=None
 			for f in snapshot.getIncludeFlist().getEffectiveFileList() :
 				if f :
+					
+					parentdir = os.path.dirname(f)
+					if parentdir == last_parentdir :
+						getLogger().debug("[LastParentDir] already processed '%s'" % parentdir)
+						continue
+					last_parentdir = parentdir
+					
+					
 					_time = str(int(time.mktime(datet.timetuple())))
 					result = ["0", _time, _time]
 					
-					parentdir = os.path.dirname(f)
-					
 					if snarfileinfo.hasPath(parentdir) :
-						getLogger().debug("already processed '%s'" % parentdir)
+						getLogger().debug("[SNARFileInfo] already processed '%s'" % parentdir)
 						continue
 					
 					getLogger().debug("processing '%s'" % parentdir)
@@ -241,13 +258,9 @@ class UpgradeManager() :
 					result.append(dumpdirs)
 				
 					snarfileinfo.addRecord(result)
+
 		
-		getLogger().debug("creating 'format' file .")
-		formatInfos = snapshot.getFormat()+"\n"
-		formatInfos += str(snapshot.getSplitedSize())
-		FAM.writetofile(snapshot.getPath()+os.sep +"format", formatInfos)
-		
-		getLogger().debug("creating 'ver' file .")
+		getLogger().info("creating 'ver' file .")
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.5\n" )
 		snapshot.setVersion("1.5")
 		if os.path.exists(snapshot.getPath()+os.sep +"ver") :

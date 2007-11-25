@@ -14,7 +14,6 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
-import gettext
 from gettext import gettext as _
 import traceback, time
 from thread import *

@@ -17,7 +17,6 @@
 
 from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.managers.SnapshotManager import SnapshotManager
-from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import getLogger
 import unittest
 import os
@@ -26,8 +25,8 @@ class TestRestoreManager(unittest.TestCase) :
 	
 	def setUp(self):
 		getLogger(level=10)
- 		self.rvtman = RestoreManager()
- 		self.snpman = SnapshotManager(os.path.abspath("test-datas/backupdir"))
+		self.rvtman = RestoreManager()
+		self.snpman = SnapshotManager(os.path.abspath("test-datas/backupdir"))
 	
 	def testRestore(self):
 		"""

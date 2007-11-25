@@ -17,7 +17,6 @@
 
 from nssbackup.managers.UpgradeManager import UpgradeManager
 from nssbackup.managers.SnapshotManager import SnapshotManager
-from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import getLogger
 import unittest
 import os
@@ -25,7 +24,7 @@ import os
 class TestUpgradeManager(unittest.TestCase) :
 	
 	def setUp(self):
-		getLogger(level=10)
+		getLogger(level=20)
 		self.upgman = UpgradeManager()
 		self.snpman = SnapshotManager(os.path.abspath("test-datas/backupdir"))
 	

@@ -19,14 +19,10 @@
 import nssbackup.managers.FileAccessManager as FAM
 import re
 import os
-import subprocess
 from gettext import gettext as _
-from tempfile import *
-import cPickle as pickle
-from exceptions import * 
+from exceptions import NotValidSnapshotNameException,SBException, NotValidSnapshotException
 from log import getLogger
 from structs import SBdict
-import nssbackup.util as Util
 import nssbackup.util.tar as TAR
 from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
 
@@ -242,8 +238,10 @@ class Snapshot :
 			else :
 				ver = FAM.readfile(verfile)
 				try : 
-					major = int(ver[0])
-					minor = int(ver[2])
+					# major = 
+					int(ver[0])
+					# minor = 
+					int(ver[2])
 				except Exception:
 					FAM.delete(self.getPath()+os.sep +"ver")
 					raise SBException (_("%(file)s doesn't contain valid value ! Ignoring incomplete or non-backup directory. ") % {"file" : self.getPath()+ os.sep +"ver"})
@@ -325,8 +323,8 @@ class Snapshot :
 	def addToIncludeFlist (self, item) :
 		"""
 		Add an item to be backup into the snapshot.
-		 Usage :  addToIncludeFlist(item) where
-		 - item is the item to be add (file, dir, or link)
+		Usage :  addToIncludeFlist(item) where
+		- item is the item to be add (file, dir, or link)
 		"""
 		global __includeFlist
 		
@@ -335,8 +333,8 @@ class Snapshot :
 	def addToExcludeFlist (self, item) :
 		"""
 		Add an item to not be backup into the snapshot.
-		 Usage :  addToExcludeFlist(item) where
-		 - item is the item to be add (file, dir, or link)
+		Usage :  addToExcludeFlist(item) where
+		- item is the item to be add (file, dir, or link)
 		"""
 		global __excludeFlist
 		
