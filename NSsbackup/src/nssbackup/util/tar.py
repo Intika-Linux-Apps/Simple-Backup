@@ -16,7 +16,7 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 
-import os,re,tarfile, csv, shutil
+import os,re,shutil
 from gettext import gettext as _
 from nssbackup.util.log import getLogger
 import nssbackup.util as Util
@@ -239,7 +239,7 @@ def makeTarFullBackup(snapshot):
 class Dumpdir():
 	"""
 	Dumpdir is a sequence of entries of the following form:
- 		C filename \0
+		C filename \0
 	where C is one of the control codes described below, filename is the name of the file C operates upon, and '\0' represents a nul character (ASCII 0). The white space characters were added for readability, real dumpdirs do not contain them.
 	Each dumpdir ends with a single nul character. 
 	
@@ -303,6 +303,7 @@ class Dumpdir():
 	def __str__(self):
 		return self.filename + " " +self.getHumanReadableControl() 
 	
+	@classmethod
 	def getHRCtrls(Dumpdir):
 		"""
 		@return: The Human Readable control dictionary
@@ -310,7 +311,6 @@ class Dumpdir():
 		"""
 		return Dumpdir.__HRCtrls
 	
-	getHRCtrls = classmethod(getHRCtrls)
 # ---
 
 class SnapshotFile():
@@ -462,7 +462,7 @@ class SnapshotFile():
 			if c == '\0' and last_c == '\0' :
 				# we got a line
 				yield format(currentline)
-				 
+				
 				currentline = ''
 				last_c = ''
 			else :
@@ -532,6 +532,8 @@ class MemSnapshotFile(SBdict):
 	The "prop" value is the content of the directory. wich is a list of L{Dumpdir}
 	"""
 	
+	__snapshotFile = None
+	
 	def __init__(self,snapshotFile):
 		"""
 		load the snapshotFile in memory
@@ -540,6 +542,8 @@ class MemSnapshotFile(SBdict):
 		"""
 		if not isinstance(snapshotFile, SnapshotFile) :
 			raise Exception("A SnapshotFile is required")
+		
+		self.__snapshotFile = snapshotFile
 		
 		for f in snapshotFile.parseFormat2():
 			self[f[-2]] = f[-1]
@@ -553,6 +557,23 @@ class MemSnapshotFile(SBdict):
 		"""
 		return self.has_key(path)
 	
+	def addRecord(self,record):
+		"""
+		Write a record in the snar file. A record is a tuple with 6 entries + a content that is a dict
+		@param record: A tuple that contains the record to add. [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a dict of {file:'control'}
+		"""
+		self.__snapshotFile.addRecord(record)
+		self[record[-2]] = record[-1]
+		
+	def setHeader(self,timeofBackup):
+		"""
+		Sets the header of the snar File. 
+		GNU tar-1.19-2  -> in the first line
+		second line is timeofBackupInSec\000timeofBackupInNano
+		@param timeofBackup: The time to set in the snar file
+		@type timeofBackup: datetime
+		"""
+		self.__snapshotFile.setHeader(timeofBackup)
 	
 	def getContent(self,dirpath):
 		"""
@@ -621,7 +642,23 @@ class ProcSnapshotFile :
 				return True
 		return False
 	
+	def addRecord(self,record):
+		"""
+		Write a record in the snar file. A record is a tuple with 6 entries + a content that is a dict
+		@param record: A tuple that contains the record to add. [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a dict of {file:'control'}
+		"""
+		self.__snapshotFile.addRecord(record)
 	
+	def setHeader(self,timeofBackup):
+		"""
+		Sets the header of the snar File. 
+		GNU tar-1.19-2  -> in the first line
+		second line is timeofBackupInSec\000timeofBackupInNano
+		@param timeofBackup: The time to set in the snar file
+		@type timeofBackup: datetime
+		"""
+		self.__snapshotFile.setHeader(timeofBackup)
+		
 	def getContent(self,dirpath):
 		"""
 		convenance method to get the content of a directory.

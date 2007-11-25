@@ -11,13 +11,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 import inspect
 import os
-import os.path
 import sys
 import glob
 import nssbackup, subprocess
@@ -115,7 +113,7 @@ class PluginManager :
 		if self.__pluginList : return self.__pluginList
 		else :
 			self.__pluginList = dict()
-			tmp = inspect.getabsfile(nssbackup.plugins)
+			tmp = inspect.getabsfile(inspect.getmodule(self))
 			plugins_dir = os.path.dirname(tmp)
 			if os.path.isdir(plugins_dir):
 				if plugins_dir not in sys.path:

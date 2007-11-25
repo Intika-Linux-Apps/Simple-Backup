@@ -19,13 +19,11 @@ import traceback
 import smtplib
 import socket
 import datetime
-import gettext
 import re
 from gettext import gettext as _
 from nssbackup.util.log import getLogger
-from nssbackup.util.exceptions import SBException
 import nssbackup.managers.FileAccessManager as FAM
-from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir
+from nssbackup.managers.ConfigManager import getUserConfDir
 from nssbackup.managers.BackupManager import BackupManager
 
 ##
@@ -98,7 +96,7 @@ class NSsbackupd () :
 		"""
 		Method used to run nssbackupd
 		- checks for the user who called it
-	 	- if it's root, it makes a loop to run sbackup for all users that asked for it.
+		- if it's root, it makes a loop to run sbackup for all users that asked for it.
 	 	- if it's another user, launch BackupManager with the user configuration file
 		- catches all exceptions thrown and logs them (with stacktrace)
 		"""

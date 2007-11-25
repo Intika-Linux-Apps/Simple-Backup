@@ -17,7 +17,6 @@
 
 from nssbackup.util import Snapshot
 import os
-import os.path
 import unittest
 import pickle
 from nssbackup.util.exceptions import SBException
@@ -29,7 +28,7 @@ class TestSnapshot(unittest.TestCase):
 	snappath2 = abspath+"/test-datas/backupdir/2007-05-17_19.45.08.812921.wattazoum-vm.inc"
 	
 	def setUp(self):
- 		self.snapshot = Snapshot.Snapshot(self.snappath)
+		self.snapshot = Snapshot.Snapshot(self.snappath)
 
 	def testgetName(self) :
 		" get the right name of a snapshot "
@@ -99,9 +98,9 @@ class TestSnapshot(unittest.TestCase):
 	def testaddFile(self) :
 		"""
 		Add an item to be backup into the snapshot.
-		 Usage :  addFile(item, props) where
-		 - item is the item to be add (file, dir, or link)
-		 - props is this item properties
+		Usage :  addFile(item, props) where
+		- item is the item to be add (file, dir, or link)
+		- props is this item properties
 		"""
 		
 	def testsetVersion(self) :

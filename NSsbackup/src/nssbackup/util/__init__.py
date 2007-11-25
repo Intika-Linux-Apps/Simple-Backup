@@ -26,58 +26,55 @@ from shutil import *
 
 
 def nssb_copytree(src, dst, symlinks=False):
-    """
-    mod of shutil.copytree 
-    This doesn't fail if the directory exists, it copies inside
-    """
-    names = os.listdir(src)
-    if not os.path.exists(dst) :
-        os.makedirs(dst)
-    errors = []
-    for name in names:
-        srcname = os.path.join(src, name)
-        dstname = os.path.join(dst, name)
-        try:
-            if symlinks and os.path.islink(srcname):
-                linkto = os.readlink(srcname)
-                os.symlink(linkto, dstname)
-            elif os.path.isdir(srcname):
-                nssb_copytree(srcname, dstname, symlinks)
-            else:
-                copy2(srcname, dstname)
-            # XXX What about devices, sockets etc.?
-        except (IOError, os.error), why:
-            errors.append((srcname, dstname, str(why)))
-        # catch the Error from the recursive copytree so that we can
-        # continue with other files
-        except Error, err:
-            errors.extend(err.args[0])
-    try:
-        copystat(src, dst)
-    except WindowsError:
-        # can't copy file access times on Windows
-        pass
-    except OSError, why:
-        errors.extend((src, dst, str(why)))
-    if errors:
-        raise Error, errors
+	"""
+	mod of shutil.copytree 
+	This doesn't fail if the directory exists, it copies inside
+	"""
+	names = os.listdir(src)
+	if not os.path.exists(dst) :
+		os.makedirs(dst)
+	errors = []
+	for name in names:
+		srcname = os.path.join(src, name)
+		dstname = os.path.join(dst, name)
+		try:
+			if symlinks and os.path.islink(srcname):
+				linkto = os.readlink(srcname)
+				os.symlink(linkto, dstname)
+			elif os.path.isdir(srcname):
+				nssb_copytree(srcname, dstname, symlinks)
+			else:
+				copy2(srcname, dstname)
+			# XXX What about devices, sockets etc.?
+		except (IOError, os.error), why:
+			errors.append((srcname, dstname, str(why)))
+		# catch the Error from the recursive copytree so that we can
+		# continue with other files
+		except Error, err:
+			errors.extend(err.args[0])
+	try:
+		copystat(src, dst)
+	except OSError, why:
+		errors.extend((src, dst, str(why)))
+	if errors:
+		raise Error, errors
 
 def nssb_move(src, dst):
-    """
-    mod of shutil.move that uses nssb_copytree
-    """
-
-    try:
-        os.rename(src, dst)
-    except OSError:
-        if os.path.isdir(src):
-            if shutil.destinsrc(src, dst):
-                raise Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
-            nssb_copytree(src, dst, symlinks=True)
-            rmtree(src)
-        else:
-            copy2(src,dst)
-            os.unlink(src)
+	"""
+	mod of shutil.move that uses nssb_copytree
+	"""
+	
+	try:
+		os.rename(src, dst)
+	except OSError:
+		if os.path.isdir(src):
+			if shutil.destinsrc(src, dst):
+				raise Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
+			nssb_copytree(src, dst, symlinks=True)
+			rmtree(src)
+		else:
+			copy2(src,dst)
+			os.unlink(src)
 
 def getResource(resourceName):
 	"""
@@ -188,8 +185,48 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	getLogger().debug("output was : " + outStr)
 
 
-
-
+def readlineNULSep(fd,fd1):
+	"""
+	Iterator that read a NUL separeted file as lines 
+	@param fd: File descriptor
+	@return: the gotten line
+	@rtype: String
+	"""
+	_continue = 0
+	
+	while _continue < 2 :
+		c = fd.read(1)
+		currentline = ''
+		
+		while c :
+			if c == '\0'  :
+				# we got a line
+				break
+			currentline += c
+			c = fd.read(1)
+		else :
+			# c is None
+			# This else correspond to the while statement
+			_continue += 1
+		
+		c1 = fd1.read(1)
+		currentline1 = ''
+		
+		while c1 :
+			if c1 == '\0'  :
+				# we got a line
+				break
+			c1 = fd1.read(1)
+			currentline1 += c1
+		else :
+			# c1 is None
+			# This else correspond to the while statement
+			_continue += 1
+		
+		if _continue == 1 :
+			raise SBException("The length of flist and Fprops are not equals")
+		yield (currentline,currentline1)
+		
 	
 import pygtk
 pygtk.require('2.0')
@@ -198,44 +235,10 @@ import gtk, gobject
 # Update the value of the progress bar so that we get
 # some movement
 def progress_timeout(pbobj):
-    
-    pbobj.pbar.pulse()
-
-    # As this is a timeout function, return TRUE so that it
-    # continues to get called
-    return True
-
-class ProgressBar:
-    
-    # Clean up allocated memory and remove the timer
-    def destroy_progress(self, widget, data=None):
-        #gobject.source_remove(self.timer)
-        self.timer = 0
-        self.window.destroy()
-
-    def __init__(self):
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        self.window.set_resizable(True)
-
-        self.window.connect("destroy", self.destroy_progress)
-        self.window.set_title("ProgressBar")
-        self.window.set_border_width(0)
-
-        vbox = gtk.VBox(False, 5)
-        vbox.set_border_width(10)
-        self.window.add(vbox)
-        vbox.show()
-        # Create a centering alignment object
-        align = gtk.Alignment(0.5, 0.5, 0, 0)
-        vbox.pack_start(align, False, False, 5)
-        align.show()
-        # Create the ProgressBar
-        self.pbar = gtk.ProgressBar()
-
-        align.add(self.pbar)
-        self.pbar.show()
-
-        # Add a timer callback to update the value of the progress bar
-        self.timer = gobject.timeout_add (100, progress_timeout, self)
-
-        self.window.show()
+	
+	pbobj.pbar.pulse()
+	
+	# As this is a timeout function, return TRUE so that it
+	# continues to get called
+	return True
+	

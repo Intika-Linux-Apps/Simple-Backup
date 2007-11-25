@@ -17,7 +17,6 @@
 
 
 import unittest
-import os
 from nssbackup.plugins import PluginManager
 
 class TestPluginManager(unittest.TestCase):

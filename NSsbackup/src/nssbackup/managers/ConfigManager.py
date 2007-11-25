@@ -15,9 +15,7 @@
 # Author: Ouattara Oumar Aziz <wattazoum at gmail dot com>
 
 import os, re
-import os.path
 import ConfigParser
-import traceback
 import smtplib
 from gettext import gettext as _
 from optparse import OptionParser
@@ -289,7 +287,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 				if type(remotes) == str :
 					remotes = eval(remotes)
 				if type(remotes) != dict :
-					raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
+					raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': remotes,'value': type(remotes)})
 				if not remotes.has_key(option) :
 					# then it wasn't for us , fall back on the parent
 					return ConfigParser.ConfigParser.has_option(self, section, option)
@@ -312,7 +310,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
-				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
+				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': remotes,'value': type(remotes)})
 			# we have that key
 			return remotes[option]
 		elif section == "dirconfig" and option == 'remote' and ConfigParser.ConfigParser.has_option(self,section, option):
@@ -320,7 +318,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
-				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': r ,'value':remotes})
+				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': remotes,'value': type(remotes)})
 			return remotes
 		else :
 			#fall back in parent behaviour
@@ -343,7 +341,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 				if type(remotes) == str :
 					remotes = eval(remotes)
 				if type(remotes) != dict :
-					raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (r,remotes))
+					raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (remotes, type(remotes)))
 				for rsource, flag in value.iteritems() :
 					remotes[rsource] = flag
 				ConfigParser.ConfigParser.set(self, section, option, remotes)
@@ -367,7 +365,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 				if type(remotes) == str :
 					remotes = eval(remotes)
 				if type(remotes) != dict :
-					raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (r,remotes))
+					raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (remotes, type(remotes)))
 				if not remotes.has_key(option) :
 					# then it wasn't for us , fall back on the parent
 					ConfigParser.ConfigParser.remove_option(self, section, option)
@@ -474,7 +472,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	def getSchedule(self):
 		"""
 		get the actual schedule state
-		@return: (isCron, value) a tuple where isCron = 0 if anacron is set and 1 \ 
+		@return: (isCron, value) a tuple where isCron = 0 if anacron is set and 1 \
 		if cron is set . If None has been found , 'None' is return
 		"""
 		if not self.has_section("schedule") or (not self.has_option("schedule", "cron") and not self.has_option("schedule", "anacron")) :
@@ -651,7 +649,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		else :
 			if self.has_option("schedule", "cron") :
 				getLogger().debug("Saving Cron entries")
-				erase_services()
+				self.erase_services()
 				FAM.writetofile("/etc/cron.d/nssbackup", self.get("schedule", "cron") + "\troot\t"+ Util.getResource("nssbackup"))
 				
 			if self.has_option("schedule", "anacron") :

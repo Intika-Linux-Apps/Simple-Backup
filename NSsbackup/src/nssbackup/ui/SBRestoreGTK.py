@@ -16,7 +16,7 @@
 
 import gettext
 from gettext import gettext as _
-import sys, traceback, time
+import traceback, time
 from thread import *
 from GladeWindow import *
 import nssbackup.util as Util
@@ -28,7 +28,6 @@ from nssbackup.util.log import getLogger
 import nssbackup.util.Snapshot
 from nssbackup.util.Snapshot import Snapshot
 import nssbackup.util.tar as TAR
-from nssbackup.util import ProgressBar
 
 #----------------------------------------------------------------------
 
@@ -392,9 +391,7 @@ class SBRestoreGTK(GladeWindow):
 			if response == gtk.RESPONSE_YES:
 				# TODO: put a progress bar here
 				try :	
-					pb = ProgressBar()
 					self.restoreman.restoreAs(self.currentSnp, src, dirname)
-					pb.destroy_progress(None)
 				except Exception, e :
 					getLogger().error(str(e))
 					getLogger().error(traceback.format_exc())

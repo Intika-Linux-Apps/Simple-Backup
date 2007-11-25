@@ -7,7 +7,6 @@
 
 import re
 import subprocess
-import sys
 import os
 import time
 import locale
@@ -18,7 +17,6 @@ from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
 from GladeGnomeApp import *
-import gettext
 from gettext import gettext as _
 import nssbackup.util as Util
 
@@ -31,14 +29,14 @@ class SBconfigGTK(GladeGnomeApp):
 	orig_configman = None
 	plugin_manager = None
 	
-    #----------------------------------------------------------------------
+	#----------------------------------------------------------------------
 
 	def __init__(self):
 		''' '''
 		self.init()
 		
 
-    #----------------------------------------------------------------------
+	#----------------------------------------------------------------------
 
 	def init(self):
 		
@@ -621,7 +619,7 @@ class SBconfigGTK(GladeGnomeApp):
 				try : 
 					purge = int(self.configman.get("general", "purge"))
 				except Exception,e:
-					getLogger().error("Purge value '%s' is invalide" %self.configman.get("general", "purge"))	
+					getLogger().error("Purge value '%s' is invalide : " + e %self.configman.get("general", "purge"))	
 					purge = 30
 				self.widgets['purgedays'].set_text(str(purge))
 				self.widgets['purgeradiobutton'].set_active(True)

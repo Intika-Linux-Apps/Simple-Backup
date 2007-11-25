@@ -34,8 +34,8 @@ class FuseFAM:
 	## the config manager from which to get the dir list to be mounted.
 	__config = None
 	
-	 ## the list of all mounted dirs , should be filled by initialize.
-	 # It's a dict with key = remoteSource and value = mountpoint
+	## the list of all mounted dirs , should be filled by initialize.
+	# It's a dict with key = remoteSource and value = mountpoint
 	__mountedDirs = {}
 	
 	def __init__(self, configManager=None):
@@ -192,7 +192,7 @@ class FuseFAM:
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
-				raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (r,remotes))
+				raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (remotes,type(remotes)))
 			getLogger().debug("remotes : '%s'" % remotes)
 			for source,flag in remotes.iteritems() :
 				#TODO : check for multiple mount

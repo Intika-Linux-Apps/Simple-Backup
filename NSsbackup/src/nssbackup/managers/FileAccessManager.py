@@ -15,12 +15,11 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-import re, os, os.path, shutil, filecmp
-import cPickle as pickle
+import os, shutil
 try:
-    import gnomevfs
+	import gnomevfs
 except ImportError:
-    import gnome.vfs as gnomevfs
+	import gnome.vfs as gnomevfs
 
 
 def delete(  uri ):
@@ -34,18 +33,18 @@ def delete(  uri ):
 			return True
 	else:
 		if not isdir( uri ):
-		    gnomevfs.unlink( uri )
+			gnomevfs.unlink( uri )
 		else:
-		    d = gnomevfs.open_directory( uri )
-		    for f in d:
-			if f.name=="." or f.name=="..":
-			    continue
-			if f.type==2:
-			    delete( uri+"/"+f.name )
-			else:
-			    gnomevfs.unlink( uri+"/"+f.name )
-		    d.close()
-		    gnomevfs.remove_directory( uri )
+			d = gnomevfs.open_directory( uri )
+			for f in d:
+				if f.name=="." or f.name=="..":
+					continue
+				if f.type==2:
+					delete( uri+"/"+f.name )
+				else:
+					gnomevfs.unlink( uri+"/"+f.name )
+			d.close()
+			gnomevfs.remove_directory( uri )
 
 def isdir(  uri ):
 	"checks if the given uri is a dir"
@@ -56,8 +55,8 @@ def isdir(  uri ):
 
 def rename(  uri, name ) :
 	"""
-	 Rename the given uri file name to the new file name. 
-	 ex: rename("/my/dir/filename", "newfilename") => "/my/dir/newfilename"
+	Rename the given uri file name to the new file name. 
+	ex: rename("/my/dir/filename", "newfilename") => "/my/dir/newfilename"
 	"""
 	p = gnomevfs.get_file_info( uri )
 	p.name = name
@@ -139,13 +138,13 @@ def listdir( target) :
 	@return: a list ['file1','file2','file3' ...]
 	"""
 	if islocal( target ):
-	    listing = os.listdir( target )
+		listing = os.listdir( target )
 	else:
-	    d = gnomevfs.open_directory( target )
-	    listing = []
-	    for f in d:
-	        if f.name != "." and f.name != "..":
-	            listing.append( f.name )
+		d = gnomevfs.open_directory( target )
+		listing = []
+		for f in d:
+			if f.name != "." and f.name != "..":
+				listing.append( f.name )
 	return listing
 
 def makedir( target) :

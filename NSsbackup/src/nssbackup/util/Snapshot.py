@@ -244,7 +244,7 @@ class Snapshot :
 				try : 
 					major = int(ver[0])
 					minor = int(ver[2])
-				except Exception, e:
+				except Exception:
 					FAM.delete(self.getPath()+os.sep +"ver")
 					raise SBException (_("%(file)s doesn't contain valid value ! Ignoring incomplete or non-backup directory. ") % {"file" : self.getPath()+ os.sep +"ver"})
 				self.__version = ver[:3]
@@ -273,13 +273,15 @@ class Snapshot :
 				self.__packages = FAM.readfile(packagesfile)
 				return self.__packages
 	
-	def getSnapshotFileInfos(self,useMem=False):
+	def getSnapshotFileInfos(self,useMem=False,writeFlag=False):
 		"""
 		@param useMem: use or not the memory to store infos about the SNAR file
 		@type useMem: boolean
+		@param writeFlag: Will be passed to the SnapshotFile to permit writing
+		@type writeFlag: boolean
 		@return: the corresponding SnapshotFile (Mem ou Proc), the only method usable afterward is getContent(path) 
 		"""
-		snpfile = SnapshotFile(self.getSnarFile())
+		snpfile = SnapshotFile(self.getSnarFile(),writeFlag)
 		
 		snpfileInfo = None
 		
@@ -412,12 +414,8 @@ class Snapshot :
 		# validate the name
 		if not self.__isValidName(self.__name) :
 			raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
-		if not FAM.exists( self.getPath()+os.sep +"includes.list" ) \
-		or not FAM.exists( self.getPath()+os.sep +"excludes.list" ) \
-		or not FAM.exists( self.getPath()+os.sep +"files.snar" ) \
-		or not self.getArchive() \
-		or not FAM.exists( self.getPath()+os.sep +"ver" ):
-			raise NotValidSnapshotException (_("One of the mandatory files doesn't exist in [%s]") % self.getName())
+		if  not FAM.exists( self.getPath()+os.sep +"ver" ):
+			raise NotValidSnapshotException (_("The mandatory 'ver' file doesn't exist in [%s]") % self.getName())
 		
 	def __isValidName(self, name ) :
 		" Check if the snapshot name is valid "
