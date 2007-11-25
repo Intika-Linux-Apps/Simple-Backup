@@ -16,7 +16,6 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 import logging
-import logging.handlers
 import sys
 import traceback
 import os.path

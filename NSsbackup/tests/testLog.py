@@ -10,7 +10,7 @@ class Test:
 
 		l.info("Hello World")
 		l.debug("Argh")
-    
+
 if __name__ == '__main__':
 	t = Test()
 	t.logsome()

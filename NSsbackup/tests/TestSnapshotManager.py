@@ -16,7 +16,6 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 from nssbackup.managers.SnapshotManager import SnapshotManager
-from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import getLogger
 import unittest
 import os
@@ -25,7 +24,7 @@ class TestSnapshotManager(unittest.TestCase) :
 	
 	def setUp(self):
 		getLogger(level=10)
- 		self.snpman = SnapshotManager(os.path.abspath("test-datas/backupdir"))
+		self.snpman = SnapshotManager(os.path.abspath("test-datas/backupdir"))
 	
 	def testGetSnapshots(self):
 		"""

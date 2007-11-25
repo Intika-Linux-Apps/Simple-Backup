@@ -17,30 +17,33 @@
 #	Aigars Mahinovs <aigarius@debian.org>
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
+# IMPORTS #
 import FileAccessManager as FAM
+import nssbackup.util as Util
 from SnapshotManager import SnapshotManager
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from nssbackup.util.Snapshot import Snapshot
-import gettext
 from gettext import gettext as _
-import re
 import cPickle as pickle
-import datetime
+from nssbackup.util.tar import Dumpdir
+from nssbackup.util.structs import SBdict
+import datetime, time
 import os
-import os.path
-import sys
-import traceback
+from stat import *
 
 try:
-    import gnomevfs
+	import gnomevfs
 except ImportError:
-    import gnome.vfs as gnomevfs
+	import gnome.vfs as gnomevfs
+# ------------------ #
 
 class UpgradeManager() :
 	"""
 	The UpgradeManager class
 	"""
+	
+	
 	__possibleVersion = ["1.0","1.1","1.2","1.3","1.4","1.5"]
 
 	def upgradeSnapshot(self, snapshot,version="1.5"):
@@ -72,9 +75,7 @@ class UpgradeManager() :
 						self.__upgrade_v14(snapshot)
 					elif snapshot.getVersion() < "1.5" :
 						self.__upgrade_v15(snapshot)
-		tdir = snapshot.getPath()
-		if FAM.exists( tdir +os.sep +"flist" ) and FAM.exists( tdir+os.sep +"fprops" ) and FAM.exists( tdir+os.sep +"files.tar.gz" ) and FAM.exists( tdir+os.sep +"ver" ):
-			return	
+
 	
 	##
 	#The downgrade feature will be certainly used for exporting snapshots, 
@@ -166,17 +167,108 @@ class UpgradeManager() :
 		if not FAM.exists( snapshot.getPath()+os.sep +"flist" ) or not FAM.exists( snapshot.getPath()+os.sep +"fprops" ) or not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" ) or not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
 			raise SBException ("Non complete Snapshot ! One of the essential files doesn't exist" )
 		
-		getLogger().debug("renaming file.tgz to file.tar.gz")
+		getLogger().info("renaming file.tgz to file.tar.gz")
 		os.rename(snapshot.getPath()+os.sep +"files.tgz", snapshot.getPath()+os.sep +"files.tar.gz") 
 		
-		getLogger().debug("creating 'format' file .")
-		FAM.writetofile(snapshot.getPath()+os.sep +"format", snapshot.getFormat())
+		#TODO:
+		getLogger().info("Creating includes.list")
+		flist = snapshot.getPath()+os.sep +"flist" 
+		fprops = snapshot.getPath()+os.sep +"fprops" 
 		
-		getLogger().debug("creating 'ver' file .")
+		f1 = open(flist,'r')
+		f2 = open(fprops,'r')
+		for f,p in Util.readlineNULSep(f1,f2):
+			if p is not None and p is not str(None) :
+				snapshot.addToIncludeFlist(f)
+		# commit include.list
+		fi = open(snapshot.getIncludeFListFile(),"w")
+		for f in snapshot.getIncludeFlist().getEffectiveFileList() :
+			fi.write(str(f) +"\n")
+		fi.close()
+		
+		getLogger().info("Creating empty excludes.list")
+		f1 = open(snapshot.getExcludeFListFile(),'w')
+		f1.close()
+		
+				
+		getLogger().info("creating 'format' file .")
+		formatInfos = snapshot.getFormat()+"\n"
+		formatInfos += str(snapshot.getSplitedSize())
+		FAM.writetofile(snapshot.getPath()+os.sep +"format", formatInfos)
+		
+		getLogger().info("Creating the SNAR file ")
+		if os.path.exists(snapshot.getSnarFile()) :
+			getLogger().warning(_("The SNAR file alredy exist for snapshot '%s', I'll not overide it") % str(snapshot))
+		else :
+			date = snapshot.getDate()
+			datet = datetime.datetime(date['year'],date['month'],date['day'],date['hour'],date['minute'],date['second'])
+			snarfileinfo = snapshot.getSnapshotFileInfos(writeFlag=True)
+			snarfileinfo.setHeader(datet)
+			
+			#header created, let's now add the directories from includes.list
+			last_parentdir=None
+			for f in snapshot.getIncludeFlist().getEffectiveFileList() :
+				if f :
+					
+					parentdir = os.path.dirname(f)
+					if parentdir == last_parentdir :
+						getLogger().debug("[LastParentDir] already processed '%s'" % parentdir)
+						continue
+					last_parentdir = parentdir
+					
+					
+					_time = str(int(time.mktime(datet.timetuple())))
+					result = ["0", _time, _time]
+					
+					if snarfileinfo.hasPath(parentdir) :
+						getLogger().debug("[SNARFileInfo] already processed '%s'" % parentdir)
+						continue
+					
+					getLogger().debug("processing '%s'" % parentdir)
+					
+					if os.path.exists(parentdir) :
+						result.append(str(os.stat(parentdir)[ST_DEV]))
+						result.append(str(os.stat(parentdir)[ST_INO]))
+					else :
+						result.extend(['0','0'])
+					
+					result.append(parentdir)
+					
+					fname = os.path.basename(f)
+					dumpdirs = dict()
+					
+					#get the parent dir content
+					cSBdict = snapshot.getIncludeFlist().getSon(parentdir)
+					for k,v in dict.iteritems(cSBdict):
+						# determine if it's a dir or a file
+						if os.path.exists(parentdir+os.sep+k) :
+							if os.path.isdir(parentdir+os.sep+k) :
+								control = Dumpdir.DIRECTORY
+							else :
+								control = Dumpdir.INCLUDED
+						else :
+							if v and type(v) is list and len(v) == 2 and type(v[1]) == SBdict :
+								# this is a dirrectory
+								control = Dumpdir.DIRECTORY
+							else :
+								control = Dumpdir.INCLUDED
+						
+						dumpdirs[k] = control
+					
+					result.append(dumpdirs)
+				
+					snarfileinfo.addRecord(result)
+
+		
+		getLogger().info("creating 'ver' file .")
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.5\n" )
 		snapshot.setVersion("1.5")
 		if os.path.exists(snapshot.getPath()+os.sep +"ver") :
 			getLogger().debug("'ver' file created.")
+
+		
+
+	#---------------------------------------------------------------------------------
 
 	def __downgrade_v12 (self,snapshot ):
 		getLogger().info("Downgrading to v1.2: %s" % str(snapshot) )
@@ -196,7 +288,7 @@ class UpgradeManager() :
 				FAM.rename(snapshot.getPath()+os.sep +"flist.v12", "flist")
 				FAM.rename(snapshot.getPath()+os.sep +"fprops", "fprops.old")
 				FAM.rename(snapshot.getPath()+os.sep +"fprops.v12", "fprops")
-				v = FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.3\n" )
+				FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.3\n" )
 		else:
 			FAM.delete(snapshot.getPath()+os.sep +"ver")
 			raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath() )

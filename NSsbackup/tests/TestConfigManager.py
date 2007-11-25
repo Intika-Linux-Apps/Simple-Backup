@@ -16,15 +16,14 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 import os
-import sys
 import unittest
-from nssbackup.util.exceptions import *
+from nssbackup.util.exceptions import SBException,NonValidOptionException
 from nssbackup.managers.ConfigManager import ConfigManager 
 
 class TestConfigManager(unittest.TestCase):
 
 	def setUp(self):
- 		self.config = ConfigManager()
+		self.config = ConfigManager()
 
 	def testinitSection(self):
 		" Init the config sections "

@@ -17,7 +17,6 @@
 from gettext import gettext as _
 import os , grp
 import datetime
-import time
 import re
 import socket
 from FuseFAM import FuseFAM
@@ -29,6 +28,12 @@ from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import *
 
+try:
+	import pynotify
+except Exception, e:
+	getLogger().warning(str(e))
+	pynotify = False
+				
 class BackupManager :
 	"""
 	"""
@@ -128,7 +133,7 @@ class BackupManager :
 			getLogger().info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
 			self.__actualSnapshot.setBase(base.getName())
 		del base
-  
+
 		# Backup list of installed packages (Debian only part)
 		try:
 			getLogger().info(_("Setting packages File "))
@@ -165,15 +170,12 @@ class BackupManager :
 		self.__fillSnapshot(prev)
 		
 		if os.getuid() != 0 :
-			try:
-				import pynotify
+			if pynotify :
 				if pynotify.init("NSsbackup"):
 					n = pynotify.Notification("NSsbackup", _("File list ready , Committing to disk"))
 					n.show()
 				else:
 					getLogger().warning(_("there was a problem initializing the pynotify module"))
-			except Exception, e:
-				getLogger().warning(str(e))
 				
 		self.__actualSnapshot.commit()
 		
@@ -301,10 +303,8 @@ class BackupManager :
 		getLogger().debug("set the list to backup and to exclude")
 		if self.config.has_section( "dirconfig" ):
 			if not len(self.config.items("dirconfig")) :
-				includelist, excludelist = {},{}
 				getLogger().warning(_("No directory to backup !"))
 			else :
-				includelist, excludelist = list(),list()
 				for k,v in self.config.items("dirconfig") :
 					if int(v) == 1 :
 						self.__actualSnapshot.addToIncludeFlist(k)
@@ -348,7 +348,7 @@ class BackupManager :
 			else :
 				FAM.delete(self.__lockfile)
 		
-		lock = FAM.writetofile(self.__lockfile, str(os.getpid()) )
+		FAM.writetofile(self.__lockfile, str(os.getpid()) )
 		getLogger().debug("Created lockfile at '%s' with info '%s'"% (self.__lockfile, str(os.getpid()) ) )
 
 	def __endSBsession(self):
@@ -371,15 +371,12 @@ class BackupManager :
 		getLogger().info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.terminate()
 		if os.getuid() != 0 :
-			try:
-				import pynotify
+			if pynotify :
 				if pynotify.init("NSsbackup"):
 					n = pynotify.Notification("NSsbackup", _("Ending Backup Session"))
 					n.show()
 				else:
 					getLogger().warning(_("there was a problem initializing the pynotify module"))
-			except Exception, e:
-				getLogger().warning(str(e))
 			
 
 	def __checkTarget(self):
@@ -407,7 +404,6 @@ class BackupManager :
 		@param listing: a list of snapshot
 		@return: a tuple (name, base, prev)
 		""" 
-		r = re.compile(r"^(\d{4})-(\d{2})-(\d{2})_(\d{2})[\:\.](\d{2})[\:\.](\d{2})\.\d+\..*?\.(.+)$")
 		prev = {}
 		base = None
 		if len(listing) == 0 :
@@ -421,7 +417,7 @@ class BackupManager :
 				getLogger().debug("Last (%s) was a full backup" % listing[0].getName())
 				d = listing[0].getDate()
 				if ( datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days < self.config.get("general","maxincrement") :
-			    	# Less then maxincrement days passed since that -> make an increment
+					# Less than maxincrement days passed since that -> make an increment
 					increment = True
 				else:
 					getLogger().info("Last full backup is old -> make a full backup")

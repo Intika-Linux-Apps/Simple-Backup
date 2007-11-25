@@ -7,7 +7,6 @@
 
 import re
 import subprocess
-import sys
 import os
 import time
 import locale
@@ -18,7 +17,6 @@ from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
 from GladeGnomeApp import *
-import gettext
 from gettext import gettext as _
 import nssbackup.util as Util
 
@@ -31,14 +29,14 @@ class SBconfigGTK(GladeGnomeApp):
 	orig_configman = None
 	plugin_manager = None
 	
-    #----------------------------------------------------------------------
+	#----------------------------------------------------------------------
 
 	def __init__(self):
 		''' '''
 		self.init()
 		
 
-    #----------------------------------------------------------------------
+	#----------------------------------------------------------------------
 
 	def init(self):
 		
@@ -409,7 +407,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.splitSizeLS.append([self.splitSize[k],k])
 		self.widgets['splitsizeCB'].set_model(self.splitSizeLS)
 		cell = gtk.CellRendererText()
-  		self.widgets['splitsizeCB'].pack_start(cell, True)
+		self.widgets['splitsizeCB'].pack_start(cell, True)
 		self.widgets['splitsizeCB'].add_attribute(cell, 'text', 0) 
 			
 		# ---
@@ -621,7 +619,7 @@ class SBconfigGTK(GladeGnomeApp):
 				try : 
 					purge = int(self.configman.get("general", "purge"))
 				except Exception,e:
-					getLogger().error("Purge value '%s' is invalide" %self.configman.get("general", "purge"))	
+					getLogger().error("Purge value '%s' is invalide : " + e %self.configman.get("general", "purge"))	
 					purge = 30
 				self.widgets['purgedays'].set_text(str(purge))
 				self.widgets['purgeradiobutton'].set_active(True)
@@ -758,7 +756,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.saveConf(dialog.get_filename())
 			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
-		    pass
+			pass
 		dialog.destroy()
 
 	def on_exit_activate(self, *args):
@@ -923,7 +921,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.set( "dirconfig", dialog.get_filename(), "1" )
 			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
-		    pass
+			pass
 		dialog.destroy()
 
 	def on_inc_adddir_clicked(self, *args):
@@ -936,7 +934,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.set( "dirconfig", dialog.get_filename()+"/", "1" )
 			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
-		    pass
+			pass
 		dialog.destroy()
 
 	def on_inc_del_clicked(self, *args):
@@ -1066,7 +1064,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.set( "dirconfig", dialog.get_filename(), "0" )
 			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
-		    pass
+			pass
 		dialog.destroy()
 
 	def on_ex_adddir_clicked(self, *args):
@@ -1270,7 +1268,7 @@ class SBconfigGTK(GladeGnomeApp):
 		self.isConfigChanged()
 		# put current cronline into the ccronline widget here
 		self.widgets["ccronline"].set_text(cronline)
-        
+
 	def on_time_maxinc_changed(self,*args):
 		# add maxinc to the config
 		self.configman.set("general", "maxincrement", int(self.widgets["time_maxinc"].get_value())) 
@@ -1305,17 +1303,17 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_purgeradiobutton_toggled(self, *args):
 		if self.widgets["purgeradiobutton"].get_active():
-		    self.widgets["purgedays"].set_sensitive( True )
-		    try: i = int(self.widgets["purgedays"].get_text())
-		    except: i = -1
-		    if not ( i>0 and i<10000 ):	i=30
-		    self.widgets["purgedays"].set_text(str(i))
-		    self.configman.set( "general", "purge", str(i) )
-		    self.isConfigChanged()
+			self.widgets["purgedays"].set_sensitive( True )
+			try: i = int(self.widgets["purgedays"].get_text())
+			except: i = -1
+			if not ( i>0 and i<10000 ):	i=30
+			self.widgets["purgedays"].set_text(str(i))
+			self.configman.set( "general", "purge", str(i) )
+			self.isConfigChanged()
 		elif self.widgets["logpurgeradiobutton"].get_active():
-		    self.widgets["purgedays"].set_sensitive( False )
-		    self.configman.set( "general", "purge", "log" )
-		    self.isConfigChanged()
+			self.widgets["purgedays"].set_sensitive( False )
+			self.configman.set( "general", "purge", "log" )
+			self.isConfigChanged()
 
 	def on_purgedays_changed( self, *args ):
 		try: i = int(self.widgets["purgedays"].get_text())

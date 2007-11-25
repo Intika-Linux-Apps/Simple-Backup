@@ -15,7 +15,7 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from exceptions import *
+from exceptions import CorruptedSBdictException,SBException
 import os
 
 class SBdict (dict) :
@@ -47,7 +47,7 @@ class SBdict (dict) :
 	{ 'file' : [ 'props', sonNode ] }
 	
 	Example : 
-	 
+	
 	{ 'home' : [ 'props', {
 		 'wattazoum' : [ 'props', { 
 		 	'Desktop' : [ 'props', { 
