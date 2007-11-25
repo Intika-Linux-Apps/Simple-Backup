@@ -17,32 +17,32 @@
 #	Aigars Mahinovs <aigarius@debian.org>
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
+# IMPORTS #
+import FileAccessManager as FAM
+import nssbackup.util as Util
+from SnapshotManager import SnapshotManager
+from nssbackup.util.log import getLogger
+from nssbackup.util.exceptions import SBException
+from nssbackup.util.Snapshot import Snapshot
+from gettext import gettext as _
+import cPickle as pickle
+from nssbackup.util.tar import Dumpdir
+from nssbackup.util.structs import SBdict
+import datetime, time
+import os
+from stat import *
 
+try:
+	import gnomevfs
+except ImportError:
+	import gnome.vfs as gnomevfs
+# ------------------ #
 
 class UpgradeManager() :
 	"""
 	The UpgradeManager class
 	"""
-	# IMPORTS #
-	import FileAccessManager as FAM
-	import nssbackup.util as Util
-	from SnapshotManager import SnapshotManager
-	from nssbackup.util.log import getLogger
-	from nssbackup.util.exceptions import SBException
-	from nssbackup.util.Snapshot import Snapshot
-	from gettext import gettext as _
-	import cPickle as pickle
-	from nssbackup.util.tar import Dumpdir
-	from nssbackup.util.structs import SBdict
-	import datetime, time
-	import os
-	from stat import *
 	
-	try:
-		import gnomevfs
-	except ImportError:
-		import gnome.vfs as gnomevfs
-	# ------------------ #
 	
 	__possibleVersion = ["1.0","1.1","1.2","1.3","1.4","1.5"]
 
