@@ -39,6 +39,9 @@ class SnapshotManager :
 	# The list of the snapshots is stored the first time it's used so that we don't have to reget it
 	__snapshots = None
 	
+	REBASEDIR = "rebaseTmpDir"
+	
+	
 	def __init__(self,targetDir):
 		global __targetDir
 		if not targetDir or not FAM.exists(targetDir) :
@@ -119,6 +122,21 @@ class SnapshotManager :
 		Basicaly , That means for 3 snapshots A,B,C if we rebase C to A, 
 		we can remove B with no problem, the information contained in C will be updated to 
 		keep the changed occurred in B inside C.
+		
+		Rebase principle:
+		snp1 -> snp2 -> snp3
+		
+		rebase snp3 on snp1 :
+		(snp3 has the newer version of the file it contains)
+			remove snp3 "ver" file ( means the snapshot is being processed )
+			for each file in snp2 :
+				if included in snp3 -> pass
+				if not : push the file in snp3
+			when finished, checks and merge the includes.list and excludes.list
+			change the base file content to the new base
+			write the "ver" file
+		If an error is encountered -> cancel Rebase ( we shouldn't loose the snapshot !)
+
 		@raise SBException: if torebase is a full backup or newbase is ealier
 		"""
 		#if the snapshot to rebase is full, no need to do the operation. 
@@ -127,7 +145,107 @@ class SnapshotManager :
 		# if the new base is earlier, t
 		if newbase and torebase.getName() <= newbase.getName() :
 			raise SBException(_("Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")% {'snapshotToRebase':torebase.getName(), 'NewBaseSnapshot': newbase.getName()}) 
-		# to rebase, we get the revert state to update the snapshot
+		if not torebase.getBase():
+			raise SBException(_("'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken ")% {'snapshotToRebase':torebase.getName()})
+		
+		currentTorebase = torebase
+		
+		while currentTorebase.getBase():
+			self.__rebaseOnLastSnp(currentTorebase)
+			if newbase and currentTorebase.getBaseSnapshot().getName() <= newbase.getName():
+				break
+			currentTorebase = currentTorebase.getBaseSnapshot()
+		
+		
+	def __rebaseOnLastSnp(self,snapshot):
+		"""
+		One step rebase
+		"""
+		
+		# Utilities functions everything should be done in temporary files #
+		
+		def addToTmpList(_file):
+			" TODO: "
+			
+		def addToTmpSnar(_file):
+			" TODO: "
+		
+		def makeTmpTAR():
+			" TODO: "
+		
+		def mergeSnarFile():
+			" TODO: "
+		
+		def mergeTAR():
+			" TODO: "
+		
+		def mergeIncludesList():
+			" TODO: "
+		
+		def mergeExcludesList():
+			" TODO: "
+		
+		# ------------------
+		
+		if not snapshot.getBase() :
+			raise SBException(_("Snapshot '%s' is a full . Can't rebase on older snapshot") ) % snapshot.getName()
+		basesnp = snapshot.getBaseSnapshot()
+		newbase = basesnp.getBase()
+		# process
+		try :
+			tmpdir = snapshot.getPath()+os.sep+self.REBASEDIR
+			os.mkdir(tmpdir)
+			
+			base_snpfinfo = basesnp.getSnapshotFileInfo()
+			cur_snpfinfo = snapshot.getSnapshotFileInfo()
+			for f in base_snpfinfo.iterfiles():
+				if not cur_snpfinfo.hasFile(f):
+					addToTmpList(f)
+					addToTmpSnar(f)
+			makeTmpTAR()
+			mergeSnarFile()
+			mergeIncludesList()
+			mergeExcludesList()
+			mergeTAR()
+			snapshot.commitverfile()
+		except Exception,e :
+			getLogger().error("Got an exception when rebasing '%s' : "+e) % snapshot.getName()
+			self.__cancelRebase(snapshot)
+		
+		# set the new base
+		if newbase :
+			snapshot.setBase(newbase)
+			snapshot.commitbasefile()
+		else :
+			self.__makeSnpFull(snapshot)  
+		
+		
+	def __makeSnpFull(self,snapshot):
+		"""
+		Make an inc  snapshot to a full one
+		@param snapshot: The snapshot to transform
+		@type snapshot: Snapshot
+		@return: the new full snapshot
+		@rtype: Snapshot
+		"""
+		if snapshot.isfull():
+			getLogger().info(_("Snapshot '%s' is already Full, nothing to do (not changing it to full")) % snapshot.getName()
+			return snapshot
+		path = snapshot.getPath()
+		os.rename(path+os.sep+'base', path+os.sep+'base.old')
+		os.rename(path, path[:-3]+'ful')
+		return Snapshot(path[:-3]+'ful')
+		
+	def __cancelRebase(self,snapshot):
+		"""
+		To be able to handle well the cancellation of a rebase, we will need to not modify the snapshot till the last moment.
+		This means, the infos we want to add in the SNAR file should be created as a temporary SNAR file
+		Same goes for the TAR file. So that to cancel, we will just have to remove those temporary files and restore the 'ver' file.
+		"""
+		getLogger().info("Cancelling rebase of snapshot '%s'") % snapshot.getName()
+		path = snapshot.getPath()+os.sep+self.REBASEDIR
+		os.remove(path)
+		snapshot.commitverfile()
 	
 	
 	def removeSnapshot(self,snapshot):
@@ -145,101 +263,102 @@ class SnapshotManager :
 		getLogger().debug("Removing '%s'" % snapshot.getName())
 		FAM.delete(snapshot.getPath())
 		
+		
 	def compareSnapshots(self, snap1, snap2):
 		"""
 		Compare 2 snapshots and return and SBdict with the differences between their 
 		files. The format is {"file" : ("propsnap1|propsnap2",sonsbdict)}.
 		"""
 	
-	def isAlreadyStored(self,snapshot, _file, lastsnapshot=None):
-		"""
-		for a file , check if it's already stored in a last snapshot
-		@param snapshot: The first snapshot in wih to look
-		@param file: The file to look for
-		@param lastsnapshot(=None): The lastsnapshot in wich to search (default is last Full one)
-		@return: None if file not inside, (the file props if it was stored) 
-		"""
-		# keep all the snapshot infos
-		#getLogger().debug("Searching for '%s' from '%s'" % (_file, snapshot.getName()))
-		result = None
-		
-		if snapshot.isfull() :
-			#getLogger().debug("Snapshot '%s' is full, no need to go further " % snapshot.getName())
-			if snapshot.getFilesList().has_key(_file) :
-				#getLogger().debug("found in '%s' " % snapshot.getName())
-				result = snapshot.getFilesList()[_file][0]
-			return result
-		else :
-			# snapshot is inc
-			# till we reach full base add the non existing files
-			endpointfound = False
-			cursnp = snapshot
-			while endpointfound is False and result is None :
-				#getLogger().debug("Searching for '%s' from '%s'" % (_file, cursnp.getName()))
-				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
-					#getLogger().debug("stop point found '%s'" % cursnp.getName())
-					endpointfound = True
-				if cursnp.getFilesList().has_key(_file) :
-					#getLogger().debug("found in '%s' " % cursnp.getName())
-					result = cursnp.getFilesList()[_file][0]
-				else : 
-					if not cursnp.isfull() :
-						cursnp = cursnp.getBaseSnapshot()
-			
-			return result
-	
-	def getRevertState(self,snapshot, path, lastsnapshot=None):
-		"""
-		gets the revert state ie the state of the files at the snapshot time. 
-		The algorithm is to keep the newer file existing between snapshot and the first ful snapshot that we encounter.
-		@param snapshot: the snapshot from wich to get the state:
-		@param path: the path to get the revert state.
-		@param lastsnapshot : The snapshot on which one to stop  
-		@return: a dict {snapshotPath : SBdict } where SBdict is filled with 
-		the files and properties coming from snapshot 'snapshot' and that must be include in the revert state.
-		"""
-		if not snapshot.getFilesList().has_key(path) : 
-			raise SBException(_("The file '%s' is not found in snapshot") % path)
-		# keep all the snapshot infos
-		contents = SBdict()
-		contents[path] = snapshot.getFilesList()[path]
-		getLogger().debug("keep all the snapshot '%s' infos" % snapshot.getName())
-		result = {snapshot.getPath() : contents}
-			
-		if snapshot.isfull() :
-			getLogger().debug("Snapshot '%s' is full, no need to go further " % snapshot.getName())
-			return result
-		else :
-			getLogger().debug("Snapshot '%s' is inc" % snapshot.getName())
-			# snapshot is inc
-			# till we reach full base add the non existing files
-			fullfound = False
-			cursnp = snapshot
-			while fullfound is False :
-				cursnp = cursnp.getBaseSnapshot()
-				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
-					getLogger().debug("stop point found '%s'" % cursnp.getName())
-					fullfound = True
-				if cursnp.getFilesList().has_key(path) and cursnp.getFilesList().getSon(path) :
-					for subfile,props in cursnp.getFilesList().getSon(path).iteritems() :
-						if not result.has_key(cursnp.getPath()) :
-							result[cursnp.getPath()] = SBdict()
-						#now sort result.
-						keys = result.keys()
-						keys.sort(reverse=True)
-						
-						file = os.path.normpath(os.sep.join([path.rstrip(os.sep),subfile.lstrip(os.sep)]))
-						
-						for k in keys :
-							incl = result[k]
-							# /!\ Don't add the cursnp in the include check process.
-							if k != cursnp.getPath() and not incl.has_key(file):
-								# It means that it's the newer version of that file ,
-								#add the file 
-								result[cursnp.getPath()][file] = props
-				# processing finished for this snapshot
-				getLogger().debug("processing finished for snapshot %s " % str(cursnp))
-			return result
+#	def isAlreadyStored(self,snapshot, _file, lastsnapshot=None):
+#		"""
+#		for a file , check if it's already stored in a last snapshot
+#		@param snapshot: The first snapshot in wih to look
+#		@param file: The file to look for
+#		@param lastsnapshot(=None): The lastsnapshot in wich to search (default is last Full one)
+#		@return: None if file not inside, (the file props if it was stored) 
+#		"""
+#		# keep all the snapshot infos
+#		#getLogger().debug("Searching for '%s' from '%s'" % (_file, snapshot.getName()))
+#		result = None
+#		
+#		if snapshot.isfull() :
+#			#getLogger().debug("Snapshot '%s' is full, no need to go further " % snapshot.getName())
+#			if snapshot.getFilesList().has_key(_file) :
+#				#getLogger().debug("found in '%s' " % snapshot.getName())
+#				result = snapshot.getFilesList()[_file][0]
+#			return result
+#		else :
+#			# snapshot is inc
+#			# till we reach full base add the non existing files
+#			endpointfound = False
+#			cursnp = snapshot
+#			while endpointfound is False and result is None :
+#				#getLogger().debug("Searching for '%s' from '%s'" % (_file, cursnp.getName()))
+#				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
+#					#getLogger().debug("stop point found '%s'" % cursnp.getName())
+#					endpointfound = True
+#				if cursnp.getFilesList().has_key(_file) :
+#					#getLogger().debug("found in '%s' " % cursnp.getName())
+#					result = cursnp.getFilesList()[_file][0]
+#				else : 
+#					if not cursnp.isfull() :
+#						cursnp = cursnp.getBaseSnapshot()
+#			
+#			return result
+#	
+#	def getRevertState(self,snapshot, path, lastsnapshot=None):
+#		"""
+#		gets the revert state ie the state of the files at the snapshot time. 
+#		The algorithm is to keep the newer file existing between snapshot and the first ful snapshot that we encounter.
+#		@param snapshot: the snapshot from wich to get the state:
+#		@param path: the path to get the revert state.
+#		@param lastsnapshot : The snapshot on which one to stop  
+#		@return: a dict {snapshotPath : SBdict } where SBdict is filled with 
+#		the files and properties coming from snapshot 'snapshot' and that must be include in the revert state.
+#		"""
+#		if not snapshot.getFilesList().has_key(path) : 
+#			raise SBException(_("The file '%s' is not found in snapshot") % path)
+#		# keep all the snapshot infos
+#		contents = SBdict()
+#		contents[path] = snapshot.getFilesList()[path]
+#		getLogger().debug("keep all the snapshot '%s' infos" % snapshot.getName())
+#		result = {snapshot.getPath() : contents}
+#			
+#		if snapshot.isfull() :
+#			getLogger().debug("Snapshot '%s' is full, no need to go further " % snapshot.getName())
+#			return result
+#		else :
+#			getLogger().debug("Snapshot '%s' is inc" % snapshot.getName())
+#			# snapshot is inc
+#			# till we reach full base add the non existing files
+#			fullfound = False
+#			cursnp = snapshot
+#			while fullfound is False :
+#				cursnp = cursnp.getBaseSnapshot()
+#				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
+#					getLogger().debug("stop point found '%s'" % cursnp.getName())
+#					fullfound = True
+#				if cursnp.getFilesList().has_key(path) and cursnp.getFilesList().getSon(path) :
+#					for subfile,props in cursnp.getFilesList().getSon(path).iteritems() :
+#						if not result.has_key(cursnp.getPath()) :
+#							result[cursnp.getPath()] = SBdict()
+#						#now sort result.
+#						keys = result.keys()
+#						keys.sort(reverse=True)
+#						
+#						file = os.path.normpath(os.sep.join([path.rstrip(os.sep),subfile.lstrip(os.sep)]))
+#						
+#						for k in keys :
+#							incl = result[k]
+#							# /!\ Don't add the cursnp in the include check process.
+#							if k != cursnp.getPath() and not incl.has_key(file):
+#								# It means that it's the newer version of that file ,
+#								#add the file 
+#								result[cursnp.getPath()][file] = props
+#				# processing finished for this snapshot
+#				getLogger().debug("processing finished for snapshot %s " % str(cursnp))
+#			return result
 
 	def getSnpHistory(self,snapshot):
 		"""

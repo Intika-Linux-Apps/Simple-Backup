@@ -308,14 +308,14 @@ class Snapshot :
 	
 	def commit (self) :
 		"Commit the snapshot infos ( write to the disk )"
-		self.__commitbasefile()
-		self.__commitFormatfile()
-		self.__commitexcludefile()
-		self.__commitpackagefile()
-		self.__commitflistFiles()
+		self.commitbasefile()
+		self.commitFormatfile()
+		self.commitexcludefile()
+		self.commitpackagefile()
+		self.commitflistFiles()
 		self.__makebackup()
 		self.__clean()
-		self.__commitverfile()
+		self.commitverfile()
 	
 	
 	#----------------------------
@@ -415,11 +415,11 @@ class Snapshot :
 		if  not FAM.exists( self.getPath()+os.sep +"ver" ):
 			raise NotValidSnapshotException (_("The mandatory 'ver' file doesn't exist in [%s]") % self.getName())
 		
-	def __isValidName(self, name ) :
+	def isValidName(self, name ) :
 		" Check if the snapshot name is valid "
 		return str(re.match(self.__validname_re , name )) != "None"
 
-	def __commitFormatfile(self):
+	def commitFormatfile(self):
 		"""
 		writes the format file
 		"""
@@ -428,13 +428,13 @@ class Snapshot :
 		
 		FAM.writetofile(self.getPath()+os.sep+"format", formatInfos)
 
-	def __commitverfile(self) :
+	def commitverfile(self) :
 		" Commit ver file on the disk "
 		if not self.getVersion() :
 			self.setVersion()
 		FAM.writetofile(self.getPath()+os.sep +"ver", self.getVersion())
 		
-	def __commitbasefile(self):
+	def commitbasefile(self):
 		" Commit base file on the disk "
 		if self.getBase() :
 			if self.getName()[-3:] != "ful" :
@@ -443,7 +443,7 @@ class Snapshot :
 			if self.getName()[-3:] != "ful" :
 				raise SBException(_("Base name must be set for inc backup !"))
 		
-	def __commitexcludefile(self):
+	def commitexcludefile(self):
 		"""
 		Commit exclude file on the disk.
 		@raise SBException: if excludes hasn't been set 
@@ -451,7 +451,7 @@ class Snapshot :
 		FAM.pickledump( self.__excludes, self.getPath()+os.sep +"excludes" )
 	
 	
-	def __commitflistFiles(self):
+	def commitflistFiles(self):
 		"""
 		Commit the include.list and exclude.list to the disk
 		"""
@@ -477,7 +477,7 @@ class Snapshot :
 		fe.close()
 		
 		
-	def __commitpackagefile(self):
+	def commitpackagefile(self):
 		" Commit packages file on the disk"
 		if not self.getPackages() :
 			FAM.writetofile(self.getPath()+os.sep +"packages", "")

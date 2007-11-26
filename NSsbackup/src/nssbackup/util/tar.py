@@ -642,6 +642,18 @@ class ProcSnapshotFile :
 				return True
 		return False
 	
+	def iterfiles(self):
+		"""
+		iterator that returns every file in the snapshot
+		"""
+		for l in self.__snapshotFile.parseFormat2():
+			dir = l[-2]
+			if l[-1] :
+				for dumpdir in l[-1] :
+					yield dir+os.sep+dumpdir.getFilename()
+				
+	
+	
 	def addRecord(self,record):
 		"""
 		Write a record in the snar file. A record is a tuple with 6 entries + a content that is a dict
