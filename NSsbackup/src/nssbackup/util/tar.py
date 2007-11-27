@@ -325,8 +325,17 @@ class SnapshotFile():
 	
 	__SEP = '\000'
 	__entrySEP = 2*__SEP
-
-
+	
+	# Infos on indices in a record 
+	REC_NFS = 0
+	REC_MTIME_SEC =1
+	REC_MTIME_NANO=2
+	REC_DEV_NO=3
+	REC_INO=4
+	REC_DIRNAME=5
+	REC_CONTENT=6
+	
+	
 	def __init__(self, filename,writeFlag=False):
 		"""
 		Constructor 
@@ -651,7 +660,13 @@ class ProcSnapshotFile :
 			if l[-1] :
 				for dumpdir in l[-1] :
 					yield dir+os.sep+dumpdir.getFilename()
-				
+	
+	def iterRecords(self):
+		"""
+		Iter snar file records (wrapper on the parseFormat2 method of SnaspshotFile
+		"""
+		for record in self.__snapshotFile.parseFormat2():
+			yield record
 	
 	
 	def addRecord(self,record):

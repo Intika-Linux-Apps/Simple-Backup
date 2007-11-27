@@ -11,10 +11,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
-
+from nssbackup.util.tar import SnapshotFile
+from nssbackup.util.tar import ProcSnapshotFile
 import os
 import re
 import datetime
@@ -164,17 +164,28 @@ class SnapshotManager :
 		
 		# Utilities functions everything should be done in temporary files #
 		
-		def addToTmpList(_file):
-			" TODO: "
-			
-		def addToTmpSnar(_file):
-			" TODO: "
-		
 		def makeTmpTAR():
 			" TODO: "
+			getLogger().info("Make a temporary tar file by tranfering the files from base")
 		
 		def mergeSnarFile():
-			" TODO: "
+			"""
+			TODO: 
+			Merge the snar.full.tmp file with the current snapshot snarfile in a snar.final.tmp file.
+			for each path in the current snar if included inthe snar.full.tmp , drop it, oherwise add the whole record.
+			""" 
+			getLogger().info("Merging Snar files")
+			
+			fd = open(tmpdir+os.sep+"snar.final.tmp",'w')
+			fd.write(header)
+			fd.close()
+			
+			tmpfinalSnarinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.final.tmp"),True)
+			
+			snarfileinfos = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.full.tmp"))
+			for record in cur_snpfinfo.iterRecords():
+				if not snarfileinfos.hasPath(record[SnapshotFile.REC_DIRNAME]):
+					tmpfinalSnarinfo.addRecord(record)
 		
 		def mergeTAR():
 			" TODO: "
@@ -196,12 +207,75 @@ class SnapshotManager :
 			tmpdir = snapshot.getPath()+os.sep+self.REBASEDIR
 			os.mkdir(tmpdir)
 			
+			getLogger().info("Writing the temporary SNARFILEs to make the transfer")
+			
+			# get snar header from current snapshots
+			snard = open(snapshot.getSnarFile())
+			header = snard.readline()
+			n=0
+			while n < 2:
+				c = snard.read(1)
+				if c == '\0' : n += 1
+				header+=c
+			snard.close()
+			getLogger().debug("Current SNAR Header : " + header)
+			
+			fd = open(tmpdir+os.sep+"snar.part.tmp",'w')
+			fd.write(header)
+			fd.close()
+			fd = open(tmpdir+os.sep+"snar.full.tmp",'w')
+			fd.write(header)
+			fd.close()
+			
+			snarpartinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp"),True)
+			snarfullinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.full.tmp"),True)
+			
 			base_snpfinfo = basesnp.getSnapshotFileInfo()
 			cur_snpfinfo = snapshot.getSnapshotFileInfo()
-			for f in base_snpfinfo.iterfiles():
-				if not cur_snpfinfo.hasFile(f):
-					addToTmpList(f)
-					addToTmpSnar(f)
+			for record in base_snpfinfo.iterRecords():
+				
+				if not cur_snpfinfo.haspath(record[SnapshotFile.REC_DIRNAME]):
+					# ADD to temp snar
+					snarfullinfo.addRecord(record)
+					snarpartinfo.addRecord(record)
+				else :
+					toaddContent = []
+					# go in the content to check for the existance 
+					curcontent = cur_snpfinfo.getContent(record[SnapshotFile.REC_DIRNAME])
+					curcontentFiles = []
+					for d in curcontent :
+						curcontentFiles.append(d.getFilename())
+					
+					for dumpdir in record[SnapshotFile.REC_CONTENT]:
+						if dumpdir.getFilename() not in curcontentFiles :
+							toaddContent.append(dumpdir)
+							# to prepare the full temp snar file, complet the curcontent
+							curcontent.append(dumpdir)
+					
+					# if toadd content is empty then , the whole content is already included in the directory
+					# no need to add it
+					if toaddContent:
+						toaddRecord = record[:-1]
+						toaddRecord.append(toaddContent)
+						# write to the SnarFile
+						snarpartinfo.addRecord(toaddRecord)
+					# 	add the complete record to the full temp snar file
+					toaddFullRecord = record[:-1]
+					toaddFullRecord.append(curcontent)
+					snarfullinfo.addRecord(toaddFullRecord)
+					
+			# Currently the snar.full.tmp contains both base complete records and the common completed 
+			# records between base and current 
+			
+			
+			# write temp flist using the snar file  to backup
+			getLogger().info("Writing the temporary Files list to make the transfer")
+			flistd = open(tmpdir+os.sep+"flist.tmp",'w')
+			snarfile = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp"))
+			for f in snarfile.iterfiles():
+				flistd.write(f+'\0')
+			flistd.close()
+			
 			makeTmpTAR()
 			mergeSnarFile()
 			mergeIncludesList()
