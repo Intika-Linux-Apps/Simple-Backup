@@ -15,6 +15,10 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 from nssbackup.util.tar import SnapshotFile
 from nssbackup.util.tar import ProcSnapshotFile
+import nssbackup.util.tar as TAR
+from xml.etree.ElementInclude import include
+import shutil
+import tempfile
 import os
 import re
 import datetime
@@ -166,7 +170,19 @@ class SnapshotManager :
 		
 		def makeTmpTAR():
 			" TODO: "
+			# write temp flist using the snar file  to backup
+			getLogger().info("Writing the temporary Files list to make the transfer")
+			flistd = open(tmpdir+os.sep+"flist.tmp",'w')
+			snarfile = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp"))
+			for f in snarfile.iterfiles():
+				flistd.write(f+'\0')
+			flistd.close()
+			
 			getLogger().info("Make a temporary tar file by tranfering the files from base")
+			tmptardir = tempfile.mkdtemp(suffix="tempTARdir_", dir=tmpdir)
+			TAR.extract2(basesnp.getArchive(), tmpdir+os.sep+"flist.tmp", tmptardir)
+			TAR.appendToTarFile(snapshot.getArchive(), ".",workingdir=tmptardir ,additionalOpts=['--remove-files'])
+			shutil.rmtree(tmptardir)
 		
 		def mergeSnarFile():
 			"""
@@ -187,14 +203,54 @@ class SnapshotManager :
 				if not snarfileinfos.hasPath(record[SnapshotFile.REC_DIRNAME]):
 					tmpfinalSnarinfo.addRecord(record)
 		
-		def mergeTAR():
-			" TODO: "
-		
 		def mergeIncludesList():
 			" TODO: "
-		
+			srcfd = open(basesnp.getIncludeFlistFile())
+			destfd = open(tmpdir+os.sep+"includes.list.tmp",'w')
+			for line in srcfd.readlines():
+				destfd.write(line)
+			srcfd.close()
+			
+			srcfd = open(snapshot.getIncludeFlistFile())
+			for line in srcfd.readlines():
+				destfd.write(line)
+			srcfd.close()
+			
+			destfd.close()
+			
+				
 		def mergeExcludesList():
 			" TODO: "
+			srcfd = open(basesnp.getExcludeFlistFile())
+			destfd = open(tmpdir+os.sep+"excludes.list.tmp",'w')
+			for line in srcfd.readlines():
+				destfd.write(line)
+			srcfd.close()
+			
+			srcfd = open(snapshot.getExcludeFlistFile())
+			for line in srcfd.readlines():
+				destfd.write(line)
+			srcfd.close()
+			
+			destfd.close()
+			
+		
+		def movetoFinaldest():
+			getLogger().info("Move all temporary files to their final destivation")
+			# SNAR file
+			if os.path.exists(snapshot.getSnarFile()) :
+				os.remove(snapshot.getSnarFile())
+			os.rename(tmpdir+os.sep+"snar.final.tmp",snapshot.getSnarFile())
+			
+			# Includes.list
+			if os.path.exists(snapshot.getIncludeFListFile()) :
+				os.remove(snapshot.getIncludeFListFile())
+			os.rename(tmpdir+os.sep+"includes.list.tmp",snapshot.getIncludeFListFile())
+			
+			# Excludes.list
+			if os.path.exists(snapshot.getIncludeFListFile()) :
+				os.remove(snapshot.getExcludeFListFile())
+			os.rename(tmpdir+os.sep+"excludes.list.tmp",snapshot.getExcludeFListFile())
 		
 		# ------------------
 		
@@ -267,20 +323,15 @@ class SnapshotManager :
 			# Currently the snar.full.tmp contains both base complete records and the common completed 
 			# records between base and current 
 			
-			
-			# write temp flist using the snar file  to backup
-			getLogger().info("Writing the temporary Files list to make the transfer")
-			flistd = open(tmpdir+os.sep+"flist.tmp",'w')
-			snarfile = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp"))
-			for f in snarfile.iterfiles():
-				flistd.write(f+'\0')
-			flistd.close()
-			
-			makeTmpTAR()
 			mergeSnarFile()
 			mergeIncludesList()
 			mergeExcludesList()
-			mergeTAR()
+			
+			makeTmpTAR()
+			movetoFinaldest()
+			# clean Temporary files 
+			shutil.rmtree(tmpdir)
+			
 			snapshot.commitverfile()
 		except Exception,e :
 			getLogger().error("Got an exception when rebasing '%s' : "+e) % snapshot.getName()

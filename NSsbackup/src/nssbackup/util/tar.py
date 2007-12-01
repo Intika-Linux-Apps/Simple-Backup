@@ -90,7 +90,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 		raise SBException("Error when extracting : " + errStr )
 	getLogger().debug("output was : " + outStr)
 	
-def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
+def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOps=None ):
 	"""
 	Extract the files listed in the 'fileslist' file to dest. This method 
 	has been created to optimize the time spent by giving to tar a complete 
@@ -98,6 +98,8 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	@param sourcetgz:
 	@param fileslist: a path to the file containing the list
 	@param dest: destination
+	@param bckupsuffix: 
+	@param additionalOpts: a list of aption to add
 	"""
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
@@ -120,7 +122,70 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	if bckupsuffix :
 		options.append("--suffix="+bckupsuffix)
 	
+	if additionalOps and type(additionalOps) == list :
+		options.extend(additionalOps)
+		
 	options.extend(['--file='+sourcetgz,'--null','--files-from='+os.path.normpath(fileslist)])
+	
+	outStr, errStr, retval = Util.launch("tar", options)
+	if retval != 0 :
+		getLogger().debug("output was : " + outStr)
+		raise SBException("Error when extracting : " + errStr )
+	getLogger().debug("output was : " + outStr)
+
+def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOps=None ):
+	"""
+	@param desttar: The tar file to wich append
+	@param fileOrDir: The file or directory to append
+	@param workingDir: the dir to move in before appending the dir ( usefun for relative paths)
+	"""
+	options = ["--append", "--ignore-failed-read"]
+	
+	archType = getArchiveType(desttar)
+	if archType =="tar" :
+		pass
+	elif archType == "gzip" :
+		options.insert(1,"--gzip")
+	elif archType == "bzip2" :
+		options.insert(1,"--bzip2")
+	else :
+		raise SBException (_("Invalid Archive type"))
+		
+	if additionalOps and type(additionalOps) == list :
+		options.extend(additionalOps)
+		
+	options.extend(['--file='+desttar,'--null'])
+	
+	if workingdir:
+		options.append("-C "+workingdir)
+	
+	options.append(fileOrDir)
+	
+	outStr, errStr, retval = Util.launch("tar", options)
+	if retval != 0 :
+		getLogger().debug("output was : " + outStr)
+		raise SBException("Error when extracting : " + errStr )
+	getLogger().debug("output was : " + outStr)
+
+def appendToTarFile2(desttar, fileslist, additionalOps=None ):
+	"""
+	"""
+	options = ["--append", "--ignore-failed-read"]
+	
+	archType = getArchiveType(desttar)
+	if archType =="tar" :
+		pass
+	elif archType == "gzip" :
+		options.insert(1,"--gzip")
+	elif archType == "bzip2" :
+		options.insert(1,"--bzip2")
+	else :
+		raise SBException (_("Invalid Archive type"))
+		
+	if additionalOps and type(additionalOps) == list :
+		options.extend(additionalOps)
+		
+	options.extend(['--file='+desttar,'--null','--files-from='+os.path.normpath(fileslist)])
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
