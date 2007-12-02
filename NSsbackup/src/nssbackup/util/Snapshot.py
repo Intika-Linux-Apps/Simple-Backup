@@ -415,7 +415,7 @@ class Snapshot :
 		if  not FAM.exists( self.getPath()+os.sep +"ver" ):
 			raise NotValidSnapshotException (_("The mandatory 'ver' file doesn't exist in [%s]") % self.getName())
 		
-	def isValidName(self, name ) :
+	def __isValidName(self, name ) :
 		" Check if the snapshot name is valid "
 		return str(re.match(self.__validname_re , name )) != "None"
 

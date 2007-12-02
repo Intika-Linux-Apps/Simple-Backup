@@ -271,7 +271,8 @@ def makeTarIncBackup(snapshot):
 		outStr, errStr, retVal = Util.launch("tar", options)
 		getLogger().debug("TAR Output : " + outStr)
 		if retVal != 0 :
-			raise SBException(_("Couldn't make a proper backup : ") + errStr )
+			# list-incremental is not compatible with ignore failed read
+			getLogger().error(_("Couldn't make a proper backup, finishing backup though :") + errStr )
 		
 
 def makeTarFullBackup(snapshot):
@@ -297,7 +298,8 @@ def makeTarFullBackup(snapshot):
 	outStr, errStr, retVal = Util.launch("tar", options)
 	getLogger().debug("TAR Output : " + outStr)
 	if retVal != 0 :
-		raise SBException(_("Couldn't make a proper backup : ") + errStr )
+		# list-incremental is not compatible with ignore failed read
+		getLogger().error(_("Couldn't make a proper backup, finishing backup though : ") + errStr )
 	
 # ---
 

@@ -40,6 +40,8 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def init(self):
 		
+		self.default_conffile = None 
+		
 		if os.geteuid() == 0 :
 			if os.path.exists("/etc/nssbackup.conf") :
 				self.default_conffile = "/etc/nssbackup.conf"
@@ -641,7 +643,8 @@ class SBconfigGTK(GladeGnomeApp):
 				self.widgets["splitsizeCB"].set_active(0)
 		
 		# set the profile name
-		self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
+		# TODO: check why it's not working
+		#self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
 		
 		self.isConfigChanged()
 	#----------------------------------------------------------------------
