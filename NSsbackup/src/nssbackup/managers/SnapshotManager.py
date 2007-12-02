@@ -16,7 +16,6 @@
 from nssbackup.util.tar import SnapshotFile
 from nssbackup.util.tar import ProcSnapshotFile
 import nssbackup.util.tar as TAR
-from xml.etree.ElementInclude import include
 import shutil
 import tempfile
 import os
@@ -186,7 +185,7 @@ class SnapshotManager :
 		
 		def mergeSnarFile():
 			"""
-			TODO: 
+			TODO:
 			Merge the snar.full.tmp file with the current snapshot snarfile in a snar.final.tmp file.
 			for each path in the current snar if included inthe snar.full.tmp , drop it, oherwise add the whole record.
 			""" 
