@@ -34,6 +34,8 @@ uninstall-local-data:
 	rm -f $(prefix)/share/nssbackup/nssbackup-restore.glade
 	rm -f $(prefix)/share/nssbackup/nssbackup
 	rm -rf $(pythondir)/nssbackup $(pythondir)/NSsbackup*
+	
+reinstall: uninstall install
 
 ACLOCAL_AMFLAGS = -I m4
 

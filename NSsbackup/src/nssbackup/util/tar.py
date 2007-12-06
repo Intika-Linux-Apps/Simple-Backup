@@ -139,7 +139,7 @@ def __prepareTarCommonOpts(snapshot):
 	options = list()
 	
 	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile().replace(" ", "\ ")+".tmp"])
-	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ "))
+	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ ")+".tmp")
 	
 	archivename = "files.tar"
 	if snapshot.getFormat() == "gzip":
@@ -250,7 +250,7 @@ class Dumpdir():
 	UNCHANGED = 'N'
 	DIRECTORY = 'D'
 	
-	__HRCtrls = {'Y':_('Included'),'N':_('Unchanged'),'D':_('Directory')} #: The dictionary mapping control with their meanings
+	__HRCtrls = {'Y':_('Included'),'N':_('Excluded'),'D':_('Directory')} #: The dictionary mapping control with their meanings
 	
 	control = None
 	filename = None

@@ -226,7 +226,7 @@ def readlineNULSep(fd,fd1):
 		if _continue == 1 :
 			raise SBException("The length of flist and Fprops are not equals")
 		yield (currentline,currentline1)
-		
+
 	
 import pygtk
 pygtk.require('2.0')

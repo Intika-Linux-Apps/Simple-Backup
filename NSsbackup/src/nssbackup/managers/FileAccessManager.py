@@ -15,7 +15,7 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-import os, shutil
+import os, shutil,pickle
 try:
 	import gnomevfs
 except ImportError:

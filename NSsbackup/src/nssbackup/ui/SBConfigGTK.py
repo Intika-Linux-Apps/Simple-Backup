@@ -641,7 +641,8 @@ class SBconfigGTK(GladeGnomeApp):
 				self.widgets["splitsizeCB"].set_active(0)
 		
 		# set the profile name
-		self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
+		#TODO: WHY isn't GnomeApp working anymore
+		#self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
 		
 		self.isConfigChanged()
 	#----------------------------------------------------------------------

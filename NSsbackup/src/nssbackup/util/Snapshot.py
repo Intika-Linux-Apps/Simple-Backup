@@ -470,6 +470,12 @@ class Snapshot :
 			fi.write(str(f) +"\n")
 		fi.close()
 		
+		# commit exclude.list.tmp
+		fe = open(self.getExcludeFListFile()+".tmp","w")
+		for f in self.__excludeFlist.getEffectiveFileList() :
+			fe.write(re.escape(str(f)) +"\n")
+		fe.close()
+		
 		# commit exclude.list
 		fe = open(self.getExcludeFListFile(),"w")
 		for f in self.__excludeFlist.getEffectiveFileList() :
@@ -499,3 +505,5 @@ class Snapshot :
 		# 
 		if os.path.exists(self.getIncludeFListFile()+".tmp") :
 			os.remove(self.getIncludeFListFile()+".tmp")
+		if os.path.exists(self.getExcludeFListFile()+".tmp") :
+			os.remove(self.getExcludeFListFile()+".tmp")
