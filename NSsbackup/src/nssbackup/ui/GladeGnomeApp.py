@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 
-#----------------------------------------------------------------------
-# GladeWindow.py
-# Dave Reed
-# 12/15/2002
-#----------------------------------------------------------------------
-
 import os
 import gtk
 import gtk.glade
 import gnome
+# import mandatory for GnomeApp to work
+import gnome.ui
 #----------------------------------------------------------------------
 
 def search_file(filename, search_path):
