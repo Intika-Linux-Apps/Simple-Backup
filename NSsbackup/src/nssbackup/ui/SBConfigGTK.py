@@ -16,7 +16,7 @@ from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.util.log import getLogger
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
-from GladeGnomeApp import *
+from nssbackup.ui.GladeGnomeApp import *
 from gettext import gettext as _
 import nssbackup.util as Util
 
@@ -39,6 +39,8 @@ class SBconfigGTK(GladeGnomeApp):
 	#----------------------------------------------------------------------
 
 	def init(self):
+		
+		self.default_conffile = None 
 		
 		if os.geteuid() == 0 :
 			if os.path.exists("/etc/nssbackup.conf") :
