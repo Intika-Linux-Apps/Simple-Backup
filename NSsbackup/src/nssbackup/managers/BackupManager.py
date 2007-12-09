@@ -38,17 +38,6 @@ class BackupManager :
 	"""
 	"""
 	
-	config = None
-	__um = UpgradeManager()
-	__snpman = None
-	
-	__fusefam = None
-	# The whole snapshot path
-	__actualSnapshot = None
-	
-	__lockfile = None
-	
-	__includeInSnp = None
 	
 	def __init__(self, configfile = None):
 		"""
@@ -57,6 +46,21 @@ class BackupManager :
 		@param configfile : The config file
 		"""
 		global config
+		
+		#-------------------------------
+		self.config = None
+		self.__um = UpgradeManager()
+		self.__snpman = None
+		
+		self.__fusefam = None
+		# The whole snapshot path
+		self.__actualSnapshot = None
+		
+		self.__lockfile = None
+		
+		self.__includeInSnp = None
+		#-----------------------------------
+		
 		if configfile :
 			self.config = ConfigManager(configfile)
 			if not self.config.has_option("log", "file") :

@@ -38,10 +38,13 @@ from nssbackup.managers.BackupManager import BackupManager
 # @version: 1.0
 class NSsbackupd () :
 	
-	__bm = None
-	
 	__confFilesRE = "^nssbackup-.+?\.conf$"
 
+	def __init__(self):
+		"""
+		Initialisation
+		"""
+		self.__bm = None
 
 	def __sendEmail(self):
 		"""

@@ -28,26 +28,7 @@ from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
 
 class Snapshot : 
 	"The snapshot class represents one snapshot in the backup directory"
-	# Attributes
-	__name = False
-	__base = False
-	__format = "gzip" # default value
 	
-	# TODO (in|ex)cludeFlist should be an SBdict
-	__snarfile = None
-	__includeFlist = SBdict()
-	__includeFlistFile = None # Str
-	__excludeFlist = SBdict()
-	__excludeFlistFile = None # Str
-	
-	__splitedSize = 0
-	__excludes = False
-	
-	__packages = False
-	__version = False
-	__snapshotpath = False
-	
-	__baseSnapshot = None
 	
 	__validname_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})_(\d{2})[\:\.](\d{2})[\:\.](\d{2})\.\d+\..*?\.(.+)$")
 	
@@ -59,6 +40,32 @@ class Snapshot :
 		@param fam : The File Access Manager to use. False will create a default one
 		"""
 		global __name, __snapshotpath
+		
+		# -----------------
+		
+		# Attributes
+		self.__name = False
+		self.__base = False
+		self.__format = "gzip" # default value
+		
+		# TODO (in|ex)cludeFlist should be an SBdict
+		self.__snarfile = None
+		self.__includeFlist = SBdict()
+		self.__includeFlistFile = None # Str
+		self.__excludeFlist = SBdict()
+		self.__excludeFlistFile = None # Str
+		
+		self.__splitedSize = 0
+		self.__excludes = False
+		
+		self.__packages = False
+		self.__version = False
+		self.__snapshotpath = False
+		
+		self.__baseSnapshot = None
+		
+		#------------------
+		
 		
 		self.__snapshotpath = os.path.normpath(str(path))
 		

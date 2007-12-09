@@ -35,12 +35,13 @@ class SnapshotManager :
 	#
 	__targetDir = None
 	
-	## 
-	# The list of the snapshots is stored the first time it's used so that we don't have to reget it
-	__snapshots = None
-	
 	def __init__(self,targetDir):
 		global __targetDir
+		
+		## 
+		# The list of the snapshots is stored the first time it's used so that we don't have to reget it
+		self.__snapshots = None
+		
 		if not targetDir or not FAM.exists(targetDir) :
 			raise SBException(_("Invalid value of the target directory : ") + targetDir)
 		self.__targetDir = targetDir

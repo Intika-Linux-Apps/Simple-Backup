@@ -28,15 +28,7 @@ class FuseFAM:
 	"""
 	The Fuse File access Manager
 	"""
-	## The dir tjat will be the base for all mount points
-	__mountdir = None
 	
-	## the config manager from which to get the dir list to be mounted.
-	__config = None
-	
-	## the list of all mounted dirs , should be filled by initialize.
-	# It's a dict with key = remoteSource and value = mountpoint
-	__mountedDirs = {}
 	
 	def __init__(self, configManager=None):
 		"""
@@ -44,6 +36,19 @@ class FuseFAM:
 		@param configManager: 
 		"""
 		global __config
+		
+		#-------------------------------------
+		## The dir tjat will be the base for all mount points
+		self.__mountdir = None
+		
+		## the config manager from which to get the dir list to be mounted.
+		self.__config = None
+		
+		## the list of all mounted dirs , should be filled by initialize.
+		# It's a dict with key = remoteSource and value = mountpoint
+		self.__mountedDirs = {}
+		#-------------------------------------
+		
 		self.__config = configManager
 		#sets the default mount dir 
 		if self.__config and self.__config.has_option("general","mountdir") :
