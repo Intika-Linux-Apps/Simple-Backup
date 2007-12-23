@@ -1,3 +1,11 @@
+nssbackup (0.1-3~ppa2) gutsy; urgency=low
+
+  * removed build dependancy on pyGTK
+  * Fixed [Bug 157250] simple-backup-config has incorrect example exclusion regex 
+  * fixed LP Bug #177385 : Maxincrement option is not working
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Fri, 21 Dec 2007 22:06:25 +0100
+
 nssbackup (0.1-2~ppa1) gutsy; urgency=low
 
   * GNU packaging standardization

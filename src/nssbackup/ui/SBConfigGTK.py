@@ -680,7 +680,7 @@ class SBconfigGTK(GladeWindow):
 		about = gtk.AboutDialog()
 		about.set_name("Not So Simple Backup Suite")
 		# TODO: Always keep this updated
-		about.set_version("0.1-2")
+		about.set_version("0.1-3")
 		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
 		about.set_transient_for(self.widgets["backup_properties_dialog"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")

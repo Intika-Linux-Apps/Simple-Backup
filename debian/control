@@ -2,12 +2,12 @@ Source: nssbackup
 Section: universe/devel
 Priority: optional
 Maintainer: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
-Build-Depends: debhelper (>= 5)
+Build-Depends: debhelper (>= 5),autotools-dev, python2.5, pkg-config, python-gtk2, yelp, libxml-parser-perl, tar, cron, anacron, scrollkeeper, python-support (>= 0.3), python-glade2
 Standards-Version: 3.7.2
 
 Package: nssbackup
 Architecture: any
-Depends: python, python-gnome2, python-glade2, fuse-utils, python-notify
+Depends: python2.5, python-gnome2, python-glade2, fuse-utils, python-notify
 Description: Not So Simple Backup Suite 
  NSsbackup is a fork of Sbackup intended for desktop
  use. It has multiuser support with nice handling of logs . It also has
