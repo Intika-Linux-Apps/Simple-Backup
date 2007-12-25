@@ -426,7 +426,7 @@ class BackupManager :
 					if i.isfull():
 						d = i.getDate()
 						age = (datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days
-						if  age < self.config.get("general","maxincrement") :
+						if  age < int(self.config.get("general","maxincrement")) :
 							# Last full backup is fresh -> make an increment
 							getLogger().info("Last full backup is fresh (%d days old )-> make an increment" % age )
 							increment = True
@@ -465,3 +465,4 @@ class BackupManager :
 		get the actual snapshot
 		"""
 		return self.__actualSnapshot
+
