@@ -16,7 +16,7 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
-import gettext, sys
+import gettext, sys,os
 from gettext import gettext as _
 from nssbackup.util.log import getLogger
 from nssbackup.managers.UpgradeManager import UpgradeManager
@@ -39,7 +39,8 @@ Use simple-restore-gnome for more ease of use.
 	
 	try : 
 		u = UpgradeManager()
-		u.upgradeAll(sys.argv[1])
+		path = os.path.abspath(sys.argv[1])
+		u.upgradeAll(path)
 	except Exception, e :
 			getLogger().error(str(e))
 			getLogger().error(traceback.format_exc())
