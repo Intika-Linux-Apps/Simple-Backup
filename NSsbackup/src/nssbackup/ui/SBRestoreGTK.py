@@ -313,7 +313,7 @@ class SBRestoreGTK(GladeWindow):
 			f1_items = self.currSnpFilesInfos.getFirstItems()
 			if not f1_items :
 				# first items is empty
-				self.flisttreestore.append(None, [_("This snapshot seems empty.")])
+				self.flisttreestore.append(None, [_("This snapshot seems empty."),""])
 				self.widgets['snpdetails'].set_sensitive(False)
 			else :
 				self.widgets['snpdetails'].set_sensitive(True)
