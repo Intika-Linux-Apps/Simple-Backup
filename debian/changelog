@@ -1,0 +1,24 @@
+nssbackup (0.2-0~ppa2) gutsy; urgency=low
+
+  * devel version
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Fri, 21 Dec 2007 22:06:25 +0100
+
+nssbackup (0.1-2~ppa1) gutsy; urgency=low
+
+  * GNU packaging standardization
+  * Deleted unuseful documentation
+  * We don't exclude anything as a recommendation (Closes LP Bug #152861)
+  * Changed nssbackup icons
+  * changed the whole revert process ( closes LP Bug #146617 )
+  * base was always set as the last full snapshot
+  * Launchpad Bug #146618 : remove the file size limit recommendation
+  * LP #138750 & #138749 fixed
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 21 Oct 2007 07:42:55 +0200
+
+nssbackup (0.1-1) gutsy; urgency=low
+
+  * Ubuntu Initial release
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 26 Aug 2007 12:44:18 
