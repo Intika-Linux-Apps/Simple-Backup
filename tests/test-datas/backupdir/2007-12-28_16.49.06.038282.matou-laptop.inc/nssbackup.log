@@ -1,0 +1,14 @@
+NSSBackup Logger
+==============
+2007-12-28 16:49:05,976 - INFO - ConfigManager.py:__init__(252) - ConfigManager created with '/home/wattazoum/.config/nssbackup/nssbackup.conf'
+2007-12-28 16:49:05,977 - INFO - BackupManager.py:__init__(63) - Création du BackupManager 
+2007-12-28 16:49:05,993 - INFO - BackupManager.py:makeBackup(82) - Début de la sauvegarde
+2007-12-28 16:49:05,994 - INFO - BackupManager.py:makeBackup(87) - Initialisation de FUSE FILE ACCESS MANAGER
+2007-12-28 16:49:05,995 - WARNING - SnapshotManager.py:purge(296) - Purge logarithmique non implémentée pour le moment
+2007-12-28 16:49:05,995 - INFO - UpgradeManager.py:upgradeAll(102) - Upgrading All valid snapshot in '/home/wattazoum/workspace/NSsbackup/devel/tests/test-datas/backupdir'
+2007-12-28 16:49:06,038 - INFO - BackupManager.py:makeBackup(124) - Début de la sauvegarde 2007-12-28_16.49.06.038282.matou-laptop.inc 
+2007-12-28 16:49:06,039 - INFO - BackupManager.py:makeBackup(128) - Paramétrage de la base à '2007-12-28_16.47.05.716709.matou-laptop.ful' 
+2007-12-28 16:49:06,039 - INFO - BackupManager.py:makeBackup(134) - Ajustement du fichier de sauvegarde des paquets .deb 
+2007-12-28 16:49:06,189 - INFO - BackupManager.py:makeBackup(145) - Ajustement du fichier des exclusions 
+2007-12-28 16:49:06,655 - INFO - Snapshot.py:__makebackup(341) - Lancement de TAR pour la sauvegarde
+2007-12-28 16:49:06,665 - INFO - BackupManager.py:__endSBsession(394) - La session de sauvegarde est terminée (/home/wattazoum/.local/share/nssbackup/nssbackup.lock est supprimé) 

@@ -32,10 +32,12 @@ class TestUpgradeManager(unittest.TestCase) :
 		"""
 		Upgrade a snapshot to the Upper version
 		"""
-		snapshots = self.snpman.getSnapshots()
-		snapshots.sort(reverse=True)
-		self.upgman.upgradeSnapshot(snapshots[0])
-		self.assertEqual(snapshots[0].getVersion(),"1.5")
+		path = os.path.abspath("test-datas/backupdir")
+		self.upgman.upgradeAll(path)
+#		snapshots = self.snpman.getSnapshots()
+#		snapshots.sort(reverse=True)
+#		self.upgman.upgradeSnapshot(snapshots[0])
+#		self.assertEqual(snapshots[0].getVersion(),"1.5")
 		
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestUpgradeManager)
