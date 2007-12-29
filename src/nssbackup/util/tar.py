@@ -90,7 +90,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 		raise SBException("Error when extracting : " + errStr )
 	getLogger().debug("output was : " + outStr)
 	
-def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOps=None ):
+def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None ):
 	"""
 	Extract the files listed in the 'fileslist' file to dest. This method 
 	has been created to optimize the time spent by giving to tar a complete 
@@ -122,8 +122,8 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOps=None )
 	if bckupsuffix :
 		options.append("--suffix="+bckupsuffix)
 	
-	if additionalOps and type(additionalOps) == list :
-		options.extend(additionalOps)
+	if additionalOpts and type(additionalOpts) == list :
+		options.extend(additionalOpts)
 		
 	options.extend(['--file='+sourcetgz,'--null','--files-from='+os.path.normpath(fileslist)])
 	
@@ -133,7 +133,7 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOps=None )
 		raise SBException("Error when extracting : " + errStr )
 	getLogger().debug("output was : " + outStr)
 
-def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOps=None ):
+def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	"""
 	@param desttar: The tar file to wich append
 	@param fileOrDir: The file or directory to append
@@ -151,8 +151,8 @@ def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOps=None ):
 	else :
 		raise SBException (_("Invalid Archive type"))
 		
-	if additionalOps and type(additionalOps) == list :
-		options.extend(additionalOps)
+	if additionalOpts and type(additionalOpts) == list :
+		options.extend(additionalOpts)
 		
 	options.extend(['--file='+desttar,'--null'])
 	
@@ -167,7 +167,7 @@ def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOps=None ):
 		raise SBException("Error when extracting : " + errStr )
 	getLogger().debug("output was : " + outStr)
 
-def appendToTarFile2(desttar, fileslist, additionalOps=None ):
+def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
 	"""
 	"""
 	options = ["--append", "--ignore-failed-read"]
@@ -182,8 +182,8 @@ def appendToTarFile2(desttar, fileslist, additionalOps=None ):
 	else :
 		raise SBException (_("Invalid Archive type"))
 		
-	if additionalOps and type(additionalOps) == list :
-		options.extend(additionalOps)
+	if additionalOpts and type(additionalOpts) == list :
+		options.extend(additionalOpts)
 		
 	options.extend(['--file='+desttar,'--null','--files-from='+os.path.normpath(fileslist)])
 	
@@ -581,21 +581,21 @@ class SnapshotFile():
 		fd.close()
 		
 		
-	def createContent(self,contentDict):
+	def createContent(self,contentList):
 		"""
 		create a content out of a dict of {file:'control'}
 		@param contentDict: the content dictionary
-		@type contentDict: dict
+		@type contentList: dict
 		@return: a string containing the computed content
 		@rtype: string
 		"""
-		if type(contentDict) != dict :
-			raise SBException("contentDict must be a dictionary")
+		if type(contentList) != list :
+			raise SBException("contentlist must be a list : %r" % repr(contentList))
 		
 		result = ""
 		
-		for f,c in contentDict.iteritems():
-			result += c+f+self.__SEP
+		for dumpdir in contentList:
+			result += dumpdir.getControl()+dumpdir.getFilename()+self.__SEP
 		
 		return result
 		

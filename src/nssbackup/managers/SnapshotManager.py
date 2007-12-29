@@ -24,6 +24,7 @@ import datetime
 import time
 import FileAccessManager as FAM
 from gettext import gettext as _
+import nssbackup.util as Util
 from nssbackup.util.structs import SBdict
 from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.exceptions import *
@@ -174,13 +175,35 @@ class SnapshotManager :
 			flistd = open(tmpdir+os.sep+"flist.tmp",'w')
 			snarfile = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp"))
 			for f in snarfile.iterfiles():
-				flistd.write(f+'\0')
+				flistd.write(f.lstrip(os.sep)+'\0')
 			flistd.close()
 			
 			getLogger().info("Make a temporary tar file by tranfering the files from base")
-			tmptardir = tempfile.mkdtemp(suffix="tempTARdir_", dir=tmpdir)
-			TAR.extract2(basesnp.getArchive(), tmpdir+os.sep+"flist.tmp", tmptardir)
-			TAR.appendToTarFile(snapshot.getArchive(), ".",workingdir=tmptardir ,additionalOpts=['--remove-files'])
+			tmptardir = tempfile.mkdtemp(suffix="tempTARdir", dir=tmpdir)
+			TAR.extract2(basesnp.getArchive(), tmpdir+os.sep+"flist.tmp", tmptardir,additionalOpts=["--no-recursion"])
+			
+			# uncompress the tar file so that we can append files to it
+			archive = snapshot.getArchive()
+			if not TAR.getArchiveType(archive):
+				raise SBException("Invalid archive file '%s'" % archive)
+			else :
+				arvtype = TAR.getArchiveType(archive)
+				if arvtype == "gzip" :
+					Util.launch("gunzip", [archive])
+					archive = archive[:-3]
+				elif arvtype == "bzip2" :
+					Util.launch("bunzip2", [archive])
+					archive = archive[:-4]
+				# else : the archive is already uncompressed
+					
+			TAR.appendToTarFile(archive, ".",workingdir=tmptardir+os.sep )
+			
+			# recompress
+			if arvtype == "gzip" :
+				Util.launch("gzip", [archive])
+			elif arvtype == "bzip2" :
+				Util.launch("bzip2", [archive])
+			
 			shutil.rmtree(tmptardir)
 		
 		def mergeSnarFile():
@@ -195,7 +218,7 @@ class SnapshotManager :
 			fd.write(header)
 			fd.close()
 			
-			tmpfinalSnarinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.final.tmp"),True)
+			tmpfinalSnarinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.final.tmp",True))
 			
 			snarfileinfos = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.full.tmp"))
 			for record in cur_snpfinfo.iterRecords():
@@ -204,13 +227,13 @@ class SnapshotManager :
 		
 		def mergeIncludesList():
 			" TODO: "
-			srcfd = open(basesnp.getIncludeFlistFile())
+			srcfd = open(basesnp.getIncludeFListFile())
 			destfd = open(tmpdir+os.sep+"includes.list.tmp",'w')
 			for line in srcfd.readlines():
 				destfd.write(line)
 			srcfd.close()
 			
-			srcfd = open(snapshot.getIncludeFlistFile())
+			srcfd = open(snapshot.getIncludeFListFile())
 			for line in srcfd.readlines():
 				destfd.write(line)
 			srcfd.close()
@@ -220,13 +243,13 @@ class SnapshotManager :
 				
 		def mergeExcludesList():
 			" TODO: "
-			srcfd = open(basesnp.getExcludeFlistFile())
+			srcfd = open(basesnp.getExcludeFListFile())
 			destfd = open(tmpdir+os.sep+"excludes.list.tmp",'w')
 			for line in srcfd.readlines():
 				destfd.write(line)
 			srcfd.close()
 			
-			srcfd = open(snapshot.getExcludeFlistFile())
+			srcfd = open(snapshot.getExcludeFListFile())
 			for line in srcfd.readlines():
 				destfd.write(line)
 			srcfd.close()
@@ -257,6 +280,7 @@ class SnapshotManager :
 			raise SBException(_("Snapshot '%s' is a full . Can't rebase on older snapshot") ) % snapshot.getName()
 		basesnp = snapshot.getBaseSnapshot()
 		newbase = basesnp.getBase()
+		
 		# process
 		try :
 			tmpdir = snapshot.getPath()+os.sep+self.REBASEDIR
@@ -282,14 +306,14 @@ class SnapshotManager :
 			fd.write(header)
 			fd.close()
 			
-			snarpartinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp"),True)
-			snarfullinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.full.tmp"),True)
+			snarpartinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp",True))
+			snarfullinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.full.tmp",True))
 			
-			base_snpfinfo = basesnp.getSnapshotFileInfo()
-			cur_snpfinfo = snapshot.getSnapshotFileInfo()
+			base_snpfinfo = basesnp.getSnapshotFileInfos()
+			cur_snpfinfo = snapshot.getSnapshotFileInfos()
 			for record in base_snpfinfo.iterRecords():
 				
-				if not cur_snpfinfo.haspath(record[SnapshotFile.REC_DIRNAME]):
+				if not cur_snpfinfo.hasPath(record[SnapshotFile.REC_DIRNAME]):
 					# ADD to temp snar
 					snarfullinfo.addRecord(record)
 					snarpartinfo.addRecord(record)
@@ -333,8 +357,9 @@ class SnapshotManager :
 			
 			snapshot.commitverfile()
 		except Exception,e :
-			getLogger().error("Got an exception when rebasing '%s' : "+e) % snapshot.getName()
+			getLogger().error(_("Got an exception when rebasing '%s' : "+str(e)) % snapshot.getName() ) 
 			self.__cancelRebase(snapshot)
+			raise e
 		
 		# set the new base
 		if newbase :
@@ -366,9 +391,16 @@ class SnapshotManager :
 		This means, the infos we want to add in the SNAR file should be created as a temporary SNAR file
 		Same goes for the TAR file. So that to cancel, we will just have to remove those temporary files and restore the 'ver' file.
 		"""
-		getLogger().info("Cancelling rebase of snapshot '%s'") % snapshot.getName()
+		getLogger().info(_("Cancelling rebase of snapshot '%s'") % snapshot.getName() )
 		path = snapshot.getPath()+os.sep+self.REBASEDIR
-		os.remove(path)
+		shutil.rmtree(path)
+		
+		if os.path.exists(snapshot.getPath()+os.sep+"files.tar"):
+			format = snapshot.getFormat()
+			if format == "gzip":
+				Util.launch("gzip",[snapshot.getPath()+os.sep+"files.tar"])
+			elif format == "bzip2":
+				Util.launch("bzip2",[snapshot.getPath()+os.sep+"files.tar"])
 		snapshot.commitverfile()
 	
 	

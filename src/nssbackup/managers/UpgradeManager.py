@@ -178,7 +178,7 @@ class UpgradeManager() :
 		f1 = open(flist,'r')
 		f2 = open(fprops,'r')
 		for f,p in Util.readlineNULSep(f1,f2):
-			if p is not None and p is not str(None) :
+			if p is not None and p != str(None) :
 				snapshot.addToIncludeFlist(f)
 		# commit include.list
 		fi = open(snapshot.getIncludeFListFile(),"w")
