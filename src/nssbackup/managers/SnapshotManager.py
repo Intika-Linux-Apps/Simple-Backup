@@ -179,7 +179,9 @@ class SnapshotManager :
 			flistd.close()
 			
 			getLogger().info("Make a temporary tar file by tranfering the files from base")
-			tmptardir = tempfile.mkdtemp(suffix="tempTARdir", dir=tmpdir)
+			tmptardir = tmpdir+os.sep+"tempTARdir"
+			os.mkdir(tmptardir)
+			
 			TAR.extract2(basesnp.getArchive(), tmpdir+os.sep+"flist.tmp", tmptardir,additionalOpts=["--no-recursion"])
 			
 			# uncompress the tar file so that we can append files to it
@@ -195,8 +197,11 @@ class SnapshotManager :
 					Util.launch("bunzip2", [archive])
 					archive = archive[:-4]
 				# else : the archive is already uncompressed
+			
+			# get file list to append
+			fl = os.listdir(tmptardir+os.sep)
 					
-			TAR.appendToTarFile(archive, ".",workingdir=tmptardir+os.sep )
+			TAR.appendToTarFile(archive, fl,workingdir=tmptardir+os.sep )
 			
 			# recompress
 			if arvtype == "gzip" :
@@ -224,6 +229,10 @@ class SnapshotManager :
 			for record in cur_snpfinfo.iterRecords():
 				if not snarfileinfos.hasPath(record[SnapshotFile.REC_DIRNAME]):
 					tmpfinalSnarinfo.addRecord(record)
+			
+			for record in snarfileinfos.iterRecords():
+				tmpfinalSnarinfo.addRecord(record)
+			
 		
 		def mergeIncludesList():
 			" TODO: "

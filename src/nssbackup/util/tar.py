@@ -136,8 +136,10 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None 
 def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	"""
 	@param desttar: The tar file to wich append
-	@param fileOrDir: The file or directory to append
+	@param fileOrDir: The file or directory to append, can be a list of files too
+	@type fileOrDir: str or list
 	@param workingDir: the dir to move in before appending the dir ( usefun for relative paths)
+	@param additionalOpts: a list of additional option to append (will be append before changing the working dir)
 	"""
 	options = ["--append", "--ignore-failed-read"]
 	
@@ -157,9 +159,12 @@ def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	options.extend(['--file='+desttar,'--null'])
 	
 	if workingdir:
-		options.append("-C "+workingdir)
+		options.append("--directory="+workingdir)
 	
-	options.append(fileOrDir)
+	if type(fileOrDir) is str:
+		options.append(fileOrDir)
+	elif type(fileOrDir) is list :
+		options.extend(fileOrDir)
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
@@ -515,7 +520,7 @@ class SnapshotFile():
 			subroutine to format a line including NUL char to have and array
 			"""
 			nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents = line.lstrip("\0").split("\0",6)
-			return (nfs,mtime_sec,mtime_nano,dev_no,i_no,name,formatDumpDirs(contents))
+			return [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,formatDumpDirs(contents)]
 			
 			
 		fd = open(self.snpfile)
