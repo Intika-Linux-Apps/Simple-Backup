@@ -12,6 +12,7 @@ import os
 import time
 import locale
 import nssbackup.managers.FileAccessManager as FAM
+from nssbackup import Infos
 from nssbackup.plugins import PluginManager, pluginFAM
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.util.log import getLogger
@@ -500,9 +501,11 @@ class SBconfigGTK(GladeWindow):
 		
 		if self.configman.has_section("report") :
 			if not self.configman.options("report") :
+				unfillreportentries()
+				# LP Bug #153605
+				self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
 				self.widgets['smtplogininfo'].set_sensitive(False)
 				self.widgets['TLSinfos'].set_sensitive(False)
-				unfillreportentries()
 			else :
 				
 				if self.configman.has_option("report", "from") :
@@ -536,9 +539,11 @@ class SBconfigGTK(GladeWindow):
 					self.widgets['crtfilechooser'].set_filename("")
 					self.widgets['keyfilechooser'].set_filename("")
 		else :
+			unfillreportentries()
+			# LP Bug #153605
+			self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
 			self.widgets['smtplogininfo'].set_sensitive(False)
 			self.widgets['TLSinfos'].set_sensitive(False)
-			unfillreportentries()
 			
 		# Purge setting 
 		if self.configman.has_option("general", "purge") :
@@ -678,15 +683,15 @@ class SBconfigGTK(GladeWindow):
 
 	def on_about_activate(self, *args):
 		about = gtk.AboutDialog()
-		about.set_name("Not So Simple Backup Suite")
+		about.set_name(Infos.NAME)
 		# TODO: Always keep this updated
-		about.set_version("0.1-3")
-		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
+		about.set_version(Infos.VERSION)
+		about.set_comments(Infos.DESCRIPTION)
 		about.set_transient_for(self.widgets["backup_properties_dialog"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
 		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>", "Mathias HOUNGBO <mathias.houngbo@gmail.com>"])
-		about.set_website("https://launchpad.net/nssbackup/")
+		about.set_website(Infos.WEBSITE)
 		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
 		about.run()
 		about.destroy()
