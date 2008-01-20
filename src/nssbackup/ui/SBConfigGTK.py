@@ -267,6 +267,11 @@ class SBconfigGTK(GladeWindow):
 			'on_keyfilechooser_selection_changed',
 			'on_pluginscombobox_changed',
 			'on_fusecheckbutton_clicked',
+			'on_includetv_key_press_event',
+			'on_remote_includetv_key_press_event',
+			'on_ex_pathstv_key_press_event',
+			'on_ex_ftypetv_key_press_event',
+			'on_ex_regextv_key_press_event',
 			]
 
 		top_window = 'backup_properties_dialog'
@@ -1345,6 +1350,48 @@ class SBconfigGTK(GladeWindow):
 			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
 			store.remove( iter )
+
+	def on_exregextv_suppr_key_press(self, widget, event, *args):
+		"""
+		"""
+		if event.keyval == gtk.keysyms.Delete :
+			getLogger().debug("TODO: on_tv_suppr_key_press "+repr(widget))
+			if isinstance(widget,gtk.TreeView) :
+				model = widget.get_model()
+				if model is not None :
+					print repr(model)
+					print repr(event)
+					print str(event.keyval)
+
+	#----------------------------------------------------------------------
+
+	def on_includetv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_inc_del_clicked()
+	
+	#----------------------------------------------------------------------
+	
+	def on_remote_includetv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_remote_inc_del_clicked()
+	
+	#----------------------------------------------------------------------
+	
+	def on_ex_pathstv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_ex_delpath_clicked()
+	
+	#----------------------------------------------------------------------
+
+	def on_ex_ftypetv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_ex_delftype_clicked()
+	
+	#----------------------------------------------------------------------
+	
+	def on_ex_regextv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_ex_delregex_clicked()
 
 	#----------------------------------------------------------------------
 
