@@ -525,32 +525,34 @@ class SnapshotFile():
 			
 		fd = open(self.snpfile)
 		# skip header which is the first line and 2 entries separated with NULL in this case
-		fd.readline()
-		
-		n = 0
-		
-		while n < 2 :
-			c = fd.read(1)
-			if c == '\0' : n += 1
-		
-		currentline=""
-		
-		c = fd.read(1)
-		last_c = ''
-		
-		while c :
-			currentline += c
-			if c == '\0' and last_c == '\0' :
-				# we got a line
-				yield format(currentline)
+		l = fd.readline()
+		if l !="":
+			#Snarfile not empty
 				
-				currentline = ''
-				last_c = ''
-			else :
-				last_c = c
+			n = 0
+			
+			while n < 2 :
+				c = fd.read(1)
+				if c == '\0' : n += 1
+			
+			currentline=""
+			
 			c = fd.read(1)
-		
-		fd.close
+			last_c = ''
+			
+			while c :
+				currentline += c
+				if c == '\0' and last_c == '\0' :
+					# we got a line
+					yield format(currentline)
+					
+					currentline = ''
+					last_c = ''
+				else :
+					last_c = c
+				c = fd.read(1)
+			
+			fd.close
 
 	# ---
 	
@@ -588,9 +590,9 @@ class SnapshotFile():
 		
 	def createContent(self,contentList):
 		"""
-		create a content out of a dict of {file:'control'}
-		@param contentDict: the content dictionary
-		@type contentList: dict
+		create a content out of a list of Dumpdir
+		@param contentList: the Dumpdir content list
+		@type contentList: list
 		@return: a string containing the computed content
 		@rtype: string
 		"""
