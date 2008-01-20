@@ -1283,14 +1283,18 @@ class SBconfigGTK(GladeWindow):
 			else:
 				ftype = self.widgets["ftype_custom_ex"].get_text()
 
+			if self.configman.has_option("exclude", "regex") :
+				r = self.configman.get( "exclude", "regex" )
+			else:
+				r=""
+			r = r + r",\." + ftype.strip()
+			self.configman.set( "exclude", "regex", r )
+			
 			if ftype in self.known_ftypes:
 				self.ex_ftype.append( [self.known_ftypes[ftype], ftype] )
 			else:
 				self.ex_ftype.append( [_("Custom"), ftype] )
 
-			r = self.configman.get( "exclude", "regex" )
-			r = r + r",\." + ftype.strip()
-			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
 			pass		                
@@ -1318,10 +1322,14 @@ class SBconfigGTK(GladeWindow):
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
 			
-			self.ex_regex.append( [regex] )
-			r = self.configman.get( "exclude", "regex" )
+			if self.configman.has_option("exclude", "regex") :
+				r = self.configman.get( "exclude", "regex" )
+			else:
+				r=""
 			r = r + r"," + regex.strip()
 			self.configman.set( "exclude", "regex", r )
+			
+			self.ex_regex.append( [regex] )
 			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
