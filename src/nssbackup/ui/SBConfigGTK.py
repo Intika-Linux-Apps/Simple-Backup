@@ -1351,18 +1351,6 @@ class SBconfigGTK(GladeWindow):
 			self.isConfigChanged()
 			store.remove( iter )
 
-	def on_exregextv_suppr_key_press(self, widget, event, *args):
-		"""
-		"""
-		if event.keyval == gtk.keysyms.Delete :
-			getLogger().debug("TODO: on_tv_suppr_key_press "+repr(widget))
-			if isinstance(widget,gtk.TreeView) :
-				model = widget.get_model()
-				if model is not None :
-					print repr(model)
-					print repr(event)
-					print str(event.keyval)
-
 	#----------------------------------------------------------------------
 
 	def on_includetv_key_press_event(self, widget, event, *args):

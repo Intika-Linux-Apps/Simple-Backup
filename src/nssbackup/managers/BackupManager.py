@@ -359,7 +359,7 @@ class BackupManager :
 		getLogger().debug("Free size required is '%s' " % str(fullsize))
 		vstat = os.statvfs( self.__actualSnapshot.getPath() )
 		if (vstat.f_bavail * vstat.f_bsize) <= fullsize:
-			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': self.__fullsize})
+			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': fullsize})
 	
 	
 	def __setlockfile(self):
