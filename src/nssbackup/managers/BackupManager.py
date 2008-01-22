@@ -277,6 +277,7 @@ class BackupManager :
 					fullsize += os.lstat(_file).st_size
 				else :
 					# file is dir , search in the content
+					getLogger().debug("'%s' is directory, searching in the content" % _file)
 					try :
 						for contents in FAM.listdir(_file) :
 							# contents is a path of a file or dir to include 
@@ -342,6 +343,7 @@ class BackupManager :
 		getLogger().debug("We have now every thing we need, starting the creation of the Flist " )
 		for incl in includelist.iterkeys() :
 			# incl is a path of a file or dir to include 
+			getLogger().debug("processing '%s' from includelist" % incl )
 			if not isexcludedbyconf( incl ) :
 				if os.path.isdir(incl):
 					addtobackup( incl, None )

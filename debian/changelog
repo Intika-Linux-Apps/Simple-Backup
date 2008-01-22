@@ -1,3 +1,14 @@
+nssbackup (0.1-4~ppa1) gutsy; urgency=low
+
+  * LP Bug 181998 typo in an error message
+  * LP Bug #181987 DEL key is now usable to remove some entries
+  * avoid an exception in regex tab of configGUI when adding the first regexp
+  * LP Bug #153605 Prefill the 'From' text entry in the report tab
+  * add necessary import in upgrade-backup script
+  * Upgrade backus scripts takes relative path
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Tue, 22 Jan 2008 20:51:34 +0100
+
 nssbackup (0.1-3~ppa2) gutsy; urgency=low
 
   * removed build dependancy on pyGTK
