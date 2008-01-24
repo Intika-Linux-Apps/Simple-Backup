@@ -1,3 +1,9 @@
+nssbackup (0.1-5~ppa1) gutsy; urgency=low
+
+  * LP BUG #184713 nssbackup doesn't backup
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Thu, 24 Jan 2008 21:36:34 +0100
+
 nssbackup (0.1-4~ppa1) gutsy; urgency=low
 
   * LP Bug 181998 typo in an error message

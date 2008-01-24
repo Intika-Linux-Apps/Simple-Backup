@@ -15,7 +15,7 @@
 # Author: Oumar Aziz OUATTARA <wattazoum at gmail dot com>
 
 from gettext import gettext as _
-import os , grp
+import os , grp, signal
 import datetime
 import time
 import re
@@ -189,6 +189,13 @@ class BackupManager :
 		# -----------------------------------------------------------------
 		# sub routines 
 		
+		def handler(signum, frame):
+			print 'Signal handler called with signal', signum
+			raise OSError, "Couldn't open device!"
+
+		# Set the signal handler 
+		signal.signal(signal.SIGALRM, handler)
+				
 		def isexcludedbyconf(_file2):
 			"""
 			This will decide whether or not a file is to be excluded (by the configuration)
@@ -214,11 +221,15 @@ class BackupManager :
 			
 			# refuse a file if we don't have read access
 			try : 
-				fd = os.open(_file2, os.R_OK)
+				signal.alarm(5)
+				# This open() may hang indefinitely (LP Bug 184713)
+				fd = os.open(_file2, os.R_OK)  
 				os.close(fd)
 			except OSError, e:
 				getLogger().warning(_("We don't have read access to '%(file)s', it has to be exclude : %(error)s ") % {'file':_file2, 'error':str(e) }  )
-				return True		
+				return True
+			finally :
+				signal.alarm(0)          # Disable the alarm
 			
 			#if the file is too big
 			if self.config.has_option("exclude","maxsize") and s.st_size > int(self.config.get("exclude","maxsize")) > 0 :
