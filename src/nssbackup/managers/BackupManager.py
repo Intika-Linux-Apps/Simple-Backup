@@ -317,9 +317,24 @@ class BackupManager :
 						getLogger().warning(_("got an error with '%(file)s' : %(error)s") % {'file':_file, 'error' : str(e)})
 						if self.__actualSnapshot.getFilesList().has_key(_file) :
 							del self.__actualSnapshot.getFilesList()[_file]
+				
+			else :
+				# we got a link
+				if backuplinks :
+					cprops = isexcludedbyinc(_file)
+					if cprops != True and type(cprops) == str:
+						getLogger().debug("backing up the link '%s' ! " % _file)
+						self.__actualSnapshot.addFile(_file, cprops)
+						fullsize += os.lstat(_file).st_size
+				else :
+					getLogger().debug("Excluding link '%s' ! " % _file)
 									
 		# End of Subroutines
 		# -----------------------------------------------------------------
+		
+		backuplinks=None
+		if self.config.has_option("general","backuplinks") and str(self.config.get("general","backuplinks")) == "1" :
+			backuplinks=True
 		
 		# regexp to be used for excluding files from flist
 		getLogger().debug("getting exclude list for actual snapshot")

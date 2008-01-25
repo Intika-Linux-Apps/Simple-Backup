@@ -66,6 +66,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	# Backup format:
 	# 1 - All files are stored in the files.tgz
 	format = 1
+	backuplinks=1
 	
 	[log]
 	level = 20
@@ -139,7 +140,8 @@ class ConfigManager (ConfigParser.ConfigParser):
 	
 		# Default values, constants and the like
 	our_options = {
-	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : int, 'purge' : str, 'run4others' : int  },
+	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : int, 'purge' : str, 'run4others' : int,
+				  'backuplinks' : int  },
 	 'log' : {'level' : int , 'file' : str },
 	 'report' : {'from' :str, 'to' : str,'smtpserver' : str,'smtpport' : int, 'smtpuser' : str,
 				'smtppassword' : str, 'smtptls' : int, 'smtpcert': str, 'smtpkey': str },

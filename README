@@ -1,1 +1,21 @@
+Install
+=======
+
+./configure
+make
+sudo make install
+
+Uninstall
+=========
+
+sudo make uninstall
+
+Configuration Hint
+===================
+
+Follow links 
+------------
+
+use the option in general->backuplinks=1 to activate and general->backuplinks=0 to deactivate
+see the example configuration file for more infos.
 
