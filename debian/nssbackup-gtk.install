@@ -3,3 +3,5 @@ debian/tmp/usr/lib/python2.5/site-packages/nssbackup/ui/*GTK.py
 debian/tmp/usr/share/nssbackup/*.glade
 debian/tmp/usr/share/applications/*.desktop
 debian/tmp/usr/share/pixmaps
+debian/tmp/usr/bin/nssbackup-restore-gui
+debian/tmp/usr/bin/nssbackup-config-gui
