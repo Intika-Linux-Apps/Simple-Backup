@@ -14,7 +14,7 @@ Description: Not So Simple Backup Suite
  a plugin architecture that will allow you to extend its functionalities.
 
 Package: nssbackup-common
-Architecture: all
+Architecture: any
 Depends: python ( >= 2.5 ),
          fuse-utils,
          python-notify
@@ -24,7 +24,7 @@ Description: NSsbackup Common files package
  but contains the minimum set of files to make it run.
 
 Package: nssbackup-gtk
-Architecture: all
+Architecture: any
 Depends: nssbackup-common,
          python-glade2,
          python-gtk2 (>= 2.10),
