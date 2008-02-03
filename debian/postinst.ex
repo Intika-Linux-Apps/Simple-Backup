@@ -1,5 +1,5 @@
-#! /bin/sh
-# postinst script for sbackup
+#!/bin/sh
+# postinst script for nssbackup
 #
 # see: dh_installdeb(1)
 
@@ -10,24 +10,19 @@ set -e
 #        * <old-postinst> `abort-upgrade' <new version>
 #        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
 #          <new-version>
+#        * <postinst> `abort-remove'
 #        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
 #          <failed-install-package> <version> `removing'
 #          <conflicting-package> <version>
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
-#
+
 
 case "$1" in
     configure)
-	if test ! -e /etc/nssbackup.conf; then
-	    cp /usr/share/doc/nssbackup/examples/nssbackup.conf.example /etc/nssbackup.conf;
-	    chown -f root.adm /etc/nssbackup.conf
-	    chmod -f 640 /etc/nssbackup.conf
-	fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
-
     ;;
 
     *)

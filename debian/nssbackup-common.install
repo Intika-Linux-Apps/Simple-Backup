@@ -1,0 +1,11 @@
+debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/managers
+debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/util
+debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/ui/__init__.py
+debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/plugins/localFuseFAM.py
+debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/plugins/__init__.py
+debian/nssbackup/usr/bin/upgrade-backups
+debian/nssbackup/usr/bin/nssbackupd
+debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/ressources
+debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/*.py
+debian/nssbackup/usr/share/nssbackup/multipleTarScript
+debian/nssbackup/usr/share/nssbackup/nssbackup
