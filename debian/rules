@@ -37,14 +37,13 @@ install-arch:
 	# debian/tmp.
 	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/tmp/usr install
 
-	dh_install -s
+	dh_install
 # Must not depend on anything. This is to be called by
 # binary-arch/binary-indep
 # in another 'make' thread.
 binary-common:
 	dh_testdir
 	dh_testroot
-	dh_install
 	dh_installchangelogs ChangeLog
 	dh_installdocs
 	dh_installexamples $(CURDIR)/datas/nssbackup.conf.example
@@ -62,7 +61,7 @@ binary-common:
 
 # Build architecture dependant packages using the common target.
 binary-arch: install-arch
-	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
+	$(MAKE) -f debian/rules binary-common
 
 binary: binary-arch 
 .PHONY: build clean binary-arch binary install install-arch
