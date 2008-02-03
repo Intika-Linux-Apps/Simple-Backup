@@ -1,5 +1,5 @@
-debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/ui/Glade*.py
-debian/nssbackup/usr/lib/python2.5/site-packages/nssbackup/ui/*GTK.py
-debian/nssbackup/usr/share/nssbackup/*.glade
-debian/nssbackup/usr/share/applications/*.desktop
-debian/nssbackup/usr/share/pixmaps
+debian/tmp/usr/lib/python2.5/site-packages/nssbackup/ui/Glade*.py
+debian/tmp/usr/lib/python2.5/site-packages/nssbackup/ui/*GTK.py
+debian/tmp/usr/share/nssbackup/*.glade
+debian/tmp/usr/share/applications/*.desktop
+debian/tmp/usr/share/pixmaps

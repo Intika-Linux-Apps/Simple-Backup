@@ -45,6 +45,7 @@ clean:
 	rm -f po/*~
 	rm -f *~ *.bak
 	rm -rf build
+	for lang in $(PO); do rm -rf po/$$lang ; done
 
 install-po:
 	for lang in $(PO); do install -d $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done

@@ -35,7 +35,7 @@ install-arch:
 
 	# Add here commands to install the arch part of the package into 
 	# debian/tmp.
-	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/nssbackup/usr install
+	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/tmp/usr install
 
 	dh_install -s
 # Must not depend on anything. This is to be called by
@@ -44,6 +44,7 @@ install-arch:
 binary-common:
 	dh_testdir
 	dh_testroot
+	dh_install
 	dh_installchangelogs ChangeLog
 	dh_installdocs
 	dh_installexamples $(CURDIR)/datas/nssbackup.conf.example
@@ -60,7 +61,7 @@ binary-common:
 	dh_builddeb
 
 # Build architecture dependant packages using the common target.
-binary-arch: build-arch install-arch
+binary-arch: install-arch
 	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
 
 binary: binary-arch 

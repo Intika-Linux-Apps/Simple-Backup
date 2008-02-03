@@ -2,8 +2,7 @@ Source: nssbackup
 Section: universe/devel
 Priority: optional
 Maintainer: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
-Build-Depends: debhelper (>= 5)
-Conflicts: sbackup
+Build-Depends: debhelper (>= 5), python ( >= 2.5 )
 Standards-Version: 3.7.2
 
 Package: nssbackup
@@ -19,10 +18,11 @@ Architecture: all
 Depends: python ( >= 2.5 ),
          fuse-utils,
          python-notify
+Conflicts: sbackup
 Description: NSsbackup Common files package
  NSsbackup common files package. This package is not the software itself 
  but contains the minimum set of files to make it run.
- 
+
 Package: nssbackup-gtk
 Architecture: all
 Depends: nssbackup-common,
