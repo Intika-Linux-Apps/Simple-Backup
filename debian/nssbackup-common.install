@@ -1,5 +1,5 @@
-debian/tmp/usr/lib/python2.5/site-packages/nssbackup/managers
-debian/tmp/usr/lib/python2.5/site-packages/nssbackup/util
+debian/tmp/usr/lib/python2.5/site-packages/nssbackup/managers/*.py
+debian/tmp/usr/lib/python2.5/site-packages/nssbackup/util/*.py
 debian/tmp/usr/lib/python2.5/site-packages/nssbackup/ui/__init__.py
 debian/tmp/usr/lib/python2.5/site-packages/nssbackup/plugins/localFuseFAM.py
 debian/tmp/usr/lib/python2.5/site-packages/nssbackup/plugins/__init__.py

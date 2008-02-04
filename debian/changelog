@@ -1,6 +1,6 @@
-nssbackup (0.2-0~ppa1beta1) hardy; urgency=low
+nssbackup (0.2-0~alpha1) hardy; urgency=low
 
-  * First beta of version 0.2
+  * First alpha of version 0.2
   * New multi binaries strategy
   * LP Bug 181998 typo in an error message
   * LP Bug #181987 DEL key is now usable to remove some entries

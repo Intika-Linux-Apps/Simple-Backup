@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 5), python ( >= 2.5 )
 Standards-Version: 3.7.2
 
 Package: nssbackup
-Architecture: any
+Architecture: all
 Depends: nssbackup-gtk
 Description: Not So Simple Backup Suite 
  NSsbackup is a fork of Sbackup intended for desktop
@@ -14,7 +14,7 @@ Description: Not So Simple Backup Suite
  a plugin architecture that will allow you to extend its functionalities.
 
 Package: nssbackup-common
-Architecture: any
+Architecture: all
 Depends: python ( >= 2.5 ),
          fuse-utils,
          python-notify
@@ -24,7 +24,7 @@ Description: NSsbackup Common files package
  but contains the minimum set of files to make it run.
 
 Package: nssbackup-gtk
-Architecture: any
+Architecture: all
 Depends: nssbackup-common,
          python-glade2,
          python-gtk2 (>= 2.10),
@@ -33,7 +33,7 @@ Description: NSsbackup GTK GUI
  NSsbackup GTK GUI. This package will install the GTK+2 GUI of NSsbackup.
 
 Package: nssbackup-ftp
-Architecture: any
+Architecture: all
 Depends: curlftpfs,
          nssbackup-common
 Description: NSsbackup Fuse FTP/SFTP plugin 
@@ -42,7 +42,7 @@ Description: NSsbackup Fuse FTP/SFTP plugin
  systems.
 
 Package: nssbackup-ssh
-Architecture: any
+Architecture: all
 Depends: sshfs,
          nssbackup-common,
          python-pexpect

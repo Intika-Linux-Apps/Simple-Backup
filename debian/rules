@@ -26,18 +26,20 @@ clean:
 
 	dh_clean 
 
-install: install-arch
-install-arch:
+install: install-indep
+
+install-indep:
 	dh_testdir
 	dh_testroot
-	dh_clean -k -s 
-	dh_installdirs -s
+	dh_clean -k -i 
+	dh_installdirs -i
 
-	# Add here commands to install the arch part of the package into 
-	# debian/tmp.
+	# Add here commands to install the indep part of the package into
+	# debian/<package>-doc.
 	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/tmp/usr install
 
-	dh_install -s
+	dh_install -i
+
 # Must not depend on anything. This is to be called by
 # binary-arch/binary-indep
 # in another 'make' thread.
@@ -48,6 +50,7 @@ binary-common:
 	dh_installdocs
 	dh_installexamples $(CURDIR)/datas/nssbackup.conf.example
 	dh_installman
+	dh_installmenu
 	dh_link
 	dh_strip
 	dh_compress 
@@ -58,10 +61,9 @@ binary-common:
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
+# Build architecture independant packages using the common target.
+binary-indep: install-indep
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
-# Build architecture dependant packages using the common target.
-binary-arch: install-arch
-	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
-
-binary: binary-arch 
-.PHONY: build clean binary-arch binary install install-arch
+binary: binary-indep
+.PHONY: build clean binary-indep binary install install-indep

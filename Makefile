@@ -45,6 +45,7 @@ clean:
 	rm -f po/*~
 	rm -f *~ *.bak
 	rm -rf build
+	rm -f src/nssbackup/ressources
 	for lang in $(PO); do rm -rf po/$$lang ; done
 
 install-po:
