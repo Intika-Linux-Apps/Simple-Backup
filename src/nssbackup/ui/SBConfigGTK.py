@@ -11,6 +11,7 @@ import os
 import time
 import locale
 import nssbackup.managers.FileAccessManager as FAM
+from nssbackup import Infos
 from nssbackup.plugins import PluginManager, pluginFAM
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.util.log import getLogger
@@ -295,6 +296,11 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_removeProfileButton_clicked',
 			'on_editProfileButton_clicked',
 			'on_closeProfileManagerButton_clicked',
+			'on_includetv_key_press_event',
+			'on_remote_includetv_key_press_event',
+			'on_ex_pathstv_key_press_event',
+			'on_ex_ftypetv_key_press_event',
+			'on_ex_regextv_key_press_event',
 			]
 
 		top_window = 'nssbackupConfApp'
@@ -572,9 +578,11 @@ class SBconfigGTK(GladeGnomeApp):
 		
 		if self.configman.has_section("report") :
 			if not self.configman.options("report") :
+				unfillreportentries()
+				# LP Bug #153605
+				self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
 				self.widgets['smtplogininfo'].set_sensitive(False)
 				self.widgets['TLSinfos'].set_sensitive(False)
-				unfillreportentries()
 			else :
 				
 				if self.configman.has_option("report", "from") :
@@ -608,9 +616,11 @@ class SBconfigGTK(GladeGnomeApp):
 					self.widgets['crtfilechooser'].set_filename("")
 					self.widgets['keyfilechooser'].set_filename("")
 		else :
+			unfillreportentries()
+			# LP Bug #153605
+			self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
 			self.widgets['smtplogininfo'].set_sensitive(False)
 			self.widgets['TLSinfos'].set_sensitive(False)
-			unfillreportentries()
 			
 		# Purge setting 
 		if self.configman.has_option("general", "purge") :
@@ -766,15 +776,15 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_about_activate(self, *args):
 		about = gtk.AboutDialog()
-		about.set_name("Not So Simple Backup Suite")
+		about.set_name(Infos.NAME)
 		# TODO: Always keep this updated
-		about.set_version("0.2~devel")
-		about.set_comments(_("This is a user friendly backup solution for common desktop needs."))
+		about.set_version(Infos.VERSION)
+		about.set_comments(Infos.DESCRIPTION)
 		about.set_transient_for(self.widgets["nssbackupConfApp"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
 		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>", "Mathias HOUNGBO <mathias.houngbo@gmail.com>"])
-		about.set_website("https://launchpad.net/nssbackup/")
+		about.set_website(Infos.WEBSITE)
 		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
 		about.run()
 		about.destroy()
@@ -1412,14 +1422,18 @@ class SBconfigGTK(GladeGnomeApp):
 			else:
 				ftype = self.widgets["ftype_custom_ex"].get_text()
 
+			if self.configman.has_option("exclude", "regex") :
+				r = self.configman.get( "exclude", "regex" )
+			else:
+				r=""
+			r = r + r",\." + ftype.strip()
+			self.configman.set( "exclude", "regex", r )
+			
 			if ftype in self.known_ftypes:
 				self.ex_ftype.append( [self.known_ftypes[ftype], ftype] )
 			else:
 				self.ex_ftype.append( [_("Custom"), ftype] )
 
-			r = self.configman.get( "exclude", "regex" )
-			r = r + r",\." + ftype.strip()
-			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
 			pass		                
@@ -1447,10 +1461,14 @@ class SBconfigGTK(GladeGnomeApp):
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
 			
-			self.ex_regex.append( [regex] )
-			r = self.configman.get( "exclude", "regex" )
+			if self.configman.has_option("exclude", "regex") :
+				r = self.configman.get( "exclude", "regex" )
+			else:
+				r=""
 			r = r + r"," + regex.strip()
 			self.configman.set( "exclude", "regex", r )
+			
+			self.ex_regex.append( [regex] )
 			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
@@ -1466,6 +1484,36 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
 			store.remove( iter )
+
+	#----------------------------------------------------------------------
+
+	def on_includetv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_inc_del_clicked()
+	
+	#----------------------------------------------------------------------
+	
+	def on_remote_includetv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_remote_inc_del_clicked()
+	
+	#----------------------------------------------------------------------
+	
+	def on_ex_pathstv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_ex_delpath_clicked()
+	
+	#----------------------------------------------------------------------
+
+	def on_ex_ftypetv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_ex_delftype_clicked()
+	
+	#----------------------------------------------------------------------
+	
+	def on_ex_regextv_key_press_event(self, widget, event, *args):
+		if event.keyval == gtk.keysyms.Delete :
+			self.on_ex_delregex_clicked()
 
 	#----------------------------------------------------------------------
 

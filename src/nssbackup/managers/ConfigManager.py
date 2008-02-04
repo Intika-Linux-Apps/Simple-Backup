@@ -66,10 +66,12 @@ class ConfigManager (ConfigParser.ConfigParser):
 	maxincrement = 21
 	
 	# Backup format:
+
 	# none : use a tar - All files are stored in a non compressed tar archive
 	# gzip : use a tar.gz - All files are stored in the files.tar.gz
 	# bzip2 :use a tar.bz2 - All files are stored in the files.tar.bz2
 	format = gzip
+	backuplinks=1
 	
 	# For the split functionality :
 	# this should be an integer . It represent the size in KB of each archive (0 => unlimited)
@@ -151,7 +153,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	
 	# Default values, constants and the like
 	our_options = {
-	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : str,'splitsize' : int, 'purge' : str, 'run4others' : int  },
+	 'general' : {'mountdir': str, 'target' : str , 'lockfile' : str , 'maxincrement' : int , 'format' : str,'splitsize' : int, 'purge' : str, 'run4others' : int, 'backuplinks' : int   },
 	 'log' : {'level' : int , 'file' : str },
 	 'report' : {'from' :str, 'to' : str,'smtpserver' : str,'smtpport' : int, 'smtpuser' : str,
 				'smtppassword' : str, 'smtptls' : int, 'smtpcert': str, 'smtpkey': str },

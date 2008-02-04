@@ -1242,7 +1242,9 @@ bzip2</property>
                             <property name="can_focus">True</property>
                             <property name="border_width">2</property>
                             <property name="headers_visible">False</property>
-                            <property name="enable_search">False</property>
+                            <property name="search_column">1</property>
+                            <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
+                            <signal name="key_press_event" handler="on_includetv_key_press_event"/>
                           </widget>
                         </child>
                       </widget>
@@ -1387,7 +1389,9 @@ bzip2</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="headers_visible">False</property>
-                            <property name="enable_search">False</property>
+                            <property name="search_column">1</property>
+                            <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
+                            <signal name="key_press_event" handler="on_remote_includetv_key_press_event"/>
                           </widget>
                         </child>
                       </widget>
@@ -1512,7 +1516,9 @@ bzip2</property>
                                 <property name="can_focus">True</property>
                                 <property name="border_width">2</property>
                                 <property name="headers_visible">False</property>
-                                <property name="enable_search">False</property>
+                                <property name="search_column">1</property>
+                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
+                                <signal name="key_press_event" handler="on_ex_pathstv_key_press_event"/>
                               </widget>
                             </child>
                           </widget>
@@ -1663,6 +1669,9 @@ bzip2</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="headers_visible">False</property>
+                                <property name="search_column">1</property>
+                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
+                                <signal name="key_press_event" handler="on_ex_ftypetv_key_press_event"/>
                               </widget>
                             </child>
                           </widget>
@@ -1735,6 +1744,9 @@ bzip2</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="headers_visible">False</property>
+                                <property name="search_column">1</property>
+                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
+                                <signal name="key_press_event" handler="on_ex_regextv_key_press_event"/>
                               </widget>
                             </child>
                           </widget>
