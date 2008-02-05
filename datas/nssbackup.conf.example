@@ -22,6 +22,9 @@ format = 1
 # Run for others (This option is for root only) : will run normal users config files after the root run is finished
 run4others = 1
 
+# Backup links : use 1 to activate and 0 to deactivate (default = 0 )
+backuplinks=1
+
 [log]
 # level : 10 = DEBUG, 20 = INFO, 50 = ERROR
 level = 20
