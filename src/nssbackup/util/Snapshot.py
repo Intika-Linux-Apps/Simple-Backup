@@ -380,8 +380,9 @@ class Snapshot :
 		global __base
 		if not self.__isValidName(baseName) :
 			raise SBException (_("Name of base not valid : %s") % self.__name)
-		self.__base = baseName		
-	
+		self.__base = baseName
+		# clean the baseSnapshot
+		self.__baseSnapshot = None
 	
 	def setVersion(self, ver="1.5") :
 		"Set the version of the snapshot"

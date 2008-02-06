@@ -300,23 +300,40 @@ class SnapshotManager :
 			# get snar header from current snapshots
 			snard = open(snapshot.getSnarFile())
 			header = snard.readline()
-			n=0
-			while n < 2:
-				c = snard.read(1)
-				if c == '\0' : n += 1
-				header+=c
-			snard.close()
+			if len(header) > 0 :
+				# the SNAR file isn't empty
+				n=0
+				while n < 2:
+					c = snard.read(1)
+					if len(c) != 1:
+						snard.close()
+						raise SBException(_("The snarfile header is incomplete !"))
+					if c == '\0' : n += 1
+					header+=c
+				snard.close()
+			else :
+				# the SNAR file is empty
+				getLogger().debug("SNAR file empty, create the header manually")
+				snard.close()
+				date = snapshot.getDate()
+				datet = datetime.datetime(date['year'],date['month'],date['day'],date['hour'],date['minute'],date['second'])
+				
 			getLogger().debug("Current SNAR Header : " + header)
-			
-			fd = open(tmpdir+os.sep+"snar.part.tmp",'w')
-			fd.write(header)
-			fd.close()
-			fd = open(tmpdir+os.sep+"snar.full.tmp",'w')
-			fd.write(header)
-			fd.close()
 			
 			snarpartinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp",True))
 			snarfullinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.full.tmp",True))
+			
+			if header: 
+				fd = open(tmpdir+os.sep+"snar.part.tmp",'w')
+				fd.write(header)
+				fd.close()
+				fd = open(tmpdir+os.sep+"snar.full.tmp",'w')
+				fd.write(header)
+				fd.close()
+			else :
+				snarpartinfo.setHeader(datet)
+				snarfullinfo.setHeader(datet)
+				header = snarfullinfo.getHeader()
 			
 			base_snpfinfo = basesnp.getSnapshotFileInfos()
 			cur_snpfinfo = snapshot.getSnapshotFileInfos()

@@ -528,11 +528,11 @@ class SnapshotFile():
 		l = fd.readline()
 		if l !="":
 			#Snarfile not empty
-				
 			n = 0
-			
 			while n < 2 :
 				c = fd.read(1)
+				if len(c) != 1:
+					raise SBException(_("The snarfile header is incomplete !"))
 				if c == '\0' : n += 1
 			
 			currentline=""
@@ -555,6 +555,28 @@ class SnapshotFile():
 			fd.close
 
 	# ---
+	
+	def getHeader(self):
+		"""
+		Get the full header
+		@return: the header (a string) or None if the file was empty
+		@raise SBException: if the header is incomplete
+		"""
+		fd = open(self.snpfile)
+		header = fd.readline()
+		if header !="":
+			#Snarfile not empty
+			n = 0
+			while n < 2 :
+				c = fd.read(1)
+				if len(c) != 1:
+					raise SBException(_("The snarfile header is incomplete !"))
+				if c == '\0' : n += 1
+				header += c
+		else :
+			header = None
+				
+		return header
 	
 	def setHeader(self,timeofBackup):
 		"""
@@ -647,6 +669,9 @@ class MemSnapshotFile(SBdict):
 		"""
 		self.__snapshotFile.addRecord(record)
 		self[record[-2]] = record[-1]
+	
+	def getHeader(self):
+		self.__snapshotFile.getHeader()
 		
 	def setHeader(self,timeofBackup):
 		"""
@@ -749,6 +774,9 @@ class ProcSnapshotFile :
 		@param record: A tuple that contains the record to add. [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a dict of {file:'control'}
 		"""
 		self.__snapshotFile.addRecord(record)
+	
+	def getHeader(self):
+		return self.__snapshotFile.getHeader()
 	
 	def setHeader(self,timeofBackup):
 		"""
