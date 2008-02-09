@@ -27,6 +27,7 @@ from nssbackup.util.log import getLogger
 import nssbackup.util.Snapshot
 from nssbackup.util.Snapshot import Snapshot
 import nssbackup.util.tar as TAR
+from nssbackup import Infos
 
 #----------------------------------------------------------------------
 
@@ -64,10 +65,12 @@ class SBRestoreGTK(GladeWindow):
 		self.widgets['defaultfolderlabel'].set_text(self.config.get("general", "target"))
 		
 		#tree strores
-		self.snplisttreestore = gtk.TreeStore( str )
+		self.snplisttreestore = gtk.TreeStore( str,str )
 		self.widgets['snplisttreeview'].set_model( self.snplisttreestore )
 		acolumn = gtk.TreeViewColumn(_("Snapshots"), gtk.CellRendererText(), text=0 )
+		bcolumn = gtk.TreeViewColumn(_("Version"), gtk.CellRendererText(), text=1 )
 		self.widgets['snplisttreeview'].append_column( acolumn )
+		self.widgets['snplisttreeview'].append_column( bcolumn )
 		
 		self.flisttreestore = gtk.TreeStore( str,str )
 		self.flisttreesort =  gtk.TreeModelSort(self.flisttreestore)
@@ -89,6 +92,8 @@ class SBRestoreGTK(GladeWindow):
 		self.widgets["calendar"].select_month(today[1]-1,today[0])
 		self.widgets["calendar"].select_day(today[2])
 		self.on_calendar_day_selected()
+		
+		self.widgets['snpdetails'].set_sensitive(False)
 	
 	#----------------------------------------------------------------------
 
@@ -112,6 +117,7 @@ class SBRestoreGTK(GladeWindow):
 			'snplisttreeview',
 			'snpdetails',
 			'scrolledwindow2',
+			'restoreExpander',
 			'filelisttreeview',
 			'buttonspool',
 			'restore',
@@ -135,6 +141,7 @@ class SBRestoreGTK(GladeWindow):
 			'on_restoreas_clicked',
 			'on_revert_clicked',
 			'on_revertas_clicked',
+			'on_restoreExpander_activate',
 			]
 
 		top_window = 'restorewindow'
@@ -168,6 +175,7 @@ class SBRestoreGTK(GladeWindow):
 		try :
 			self.target =  self.fusefam.mount(newtarget)
 			self.snpman = SnapshotManager(self.target)
+			self.widgets["restoreExpander"].set_expanded(False)
 			self.fill_calendar()
 		except Exception, e :
 			getLogger().error(str(e))
@@ -218,7 +226,9 @@ class SBRestoreGTK(GladeWindow):
 	
 	def on_snplisttreeview_cursor_changed(self,*args):
 		self.flisttreestore.clear()
-		self.load_filestree()
+		self.widgets["restoreExpander"].set_expanded(False)
+		tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
+		self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
 
 	#----------------------------------------------------------------------
 
@@ -303,8 +313,6 @@ class SBRestoreGTK(GladeWindow):
 		self.flisttreestore.clear()
 		#self.widgets['progressbarDialog'].show()
 		self.widgets['buttonspool'].set_sensitive(False)
-		tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
-		self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
 
 		self.currSnpFilesInfos = self.currentSnp.getSnapshotFileInfos()
 		
@@ -339,17 +347,34 @@ class SBRestoreGTK(GladeWindow):
 		self.widgets['snpdetails'].set_sensitive(True)
 		
 		if snplist == []:
-			self.snplisttreestore.append( None, [_("No backups found for this day !")])
+			self.snplisttreestore.append( None, [_("No backups found for this day !"),None])
 			self.widgets['snplist'].set_sensitive(False)
 		else:
 			self.widgets['snplist'].set_sensitive(True)
 			for snapshot in snplist:
-				self.snplisttreestore.append(None, [snapshot.getName()])
-
-	
+				self.snplisttreestore.append(None, [snapshot.getName(),snapshot.getVersion()])
 
 	#----------------------------------------------------------------------
 
+	def on_restoreExpander_activate(self,*args):
+		if not self.widgets["restoreExpander"].get_expanded():
+			tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
+			if iter:
+				self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
+				if self.currentSnp.getVersion() != int(Infos.SNPCURVERSION):
+					message = _("The snapshot version is not supported (Just %(supportedversion)s is supported). Version '%(currentversion)s' found. You should upgrade it. ") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
+					getLogger().warning(message) 
+					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=message)
+					dialog.run()
+					dialog.destroy()
+					self.widgets["snpdetails"].set_sensitive(False)
+				else:
+					self.load_filestree()
+			else:
+				self.widgets["snpdetails"].set_sensitive(False)
+
+	#----------------------------------------------------------------------
+	
 	def on_restore_clicked(self, *args):
 		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
 		src = self.path_to_dir( tstore.get_path( iter ) )
