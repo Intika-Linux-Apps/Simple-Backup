@@ -17,3 +17,5 @@ class Infos :
     else :
         mailsuffix = hostname + ".ext"
     SMTPFROM = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {'login' : os.getenv("USERNAME"), 'hostname': mailsuffix}
+    
+    SNPCURVERSION = "1.5"
