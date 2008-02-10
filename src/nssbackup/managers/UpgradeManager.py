@@ -177,9 +177,15 @@ class UpgradeManager() :
 		
 		f1 = open(flist,'r')
 		f2 = open(fprops,'r')
+		
+		isEmpty = True
+		
 		for f,p in Util.readlineNULSep(f1,f2):
-			if p is not None and p is not str(None) :
-				snapshot.addToIncludeFlist(f)
+			if f :
+				if p is not None and p != str(None) :
+					if isEmpty:
+						isEmpty = False
+					snapshot.addToIncludeFlist(f)
 		# commit include.list
 		fi = open(snapshot.getIncludeFListFile(),"w")
 		for f in snapshot.getIncludeFlist().getEffectiveFileList() :
@@ -200,64 +206,65 @@ class UpgradeManager() :
 		if os.path.exists(snapshot.getSnarFile()) :
 			getLogger().warning(_("The SNAR file alredy exist for snapshot '%s', I'll not overide it") % str(snapshot))
 		else :
-			date = snapshot.getDate()
-			datet = datetime.datetime(date['year'],date['month'],date['day'],date['hour'],date['minute'],date['second'])
 			snarfileinfo = snapshot.getSnapshotFileInfos(writeFlag=True)
-			snarfileinfo.setHeader(datet)
-			
-			#header created, let's now add the directories from includes.list
-			last_parentdir=None
-			for f in snapshot.getIncludeFlist().getEffectiveFileList() :
-				if f :
-					
-					parentdir = os.path.dirname(f)
-					if parentdir == last_parentdir :
-						getLogger().debug("[LastParentDir] already processed '%s'" % parentdir)
-						continue
-					last_parentdir = parentdir
-					
-					
-					_time = str(int(time.mktime(datet.timetuple())))
-					result = ["0", _time, _time]
-					
-					if snarfileinfo.hasPath(parentdir) :
-						getLogger().debug("[SNARFileInfo] already processed '%s'" % parentdir)
-						continue
-					
-					getLogger().debug("processing '%s'" % parentdir)
-					
-					if os.path.exists(parentdir) :
-						result.append(str(os.stat(parentdir)[ST_DEV]))
-						result.append(str(os.stat(parentdir)[ST_INO]))
-					else :
-						result.extend(['0','0'])
-					
-					result.append(parentdir)
-					
-					fname = os.path.basename(f)
-					dumpdirs = dict()
-					
-					#get the parent dir content
-					cSBdict = snapshot.getIncludeFlist().getSon(parentdir)
-					for k,v in dict.iteritems(cSBdict):
-						# determine if it's a dir or a file
-						if os.path.exists(parentdir+os.sep+k) :
-							if os.path.isdir(parentdir+os.sep+k) :
-								control = Dumpdir.DIRECTORY
-							else :
-								control = Dumpdir.INCLUDED
-						else :
-							if v and type(v) is list and len(v) == 2 and type(v[1]) == SBdict :
-								# this is a dirrectory
-								control = Dumpdir.DIRECTORY
-							else :
-								control = Dumpdir.INCLUDED
+			if not isEmpty :
+				date = snapshot.getDate()
+				datet = datetime.datetime(date['year'],date['month'],date['day'],date['hour'],date['minute'],date['second'])
+				snarfileinfo.setHeader(datet)
+							
+				#header created, let's now add the directories from includes.list
+				last_parentdir=None
+				for f in snapshot.getIncludeFlist().getEffectiveFileList() :
+					if f :
 						
-						dumpdirs[k] = control
+						parentdir = os.path.dirname(f)
+						if parentdir == last_parentdir :
+							getLogger().debug("[LastParentDir] already processed '%s'" % parentdir)
+							continue
+						last_parentdir = parentdir
+						
+						
+						_time = str(int(time.mktime(datet.timetuple())))
+						result = ["0", _time, _time]
+						
+						if snarfileinfo.hasPath(parentdir) :
+							getLogger().debug("[SNARFileInfo] already processed '%s'" % parentdir)
+							continue
+						
+						getLogger().debug("processing '%s'" % parentdir)
+						
+						if os.path.exists(parentdir) :
+							result.append(str(os.stat(parentdir)[ST_DEV]))
+							result.append(str(os.stat(parentdir)[ST_INO]))
+						else :
+							result.extend(['0','0'])
+						
+						result.append(parentdir)
+						
+						fname = os.path.basename(f)
+						dumpdirs = list()
+						
+						#get the parent dir content
+						cSBdict = snapshot.getIncludeFlist().getSon(parentdir)
+						for k,v in dict.iteritems(cSBdict):
+							# determine if it's a dir or a file
+							if os.path.exists(parentdir+os.sep+k) :
+								if os.path.isdir(parentdir+os.sep+k) :
+									control = Dumpdir.DIRECTORY
+								else :
+									control = Dumpdir.INCLUDED
+							else :
+								if v and type(v) is list and len(v) == 2 and type(v[1]) == SBdict :
+									# this is a dirrectory
+									control = Dumpdir.DIRECTORY
+								else :
+									control = Dumpdir.INCLUDED
+							
+							dumpdirs.append(Dumpdir(control+k))
+						
+						result.append(dumpdirs)
 					
-					result.append(dumpdirs)
-				
-					snarfileinfo.addRecord(result)
+						snarfileinfo.addRecord(result)
 
 		
 		getLogger().info("creating 'ver' file .")

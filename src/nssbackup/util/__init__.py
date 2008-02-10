@@ -117,6 +117,7 @@ def launch(cmd, opts):
 
 	# Call the subprocess using convenience method
 	opts.insert(0,cmd)
+	getLogger().debug("Lauching : "+str(opts))
 	retval = subprocess.call(opts, 0, None, None, outptr, errptr)
 
 	# Close log handles

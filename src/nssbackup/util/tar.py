@@ -90,7 +90,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 		raise SBException("Error when extracting : " + errStr )
 	getLogger().debug("output was : " + outStr)
 	
-def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
+def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None ):
 	"""
 	Extract the files listed in the 'fileslist' file to dest. This method 
 	has been created to optimize the time spent by giving to tar a complete 
@@ -98,6 +98,8 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	@param sourcetgz:
 	@param fileslist: a path to the file containing the list
 	@param dest: destination
+	@param bckupsuffix: 
+	@param additionalOpts: a list of aption to add
 	"""
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
@@ -120,7 +122,75 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	if bckupsuffix :
 		options.append("--suffix="+bckupsuffix)
 	
+	if additionalOpts and type(additionalOpts) == list :
+		options.extend(additionalOpts)
+		
 	options.extend(['--file='+sourcetgz,'--null','--files-from='+os.path.normpath(fileslist)])
+	
+	outStr, errStr, retval = Util.launch("tar", options)
+	if retval != 0 :
+		getLogger().debug("output was : " + outStr)
+		raise SBException("Error when extracting : " + errStr )
+	getLogger().debug("output was : " + outStr)
+
+def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
+	"""
+	@param desttar: The tar file to wich append
+	@param fileOrDir: The file or directory to append, can be a list of files too
+	@type fileOrDir: str or list
+	@param workingDir: the dir to move in before appending the dir ( usefun for relative paths)
+	@param additionalOpts: a list of additional option to append (will be append before changing the working dir)
+	"""
+	options = ["--append", "--ignore-failed-read"]
+	
+	archType = getArchiveType(desttar)
+	if archType =="tar" :
+		pass
+	elif archType == "gzip" :
+		options.insert(1,"--gzip")
+	elif archType == "bzip2" :
+		options.insert(1,"--bzip2")
+	else :
+		raise SBException (_("Invalid Archive type"))
+		
+	if additionalOpts and type(additionalOpts) == list :
+		options.extend(additionalOpts)
+		
+	options.extend(['--file='+desttar,'--null'])
+	
+	if workingdir:
+		options.append("--directory="+workingdir)
+	
+	if type(fileOrDir) is str:
+		options.append(fileOrDir)
+	elif type(fileOrDir) is list :
+		options.extend(fileOrDir)
+	
+	outStr, errStr, retval = Util.launch("tar", options)
+	if retval != 0 :
+		getLogger().debug("output was : " + outStr)
+		raise SBException("Error when extracting : " + errStr )
+	getLogger().debug("output was : " + outStr)
+
+def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
+	"""
+	"""
+	options = ["--append", "--ignore-failed-read"]
+	
+	archType = getArchiveType(desttar)
+	if archType =="tar" :
+		pass
+	elif archType == "gzip" :
+		options.insert(1,"--gzip")
+	elif archType == "bzip2" :
+		options.insert(1,"--bzip2")
+	else :
+		raise SBException (_("Invalid Archive type"))
+		
+	if additionalOpts and type(additionalOpts) == list :
+		options.extend(additionalOpts)
+		
+	options.extend(['--file='+desttar,'--null','--files-from='+os.path.normpath(fileslist)])
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
@@ -206,7 +276,8 @@ def makeTarIncBackup(snapshot):
 		outStr, errStr, retVal = Util.launch("tar", options)
 		getLogger().debug("TAR Output : " + outStr)
 		if retVal != 0 :
-			raise SBException(_("Couldn't make a proper backup : ") + errStr )
+			# list-incremental is not compatible with ignore failed read
+			getLogger().error(_("Couldn't make a proper backup, finishing backup though :") + errStr )
 		
 
 def makeTarFullBackup(snapshot):
@@ -232,7 +303,8 @@ def makeTarFullBackup(snapshot):
 	outStr, errStr, retVal = Util.launch("tar", options)
 	getLogger().debug("TAR Output : " + outStr)
 	if retVal != 0 :
-		raise SBException(_("Couldn't make a proper backup : ") + errStr )
+		# list-incremental is not compatible with ignore failed read
+		getLogger().error(_("Couldn't make a proper backup, finishing backup though : ") + errStr )
 	
 # ---
 
@@ -325,8 +397,17 @@ class SnapshotFile():
 	
 	__SEP = '\000'
 	__entrySEP = 2*__SEP
-
-
+	
+	# Infos on indices in a record 
+	REC_NFS = 0
+	REC_MTIME_SEC =1
+	REC_MTIME_NANO=2
+	REC_DEV_NO=3
+	REC_INO=4
+	REC_DIRNAME=5
+	REC_CONTENT=6
+	
+	
 	def __init__(self, filename,writeFlag=False):
 		"""
 		Constructor 
@@ -439,39 +520,63 @@ class SnapshotFile():
 			subroutine to format a line including NUL char to have and array
 			"""
 			nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents = line.lstrip("\0").split("\0",6)
-			return (nfs,mtime_sec,mtime_nano,dev_no,i_no,name,formatDumpDirs(contents))
+			return [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,formatDumpDirs(contents)]
 			
 			
 		fd = open(self.snpfile)
 		# skip header which is the first line and 2 entries separated with NULL in this case
-		fd.readline()
-		
-		n = 0
-		
-		while n < 2 :
+		l = fd.readline()
+		if l !="":
+			#Snarfile not empty
+			n = 0
+			while n < 2 :
+				c = fd.read(1)
+				if len(c) != 1:
+					raise SBException(_("The snarfile header is incomplete !"))
+				if c == '\0' : n += 1
+			
+			currentline=""
+			
 			c = fd.read(1)
-			if c == '\0' : n += 1
-		
-		currentline=""
-		
-		c = fd.read(1)
-		last_c = ''
-		
-		while c :
-			currentline += c
-			if c == '\0' and last_c == '\0' :
-				# we got a line
-				yield format(currentline)
-				
-				currentline = ''
-				last_c = ''
-			else :
-				last_c = c
-			c = fd.read(1)
-		
-		fd.close
+			last_c = ''
+			
+			while c :
+				currentline += c
+				if c == '\0' and last_c == '\0' :
+					# we got a line
+					yield format(currentline)
+					
+					currentline = ''
+					last_c = ''
+				else :
+					last_c = c
+				c = fd.read(1)
+			
+			fd.close
 
 	# ---
+	
+	def getHeader(self):
+		"""
+		Get the full header
+		@return: the header (a string) or None if the file was empty
+		@raise SBException: if the header is incomplete
+		"""
+		fd = open(self.snpfile)
+		header = fd.readline()
+		if header !="":
+			#Snarfile not empty
+			n = 0
+			while n < 2 :
+				c = fd.read(1)
+				if len(c) != 1:
+					raise SBException(_("The snarfile header is incomplete !"))
+				if c == '\0' : n += 1
+				header += c
+		else :
+			header = None
+				
+		return header
 	
 	def setHeader(self,timeofBackup):
 		"""
@@ -505,21 +610,21 @@ class SnapshotFile():
 		fd.close()
 		
 		
-	def createContent(self,contentDict):
+	def createContent(self,contentList):
 		"""
-		create a content out of a dict of {file:'control'}
-		@param contentDict: the content dictionary
-		@type contentDict: dict
+		create a content out of a list of Dumpdir
+		@param contentList: the Dumpdir content list
+		@type contentList: list
 		@return: a string containing the computed content
 		@rtype: string
 		"""
-		if type(contentDict) != dict :
-			raise SBException("contentDict must be a dictionary")
+		if type(contentList) != list :
+			raise SBException("contentlist must be a list : %r" % repr(contentList))
 		
 		result = ""
 		
-		for f,c in contentDict.iteritems():
-			result += c+f+self.__SEP
+		for dumpdir in contentList:
+			result += dumpdir.getControl()+dumpdir.getFilename()+self.__SEP
 		
 		return result
 		
@@ -564,6 +669,9 @@ class MemSnapshotFile(SBdict):
 		"""
 		self.__snapshotFile.addRecord(record)
 		self[record[-2]] = record[-1]
+	
+	def getHeader(self):
+		self.__snapshotFile.getHeader()
 		
 	def setHeader(self,timeofBackup):
 		"""
@@ -642,12 +750,33 @@ class ProcSnapshotFile :
 				return True
 		return False
 	
+	def iterfiles(self):
+		"""
+		iterator that returns every file in the snapshot
+		"""
+		for l in self.__snapshotFile.parseFormat2():
+			dir = l[-2]
+			if l[-1] :
+				for dumpdir in l[-1] :
+					yield dir+os.sep+dumpdir.getFilename()
+	
+	def iterRecords(self):
+		"""
+		Iter snar file records (wrapper on the parseFormat2 method of SnaspshotFile
+		"""
+		for record in self.__snapshotFile.parseFormat2():
+			yield record
+	
+	
 	def addRecord(self,record):
 		"""
 		Write a record in the snar file. A record is a tuple with 6 entries + a content that is a dict
 		@param record: A tuple that contains the record to add. [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a dict of {file:'control'}
 		"""
 		self.__snapshotFile.addRecord(record)
+	
+	def getHeader(self):
+		return self.__snapshotFile.getHeader()
 	
 	def setHeader(self,timeofBackup):
 		"""

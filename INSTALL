@@ -5,6 +5,9 @@ Installation Instructions
 
 Prerequist
 ==========
+python (>=2.5)
+pygnome
+pyglade
 pynotify
 fuse
 gettext
@@ -14,8 +17,10 @@ Easiest way
 ===========
 
 * If you use Debian or Ubuntu, try apt-get:
-
-     sudo apt-get install nssbackup
+ * Install the nssbackup team repository 
+  * deb http://ppa.launchpad.net/nssbackup-team/ubuntu hardy main
+  * deb http://ppa.launchpad.net/nssbackup-team/ubuntu gutsy main
+ * sudo apt-get install nssbackup
 
 
 From source code way
