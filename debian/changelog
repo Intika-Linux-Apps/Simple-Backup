@@ -1,3 +1,9 @@
+nssbackup (0.2-0~alpha2ppa1) hardy; urgency=low
+
+  * Fixed bug #189879 : NSSbackup cannot find files.snar -> crash
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 10 Feb 2008 02:10:37 +0100
+
 nssbackup (0.2-0~alpha1) hardy; urgency=low
 
   * First alpha of version 0.2
