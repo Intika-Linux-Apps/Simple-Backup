@@ -23,6 +23,7 @@ from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
 from nssbackup.managers.SnapshotManager import SnapshotManager
 from nssbackup.managers.RestoreManager import RestoreManager
+from nssbackup.managers.UpgradeManager import UpgradeManager
 from nssbackup.util.log import getLogger
 import nssbackup.util.Snapshot
 from nssbackup.util.Snapshot import Snapshot
@@ -118,12 +119,20 @@ class SBRestoreGTK(GladeWindow):
 			'snpdetails',
 			'scrolledwindow2',
 			'restoreExpander',
+			'snpmanExpander',
 			'filelisttreeview',
 			'buttonspool',
 			'restore',
 			'restoreas',
 			'revert',
 			'revertas',
+			'upgradeBox',
+			'upgradeButton',
+			'RebaseBox',
+			'rebaseLabel',
+			'rebaseButton',
+			'deleteBox',
+			'deleteButton',
 			]
 
 		handlers = [
@@ -142,6 +151,11 @@ class SBRestoreGTK(GladeWindow):
 			'on_revert_clicked',
 			'on_revertas_clicked',
 			'on_restoreExpander_activate',
+			'on_snpmanExpander_activate',
+			'on_upgradeButton_clicked',
+			'on_rebaseButton_clicked',
+			'on_deleteButton_clicked',
+			'on_exportmanExpander_activate',
 			]
 
 		top_window = 'restorewindow'
@@ -227,6 +241,7 @@ class SBRestoreGTK(GladeWindow):
 	def on_snplisttreeview_cursor_changed(self,*args):
 		self.flisttreestore.clear()
 		self.widgets["restoreExpander"].set_expanded(False)
+		self.widgets['snpmanExpander'].set_expanded(False)
 		tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
 		self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
 
@@ -321,7 +336,7 @@ class SBRestoreGTK(GladeWindow):
 			f1_items = self.currSnpFilesInfos.getFirstItems()
 			if not f1_items :
 				# first items is empty
-				self.flisttreestore.append(None, [_("This snapshot seems empty.")])
+				self.flisttreestore.append(None, [_("This snapshot seems empty."),None])
 				self.widgets['snpdetails'].set_sensitive(False)
 			else :
 				self.widgets['snpdetails'].set_sensitive(True)
@@ -361,7 +376,7 @@ class SBRestoreGTK(GladeWindow):
 			tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
 			if iter:
 				self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
-				if self.currentSnp.getVersion() != int(Infos.SNPCURVERSION):
+				if self.currentSnp.getVersion() != Infos.SNPCURVERSION:
 					message = _("The snapshot version is not supported (Just %(supportedversion)s is supported). Version '%(currentversion)s' found. You should upgrade it. ") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
 					getLogger().warning(message) 
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=message)
@@ -480,6 +495,65 @@ class SBRestoreGTK(GladeWindow):
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 					dialog.run()
 					dialog.destroy()
+	
+	#----------------------------------------------------------------------
+
+	def on_snpmanExpander_activate(self, *args):
+		if not self.widgets['snpmanExpander'].get_expanded():
+			if self.currentSnp:
+				if self.currentSnp.getVersion() == Infos.SNPCURVERSION:
+					self.widgets["upgradeBox"].hide()
+					if self.currentSnp.isfull():
+						self.widgets["RebaseBox"].hide()
+					else:
+						self.widgets["RebaseBox"].show()
+					self.widgets["rebaseLabel"].set_markup(_("Actual base : <b>%s</b>") % self.currentSnp.getBase())
+					self.widgets["deleteBox"].show()
+				elif self.currentSnp.getVersion() < Infos.SNPCURVERSION :
+					self.widgets["upgradeBox"].show()
+					self.widgets["RebaseBox"].hide()
+					self.widgets["deleteBox"].hide()
+				else :
+					self.widgets["upgradeBox"].hide()
+					self.widgets["RebaseBox"].hide()
+					self.widgets["deleteBox"].hide()
+					message=_("The version of the snapshot is greater than the supported one!")
+					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=message)
+					dialog.run()
+					dialog.destroy()
+			else:
+				self.widgets["upgradeBox"].hide()
+				self.widgets["RebaseBox"].hide()
+				self.widgets["deleteBox"].hide()
+		
+
+	#----------------------------------------------------------------------
+
+	def on_upgradeButton_clicked(self, *args):
+		um = UpgradeManager()
+		um.upgradeSnapshot(self.currentSnp)
+		self.load_snapshotslist(self.widgets['calendar'].get_date())
+		self.widgets['snpmanExpander'].set_expanded(False)
+		self.on_snpmanExpander_activate()
+		self.widgets['snpmanExpander'].set_expanded(True)
+
+	#----------------------------------------------------------------------
+
+	def on_rebaseButton_clicked(self, *args):
+		print("TODO: on_rebaseButton_clicked")
+		pass
+
+	#----------------------------------------------------------------------
+
+	def on_deleteButton_clicked(self, *args):
+		print("TODO: on_deleteButton_clicked")
+		pass
+
+	#----------------------------------------------------------------------
+
+	def on_exportmanExpander_activate(self, *args):
+		print("TODO: on_exportmanExpander_activate")
+		pass
 	
 	#----------------------------------------------------------------------
 	
