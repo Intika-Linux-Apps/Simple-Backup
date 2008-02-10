@@ -86,6 +86,11 @@ class SBRestoreGTK(GladeWindow):
 		acolumn2 = gtk.TreeViewColumn(_("State"), gtk.CellRendererText(), text=1 )
 		self.widgets['filelisttreeview'].append_column( acolumn2 )
 		
+		self.historylisttreestore= gtk.TreeStore( str )
+		self.widgets['historytv'].set_model(self.historylisttreestore)
+		acolumn3 = gtk.TreeViewColumn(_("Snapshots"), gtk.CellRendererText(), text=0 )
+		self.widgets['historytv'].append_column( acolumn3 )
+		
 		self.on_defaultradiob_toggled()
 		
 		# select the current day
@@ -133,6 +138,8 @@ class SBRestoreGTK(GladeWindow):
 			'rebaseButton',
 			'deleteBox',
 			'deleteButton',
+			'snphistoryFrame',
+			'historytv',
 			]
 
 		handlers = [
@@ -153,7 +160,7 @@ class SBRestoreGTK(GladeWindow):
 			'on_restoreExpander_activate',
 			'on_snpmanExpander_activate',
 			'on_upgradeButton_clicked',
-			'on_rebaseButton_clicked',
+			'on_rebaseButton_toggled',
 			'on_deleteButton_clicked',
 			'on_exportmanExpander_activate',
 			]
@@ -234,6 +241,9 @@ class SBRestoreGTK(GladeWindow):
 	#----------------------------------------------------------------------
 
 	def on_calendar_day_selected(self, *args):
+		self.currentSnp = None
+		self.widgets["restoreExpander"].set_expanded(False)
+		self.widgets['snpmanExpander'].set_expanded(False)
 		self.load_snapshotslist(self.widgets['calendar'].get_date())
 
 	#----------------------------------------------------------------------
@@ -539,15 +549,51 @@ class SBRestoreGTK(GladeWindow):
 
 	#----------------------------------------------------------------------
 
-	def on_rebaseButton_clicked(self, *args):
-		print("TODO: on_rebaseButton_clicked")
-		pass
+	def on_rebaseButton_toggled(self, *args):
+		if self.widgets['rebaseButton'].get_active():
+			self.widgets['snphistoryFrame'].show()
+			histlist = self.snpman.getSnpHistory(self.currentSnp)
+			for snapshot in histlist:
+				self.historylisttreestore.append(None, [snapshot.getName()])
+		else :
+			# get the selected base and rebase on it.
+			tstore, iter = self.widgets['historytv'].get_selection().get_selected()
+			if iter :
+				snp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
+				try:
+					message = _("Do you really want to rebase '%s' on '%s' ?") % (self.currentSnp, snp)
+					dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=message)
+					response = dialog.run()
+					dialog.destroy()
+					if response == gtk.RESPONSE_YES:
+						self.snpman.rebaseSnapshot(self.currentSnp, snp)
+				except Exception, e: 
+					getLogger().error(str(e))
+					getLogger().error(traceback.format_exc())
+					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
+					dialog.run()
+					dialog.destroy()
+			self.widgets['snphistoryFrame'].hide()
+			self.historylisttreestore.clear()
 
 	#----------------------------------------------------------------------
 
 	def on_deleteButton_clicked(self, *args):
-		print("TODO: on_deleteButton_clicked")
-		pass
+		message = _("Are you sure that you want to definitely remove snapshot '%s' ?") % self.currentSnp
+		dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=message)
+		response = dialog.run()
+		dialog.destroy()
+		if response == gtk.RESPONSE_YES:
+			try :
+				self.snpman.removeSnapshot(self.currentSnp)
+			except Exception, e: 
+				getLogger().error(str(e))
+				getLogger().error(traceback.format_exc())
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
+				dialog.run()
+				dialog.destroy()
+			self.snpman.getSnapshots(forceReload=True)
+			self.on_calendar_day_selected()
 
 	#----------------------------------------------------------------------
 

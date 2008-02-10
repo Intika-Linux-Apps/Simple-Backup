@@ -63,7 +63,7 @@ class SnapshotManager :
 				return snp
 		raise SBException(_("Snapshot '%s' not found ") % name)
 	
-	def getSnapshots(self, fromDate=None, toDate=None, byDate=None):
+	def getSnapshots(self, fromDate=None, toDate=None, byDate=None,forceReload=False):
 		"""
 		Return a list with all the found snapshots (according to the options set).
 		This list is sorted from the latest snapshot to the earliest . 
@@ -72,6 +72,7 @@ class SnapshotManager :
 		@param fromDate : eg. 2007-02-17
 		@param toDate :  2007-02-17
 		@param byDate : 2007-02-17
+		@param forceReload: True or false
 		@return: 
 		"""
 		global __snapshots
@@ -90,7 +91,7 @@ class SnapshotManager :
 					snapshots.append( snp )
 			snapshots.sort(key=Snapshot.getName,reverse=True)
 		else :
-			if self.__snapshots : return self.__snapshots
+			if self.__snapshots and not forceReload: return self.__snapshots
 			else :
 				listing = FAM.listdir(self.__targetDir)
 				for dir in listing :
@@ -169,7 +170,6 @@ class SnapshotManager :
 		# Utilities functions everything should be done in temporary files #
 		
 		def makeTmpTAR():
-			" TODO: "
 			# write temp flist using the snar file  to backup
 			getLogger().info("Writing the temporary Files list to make the transfer")
 			flistd = open(tmpdir+os.sep+"flist.tmp",'w')
@@ -213,7 +213,6 @@ class SnapshotManager :
 		
 		def mergeSnarFile():
 			"""
-			TODO:
 			Merge the snar.full.tmp file with the current snapshot snarfile in a snar.final.tmp file.
 			for each path in the current snar if included inthe snar.full.tmp , drop it, oherwise add the whole record.
 			""" 
@@ -235,7 +234,6 @@ class SnapshotManager :
 			
 		
 		def mergeIncludesList():
-			" TODO: "
 			srcfd = open(basesnp.getIncludeFListFile())
 			destfd = open(tmpdir+os.sep+"includes.list.tmp",'w')
 			for line in srcfd.readlines():
@@ -251,7 +249,6 @@ class SnapshotManager :
 			
 				
 		def mergeExcludesList():
-			" TODO: "
 			srcfd = open(basesnp.getExcludeFListFile())
 			destfd = open(tmpdir+os.sep+"excludes.list.tmp",'w')
 			for line in srcfd.readlines():
@@ -440,8 +437,11 @@ class SnapshotManager :
 		listing = self.getSnapshots()
 		for snp in listing :
 			if snp.getBase() == snapshot.getName() :
-				getLogger().debug("Rebasing '%s' to '%s' " % (snp.getName(), snapshot.getBaseSnapshot().getName()) )
-				self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
+				if snapshot.isfull():
+					raise SBException(_("It's impossible and not recommended to delete a full snapshot !"))
+				else:
+					getLogger().debug("Rebasing '%s' to '%s' " % (snp.getName(), snapshot.getBaseSnapshot().getName()) )
+					self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
 		getLogger().debug("Removing '%s'" % snapshot.getName())
 		FAM.delete(snapshot.getPath())
 		

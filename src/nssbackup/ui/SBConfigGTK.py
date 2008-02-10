@@ -653,8 +653,7 @@ class SBconfigGTK(GladeGnomeApp):
 				self.widgets["splitsizeCB"].set_active(0)
 		
 		# set the profile name
-		# TODO: check why it's not working
-		#self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
+		self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
 		
 		self.isConfigChanged()
 	#----------------------------------------------------------------------
