@@ -1,7 +1,6 @@
 Install
 =======
 
-./configure
 make
 sudo make install
 
