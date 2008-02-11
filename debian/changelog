@@ -1,8 +1,8 @@
-nssbackup (0.2-0~alpha3) gutsy; urgency=low
+nssbackup (0.2-0~alpha3ppa1) hardy; urgency=low
 
   * Snapshot management functionality implemented
 
- -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 10 Feb 2008 21:59:49 +0100
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 10 Feb 2008 22:36:18 +0100
 
 nssbackup (0.2-0~alpha2ppa1) hardy; urgency=low
 

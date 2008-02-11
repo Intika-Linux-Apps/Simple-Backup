@@ -159,14 +159,25 @@ class SnapshotManager :
 			self.__rebaseOnLastSnp(currentTorebase)
 			if newbase and currentTorebase.getBaseSnapshot().getName() <= newbase.getName():
 				break
-			currentTorebase = currentTorebase.getBaseSnapshot()
+			#currentTorebase = currentTorebase.getBaseSnapshot()
 		
-		
-	def __rebaseOnLastSnp(self,snapshot):
+	
+	def convertToFullSnp(self,snapshot):
 		"""
-		One step rebase
+		rebase a snapshot till the full one and then make it ful.
+		@param snapshot: the snapshot to make full
+		@type snapshot: Snapshot
 		"""
-		
+		self.rebaseSnapshot(snapshot)
+	
+	def __pullSnpContent(self,snapshot, topullSnp):
+		"""
+		Move the 'topullSnp' snapshot content to the 'snapshot' snapshot
+		@param snapshot: the snapshot to push in
+		@type snapshot: Snapshot
+		@param topullSnp: The snapshot to pull
+		@type topullSnp: Snapshot
+		"""
 		# Utilities functions everything should be done in temporary files #
 		
 		def makeTmpTAR():
@@ -182,7 +193,7 @@ class SnapshotManager :
 			tmptardir = tmpdir+os.sep+"tempTARdir"
 			os.mkdir(tmptardir)
 			
-			TAR.extract2(basesnp.getArchive(), tmpdir+os.sep+"flist.tmp", tmptardir,additionalOpts=["--no-recursion"])
+			TAR.extract2(topullSnp.getArchive(), tmpdir+os.sep+"flist.tmp", tmptardir,additionalOpts=["--no-recursion"])
 			
 			# uncompress the tar file so that we can append files to it
 			archive = snapshot.getArchive()
@@ -234,7 +245,7 @@ class SnapshotManager :
 			
 		
 		def mergeIncludesList():
-			srcfd = open(basesnp.getIncludeFListFile())
+			srcfd = open(topullSnp.getIncludeFListFile())
 			destfd = open(tmpdir+os.sep+"includes.list.tmp",'w')
 			for line in srcfd.readlines():
 				destfd.write(line)
@@ -249,7 +260,7 @@ class SnapshotManager :
 			
 				
 		def mergeExcludesList():
-			srcfd = open(basesnp.getExcludeFListFile())
+			srcfd = open(topullSnp.getExcludeFListFile())
 			destfd = open(tmpdir+os.sep+"excludes.list.tmp",'w')
 			for line in srcfd.readlines():
 				destfd.write(line)
@@ -281,12 +292,6 @@ class SnapshotManager :
 			os.rename(tmpdir+os.sep+"excludes.list.tmp",snapshot.getExcludeFListFile())
 		
 		# ------------------
-		
-		if not snapshot.getBase() :
-			raise SBException(_("Snapshot '%s' is a full . Can't rebase on older snapshot") ) % snapshot.getName()
-		basesnp = snapshot.getBaseSnapshot()
-		newbase = basesnp.getBase()
-		
 		# process
 		try :
 			tmpdir = snapshot.getPath()+os.sep+self.REBASEDIR
@@ -332,7 +337,7 @@ class SnapshotManager :
 				snarfullinfo.setHeader(datet)
 				header = snarfullinfo.getHeader()
 			
-			base_snpfinfo = basesnp.getSnapshotFileInfos()
+			base_snpfinfo = topullSnp.getSnapshotFileInfos()
 			cur_snpfinfo = snapshot.getSnapshotFileInfos()
 			for record in base_snpfinfo.iterRecords():
 				
@@ -380,16 +385,29 @@ class SnapshotManager :
 			
 			snapshot.commitverfile()
 		except Exception,e :
-			getLogger().error(_("Got an exception when rebasing '%s' : "+str(e)) % snapshot.getName() ) 
-			self.__cancelRebase(snapshot)
+			getLogger().error(_("Got an exception when Pulling '%s' : "+str(e)) % snapshot.getName() ) 
+			self.__cancelPull(snapshot)
 			raise e
+		
+	
+	def __rebaseOnLastSnp(self,snapshot):
+		"""
+		One step rebase
+		"""
+		
+		if not snapshot.getBase() :
+			raise SBException(_("Snapshot '%s' is a full . Can't rebase on older snapshot") ) % snapshot.getName()
+		basesnp = snapshot.getBaseSnapshot()
+		newbase = basesnp.getBase()
+		
+		self.__pullSnpContent(snapshot, basesnp)
 		
 		# set the new base
 		if newbase :
 			snapshot.setBase(newbase)
 			snapshot.commitbasefile()
 		else :
-			self.__makeSnpFull(snapshot)  
+			self.__makeSnpFull(snapshot)
 		
 		
 	def __makeSnpFull(self,snapshot):
@@ -408,13 +426,13 @@ class SnapshotManager :
 		os.rename(path, path[:-3]+'ful')
 		return Snapshot(path[:-3]+'ful')
 		
-	def __cancelRebase(self,snapshot):
+	def __cancelPull(self,snapshot):
 		"""
-		To be able to handle well the cancellation of a rebase, we will need to not modify the snapshot till the last moment.
+		To be able to handle well the cancellation of a pull of a snapshot from another, we will need to not modify the snapshot till the last moment.
 		This means, the infos we want to add in the SNAR file should be created as a temporary SNAR file
 		Same goes for the TAR file. So that to cancel, we will just have to remove those temporary files and restore the 'ver' file.
 		"""
-		getLogger().info(_("Cancelling rebase of snapshot '%s'") % snapshot.getName() )
+		getLogger().info(_("Cancelling pull of snapshot '%s'") % snapshot.getName() )
 		path = snapshot.getPath()+os.sep+self.REBASEDIR
 		shutil.rmtree(path)
 		
