@@ -39,6 +39,10 @@ class SnapshotManager :
 	#
 	__targetDir = None
 	
+	statusMessage = None
+	substatusMessage = None
+	statusNumber = None
+	
 	REBASEDIR = "rebaseTmpDir"
 	
 	def __init__(self,targetDir):
@@ -52,6 +56,11 @@ class SnapshotManager :
 			raise SBException(_("Invalid value of the target directory : ") + targetDir)
 		self.__targetDir = targetDir
 	
+	def getStatus(self):
+		"""
+		@return: [statusNumber,statusMessage,substatusMessage]
+		"""
+		return [self.statusNumber,self.statusMessage,self.substatusMessage]
 	
 	def getSnapshot(self,name):
 		"""
@@ -156,10 +165,10 @@ class SnapshotManager :
 		currentTorebase = torebase
 		
 		while currentTorebase.getBase():
+			self.statusMessage = _("Rebasing '%s' on '%s'") % (currentTorebase,currentTorebase.getBase)
 			self.__rebaseOnLastSnp(currentTorebase)
 			if newbase and currentTorebase.getBaseSnapshot().getName() <= newbase.getName():
 				break
-			#currentTorebase = currentTorebase.getBaseSnapshot()
 		
 	
 	def convertToFullSnp(self,snapshot):
@@ -294,6 +303,7 @@ class SnapshotManager :
 		# ------------------
 		# process
 		try :
+			self.statusNumber = 0.00
 			tmpdir = snapshot.getPath()+os.sep+self.REBASEDIR
 			os.mkdir(tmpdir)
 			
@@ -373,17 +383,32 @@ class SnapshotManager :
 					
 			# Currently the snar.full.tmp contains both base complete records and the common completed 
 			# records between base and current 
-			
+			self.statusNumber = 0.20
 			mergeSnarFile()
+			
+			self.statusNumber = 0.35
 			mergeIncludesList()
+			
+			self.statusNumber = 0.45
 			mergeExcludesList()
 			
+			self.statusNumber = 0.55
 			makeTmpTAR()
+			
+			self.statusNumber = 0.75
 			movetoFinaldest()
+			
 			# clean Temporary files 
+			self.statusNumber = 0.85
 			shutil.rmtree(tmpdir)
 			
+			self.statusNumber = 0.95
 			snapshot.commitverfile()
+			self.statusNumber = 1.00
+			
+			self.statusNumber = None
+			self.statusMessage = None
+			self.substatusMessage = None
 		except Exception,e :
 			getLogger().error(_("Got an exception when Pulling '%s' : "+str(e)) % snapshot.getName() ) 
 			self.__cancelPull(snapshot)

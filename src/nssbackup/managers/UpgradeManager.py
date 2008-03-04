@@ -46,6 +46,16 @@ class UpgradeManager() :
 	
 	__possibleVersion = ["1.0","1.1","1.2","1.3","1.4","1.5"]
 
+	statusMessage = None
+	substatusMessage = None
+	statusNumber = None
+
+	def getStatus(self):
+		"""
+		@return: [statusNumber,statusMessage,substatusMessage]
+		"""
+		return [self.statusNumber,self.statusMessage,self.substatusMessage]
+
 	def upgradeSnapshot(self, snapshot,version="1.5"):
 		"""
 		Upgrade a snapshot to a version. Default is the higher version available
@@ -75,7 +85,9 @@ class UpgradeManager() :
 						self.__upgrade_v14(snapshot)
 					elif snapshot.getVersion() < "1.5" :
 						self.__upgrade_v15(snapshot)
-
+				self.statusMessage = None
+				self.substatusMessage = None
+				self.statusNumber = None
 	
 	##
 	#The downgrade feature will be certainly used for exporting snapshots, 
@@ -113,7 +125,8 @@ class UpgradeManager() :
 	
 	
 	def __upgrade_v12( self, snapshot ):
-		getLogger().info("Upgrading from v1.0 to v1.2: %s" % str(snapshot) )
+		self.statusMessage = _("Upgrading from v1.0 to v1.2: %s")  % str(snapshot)
+		getLogger().info(self.statusMessage)
 		i = FAM.openfile(snapshot.getPath()+os.sep +"tree")
 		bfiles = pickle.load( i )
 		n = FAM.openfile( snapshot.getPath()+os.sep +"flist", True )
@@ -126,10 +139,12 @@ class UpgradeManager() :
 		i.close()
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.2\n" )
 		snapshot.setVersion("1.2")
+		self.statusNumber = 0.40
 		
 			
 	def __upgrade_v13( self, snapshot ):
-		getLogger().info("Upgrading to v1.3: %s" % str(snapshot) )
+		self.statusMessage = _("Upgrading to v1.3: %s")  % str(snapshot) 
+		getLogger().info(self.statusMessage)
 		flist = FAM.readfile( snapshot.getPath()+os.sep +"flist" ).split( "\n" )
 		fprops = FAM.readfile( snapshot.getPath()+os.sep +"fprops" ).split( "\n" )
 		if len(flist)==len(fprops) :
@@ -150,18 +165,23 @@ class UpgradeManager() :
 		else:
 			FAM.delete(snapshot.getPath()+os.sep +"ver")
 			raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath() )
+		self.statusNumber = 0.60
 
 	def __upgrade_v14( self, snapshot ):
-		getLogger().info("Upgrading to v1.4: %s" % str(snapshot) )
+		self.statusMessage = _("Upgrading to v1.4: %s") % str(snapshot)
+		getLogger().info(self.statusMessage )
 		FAM.delete( snapshot.getPath() + os.sep +"ver" )
 		
 		if not FAM.exists( snapshot.getPath()+os.sep +"flist" ) or not FAM.exists( snapshot.getPath()+os.sep +"fprops" ) or not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" ) or not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
 			raise SBException ("Non complete Snapshot ! One of the essential files doesn't exist" )
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
 		snapshot.setVersion("1.4")
+		self.statusNumber = 0.80
 		
 	def __upgrade_v15( self, snapshot ):
-		getLogger().info("Upgrading to v1.5: %s" % str(snapshot) )
+		self.statusMessage = _("Upgrading to v1.5: %s") % str(snapshot) 
+		self.statusNumber = 0.80
+		getLogger().info(self.statusMessage)
 		FAM.delete( snapshot.getPath() + os.sep +"ver" )
 		
 		if not FAM.exists( snapshot.getPath()+os.sep +"flist" ) or not FAM.exists( snapshot.getPath()+os.sep +"fprops" ) or not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" ) or not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
@@ -169,7 +189,7 @@ class UpgradeManager() :
 		
 		getLogger().info("renaming file.tgz to file.tar.gz")
 		os.rename(snapshot.getPath()+os.sep +"files.tgz", snapshot.getPath()+os.sep +"files.tar.gz") 
-		
+		self.statusNumber = 0.82
 		#TODO:
 		getLogger().info("Creating includes.list")
 		flist = snapshot.getPath()+os.sep +"flist" 
@@ -192,16 +212,18 @@ class UpgradeManager() :
 			fi.write(str(f) +"\n")
 		fi.close()
 		
+		self.statusNumber = 0.85
 		getLogger().info("Creating empty excludes.list")
 		f1 = open(snapshot.getExcludeFListFile(),'w')
 		f1.close()
 		
-				
+		self.statusNumber = 0.87
 		getLogger().info("creating 'format' file .")
 		formatInfos = snapshot.getFormat()+"\n"
 		formatInfos += str(snapshot.getSplitedSize())
 		FAM.writetofile(snapshot.getPath()+os.sep +"format", formatInfos)
 		
+		self.statusNumber = 0.90
 		getLogger().info("Creating the SNAR file ")
 		if os.path.exists(snapshot.getSnarFile()) :
 			getLogger().warning(_("The SNAR file alredy exist for snapshot '%s', I'll not overide it") % str(snapshot))
@@ -266,13 +288,13 @@ class UpgradeManager() :
 					
 						snarfileinfo.addRecord(result)
 
-		
+		self.statusNumber = 0.97
 		getLogger().info("creating 'ver' file .")
 		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.5\n" )
 		snapshot.setVersion("1.5")
 		if os.path.exists(snapshot.getPath()+os.sep +"ver") :
 			getLogger().debug("'ver' file created.")
-
+		self.statusNumber = 1.00
 		
 
 	#---------------------------------------------------------------------------------

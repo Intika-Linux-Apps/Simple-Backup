@@ -15,7 +15,7 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
 from gettext import gettext as _
-import traceback, time
+import traceback, time, gobject
 from thread import *
 from GladeWindow import *
 import nssbackup.util as Util
@@ -140,6 +140,8 @@ class SBRestoreGTK(GladeWindow):
 			'deleteButton',
 			'snphistoryFrame',
 			'historytv',
+			'statusBar',
+			'statusBarLabel',
 			]
 
 		handlers = [
@@ -169,6 +171,17 @@ class SBRestoreGTK(GladeWindow):
 		GladeWindow.__init__(self, filename, top_window, widget_list, handlers)
 		self.widgets[top_window].set_icon_from_file(Util.getResource("nssbackup-restore.png"))
 	#----------------------------------------------------------------------
+
+	def status_callback(self,getstatus):
+		"""
+		"""
+		n,m, subm = getstatus()
+		
+		if (n,m,subm) == (None,None,None):
+			return False
+		if n : 	self.widgets['statusBar'].set_fraction(n)
+		if m : self.widgets['statusBarLabel'].set_text(m)
+		if subm : self.widgets['statusBar'].set_text(subm)
 
 	def fill_calendar(self):
 		"""
@@ -541,6 +554,7 @@ class SBRestoreGTK(GladeWindow):
 
 	def on_upgradeButton_clicked(self, *args):
 		um = UpgradeManager()
+		self.timer = gobject.timeout_add (100, self.status_callback, um.getStatus)
 		um.upgradeSnapshot(self.currentSnp)
 		self.load_snapshotslist(self.widgets['calendar'].get_date())
 		self.widgets['snpmanExpander'].set_expanded(False)
@@ -566,6 +580,7 @@ class SBRestoreGTK(GladeWindow):
 					response = dialog.run()
 					dialog.destroy()
 					if response == gtk.RESPONSE_YES:
+						self.timer = gobject.timeout_add (100, self.status_callback, self.snpman.getStatus)
 						self.snpman.rebaseSnapshot(self.currentSnp, snp)
 				except Exception, e: 
 					getLogger().error(str(e))
