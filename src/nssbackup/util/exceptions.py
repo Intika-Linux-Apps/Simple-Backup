@@ -51,3 +51,13 @@ class FuseFAMException(SBException):
 	"""
 	Thrown when a Fuse mount fails
 	"""
+	
+class RebaseSnpException(SBException):
+	"""
+	Thrown for rebase exception
+	"""
+
+class RebaseFullSnpForbidden(RebaseSnpException):
+	"""
+	Thrown when trying to rebase a full snapshot
+	"""

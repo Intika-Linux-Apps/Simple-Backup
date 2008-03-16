@@ -34,13 +34,6 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def __init__(self):
 		''' '''
-		self.init()
-		
-
-	#----------------------------------------------------------------------
-
-	def init(self):
-		
 		self.default_conffile = None 
 		
 		if os.geteuid() == 0 :
@@ -57,14 +50,142 @@ class SBconfigGTK(GladeGnomeApp):
 				self.configman = ConfigManager()
 		
 		self.orig_configman = ConfigManager(self.default_conffile)
-		
-		filename = Util.getResource('nssbackup-config.glade')
+	
 		
 		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
 		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
 		self.cformat = {'none':0, 'gzip':1, 'bzip2':2}
 		self.splitSize = {0:_('Unlimited'),100:_('100 MB'),250:_('250 MB'), 650 : _('650 MB'),2000 :_('2 GB (FAT16)'),4000 : _('4 GB (FAT32)'), -1: _('Custom')}
 		
+		self.init()
+		
+		self.widgets['nssbackupConfApp'].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
+		
+		# hide the schedule tab if not root
+		if os.geteuid() != 0 :
+			self.widgets['notebook'].remove_page(4)	
+		
+		# ---
+		# Initiate all data structures
+		# Paths to be included or excluded
+		self.include = gtk.ListStore( str )
+		self.includetv = self.widgets["includetv"]
+		self.includetv.set_model( self.include )
+		cell = gtk.CellRendererText()
+		cell.set_property('editable', True)
+		cell.connect('edited', self.cell_edited_callback, (self.include, "dirconfig", 1))
+		column = gtk.TreeViewColumn(_('Name'), cell, text=0)
+		self.includetv.append_column(column)
+
+		self.ex_paths = gtk.ListStore( str )
+		self.ex_pathstv = self.widgets["ex_pathstv"]
+		self.ex_pathstv.set_model( self.ex_paths )
+		cell1 = gtk.CellRendererText()
+		cell1.set_property('editable', True)
+		cell1.connect('edited', self.cell_edited_callback, (self.ex_paths, "dirconfig", 0))
+		column1 = gtk.TreeViewColumn(_('Name'), cell1, text=0)
+		self.ex_pathstv.append_column(column1)
+
+		# Excluded file types and general regular expressions
+		self.ex_ftype = gtk.ListStore( str, str )
+		self.ex_ftypetv = self.widgets["ex_ftypetv"]
+		self.ex_ftypetv.set_model( self.ex_ftype )
+		cell3 = gtk.CellRendererText()
+		column3 = gtk.TreeViewColumn(_('File Type'), cell3, text=0)
+		cell2 = gtk.CellRendererText()
+		column2 = gtk.TreeViewColumn('Ext.', cell2, text=1)
+		self.ex_ftypetv.append_column(column3)
+		self.ex_ftypetv.append_column(column2)
+
+		if os.getuid() == 0 :
+			self.widgets['dest1'].set_label(_("Use default backup directory (/var/backup)"))
+		else :
+			self.widgets['dest1'].set_label(_("Use default backup directory (%s)") % (getUserDatasDir()+"backups") )
+		
+		self.ex_regex = gtk.ListStore( str )
+		self.ex_regextv = self.widgets["ex_regextv"]
+		self.ex_regextv.set_model( self.ex_regex )
+		cell4 = gtk.CellRendererText()
+		cell4.set_property('editable', True)
+		cell4.connect('edited', self.cell_regex_edited_callback)
+		column4 = gtk.TreeViewColumn('Name', cell4, text=0)
+		self.ex_regextv.append_column(column4)
+		
+		self.remoteinc = gtk.ListStore( str )
+		self.rem_includetv = self.widgets["remote_includetv"]
+		self.rem_includetv.set_model( self.remoteinc )
+		cell = gtk.CellRendererText()
+		cell.set_property('editable', True)
+		cell.connect('edited', self.cell_remoteinc_edited_callback, (self.remoteinc, "dirconfig", 1))
+		column = gtk.TreeViewColumn(_('Name'), cell, text=0)
+		self.rem_includetv.append_column(column)
+		
+		# Day of month table
+		self.time_dom = gtk.ListStore( str )
+		self.time_domtv = self.widgets["time_domtv"]
+		self.time_domtv.set_model( self.time_dom )
+		cell6 = gtk.CellRendererText()
+		column6 = gtk.TreeViewColumn(_('Name'), cell6, text=0)
+		self.time_domtv.append_column(column6)
+
+		for i in range(1, 32):
+			self.time_dom.append( [str(i)] )
+
+		# Day of week table
+		self.time_dow = gtk.ListStore( str )
+		self.time_dowtv = self.widgets["time_dowtv"]
+		self.time_dowtv.set_model( self.time_dow )
+		cell7 = gtk.CellRendererText()
+		column7 = gtk.TreeViewColumn(_('Name'), cell7, text=0)
+		self.time_dowtv.append_column(column7)
+
+		self.known_ftypes = { "mp3": _("MP3 Music"), "avi": _("AVI Video"), "mpeg": _("MPEG Video"), "mpg": _("MPEG Video"), "mkv": _("Matrjoshka Video"), "ogg": _("OGG Multimedia container"), "iso": _("CD Images")}
+		
+		for i in range(0,7):
+			self.time_dow.append([ time.strftime( "%A", (2000,1,1,1,1,1,i,1,1)) ])
+			
+		# Profile Manager
+		# [ enable , profilename, cfPath ]
+		self.profiles = gtk.ListStore( bool, str, str )
+		for i,v in self.configman.getProfiles().iteritems() :
+			self.profiles.append( [v[1], i, v[0]] )
+		self.profilestv = self.widgets['profilesListTreeView']
+		self.profilestv.set_model(self.profiles )
+		
+		cell8,cell9 = gtk.CellRendererToggle(), gtk.CellRendererText()
+		cell8.set_active(True)
+		cell8.connect("toggled", self.on_prfEnableCB_toggled)
+		
+		
+		enableCBColumn = gtk.TreeViewColumn(_("Enable"), cell8, active=0 ) 
+		prfNameColumn = gtk.TreeViewColumn(_("Profile Name"), cell9, text=1 )
+		
+		self.profilestv.append_column(enableCBColumn)
+		self.profilestv.append_column(prfNameColumn)
+		
+		# The split size coices
+		self.splitSizeLS = gtk.ListStore( str, int )
+		values = []
+		for k in self.splitSize.keys() :
+			values.append(k)
+		values.sort()
+		
+		for k in values :
+			self.splitSizeLS.append([self.splitSize[k],k])
+		self.widgets['splitsizeCB'].set_model(self.splitSizeLS)
+		cell = gtk.CellRendererText()
+		self.widgets['splitsizeCB'].pack_start(cell, True)
+		self.widgets['splitsizeCB'].add_attribute(cell, 'text', 0) 
+			
+		# ---
+			
+		self.prefillWindow()
+
+	#----------------------------------------------------------------------
+
+	def init(self):
+		
+		filename = Util.getResource('nssbackup-config.glade')
 		
 		widget_list = [
 			'askSaveDialog',
@@ -305,123 +426,6 @@ class SBconfigGTK(GladeGnomeApp):
 
 		top_window = 'nssbackupConfApp'
 		GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window, widget_list, handlers)
-		self.widgets[top_window].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
-		# ---
-		# Initiate all data structures
-		# Paths to be included or excluded
-		self.include = gtk.ListStore( str )
-		self.includetv = self.widgets["includetv"]
-		self.includetv.set_model( self.include )
-		cell = gtk.CellRendererText()
-		cell.set_property('editable', True)
-		cell.connect('edited', self.cell_edited_callback, (self.include, "dirconfig", 1))
-		column = gtk.TreeViewColumn(_('Name'), cell, text=0)
-		self.includetv.append_column(column)
-
-		self.ex_paths = gtk.ListStore( str )
-		self.ex_pathstv = self.widgets["ex_pathstv"]
-		self.ex_pathstv.set_model( self.ex_paths )
-		cell1 = gtk.CellRendererText()
-		cell1.set_property('editable', True)
-		cell1.connect('edited', self.cell_edited_callback, (self.ex_paths, "dirconfig", 0))
-		column1 = gtk.TreeViewColumn(_('Name'), cell1, text=0)
-		self.ex_pathstv.append_column(column1)
-
-		# Excluded file types and general regular expressions
-		self.ex_ftype = gtk.ListStore( str, str )
-		self.ex_ftypetv = self.widgets["ex_ftypetv"]
-		self.ex_ftypetv.set_model( self.ex_ftype )
-		cell3 = gtk.CellRendererText()
-		column3 = gtk.TreeViewColumn(_('File Type'), cell3, text=0)
-		cell2 = gtk.CellRendererText()
-		column2 = gtk.TreeViewColumn('Ext.', cell2, text=1)
-		self.ex_ftypetv.append_column(column3)
-		self.ex_ftypetv.append_column(column2)
-
-		if os.getuid() == 0 :
-			self.widgets['dest1'].set_label(_("Use default backup directory (/var/backup)"))
-		else :
-			self.widgets['dest1'].set_label(_("Use default backup directory (%s)") % (getUserDatasDir()+"backups") )
-		
-		self.ex_regex = gtk.ListStore( str )
-		self.ex_regextv = self.widgets["ex_regextv"]
-		self.ex_regextv.set_model( self.ex_regex )
-		cell4 = gtk.CellRendererText()
-		cell4.set_property('editable', True)
-		cell4.connect('edited', self.cell_regex_edited_callback)
-		column4 = gtk.TreeViewColumn('Name', cell4, text=0)
-		self.ex_regextv.append_column(column4)
-		
-		self.remoteinc = gtk.ListStore( str )
-		self.rem_includetv = self.widgets["remote_includetv"]
-		self.rem_includetv.set_model( self.remoteinc )
-		cell = gtk.CellRendererText()
-		cell.set_property('editable', True)
-		cell.connect('edited', self.cell_remoteinc_edited_callback, (self.remoteinc, "dirconfig", 1))
-		column = gtk.TreeViewColumn(_('Name'), cell, text=0)
-		self.rem_includetv.append_column(column)
-		
-		# Day of month table
-		self.time_dom = gtk.ListStore( str )
-		self.time_domtv = self.widgets["time_domtv"]
-		self.time_domtv.set_model( self.time_dom )
-		cell6 = gtk.CellRendererText()
-		column6 = gtk.TreeViewColumn(_('Name'), cell6, text=0)
-		self.time_domtv.append_column(column6)
-
-		for i in range(1, 32):
-			self.time_dom.append( [str(i)] )
-
-		# Day of week table
-		self.time_dow = gtk.ListStore( str )
-		self.time_dowtv = self.widgets["time_dowtv"]
-		self.time_dowtv.set_model( self.time_dow )
-		cell7 = gtk.CellRendererText()
-		column7 = gtk.TreeViewColumn(_('Name'), cell7, text=0)
-		self.time_dowtv.append_column(column7)
-
-		self.known_ftypes = { "mp3": _("MP3 Music"), "avi": _("AVI Video"), "mpeg": _("MPEG Video"), "mpg": _("MPEG Video"), "mkv": _("Matrjoshka Video"), "ogg": _("OGG Multimedia container"), "iso": _("CD Images")}
-		
-		for i in range(0,7):
-			self.time_dow.append([ time.strftime( "%A", (2000,1,1,1,1,1,i,1,1)) ])
-			
-		# Profile Manager
-		# [ enable , profilename, cfPath ]
-		self.profiles = gtk.ListStore( bool, str, str )
-		for i,v in self.configman.getProfiles().iteritems() :
-			self.profiles.append( [v[1], i, v[0]] )
-		self.profilestv = self.widgets['profilesListTreeView']
-		self.profilestv.set_model(self.profiles )
-		
-		cell8,cell9 = gtk.CellRendererToggle(), gtk.CellRendererText()
-		cell8.set_active(True)
-		cell8.connect("toggled", self.on_prfEnableCB_toggled)
-		
-		
-		enableCBColumn = gtk.TreeViewColumn(_("Enable"), cell8, active=0 ) 
-		prfNameColumn = gtk.TreeViewColumn(_("Profile Name"), cell9, text=1 )
-		
-		self.profilestv.append_column(enableCBColumn)
-		self.profilestv.append_column(prfNameColumn)
-		
-		# The split size coices
-		self.splitSizeLS = gtk.ListStore( str, int )
-		values = []
-		for k in self.splitSize.keys() :
-			values.append(k)
-		values.sort()
-		
-		for k in values :
-			self.splitSizeLS.append([self.splitSize[k],k])
-		self.widgets['splitsizeCB'].set_model(self.splitSizeLS)
-		cell = gtk.CellRendererText()
-		self.widgets['splitsizeCB'].pack_start(cell, True)
-		self.widgets['splitsizeCB'].add_attribute(cell, 'text', 0) 
-			
-		# ---
-			
-		
-		self.prefillWindow()
 
 	#----------------------------------------------------------------------
 	

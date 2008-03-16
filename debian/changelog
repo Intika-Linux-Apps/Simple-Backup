@@ -1,3 +1,9 @@
+nssbackup (0.2-0~beta1ppa1) hardy; urgency=low
+
+  * Logarithm purge implemented
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 16 Mar 2008 15:39:44 +0100
+
 nssbackup (0.2-0~alpha3ppa1) hardy; urgency=low
 
   * Snapshot management functionality implemented

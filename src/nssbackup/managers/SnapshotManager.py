@@ -155,12 +155,12 @@ class SnapshotManager :
 		"""
 		#if the snapshot to rebase is full, no need to do the operation. 
 		if torebase.isfull() : 
-			raise SBException(_("No need to rebase a full snapshot '%s'") % torebase.getName()) 
+			raise RebaseFullSnpForbidden(_("No need to rebase a full snapshot '%s'") % torebase.getName()) 
 		# if the new base is earlier, t
 		if newbase and torebase.getName() <= newbase.getName() :
-			raise SBException(_("Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")% {'snapshotToRebase':torebase.getName(), 'NewBaseSnapshot': newbase.getName()}) 
+			raise RebaseSnpException(_("Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")% {'snapshotToRebase':torebase.getName(), 'NewBaseSnapshot': newbase.getName()}) 
 		if not torebase.getBase():
-			raise SBException(_("'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken ")% {'snapshotToRebase':torebase.getName()})
+			raise RebaseSnpException(_("'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken ")% {'snapshotToRebase':torebase.getName()})
 		
 		currentTorebase = torebase
 		
@@ -537,7 +537,10 @@ class SnapshotManager :
 			getLogger().debug("Purging from %s to %s" % (_fromD,_toD))
 			snps = self.getSnapshots(fromDate=_fromD, toDate=_toD)
 			if not snps is None and len(snps) != 0 :
-				self.rebaseSnapshot(snps[0],snps[-1])
+				try :
+					self.rebaseSnapshot(snps[0],snps[-1])
+				except RebaseFullSnpForbidden, e:
+					getLogger().warning(_("Got till a Full backup before the end of the rebase ! Stopping here !"))  
 				if len(snps[1:-1]) > 0:
 					# remove the snapshot
 					for s in snps[1:-1]:
