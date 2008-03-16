@@ -495,95 +495,6 @@ class SnapshotManager :
 		files. The format is {"file" : ("propsnap1|propsnap2",sonsbdict)}.
 		"""
 	
-#	def isAlreadyStored(self,snapshot, _file, lastsnapshot=None):
-#		"""
-#		for a file , check if it's already stored in a last snapshot
-#		@param snapshot: The first snapshot in wih to look
-#		@param file: The file to look for
-#		@param lastsnapshot(=None): The lastsnapshot in wich to search (default is last Full one)
-#		@return: None if file not inside, (the file props if it was stored) 
-#		"""
-#		# keep all the snapshot infos
-#		#getLogger().debug("Searching for '%s' from '%s'" % (_file, snapshot.getName()))
-#		result = None
-#		
-#		if snapshot.isfull() :
-#			#getLogger().debug("Snapshot '%s' is full, no need to go further " % snapshot.getName())
-#			if snapshot.getFilesList().has_key(_file) :
-#				#getLogger().debug("found in '%s' " % snapshot.getName())
-#				result = snapshot.getFilesList()[_file][0]
-#			return result
-#		else :
-#			# snapshot is inc
-#			# till we reach full base add the non existing files
-#			endpointfound = False
-#			cursnp = snapshot
-#			while endpointfound is False and result is None :
-#				#getLogger().debug("Searching for '%s' from '%s'" % (_file, cursnp.getName()))
-#				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
-#					#getLogger().debug("stop point found '%s'" % cursnp.getName())
-#					endpointfound = True
-#				if cursnp.getFilesList().has_key(_file) :
-#					#getLogger().debug("found in '%s' " % cursnp.getName())
-#					result = cursnp.getFilesList()[_file][0]
-#				else : 
-#					if not cursnp.isfull() :
-#						cursnp = cursnp.getBaseSnapshot()
-#			
-#			return result
-#	
-#	def getRevertState(self,snapshot, path, lastsnapshot=None):
-#		"""
-#		gets the revert state ie the state of the files at the snapshot time. 
-#		The algorithm is to keep the newer file existing between snapshot and the first ful snapshot that we encounter.
-#		@param snapshot: the snapshot from wich to get the state:
-#		@param path: the path to get the revert state.
-#		@param lastsnapshot : The snapshot on which one to stop  
-#		@return: a dict {snapshotPath : SBdict } where SBdict is filled with 
-#		the files and properties coming from snapshot 'snapshot' and that must be include in the revert state.
-#		"""
-#		if not snapshot.getFilesList().has_key(path) : 
-#			raise SBException(_("The file '%s' is not found in snapshot") % path)
-#		# keep all the snapshot infos
-#		contents = SBdict()
-#		contents[path] = snapshot.getFilesList()[path]
-#		getLogger().debug("keep all the snapshot '%s' infos" % snapshot.getName())
-#		result = {snapshot.getPath() : contents}
-#			
-#		if snapshot.isfull() :
-#			getLogger().debug("Snapshot '%s' is full, no need to go further " % snapshot.getName())
-#			return result
-#		else :
-#			getLogger().debug("Snapshot '%s' is inc" % snapshot.getName())
-#			# snapshot is inc
-#			# till we reach full base add the non existing files
-#			fullfound = False
-#			cursnp = snapshot
-#			while fullfound is False :
-#				cursnp = cursnp.getBaseSnapshot()
-#				if cursnp.isfull() or cursnp.getName() == lastsnapshot :
-#					getLogger().debug("stop point found '%s'" % cursnp.getName())
-#					fullfound = True
-#				if cursnp.getFilesList().has_key(path) and cursnp.getFilesList().getSon(path) :
-#					for subfile,props in cursnp.getFilesList().getSon(path).iteritems() :
-#						if not result.has_key(cursnp.getPath()) :
-#							result[cursnp.getPath()] = SBdict()
-#						#now sort result.
-#						keys = result.keys()
-#						keys.sort(reverse=True)
-#						
-#						file = os.path.normpath(os.sep.join([path.rstrip(os.sep),subfile.lstrip(os.sep)]))
-#						
-#						for k in keys :
-#							incl = result[k]
-#							# /!\ Don't add the cursnp in the include check process.
-#							if k != cursnp.getPath() and not incl.has_key(file):
-#								# It means that it's the newer version of that file ,
-#								#add the file 
-#								result[cursnp.getPath()][file] = props
-#				# processing finished for this snapshot
-#				getLogger().debug("processing finished for snapshot %s " % str(cursnp))
-#			return result
 
 	def getSnpHistory(self,snapshot):
 		"""
@@ -618,6 +529,22 @@ class SnapshotManager :
 		Purge a directory
 		@param mode : for the moment, only "log" and "simple" are supported 
 		"""
+		
+		def purgeinterval(_from,_to):
+			f,t = datetime.date.fromtimestamp(_from),datetime.date.fromtimestamp(_to)
+			_fromD = '%04d-%02d-%02d' % (f.year,f.month,f.day)
+			_toD = '%04d-%02d-%02d' % (t.year,t.month,t.day)
+			getLogger().debug("Purging from %s to %s" % (_fromD,_toD))
+			snps = self.getSnapshots(fromDate=_fromD, toDate=_toD)
+			if not snps is None and len(snps) != 0 :
+				self.rebaseSnapshot(snps[0],snps[-1])
+				if len(snps[1:-1]) > 0:
+					# remove the snapshot
+					for s in snps[1:-1]:
+						if not s.isfull():
+							FAM.delete(s.getPath())
+						
+			
 		snapshots = []
 		# Remove broken backup snapshots after first intact snapshot
 		listing = FAM.listdir(self.__targetDir)
@@ -632,12 +559,39 @@ class SnapshotManager :
 					FAM.delete(self.__targetDir+os.sep+str(dir))
 		
 		# now purge according to date
-		topurge = []
 		if purge == "log":
+			getLogger().info("Logarithm Purging !")
 			# Logarithmic purge
-			# Determine which incremental backup snapshots to remove
-			getLogger().warning(_("Logarithmic purge not implemented yet !"))
+			#Keep progressivelly less backups into the past:
+			#Keep all backups from yesterday
+			#Keep one backup per day from last week.
+			#Keep one backup per week from last month.
+			#Keep one backup per month from last year.
+			#Keep one backup per year further into past.
+			#Erase all other backups.
+			daytime = 24*3600
+			_today = t = int(time.time())
+			_2daysbefore = t - 2*daytime
+			_1weekbefore = t - 9*daytime
+			_1monthbefore = t - 30*daytime
+			_1yearbefore = t - 365*daytime
+			currentday = _2daysbefore
 			
+			# check for last week 
+			getLogger().info("Logarithm Purging [Last week]!")
+			for n in range(1,(_2daysbefore - _1weekbefore) / daytime) : 
+				purgeinterval(_2daysbefore - n*daytime,_2daysbefore - (n-1)*daytime)
+			
+			# check for last month
+			getLogger().info("Logarithm Purging [Last month]!")
+			for n in range(1,(_1weekbefore - _1monthbefore) / (7*daytime)) : 
+				purgeinterval(_1weekbefore- n*7*daytime,_1weekbefore - (n-1)*7*daytime)
+			
+			# check for last year
+			getLogger().info("Logarithm Purging [Last Year]!")
+			for n in range(1,(_1monthbefore - _1yearbefore) / (30*daytime)) : 
+				purgeinterval(_1monthbefore- n*30*daytime,_1monthbefore - (n-1)*30*daytime)
+						
 		else:
 			# Purge isn't logarithmic
 			try: purge = int(purge)
@@ -647,9 +601,6 @@ class SnapshotManager :
 				for snp in snapshots:
 					date = snp.getDate()
 					if (datetime.date.today() - datetime.date(date['year'],date['month'],date['day']) ).days > purge:
-						topurge.append(snp.getPath())
-		
-		for adir in topurge:
-			getLogger().warning(_("Deleting '%(dir)s' for purge !") % {'dir' : adir })
-			FAM.delete( adir )
+								getLogger().warning(_("Deleting '%(snp)s' for purge !") % {'snp' : snp })
+								self.removeSnapshot(snp)
 		

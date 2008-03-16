@@ -108,19 +108,19 @@ class BackupManager :
 
 		# Check the target dir
 		self.__checkTarget()
-
-		# purge
-		purge = None
-		if self.config.has_option("general", "purge"):
-			purge = self.config.get("general", "purge")
-		if purge :
-			self.__snpman.purge(purge)
 		
 		# Upgrade Target 
 		try :
 			self.__um.upgradeAll( self.config.get("general","target")  )
 		except SBException, e:
 			getLogger().warning(str(e))
+		
+		# purge
+		purge = None
+		if self.config.has_option("general", "purge"):
+			purge = self.config.get("general", "purge")
+		if purge :
+			self.__snpman.purge(purge)
 		
 		# Get the snapshots list
 		listing = self.__snpman.getSnapshots()
