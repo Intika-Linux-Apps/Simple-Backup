@@ -591,7 +591,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		else :
 			if self.has_option("schedule", "cron") :
 				getLogger().debug("Saving Cron entries")
-				erase_services()
+				self.erase_services()
 				FAM.writetofile("/etc/cron.d/nssbackup", self.get("schedule", "cron") + "\troot\t"+ Util.getResource("nssbackup"))
 				
 			if self.has_option("schedule", "anacron") :
