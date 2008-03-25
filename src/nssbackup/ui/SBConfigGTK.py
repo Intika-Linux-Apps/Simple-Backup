@@ -1665,14 +1665,14 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_crtfilechooser_selection_changed(self, *args):
 		self.configman.set("report", "smtpcert", self.widgets['crtfilechooser'].get_filename())
 		self.isConfigChanged()
-		getLogger().debug("Certificate : " + self.configman.get("report", "smtpcert"))
+		getLogger().debug("Certificate : " + str(self.configman.get("report", "smtpcert")))
 
 	#----------------------------------------------------------------------
 
 	def on_keyfilechooser_selection_changed(self, *args):
 		self.configman.set("report", "smtpkey", self.widgets['keyfilechooser'].get_filename())
 		self.isConfigChanged()
-		getLogger().debug("Key : " + self.configman.get("report", "smtpkey"))
+		getLogger().debug("Key : " + str(self.configman.get("report", "smtpkey")))
 
 	#----------------------------------------------------------------------
 
