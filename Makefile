@@ -11,12 +11,33 @@ all:
 
 default:
 
-install: po-data install-po fill-templates
-	python setup.py install --prefix=$(DESTDIR)
+install: po-data install-po fill-templates install-bin install-classes install-data
 	chmod +x $(BIN)/nssbackup* $(BIN)/upgrade-backups $(DESTDIR)/share/nssbackup/multipleTarScript  $(DESTDIR)/share/nssbackup/nssbackup
 
 fill-templates:
 	sed s+@prefix@+$(PREFIX)+ src/nssbackup/ressources.in > src/nssbackup/ressources
+
+install-bin:
+	mkdir -p $(BIN)
+	cp -a src/nssbackupd $(BIN)/nssbackupd
+	cp -a src/nssbackup-config-gui $(BIN)/nssbackup-config-gui
+	cp -a src/nssbackup-restore-gui $(BIN)/nssbackup-restore-gui
+	cp -a src/upgrade-backups $(BIN)/upgrade-backups
+
+install-classes:
+	mkdir -p $(CLSDIR)
+	cp -a src/nssbackup/* $(CLSDIR)
+	rm -f $(CLSDIR)/ressources.in  
+
+install-data:
+	mkdir -p $(DESTDIR)/share/pixmaps
+	cp -a datas/*.png $(DESTDIR)/share/pixmaps/
+	mkdir -p $(DESTDIR)/share/applications
+	cp -a datas/*.desktop $(DESTDIR)/share/applications/
+	mkdir -p $(DESTDIR)/share/nssbackup
+	cp -a datas/*.glade $(DESTDIR)/share/nssbackup/
+	cp -a datas/nssbackup $(DESTDIR)/share/nssbackup/
+	cp -a datas/multipleTarScript $(DESTDIR)/share/nssbackup/
 
 uninstall: uninstall-bin uninstall-data
 
@@ -41,9 +62,9 @@ uninstall-data:
 reinstall: uninstall install
 
 clean:
-	rm -f src/*.pyc src/*/*.pyc
-	rm -f po/*~
-	rm -f *~ *.bak
+	find . -name '*.pyc' -exec rm -f '{}' \;
+	find . -name '*~' -exec rm -f '{}' \;
+	find . -name '*.bak' -exec rm -f '{}' \;
 	rm -rf build
 	rm -f src/nssbackup/ressources
 	for lang in $(PO); do rm -rf po/$$lang ; done
