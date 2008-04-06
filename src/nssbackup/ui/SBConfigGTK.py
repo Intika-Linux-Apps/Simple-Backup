@@ -383,12 +383,14 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_ex_addregex_clicked',
 			'on_ex_delregex_clicked',
 			'on_ex_max_toggled',
-			'on_ex_maxsize_value_changed',
+			'on_ex_maxsize_changed',
 			'on_dest1_toggled',
 			'on_dest_localpath_selection_changed',
 			'on_dest_remote_changed',
 			'on_dest_remotetest_clicked',
 			'on_time_freq_changed',
+			'on_time_hour_changed',
+			'on_time_min_changed',
 			'on_anacronRadio_toggled',
 			'on_ccronline_changed',
 			'on_time_domtv_cursor_changed',
@@ -1285,6 +1287,54 @@ class SBconfigGTK(GladeGnomeApp):
 		# put current cronline into the ccronline widget here
 		self.widgets["ccronline"].set_text(cronline)
 
+	def on_time_hour_changed(self, *args):
+		# Add in the configfile now
+		cmin = str(int(self.widgets["time_min"].get_value()))
+		chour = str(int(self.widgets["time_hour"].get_value()))
+		# if every day is selected, 
+		if self.widgets["time_freq"].get_active()==2:	
+			cronline = " ".join([cmin,chour,"*","*","*"])
+		else:
+			if self.widgets["time_freq"].get_active()==3:
+				cdow  = self.widgets["time_dowtv"].get_selection().get_selected_rows()[1]
+				try:  cdow = str(int(cdow[0][0])+1)
+				except: cdow = "1"
+				cronline = " ".join([cmin,chour,cdow,"*","*"])
+			elif self.widgets["time_freq"].get_active()==4:
+				cdom  = self.widgets["time_domtv"].get_selection().get_selected_rows()[1]
+				try:  cdom = str(int(cdom[0][0])+1)
+				except: cdom = "1"
+				cronline = " ".join([cmin,chour,"*",cdom,"*"])
+		self.configman.setSchedule(1, cronline)
+		self.isConfigChanged()
+		# put current cronline into the ccronline widget here
+		self.widgets["ccronline"].set_text(cronline)
+		
+	def on_time_min_changed(self, *args):
+		# Add in the configfile now
+		cmin = str(int(self.widgets["time_min"].get_value()))
+		# if every day is selected, 
+		if self.widgets["time_freq"].get_active()==1:	
+			cronline = " ".join([cmin,"*","*","*","*"])
+		else:
+			chour = str(int(self.widgets["time_hour"].get_value()))
+			if self.widgets["time_freq"].get_active()==2:	
+				cronline = " ".join([cmin,chour,"*","*","*"])
+			elif self.widgets["time_freq"].get_active()==3:
+				cdow  = self.widgets["time_dowtv"].get_selection().get_selected_rows()[1]
+				try:  cdow = str(int(cdow[0][0])+1)
+				except: cdow = "1"
+				cronline = " ".join([cmin,chour,cdow,"*","*"])
+			elif self.widgets["time_freq"].get_active()==4:
+				cdom  = self.widgets["time_domtv"].get_selection().get_selected_rows()[1]
+				try:  cdom = str(int(cdom[0][0])+1)
+				except: cdom = "1"
+				cronline = " ".join([cmin,chour,"*",cdom,"*"])
+		self.configman.setSchedule(1, cronline)
+		self.isConfigChanged()
+		# put current cronline into the ccronline widget here
+		self.widgets["ccronline"].set_text(cronline)
+		
 	def on_time_maxinc_changed(self,*args):
 		# add maxinc to the config
 		self.configman.set("general", "maxincrement", int(self.widgets["time_maxinc"].get_value())) 
@@ -1524,13 +1574,13 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_ex_max_toggled(self, *args):
 		if self.widgets["ex_max"].get_active():
 			self.widgets["ex_maxsize"].set_sensitive( True )
-			self.on_ex_maxsize_value_changed()
+			self.on_ex_maxsize_changed()
 		elif not self.widgets["ex_max"].get_active():
 			self.widgets["ex_maxsize"].set_sensitive( False )
 			self.configman.remove_option("exclude", "maxsize")
 			self.isConfigChanged()
 
-	def on_ex_maxsize_value_changed(self, *args):
+	def on_ex_maxsize_changed(self, *args):
 		self.configman.set( "exclude", "maxsize", str(int(self.widgets["ex_maxsize"].get_value())*1024*1024) )
 		self.isConfigChanged()
 	

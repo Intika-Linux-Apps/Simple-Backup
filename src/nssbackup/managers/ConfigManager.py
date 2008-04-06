@@ -132,6 +132,8 @@ class ConfigManager (ConfigParser.ConfigParser):
 
 	"""
 	
+	cronheader = "SHELL=/bin/bash \nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\n"
+	
 	servicefile = Util.getResource("nssbackup")
 	
 	regex = r"\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache"
@@ -652,7 +654,8 @@ class ConfigManager (ConfigParser.ConfigParser):
 			if self.has_option("schedule", "cron") :
 				getLogger().debug("Saving Cron entries")
 				self.erase_services()
-				FAM.writetofile("/etc/cron.d/nssbackup", self.get("schedule", "cron") + "\troot\t"+ Util.getResource("nssbackup"))
+				execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
+				FAM.writetofile("/etc/cron.d/nssbackup", self.cronheader + self.get("schedule", "cron") + "\troot\t"+ execline)
 				
 			if self.has_option("schedule", "anacron") :
 				getLogger().debug("Saving Cron entries")

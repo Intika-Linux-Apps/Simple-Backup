@@ -1,9 +1,9 @@
-nssbackup (0.2-0~beta2) gutsy; urgency=low
+nssbackup (0.2-0~beta2) hardy; urgency=low
 
   * Logarithm purge implemented
   * Installing nssbackup will install FTP and SSH plugins
 
- -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 05 Apr 2008 19:20:57 +0200
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 05 Apr 2008 20:31:22 +0200
 
 nssbackup (0.2-0~alpha3ppa1) hardy; urgency=low
 
