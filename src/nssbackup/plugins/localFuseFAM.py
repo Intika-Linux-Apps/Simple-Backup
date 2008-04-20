@@ -43,10 +43,10 @@ class localFuseFAM (pluginFAM):
 		@return: The mount point complete path
 		@rtype: str
 		"""
-		getLogger().debug("Nothing to do for '%s'" % source)
+		self.logger.debug("Nothing to do for '%s'" % source)
 		return (os.sep,"",source.lstrip(os.sep))
 	
 	def umount(self,mounteddir):
 		"""
 		"""
-		getLogger().debug("No need to unmount %s"% mounteddir)
+		self.logger.debug("No need to unmount %s"% mounteddir)

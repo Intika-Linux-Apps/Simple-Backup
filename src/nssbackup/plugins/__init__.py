@@ -22,7 +22,7 @@ import nssbackup, subprocess
 from gettext import gettext as _
 from tempfile import *
 from nssbackup.managers.FileAccessManager import *
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 
 class pluginFAM :
@@ -31,7 +31,10 @@ class pluginFAM :
 	@author: Oumar Aziz Ouattara <wattazoum@gmail.com>
 	@version: 1.0
 	"""
-
+	
+	def __init__(self):
+		self.logger = LogFactory.getLogger()
+	
 	def matchScheme(self,remoteSource):
 		"""
 		Try to match the scheme of the remoteSource.
@@ -100,6 +103,7 @@ class pluginFAM :
 class PluginManager :
 	"""
 	"""
+	logger = LogFactory.getLogger()
 	# This should be a dictionary of plugins
 	__pluginList = None
 
@@ -132,7 +136,7 @@ class PluginManager :
 								self.__pluginList[symbol_name] = symbol
 	                            
 					except Exception, e:
-						getLogger().warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
+						self.logger.warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
 						continue
 			return self.__pluginList
 		

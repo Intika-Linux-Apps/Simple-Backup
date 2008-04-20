@@ -28,7 +28,7 @@ import nssbackup.util as Util
 from nssbackup.util.structs import SBdict
 from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.exceptions import *
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 ##
 #@author: Oumar Aziz Ouattara <wattazoum@gmail.com>
 #@version: 1.0
@@ -47,6 +47,7 @@ class SnapshotManager :
 	
 	def __init__(self,targetDir):
 		global __targetDir
+		self.logger = LogFactory.getLogger()
 		
 		## 
 		# The list of the snapshots is stored the first time it's used so that we don't have to reget it
@@ -107,15 +108,15 @@ class SnapshotManager :
 					try :
 						snapshots.append( Snapshot( self.__targetDir+"/"+str(dir) ) )
 					except NotValidSnapshotException, e :
-						getLogger().warning(e.message)
+						self.logger.warning(e.message)
 				snapshots.sort(key=Snapshot.getName,reverse=True)
 				self.__snapshots = snapshots
 			
-		if getLogger().isEnabledFor(10) :
-			getLogger().debug("[Snapshots Listing]") 
+		if self.logger.isEnabledFor(10) :
+			self.logger.debug("[Snapshots Listing]") 
 			for snp in snapshots :
-				getLogger().debug(str(snp)) 
-			getLogger().debug("")
+				self.logger.debug(str(snp)) 
+			self.logger.debug("")
 			
 		return snapshots
 	
@@ -191,14 +192,14 @@ class SnapshotManager :
 		
 		def makeTmpTAR():
 			# write temp flist using the snar file  to backup
-			getLogger().info("Writing the temporary Files list to make the transfer")
+			self.logger.info("Writing the temporary Files list to make the transfer")
 			flistd = open(tmpdir+os.sep+"flist.tmp",'w')
 			snarfile = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp"))
 			for f in snarfile.iterfiles():
 				flistd.write(f.lstrip(os.sep)+'\0')
 			flistd.close()
 			
-			getLogger().info("Make a temporary tar file by tranfering the files from base")
+			self.logger.info("Make a temporary tar file by tranfering the files from base")
 			tmptardir = tmpdir+os.sep+"tempTARdir"
 			os.mkdir(tmptardir)
 			
@@ -236,7 +237,7 @@ class SnapshotManager :
 			Merge the snar.full.tmp file with the current snapshot snarfile in a snar.final.tmp file.
 			for each path in the current snar if included inthe snar.full.tmp , drop it, oherwise add the whole record.
 			""" 
-			getLogger().info("Merging Snar files")
+			self.logger.info("Merging Snar files")
 			
 			fd = open(tmpdir+os.sep+"snar.final.tmp",'w')
 			fd.write(header)
@@ -284,7 +285,7 @@ class SnapshotManager :
 			
 		
 		def movetoFinaldest():
-			getLogger().info("Move all temporary files to their final destivation")
+			self.logger.info("Move all temporary files to their final destivation")
 			# SNAR file
 			if os.path.exists(snapshot.getSnarFile()) :
 				os.remove(snapshot.getSnarFile())
@@ -307,7 +308,7 @@ class SnapshotManager :
 			tmpdir = snapshot.getPath()+os.sep+self.REBASEDIR
 			os.mkdir(tmpdir)
 			
-			getLogger().info("Writing the temporary SNARFILEs to make the transfer")
+			self.logger.info("Writing the temporary SNARFILEs to make the transfer")
 			
 			# get snar header from current snapshots
 			snard = open(snapshot.getSnarFile())
@@ -325,12 +326,12 @@ class SnapshotManager :
 				snard.close()
 			else :
 				# the SNAR file is empty
-				getLogger().debug("SNAR file empty, create the header manually")
+				self.logger.debug("SNAR file empty, create the header manually")
 				snard.close()
 				date = snapshot.getDate()
 				datet = datetime.datetime(date['year'],date['month'],date['day'],date['hour'],date['minute'],date['second'])
 				
-			getLogger().debug("Current SNAR Header : " + header)
+			self.logger.debug("Current SNAR Header : " + header)
 			
 			snarpartinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.part.tmp",True))
 			snarfullinfo = ProcSnapshotFile(SnapshotFile(tmpdir+os.sep+"snar.full.tmp",True))
@@ -410,7 +411,7 @@ class SnapshotManager :
 			self.statusMessage = None
 			self.substatusMessage = None
 		except Exception,e :
-			getLogger().error(_("Got an exception when Pulling '%s' : "+str(e)) % snapshot.getName() ) 
+			self.logger.error(_("Got an exception when Pulling '%s' : "+str(e)) % snapshot.getName() ) 
 			self.__cancelPull(snapshot)
 			raise e
 		
@@ -444,7 +445,7 @@ class SnapshotManager :
 		@rtype: Snapshot
 		"""
 		if snapshot.isfull():
-			getLogger().info(_("Snapshot '%s' is already Full, nothing to do (not changing it to full")) % snapshot.getName()
+			self.logger.info(_("Snapshot '%s' is already Full, nothing to do (not changing it to full")) % snapshot.getName()
 			return snapshot
 		path = snapshot.getPath()
 		os.rename(path+os.sep+'base', path+os.sep+'base.old')
@@ -457,7 +458,7 @@ class SnapshotManager :
 		This means, the infos we want to add in the SNAR file should be created as a temporary SNAR file
 		Same goes for the TAR file. So that to cancel, we will just have to remove those temporary files and restore the 'ver' file.
 		"""
-		getLogger().info(_("Cancelling pull of snapshot '%s'") % snapshot.getName() )
+		self.logger.info(_("Cancelling pull of snapshot '%s'") % snapshot.getName() )
 		path = snapshot.getPath()+os.sep+self.REBASEDIR
 		shutil.rmtree(path)
 		
@@ -483,9 +484,9 @@ class SnapshotManager :
 				if snapshot.isfull():
 					raise SBException(_("It's impossible and not recommended to delete a full snapshot !"))
 				else:
-					getLogger().debug("Rebasing '%s' to '%s' " % (snp.getName(), snapshot.getBaseSnapshot().getName()) )
+					self.logger.debug("Rebasing '%s' to '%s' " % (snp.getName(), snapshot.getBaseSnapshot().getName()) )
 					self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
-		getLogger().debug("Removing '%s'" % snapshot.getName())
+		self.logger.debug("Removing '%s'" % snapshot.getName())
 		FAM.delete(snapshot.getPath())
 		
 		
@@ -515,12 +516,12 @@ class SnapshotManager :
 			result.append(current)
 		
 		# Just for DEBUG
-		if getLogger().isEnabledFor(10) :
+		if self.logger.isEnabledFor(10) :
 			# get the history 
 			history = "\n[%s history]"% snapshot.getName()
 			for snp in result :
 				history += "\n- %s" % snp.getName()
-			getLogger().debug(history)
+			self.logger.debug(history)
 		
 		return result
 			
@@ -534,13 +535,13 @@ class SnapshotManager :
 			f,t = datetime.date.fromtimestamp(_from),datetime.date.fromtimestamp(_to)
 			_fromD = '%04d-%02d-%02d' % (f.year,f.month,f.day)
 			_toD = '%04d-%02d-%02d' % (t.year,t.month,t.day)
-			getLogger().debug("Purging from %s to %s" % (_fromD,_toD))
+			self.logger.debug("Purging from %s to %s" % (_fromD,_toD))
 			snps = self.getSnapshots(fromDate=_fromD, toDate=_toD)
 			if not snps is None and len(snps) != 0 :
 				try :
 					self.rebaseSnapshot(snps[0],snps[-1])
 				except RebaseFullSnpForbidden, e:
-					getLogger().warning(_("Got till a Full backup before the end of the rebase ! Stopping here !"))  
+					self.logger.warning(_("Got till a Full backup before the end of the rebase ! Stopping here !"))  
 				if len(snps[1:-1]) > 0:
 					# remove the snapshot
 					for s in snps[1:-1]:
@@ -556,14 +557,14 @@ class SnapshotManager :
 				snapshots.append(Snapshot( self.__targetDir+os.sep+str(dir) ))
 			except NotValidSnapshotException, e :
 				if isinstance(e, NotValidSnapshotNameException) :
-					getLogger().warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(dir),'error_cause' :e.message})
+					self.logger.warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(dir),'error_cause' :e.message})
 				else : 
-					getLogger().info(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(dir),'error_cause' :e.message})
+					self.logger.info(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(dir),'error_cause' :e.message})
 					FAM.delete(self.__targetDir+os.sep+str(dir))
 		
 		# now purge according to date
 		if purge == "log":
-			getLogger().info("Logarithm Purging !")
+			self.logger.info("Logarithm Purging !")
 			# Logarithmic purge
 			#Keep progressivelly less backups into the past:
 			#Keep all backups from yesterday
@@ -581,17 +582,17 @@ class SnapshotManager :
 			currentday = _2daysbefore
 			
 			# check for last week 
-			getLogger().info("Logarithm Purging [Last week]!")
+			self.logger.info("Logarithm Purging [Last week]!")
 			for n in range(1,(_2daysbefore - _1weekbefore) / daytime) : 
 				purgeinterval(_2daysbefore - n*daytime,_2daysbefore - (n-1)*daytime)
 			
 			# check for last month
-			getLogger().info("Logarithm Purging [Last month]!")
+			self.logger.info("Logarithm Purging [Last month]!")
 			for n in range(1,(_1weekbefore - _1monthbefore) / (7*daytime)) : 
 				purgeinterval(_1weekbefore- n*7*daytime,_1weekbefore - (n-1)*7*daytime)
 			
 			# check for last year
-			getLogger().info("Logarithm Purging [Last Year]!")
+			self.logger.info("Logarithm Purging [Last Year]!")
 			for n in range(1,(_1monthbefore - _1yearbefore) / (30*daytime)) : 
 				purgeinterval(_1monthbefore- n*30*daytime,_1monthbefore - (n-1)*30*daytime)
 						
@@ -604,6 +605,6 @@ class SnapshotManager :
 				for snp in snapshots:
 					date = snp.getDate()
 					if (datetime.date.today() - datetime.date(date['year'],date['month'],date['day']) ).days > purge:
-								getLogger().warning(_("Deleting '%(snp)s' for purge !") % {'snp' : snp })
+								self.logger.warning(_("Deleting '%(snp)s' for purge !") % {'snp' : snp })
 								self.removeSnapshot(snp)
 		

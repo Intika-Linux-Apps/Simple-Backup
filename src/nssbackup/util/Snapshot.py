@@ -21,7 +21,7 @@ import re
 import os
 from gettext import gettext as _
 from exceptions import NotValidSnapshotNameException,SBException, NotValidSnapshotException
-from log import getLogger
+from log import LogFactory
 from structs import SBdict
 import nssbackup.util.tar as TAR
 from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
@@ -29,6 +29,7 @@ from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
 class Snapshot : 
 	"The snapshot class represents one snapshot in the backup directory"
 	
+	logger = LogFactory.getLogger()
 	
 	__validname_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})_(\d{2})[\:\.](\d{2})[\:\.](\d{2})\.\d+\..*?\.(.+)$")
 	
@@ -216,7 +217,7 @@ class Snapshot :
 			if os.path.exists(self.getPath()+os.sep+"files.tar.gz") :
 				return self.getPath()+os.sep+"files.tar.gz"
 			elif self.getVersion() == "1.4":
-				getLogger().warning("The tgz name is deprecated, please upgrade Snapshot to Version 1.5")
+				self.logger.warning("The tgz name is deprecated, please upgrade Snapshot to Version 1.5")
 				if os.path.exists(self.getPath()+os.sep+"files.tgz") :
 					return self.getPath()+os.sep+"files.tgz"
 				else :
@@ -359,7 +360,7 @@ class Snapshot :
 		global __format
 		supported = ["none","bzip2", "gzip"]
 		if cformat and cformat in supported :
-			getLogger().debug("Set the compression format to %s" % cformat)
+			self.logger.debug("Set the compression format to %s" % cformat)
 			self.__format = cformat
 	
 	

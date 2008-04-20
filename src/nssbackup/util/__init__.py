@@ -18,7 +18,7 @@
 import nssbackup.managers.FileAccessManager as FAM
 import os
 import subprocess, nssbackup
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 from tempfile import *
 import inspect, shutil
@@ -88,10 +88,10 @@ def getResource(resourceName):
 	resfile = open(os.sep.join([os.path.dirname(tmp),"ressources"]))
 	for dir in resfile.readlines() :
 		dir = dir.strip()
-		#getLogger().debug("Searching in directory '%s'" % dir)
+		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
 		if os.path.exists(dir) and os.path.isdir(dir):
 			list = os.listdir(dir)
-			#getLogger().debug("File list is :" + str(list))
+			#LogFactory.getLogger().debug("File list is :" + str(list))
 			for f in list :
 				if f == resourceName :
 					return os.path.normpath(os.sep.join([dir,resourceName]))
@@ -117,7 +117,7 @@ def launch(cmd, opts):
 
 	# Call the subprocess using convenience method
 	opts.insert(0,cmd)
-	getLogger().debug("Lauching : "+str(opts))
+	LogFactory.getLogger().debug("Lauching : "+str(opts))
 	retval = subprocess.call(opts, 0, None, None, outptr, errptr)
 
 	# Close log handles
@@ -154,9 +154,9 @@ def extract(sourcetgz, file, dest , bckupsuffix = None):
 	
 	outStr, errStr, retval = launch("tar", options)
 	if retval != 0 :
-		getLogger().debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	getLogger().debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 	
 def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	"""
@@ -181,9 +181,9 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 	
 	outStr, errStr, retval = launch("tar", options)
 	if retval != 0 :
-		getLogger().debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	getLogger().debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 
 
 def readlineNULSep(fd,fd1):

@@ -21,63 +21,64 @@ import traceback
 import os.path
 import nssbackup.managers.FileAccessManager as FAM
 
-logger = None
-logfiles = []
-#create formatter
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s(%(lineno)d) - %(message)s")
-
-
-def getLogger( logfile=None, level=20 ) :
+class LogFactory :
 	"""
-	Initialization
-	@param logfile : default=False
-	@param level: The level of the logger (default = logging.INFO(20) )
 	"""
-	global logger
-
-	if logger :
-		if logfile :
-			if logfile in logfiles : 
-				return logger
-			else :
-				# create the logfile
-				if not FAM.exists(logfile) :
-					FAM.writetofile(logfile, "NSSBackup Logger\r\n==============\r\n")
+	logger = None
+	
+	#create formatter
+	formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s(%(lineno)d) - %(message)s")
+	
+	def getLogger(name=None, logfile=None, level=20 ) :
+		"""
+		Initialization
+		@param name: The name of the logger
+		@param logfile : default=False
+		@param level: The level of the logger (default = logging.INFO(20) )
+		"""
+			
+		if LogFactory.logger :
+			if name:
+				if LogFactory.logger.name == name :
+					return LogFactory.logger
 				else :
-					# clean the logfile
-					FAM.delete(logfile)
-					FAM.writetofile(logfile, "NSSBackup Logger\r\n==============\r\n")
-				ch1 = logging.FileHandler(logfile)
-				ch1.setLevel(level)
-				ch1.setFormatter(formatter)
-				logger.addHandler(ch1)
-				logfiles.append(logfile)
+					return LogFactory.__createLogger(name,logfile,level)
+			else :
+				return LogFactory.logger
 		else :
-			return logger
-	else :
+			return LogFactory.__createLogger(name,logfile,level)
+
+	getLogger = staticmethod(getLogger)
+	
+	def __createLogger(name=None, logfile=None, level=20):
+	
+		if not name :
+			name = "NSsbackup"
+		
 		#create logger
-		logger = logging.getLogger("NSSbackup")
-		logger.setLevel(level)
+		LogFactory.logger = logging.getLogger(name)
+		LogFactory.logger.setLevel(level)
 		#create console handler and set level to debug
 		ch = logging.StreamHandler()
 		ch.setLevel(level)
 		#add formatter to ch
-		ch.setFormatter(formatter)
+		ch.setFormatter(LogFactory.formatter)
 		#add ch to logger
-		logger.addHandler(ch)
+		LogFactory.logger.addHandler(ch)
 		
 		if logfile :
 			# create the logfile
 			if not os.path.exists(logfile) :
-				FAM.writetofile(logfile, "NSSBackup Logger\r\n==============\r\n")
+				FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
 			else :
 				# clean the logfile
-				FAM.delete(logfile)
-				FAM.writetofile(logfile, "NSSBackup Logger\r\n==============\r\n")
+				os.remove(logfile)
+				FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
 			ch1 = logging.FileHandler(logfile)
 			ch1.setLevel(level)
-			ch1.setFormatter(formatter)
-			logger.addHandler(ch1)
-			logfiles.append(logfile)
+			ch1.setFormatter(LogFactory.formatter)
+			LogFactory.logger.addHandler(ch1)
 		
-		return logger
+		return LogFactory.logger
+
+	__createLogger = staticmethod(__createLogger)

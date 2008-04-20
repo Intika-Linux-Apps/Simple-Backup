@@ -18,7 +18,7 @@
 import subprocess
 import os
 from tempfile import *
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 from nssbackup.plugins import PluginManager
 from FileAccessManager import *
 from nssbackup.util.exceptions import SBException
@@ -28,7 +28,7 @@ class FuseFAM:
 	"""
 	The Fuse File access Manager
 	"""
-	
+	logger = LogFactory.getLogger()
 	
 	def __init__(self, configManager=None):
 		"""
@@ -78,7 +78,7 @@ class FuseFAM:
 				#we got the plugin
 				plugin = p_class()
 				if plugin.matchScheme(remotedir):
-					getLogger().debug("Processing with plugin '%s' to mount '%s'" % (p_name,remotedir))
+					self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name,remotedir))
 					rsource,mpoint,pathinside = plugin.mount(remotedir, self.__mountdir)
 					self.__mountedDirs[rsource] = mpoint
 					return os.sep.join([mpoint,pathinside])
@@ -101,17 +101,17 @@ class FuseFAM:
 				#we got the plugin
 				plugin = p_class()
 				if plugin.matchScheme(remotedir):
-					getLogger().debug("Processing with plugin '%s' to mount '%s'" % (p_name,remotedir))
+					self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name,remotedir))
 					rsource,mpoint,pathinside = plugin.mount(remotedir, self.__mountdir)
 					self.__mountedDirs[rsource] = mpoint
 					if rsource != os.sep :
 						#change the value in configManager
 						if self.__config.has_option("general","target") and self.__config.get("general","target") == remotedir :
-							getLogger().debug("change the value of target in configManager")
+							self.logger.debug("change the value of target in configManager")
 							self.__config.set("general","target",os.sep.join([mpoint,pathinside]))
 							return 
 						if self.__config.has_option("dirconfig",remotedir) :
-							getLogger().debug("change the value of dirconfig option in configManager")
+							self.logger.debug("change the value of dirconfig option in configManager")
 							self.__config.set("dirconfig",os.sep.join([mpoint,pathinside]),str(self.__config.get("dirconfig",remotedir)))
 							self.__config.remove_option("dirconfig",remotedir)
 							return 
@@ -119,14 +119,14 @@ class FuseFAM:
 						# The plugin used was localFuseFAM
 						return True
 			except Exception, e :
-				getLogger().warning("ERROR when trying to use plugin '%s' to mount '%s', disabling it ! Cause : %s"% (p_name,remotedir,str(e)))
+				self.logger.warning("ERROR when trying to use plugin '%s' to mount '%s', disabling it ! Cause : %s"% (p_name,remotedir,str(e)))
 				if self.__config.has_option("dirconfig",remotedir) :
-					getLogger().debug("Removing '%s' from configManager" % remotedir)
+					self.logger.debug("Removing '%s' from configManager" % remotedir)
 					self.__config.remove_option("dirconfig",remotedir)
 				elif self.__config.has_option("general","target") and self.__config.get("general","target") == remotedir :
-					getLogger().error("We are unable to mount the target dir ! We will not abort right now and will fall back on GnomeVFS !")
+					self.logger.error("We are unable to mount the target dir ! We will not abort right now and will fall back on GnomeVFS !")
 				return False
-		getLogger().warning("No plugin could deal with that schema '%s', disabling it" % remotedir)
+		self.logger.warning("No plugin could deal with that schema '%s', disabling it" % remotedir)
 		self.__config.remove_option("dirconfig",remotedir)
 		
 	def __umount(self, mounteddir):
@@ -198,16 +198,16 @@ class FuseFAM:
 				remotes = eval(remotes)
 			if type(remotes) != dict :
 				raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )"% (remotes,type(remotes)))
-			getLogger().debug("remotes : '%s'" % remotes)
+			self.logger.debug("remotes : '%s'" % remotes)
 			for source,flag in remotes.iteritems() :
 				#TODO : check for multiple mount
 				mounted = False
 				for rsource, mountpoint in self.__mountedDirs.iteritems() :
 					if source.startswith(rsource) :
-						getLogger().debug("'%s' is already in mounted scope" % source)
+						self.logger.debug("'%s' is already in mounted scope" % source)
 						mounted = True
 						#change the reference in config manager
-						getLogger().debug("change the value of dirconfig option in configManager")
+						self.logger.debug("change the value of dirconfig option in configManager")
 						#we don't touch config for localfiles
 						if rsource != os.sep :
 							if not mountpoint.endswith(os.sep) :
@@ -223,9 +223,9 @@ class FuseFAM:
 #		try :
 #			self.__mountedDirs.pop(os.sep)
 #		except KeyError, e :
-#			getLogger().warning("No local directory were found in config  ! This is either a bug or you're doing everything remotely : '%s'" % str(e))
+#			self.logger.warning("No local directory were found in config  ! This is either a bug or you're doing everything remotely : '%s'" % str(e))
 #			
-		getLogger().debug(str(self.__config))
+		self.logger.debug(str(self.__config))
 		
 	def terminate(self):
 		"""
@@ -236,13 +236,13 @@ class FuseFAM:
 			if src is not os.sep :
 				for p_name, p_class in plugin_manager.getPlugins().iteritems():
 					#we got the plugin
-					getLogger().debug("Trying '%s' plugin to match '%s' " % (p_name,src))
+					self.logger.debug("Trying '%s' plugin to match '%s' " % (p_name,src))
 					plugin = p_class()
 					if plugin.matchScheme(src):
-						getLogger().debug("Unmounting with '%s' plugin " % p_name)
+						self.logger.debug("Unmounting with '%s' plugin " % p_name)
 						plugin.umount(dir)
 						os.rmdir(dir)
-				getLogger().warning("Couldn't unmount %s " % dir)
+				self.logger.warning("Couldn't unmount %s " % dir)
 			
 	def testFusePlugins(self, remotedir):
 		if remotedir.startswith(os.sep) :
@@ -263,20 +263,20 @@ class FuseFAM:
 				#we got the plugin
 				plugin = p_class()
 				if plugin.matchScheme(remotedir):
-					getLogger().debug("Processing with plugin '%s' to mount '%s'" % (p_name,remotedir))
+					self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name,remotedir))
 					rsource,mpoint,pathinside = plugin.mount(remotedir, mountdir)
-					getLogger().debug("Mount Succeeded !")
+					self.logger.debug("Mount Succeeded !")
 					#write
-					getLogger().debug("Testing Writability")
+					self.logger.debug("Testing Writability")
 					test = "testFuseFam"
 					testfile = os.sep.join([mpoint,pathinside,test])
 					os.mkdir(testfile)
 					os.rmdir(testfile)
 					# Unmount 
-					getLogger().debug("Unmounting !")
+					self.logger.debug("Unmounting !")
 					self.__umount(mpoint)
 					if os.path.exists(mpoint):
-						getLogger().debug("Removing mount dir")
+						self.logger.debug("Removing mount dir")
 						os.rmdir(mpoint)
 					return True
 			except Exception, e :

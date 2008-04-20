@@ -17,7 +17,7 @@
 
 from gettext import gettext as _
 from nssbackup.util.Snapshot import Snapshot
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.SnapshotManager import SnapshotManager
 import nssbackup.util as Util
@@ -31,6 +31,7 @@ class RestoreManager :
 	def __init__(self):
 		"""
 		"""
+		self.logger = LogFactory.getLogger()
 		
 	def restore(self,snapshot, _file):
 		"""
@@ -65,7 +66,7 @@ class RestoreManager :
 			if failOnNotFound :
 				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
 			else : 
-				getLogger().warning(_("File '%s' not found in the backup snapshot [%s] files list, We'll not fail though !") % (_file,snapshot.getName()) )
+				self.logger.warning(_("File '%s' not found in the backup snapshot [%s] files list, We'll not fail though !") % (_file,snapshot.getName()) )
 				return
 		
 		suffix = None
@@ -142,7 +143,7 @@ class RestoreManager :
 		history.reverse()
 		
 		for snp in history :
-			getLogger().debug("Restoring '%s' from snapshot '%s' " % (dir, snp.getName()) )
+			self.logger.debug("Restoring '%s' from snapshot '%s' " % (dir, snp.getName()) )
 			self.restoreAs(snp, dir, targetdir, False,False)
 
 

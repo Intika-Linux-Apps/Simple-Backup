@@ -24,7 +24,7 @@ from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getU
 from nssbackup.managers.SnapshotManager import SnapshotManager
 from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.managers.UpgradeManager import UpgradeManager
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 import nssbackup.util.Snapshot
 from nssbackup.util.Snapshot import Snapshot
 import nssbackup.util.tar as TAR
@@ -57,6 +57,8 @@ class SBRestoreGTK(GladeWindow):
 				self.config = ConfigManager(getUserConfDir()+ "nssbackup.conf")
 			else :
 				self.config = ConfigManager()
+		
+		self.logger = LogFactory.getLogger()
 		
 		# set fusefam
 		self.fusefam = FuseFAM(self.config)
@@ -212,8 +214,8 @@ class SBRestoreGTK(GladeWindow):
 			self.widgets["restoreExpander"].set_expanded(False)
 			self.fill_calendar()
 		except Exception, e :
-			getLogger().error(str(e))
-			getLogger().error(traceback.format_exc())
+			self.logger.error(str(e))
+			self.logger.error(traceback.format_exc())
 			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 			dialog.run()
 			dialog.destroy()
@@ -376,7 +378,7 @@ class SBRestoreGTK(GladeWindow):
 		@param date: a tupe (year, month, day) using the Calendar.get_date convention ie month is 0-11
 		"""
 		day = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"%02d" % date[2]])
-		getLogger().debug("Selected day : " + day)
+		self.logger.debug("Selected day : " + day)
 		snplist = self.snpman.getSnapshots(byDate=day)
 		
 		self.snplisttreestore.clear()
@@ -401,7 +403,7 @@ class SBRestoreGTK(GladeWindow):
 				self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
 				if self.currentSnp.getVersion() != Infos.SNPCURVERSION:
 					message = _("The snapshot version is not supported (Just %(supportedversion)s is supported). Version '%(currentversion)s' found. You should upgrade it. ") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
-					getLogger().warning(message) 
+					self.logger.warning(message) 
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=message)
 					dialog.run()
 					dialog.destroy()
@@ -428,8 +430,8 @@ class SBRestoreGTK(GladeWindow):
 				self.restoreman.restore(self.currentSnp, src)
 				self.widgets['progressbarDialog'].hide()
 			except Exception, e :
-				getLogger().error(str(e))
-				getLogger().error(traceback.format_exc())
+				self.logger.error(str(e))
+				self.logger.error(traceback.format_exc())
 				self.widgets['progressbarDialog'].hide()
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
@@ -455,8 +457,8 @@ class SBRestoreGTK(GladeWindow):
 				try :	
 					self.restoreman.restoreAs(self.currentSnp, src, dirname)
 				except Exception, e :
-					getLogger().error(str(e))
-					getLogger().error(traceback.format_exc())
+					self.logger.error(str(e))
+					self.logger.error(traceback.format_exc())
 					self.widgets['progressbarDialog'].hide()
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 					dialog.run()
@@ -480,8 +482,8 @@ class SBRestoreGTK(GladeWindow):
 				self.restoreman.revert(self.currentSnp, src)
 				self.widgets['progressbarDialog'].hide()
 			except Exception, e :
-				getLogger().error(str(e))
-				getLogger().error(traceback.format_exc())
+				self.logger.error(str(e))
+				self.logger.error(traceback.format_exc())
 				self.widgets['progressbarDialog'].hide()
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
@@ -512,8 +514,8 @@ class SBRestoreGTK(GladeWindow):
 					self.restoreman.revertAs(self.currentSnp, src,dirname)
 					self.widgets['progressbarDialog'].hide()
 				except Exception, e :
-					getLogger().error(str(e))
-					getLogger().error(traceback.format_exc())
+					self.logger.error(str(e))
+					self.logger.error(traceback.format_exc())
 					self.widgets['progressbarDialog'].hide()
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 					dialog.run()
@@ -583,8 +585,8 @@ class SBRestoreGTK(GladeWindow):
 						self.timer = gobject.timeout_add (100, self.status_callback, self.snpman.getStatus)
 						self.snpman.rebaseSnapshot(self.currentSnp, snp)
 				except Exception, e: 
-					getLogger().error(str(e))
-					getLogger().error(traceback.format_exc())
+					self.logger.error(str(e))
+					self.logger.error(traceback.format_exc())
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 					dialog.run()
 					dialog.destroy()
@@ -602,8 +604,8 @@ class SBRestoreGTK(GladeWindow):
 			try :
 				self.snpman.removeSnapshot(self.currentSnp)
 			except Exception, e: 
-				getLogger().error(str(e))
-				getLogger().error(traceback.format_exc())
+				self.logger.error(str(e))
+				self.logger.error(traceback.format_exc())
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
 				dialog.destroy()

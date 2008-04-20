@@ -14,7 +14,7 @@ import nssbackup.managers.FileAccessManager as FAM
 from nssbackup import Infos
 from nssbackup.plugins import PluginManager, pluginFAM
 from nssbackup.managers.FuseFAM import FuseFAM
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
 from nssbackup.ui.GladeGnomeApp import *
@@ -50,7 +50,8 @@ class SBconfigGTK(GladeGnomeApp):
 				self.configman = ConfigManager()
 		
 		self.orig_configman = ConfigManager(self.default_conffile)
-	
+		
+		self.logger = LogFactory.getLogger()
 		
 		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
 		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
@@ -478,10 +479,10 @@ class SBconfigGTK(GladeGnomeApp):
 		if self.configman.has_option("general", "format") :
 			cformatOpt = self.configman.get("general", "format") 
 			if cformatOpt in ["none","gzip","bzip2"]:
-				getLogger().debug("Setting compression format to %s " % self.cformat[cformatOpt])
+				self.logger.debug("Setting compression format to %s " % self.cformat[cformatOpt])
 				self.widgets["cformat"].set_active(self.cformat[cformatOpt])
 			else:
-				getLogger().debug("Setting compression format to %s " % self.cformat['gzip'])
+				self.logger.debug("Setting compression format to %s " % self.cformat['gzip'])
 				self.widgets["cformat"].set_active(self.cformat['gzip'])
 			
 				
@@ -630,14 +631,14 @@ class SBconfigGTK(GladeGnomeApp):
 			
 		# Purge setting 
 		if self.configman.has_option("general", "purge") :
-			getLogger().debug("setting purge")
+			self.logger.debug("setting purge")
 			if self.configman.get("general", "purge") == "log" :
 				self.widgets['logpurgeradiobutton'].set_active(True)
 			else:
 				try : 
 					purge = int(self.configman.get("general", "purge"))
 				except Exception,e:
-					getLogger().error("Purge value '%s' is invalide : " + e %self.configman.get("general", "purge"))	
+					self.logger.error("Purge value '%s' is invalide : " + e %self.configman.get("general", "purge"))	
 					purge = 30
 				self.widgets['purgedays'].set_text(str(purge))
 				self.widgets['purgeradiobutton'].set_active(True)
@@ -800,10 +801,10 @@ class SBconfigGTK(GladeGnomeApp):
 		self.orig_configman = ConfigManager(self.conffile)
 		self.prefillWindow()
 		self.isConfigChanged()
-		getLogger().debug("Config '%s' loaded" % self.conffile)
+		self.logger.debug("Config '%s' loaded" % self.conffile)
 
 	def on_save_clicked(self, *args):
-		getLogger().debug("Saving Config")
+		self.logger.debug("Saving Config")
 		self.configman.saveConf()
 		self.orig_configman = ConfigManager(self.configman.conffile)
 		self.isConfigChanged()
@@ -873,7 +874,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["vbox9"].set_sensitive( True )
 			self.widgets["reportvbox"].set_sensitive( True )
 			# disable Time tab
-			getLogger().debug("self.widgets['time_freq'].set_active( 0 )")
+			self.logger.debug("self.widgets['time_freq'].set_active( 0 )")
 			self.widgets["time_freq"].set_active( 0 )
 			self.widgets["croninfos"].set_sensitive( False )
 			self.widgets["ccronline"].set_sensitive( False )
@@ -985,15 +986,15 @@ class SBconfigGTK(GladeGnomeApp):
 		question.hide()
 		if response == gtk.RESPONSE_OK:
 			entry = self.widgets["remote_inc_entry"].get_text()
-			getLogger().debug("Entry : '%s'"% entry)
+			self.logger.debug("Entry : '%s'"% entry)
 			self.remoteinc.append( [entry] )
 			self.configman.set( "dirconfig", "remote", {entry:1} )
 			self.isConfigChanged()
-			getLogger().debug("Entry in dirconf:'%s' " % self.configman.get("dirconfig", "remote"))
+			self.logger.debug("Entry in dirconf:'%s' " % self.configman.get("dirconfig", "remote"))
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
 		else : 
-			getLogger().debug("Response : '%s'" % str(response))
+			self.logger.debug("Response : '%s'" % str(response))
 	
 	#----------------------------------------------------------------------
 
@@ -1038,7 +1039,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.remove_option( "dirconfig", value )
 			self.isConfigChanged()
 			store.remove( iter )
-			getLogger().debug("Entry in dirconf:'%s' " % self.configman.get("dirconfig", "remote"))
+			self.logger.debug("Entry in dirconf:'%s' " % self.configman.get("dirconfig", "remote"))
 	
 	def on_test_remote_clicked(self,*args):
 		if not self.plugin_manager : 
@@ -1131,7 +1132,7 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_ccronline_changed(self, *args):
 		self.configman.setSchedule(1, self.widgets['ccronline'].get_text())
 		self.isConfigChanged()
-		getLogger().debug("Cronline is " +self.configman.get("schedule", "cron"))
+		self.logger.debug("Cronline is " +self.configman.get("schedule", "cron"))
 		
 	
 	def on_time_freq_changed(self, *args):
@@ -1144,7 +1145,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["main_radio3"].set_active(True)
 			if self.configman.getSchedule() :
 				for option in self.configman.options("schedule") :
-					getLogger().debug("Removing ('schedule','%s') from config file " % option)
+					self.logger.debug("Removing ('schedule','%s') from config file " % option)
 					self.configman.remove_option("schedule", option)
 					self.isConfigChanged()
 		elif self.widgets["time_freq"].get_active()==5:
@@ -1229,7 +1230,7 @@ class SBconfigGTK(GladeGnomeApp):
 				if self.widgets["time_freq"].get_active()==1:			
 					self.configman.setSchedule(0, "hourly")
 					self.isConfigChanged()
-					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
+					self.logger.debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 				elif self.widgets["time_freq"].get_active()==2:
 					self.widgets["time_min"].set_sensitive( True )
 					self.widgets["time_hour"].set_sensitive( True )
@@ -1238,7 +1239,7 @@ class SBconfigGTK(GladeGnomeApp):
 					self.widgets["ccronline"].set_sensitive( False )
 					self.configman.setSchedule(0, "daily")
 					self.isConfigChanged()
-					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
+					self.logger.debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 				elif self.widgets["time_freq"].get_active()==3:
 					self.widgets["time_min"].set_sensitive( True )
 					self.widgets["time_hour"].set_sensitive( True )
@@ -1247,7 +1248,7 @@ class SBconfigGTK(GladeGnomeApp):
 					self.widgets["ccronline"].set_sensitive( False )
 					self.configman.setSchedule(0, "weekly")
 					self.isConfigChanged()
-					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
+					self.logger.debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 				elif self.widgets["time_freq"].get_active()==4:
 					self.widgets["time_min"].set_sensitive( True )
 					self.widgets["time_hour"].set_sensitive( True )
@@ -1256,7 +1257,7 @@ class SBconfigGTK(GladeGnomeApp):
 					self.widgets["ccronline"].set_sensitive( False )
 					self.configman.setSchedule(0, "monthly")
 					self.isConfigChanged()
-					getLogger().debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
+					self.logger.debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
 
 	#----------------------------------------------------------------------
 	
@@ -1419,11 +1420,11 @@ class SBconfigGTK(GladeGnomeApp):
 			if self.widgets['smtplogin'].get_text() :
 				self.configman.set("report", "smtpuser",self.widgets['smtplogin'].get_text())
 				self.isConfigChanged()
-				getLogger().debug("login : " + self.configman.get("report", "smtpuser"))
+				self.logger.debug("login : " + self.configman.get("report", "smtpuser"))
 			if self.widgets['smtppassword'].get_text() :
 				self.configman.set("report", "smtpuser", self.widgets['smtppassword'].get_text())
 				self.isConfigChanged()
-				getLogger().debug("Password : " + self.configman.get("report", "smtppassword"))
+				self.logger.debug("Password : " + self.configman.get("report", "smtppassword"))
 				
 	#----------------------------------------------------------------------
 
@@ -1630,7 +1631,7 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_logfilechooser_selection_changed(self, *args):
 		self.configman.set("log", "file", self.widgets['logfilechooser'].get_filename()+os.sep+"nssbackup.log")
 		self.isConfigChanged()
-		getLogger().debug("Log file : " + self.configman.get("log", "file"))
+		self.logger.debug("Log file : " + self.configman.get("log", "file"))
 
 	#----------------------------------------------------------------------
 
@@ -1638,19 +1639,19 @@ class SBconfigGTK(GladeGnomeApp):
 		if self.widgets['loglevelcombobox'].get_active_text() == "Info" :
 			self.configman.set("log", "level", "20")
 			self.isConfigChanged()
-			getLogger().debug("Log level : " + self.configman.get("log", "level"))
+			self.logger.debug("Log level : " + self.configman.get("log", "level"))
 		elif self.widgets['loglevelcombobox'].get_active_text() == "Debug" :
 			self.configman.set("log", "level", "10")
 			self.isConfigChanged()
-			getLogger().debug("Log level : " + self.configman.get("log", "level"))
+			self.logger.debug("Log level : " + self.configman.get("log", "level"))
 		elif self.widgets['loglevelcombobox'].get_active_text() == "Error" :
 			self.configman.set("log", "level", "50")
 			self.isConfigChanged()
-			getLogger().debug("Log level : " + self.configman.get("log", "level"))
+			self.logger.debug("Log level : " + self.configman.get("log", "level"))
 		elif self.widgets['loglevelcombobox'].get_active_text() == "Warning" :
 			self.configman.set("log", "level", "30")
 			self.isConfigChanged()
-			getLogger().debug("Log level : " + self.configman.get("log", "level"))
+			self.logger.debug("Log level : " + self.configman.get("log", "level"))
 
 	#----------------------------------------------------------------------
 
@@ -1715,14 +1716,14 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_crtfilechooser_selection_changed(self, *args):
 		self.configman.set("report", "smtpcert", self.widgets['crtfilechooser'].get_filename())
 		self.isConfigChanged()
-		getLogger().debug("Certificate : " + str(self.configman.get("report", "smtpcert")))
+		self.logger.debug("Certificate : " + str(self.configman.get("report", "smtpcert")))
 
 	#----------------------------------------------------------------------
 
 	def on_keyfilechooser_selection_changed(self, *args):
 		self.configman.set("report", "smtpkey", self.widgets['keyfilechooser'].get_filename())
 		self.isConfigChanged()
-		getLogger().debug("Key : " + str(self.configman.get("report", "smtpkey")))
+		self.logger.debug("Key : " + str(self.configman.get("report", "smtpkey")))
 
 	#----------------------------------------------------------------------
 
@@ -1780,7 +1781,7 @@ class SBconfigGTK(GladeGnomeApp):
 				dialog.destroy()
 			else :
 					
-				getLogger().debug("Got new profile name '%s : enable=%r' " % (prfName,enable) )
+				self.logger.debug("Got new profile name '%s : enable=%r' " % (prfName,enable) )
 			
 				if not enable : 
 					prfConf += "-disable"
@@ -1817,7 +1818,7 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.destroy()
 		
 		if response == gtk.RESPONSE_YES :
-			getLogger().debug("Remove Profile '%s' configuration" % prfName)
+			self.logger.debug("Remove Profile '%s' configuration" % prfName)
 			if os.path.exists(prfConf) :
 				os.remove(prfConf)
 			self.profiles.remove(iter)
@@ -1831,7 +1832,7 @@ class SBconfigGTK(GladeGnomeApp):
 		
 		tm, iter = self.profilestv.get_selection().get_selected()
 		prfName, prfConf = tm.get_value(iter,1), tm.get_value(iter,2)
-		getLogger().debug("Load Profile '%s' configuration" % prfName)
+		self.logger.debug("Load Profile '%s' configuration" % prfName)
 		
 		self.conffile = prfConf
 		self.on_reload_clicked()
@@ -1843,7 +1844,7 @@ class SBconfigGTK(GladeGnomeApp):
 		"""
 		Load the default configuration file
 		"""
-		getLogger().debug("Load the default configuration file '%s'" % self.default_conffile)
+		self.logger.debug("Load the default configuration file '%s'" % self.default_conffile)
 		self.conffile = self.default_conffile
 		self.on_reload_clicked()
 		
@@ -1859,14 +1860,14 @@ class SBconfigGTK(GladeGnomeApp):
 		# rename the file 
 		if enable :
 			# then disable
-			getLogger().debug("Disabling %s " % prfName )
+			self.logger.debug("Disabling %s " % prfName )
 			os.rename(prfConf, prfConf+"-disable")
 			self.profiles.set_value(iter, 0, False)
 			self.profiles.set_value(iter, 2, prfConf+"-disable")
 			
 		else :
 			# enable it
-			getLogger().debug("Enabling %s " % prfName )
+			self.logger.debug("Enabling %s " % prfName )
 			os.rename(prfConf, prfConf.rstrip("-disable"))
 			self.profiles.set_value(iter, 0, True)
 			self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
