@@ -11,6 +11,7 @@ Depends: nssbackup-gtk(= ${binary:Version}),
    nssbackup-ftp(= ${binary:Version}),
    nssbackup-ssh(= ${binary:Version})
 Replaces: sbackup (<= 1)
+Conflicts:  sbackup (<= 1)
 Description: Not So Simple Backup Suite 
  NSsbackup is a fork of Sbackup intended for desktop
  use. It has multiuser support with nice handling of logs . It also has
