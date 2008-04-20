@@ -19,7 +19,7 @@ import ConfigParser
 import smtplib
 from gettext import gettext as _
 from optparse import OptionParser
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import *
 import FileAccessManager as FAM
 import nssbackup.util as Util
@@ -148,6 +148,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 	format= "gzip"
 	
 	conffile = None
+	logger = None
 	__profileName = None
 	
 	prfRE = re.compile('^nssbackup-(.+?).conf(-disable)?$')
@@ -212,7 +213,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		if not FAM.exists(self.get("log","file")) :
 			FAM.createfile(self.get("log","file"))
 		
-		getLogger(self.get("log","file"),self.getint("log","level"))
+		self.logger = LogFactory.getLogger("Root Profile", self.get("log","file"),self.getint("log","level"))
 	
 	def setDefaultForUsers(self):
 		"Set the default config for normal users"
@@ -244,7 +245,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		
 		self.conffile = getUserConfDir() +"nssbackup.conf"
 		
-		getLogger(self.get("log","file"),self.getint("log","level"))
+		self.logger = LogFactory.getLogger("Default Profile", self.get("log","file"),self.getint("log","level"))
 	
 	
 	def __init__(self, configfile = False):
@@ -265,13 +266,13 @@ class ConfigManager (ConfigParser.ConfigParser):
 		
 		if self.conffile :
 			self.read(self.conffile)
-			getLogger().info( "ConfigManager created with '%s'" % self.conffile )
+			self.logger.info( "ConfigManager created with '%s'" % self.conffile )
 		else :
 			if os.geteuid() == 0 :
 				self.setDefaultForRoot()
 			else :
 				self.setDefaultForUsers()
-			getLogger(self.get("log","file")).info( "ConfigManager created with 'default'")
+			
 		self.initSection()
 	
 	def optionxform(self, option):
@@ -364,7 +365,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 				#fall back in parent behaviour
 				ConfigParser.ConfigParser.remove_option(self, section, option)
 			else :
-				getLogger().debug("search through remote option to get the option")
+				self.logger.debug("search through remote option to get the option")
 				remotes = self.get("dirconfig", "remote")
 				if type(remotes) == str :
 					remotes = eval(remotes)
@@ -376,7 +377,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 				else :
 					# we have that key
 					remotes.pop(option)
-					getLogger().debug("remote is now '%r'" %remotes)
+					self.logger.debug("remote is now '%r'" %remotes)
 					ConfigParser.ConfigParser.set(self, section, "remote", remotes)
 		else :
 			#fall back in parent behaviour
@@ -394,11 +395,11 @@ class ConfigManager (ConfigParser.ConfigParser):
 		retValue = ConfigParser.ConfigParser.read(self, self.conffile)
 		if self.has_section("log") and self.has_option("log", "file") :
 			if self.has_option("log", "level") :
-				getLogger(self.get("log", "file"), self.getint("log","level"))
+				self.logger = LogFactory.getLogger(self.getProfileName(), self.get("log", "file"), self.getint("log","level"))
 			else :
-				getLogger(self.get("log", "file"))
+				self.logger = LogFactory.getLogger(self.getProfileName(),self.get("log", "file"))
 		else :
-			getLogger()
+			self.logger = LogFactory.getLogger(self.getProfileName())
 		if len(retValue) == 0 :
 			raise SBException(_("The config file '%s' couldn't be read !") % self.conffile )
 		if self.valid_options: self.validateConfigFileOpts()
@@ -406,7 +407,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 
 	def parseCmdLine(self):
 		usage = "Usage: %prog [options] (use -h for more infos)"
-		parser = OptionParser(usage, version="%prog 0.11")
+		parser = OptionParser(usage, version="%prog 0.2")
 		parser.add_option("-c", "--config-file", dest="config",
 						metavar="FILE", help="set the config file to use")
 		
@@ -417,7 +418,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 			self.conffile = options.config
 
 	def validateConfigFileOpts(self):
-		getLogger().debug("Validating config file")
+		self.logger.debug("Validating config file")
 		if (self.valid_options is None): return
 		for section in self.sections():
 			try:
@@ -428,7 +429,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 						continue
 					raise NonValidOptionException ("key '%s' in section '%s' in file '%s' is not known, a typo possibly?" % (key, section, self.conffile))
 			except SBException, e:
-				getLogger().error(str(e))
+				self.logger.error(str(e))
 				raise e
 		return True
 
@@ -462,15 +463,15 @@ class ConfigManager (ConfigParser.ConfigParser):
 				raise NonValidOptionException("Valid values for anacron are : %s , I recieved '%s'" % (str(anacronValues),value))
 			else :
 				if self.has_option("schedule", "cron") :
-					getLogger().debug("Removing Cron config ")
+					self.logger.debug("Removing Cron config ")
 					self.remove_option("schedule", "cron")
-				getLogger().debug("Setting anacron to :"+ value)
+				self.logger.debug("Setting anacron to :"+ value)
 				self.set("schedule", "anacron", value)
 		elif isCron == 1 :
 			if self.has_option("schedule", "anacron") :
-				getLogger().debug("Removing anaCron config ")
+				self.logger.debug("Removing anaCron config ")
 				self.remove_option("schedule", "anacron")
-			getLogger().debug("Setting cron to :"+ value)
+			self.logger.debug("Setting cron to :"+ value)
 			self.set("schedule", "cron", value)
 	
 	def getSchedule(self):
@@ -480,25 +481,25 @@ class ConfigManager (ConfigParser.ConfigParser):
 		if cron is set . If None has been found , 'None' is return
 		"""
 		if not self.has_section("schedule") or (not self.has_option("schedule", "cron") and not self.has_option("schedule", "anacron")) :
-			getLogger().warning("Config file doesn't have schedule infos, probing from filesystem ")
+			self.logger.warning("Config file doesn't have schedule infos, probing from filesystem ")
 			#hourly
 			if os.path.exists("/etc/cron.hourly/nssbackup"):
-				getLogger().debug("Anacron hourly has been found")
+				self.logger.debug("Anacron hourly has been found")
 				return (0, "hourly")
 			# daily
 			elif os.path.exists("/etc/cron.daily/nssbackup"):
-				getLogger().debug("Anacron daily has been found")
+				self.logger.debug("Anacron daily has been found")
 				return (0, "daily")
 			# weekly
 			elif os.path.exists("/etc/cron.weekly/nssbackup"):
-				getLogger().debug("Anacron weekly has been found")
+				self.logger.debug("Anacron weekly has been found")
 				return (0, "weekly")
 			# monthly
 			elif os.path.exists("/etc/cron.monthly/nssbackup"):
-				getLogger().debug("Anacron monthly has been found")
+				self.logger.debug("Anacron monthly has been found")
 				return (0, "monthly")
 			if os.path.exists("/etc/cron.d/nssbackup"):
-				getLogger().debug("Cron has been found")
+				self.logger.debug("Cron has been found")
 				return (1, FAM.readfile("/etc/cron.d/nssbackup"))
 			# none has been found
 			return None
@@ -542,7 +543,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		"""
 		prfDir = getUserConfDir()+"nssbackup.d/"
 		
-		getLogger().debug("Getting profiles from '%s'" % prfDir)
+		self.logger.debug("Getting profiles from '%s'" % prfDir)
 		
 		if not os.path.exists(prfDir) or not os.path.isdir(prfDir) :
 			return dict()
@@ -552,7 +553,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 		for cf in os.listdir(prfDir) :
 			m = self.prfRE.match(cf)
 			if m : 
-				getLogger().debug("Found %s "% m.group(0))
+				self.logger.debug("Found %s "% m.group(0))
 				name, path, enable = m.group(1), prfDir+m.group(0), (m.group(2) is None)
 				profiles[name] = [path,enable]
 		
@@ -648,17 +649,17 @@ class ConfigManager (ConfigParser.ConfigParser):
 		if not self.has_section("schedule") or (not self.has_option("schedule", "anacron") and not self.has_option("schedule", "cron")) :
 			return
 		elif os.geteuid() != 0 :
-				getLogger().warning("Not implemented for non root users yet")
+				self.logger.warning("Not implemented for non root users yet")
 				return
 		else :
 			if self.has_option("schedule", "cron") :
-				getLogger().debug("Saving Cron entries")
+				self.logger.debug("Saving Cron entries")
 				self.erase_services()
 				execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
 				FAM.writetofile("/etc/cron.d/nssbackup", self.cronheader + self.get("schedule", "cron") + "\troot\t"+ execline)
 				
 			if self.has_option("schedule", "anacron") :
-				getLogger().debug("Saving Cron entries")
+				self.logger.debug("Saving Cron entries")
 				if self.get("schedule", "anacron") == "hourly" :
 					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.hourly/nssbackup")
@@ -679,7 +680,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 					"/etc/cron.weekly/nssbackup", "/etc/cron.monthly/nssbackup", "/etc/cron.d/nssbackup"]
 			for l in listServ : 
 				if os.path.exists(l) :
-					getLogger().debug("Unlinking '%s'" % l )
+					self.logger.debug("Unlinking '%s'" % l )
 					os.unlink(l)
 	
 	def testMail(self):
