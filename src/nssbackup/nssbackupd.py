@@ -21,7 +21,7 @@ import socket
 import datetime
 import re
 from gettext import gettext as _
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.managers.ConfigManager import getUserConfDir
 from nssbackup.managers.BackupManager import BackupManager
@@ -37,6 +37,8 @@ from nssbackup.managers.BackupManager import BackupManager
 # @author: Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 # @version: 1.0
 class NSsbackupd () :
+	
+	logger = LogFactory.getLogger()
 	
 	__confFilesRE = "^nssbackup-.+?\.conf$"
 
@@ -168,16 +170,16 @@ class NSsbackupd () :
 							n = pynotify.Notification("NSsbackup", "CRASH : '%s'" % str(e))
 							n.show()
 						else:
-							getLogger().warning(_("there was a problem initializing the pynotify module"))
+							self.logger.warning(_("there was a problem initializing the pynotify module"))
 					except Exception, e1:
-						getLogger().warning(str(e1))
-				getLogger().error(str(e))
-				getLogger().error(traceback.format_exc())
+						self.logger.warning(str(e1))
+				self.logger.error(str(e))
+				self.logger.error(traceback.format_exc())
 				
 				if self.__bm and self.__bm.config :
 					# remove any left lockfile
 					if self.__bm.config.has_option("general","lockfile") and FAM.exists(self.__bm.config.get("general","lockfile")) :
-						getLogger().info(_("Session of backup is finished (lockfile is removed) "))
+						self.logger.info(_("Session of backup is finished (lockfile is removed) "))
 						FAM.delete(self.__bm.config.get("general","lockfile"))
 					
 					# put the logfile in the snapshotdir
@@ -192,7 +194,7 @@ class NSsbackupd () :
 						import shutil
 						shutil.copy(logfile, snp.getPath())
 					else :
-						getLogger().error(_("Couldn't copy the logfile into the snapshot directory"))
+						self.logger.error(_("Couldn't copy the logfile into the snapshot directory"))
 					
 			finally :
 				if self.__bm and self.__bm.config :
@@ -201,5 +203,5 @@ class NSsbackupd () :
 						self.__sendEmail()
 					
 		except Exception, e :
-			getLogger().error(str(e))
-			getLogger().error(traceback.format_exc())
+			self.logger.error(str(e))
+			self.logger.error(traceback.format_exc())

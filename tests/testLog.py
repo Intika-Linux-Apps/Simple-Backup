@@ -1,4 +1,4 @@
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 
 class Test:
 	
@@ -6,10 +6,15 @@ class Test:
 		""
 	
 	def logsome(self):
-		l = getLogger("sbackup.log")
+		l = LogFactory.getLogger("TestLogger", "sbackup.log")
 
 		l.info("Hello World")
 		l.debug("Argh")
+		
+		l = LogFactory.getLogger("TestLogger1", "sbackup.log")
+
+		l.info("Hello World Log 1")
+		l.error("Argh")
 
 if __name__ == '__main__':
 	t = Test()

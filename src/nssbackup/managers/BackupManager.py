@@ -25,19 +25,18 @@ from ConfigManager import ConfigManager
 from UpgradeManager import UpgradeManager
 import FileAccessManager as FAM
 from nssbackup.util.Snapshot import Snapshot
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import *
 
 try:
 	import pynotify
 except Exception, e:
-	getLogger().warning(str(e))
+	LogFactory.getLogger().warning(str(e))
 	pynotify = False
 				
 class BackupManager :
 	"""
 	"""
-	
 	
 	def __init__(self, configfile = None):
 		"""
@@ -63,13 +62,13 @@ class BackupManager :
 		
 		if configfile :
 			self.config = ConfigManager(configfile)
-			if not self.config.has_option("log", "file") :
-				getLogger()
 		else :
 			self.config = ConfigManager()
 		
+		self.logger = LogFactory.getLogger()
+		
 		self.__fusefam = FuseFAM(self.config)
-		getLogger().info(_("BackupManager created "))
+		self.logger.info(_("BackupManager created "))
 		
 	def makeBackup(self ):
 		"""
@@ -83,17 +82,17 @@ class BackupManager :
 				n = pynotify.Notification("NSsbackup", _("Starting backup Session"))
 				n.show()
 			else:
-				getLogger().warning(_("there was a problem initializing the pynotify module"))
+				self.logger.warning(_("there was a problem initializing the pynotify module"))
 		except Exception, e:
-			getLogger().warning(str(e))
+			self.logger.warning(str(e))
 		
 		
-		getLogger().info(_("Starting backup"))
+		self.logger.info(_("Starting backup"))
 		
 		# set the lockfile
 		self.__setlockfile()
 		
-		getLogger().info(_("Initializing FUSE FILE ACCESS MANAGER !"))
+		self.logger.info(_("Initializing FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.initialize()
 		
 		self.__snpman = SnapshotManager(self.config.get("general","target"))
@@ -104,7 +103,7 @@ class BackupManager :
 				# The uid is still root and the gid is admin
 				os.setgid( grp.getgrnam("admin").gr_gid )
 			except Exception, e: 
-				getLogger().warning(_("Failed to set the gid to 'admin' one :") + str(e) )
+				self.logger.warning(_("Failed to set the gid to 'admin' one :") + str(e) )
 
 		# Check the target dir
 		self.__checkTarget()
@@ -113,7 +112,7 @@ class BackupManager :
 		try :
 			self.__um.upgradeAll( self.config.get("general","target")  )
 		except SBException, e:
-			getLogger().warning(str(e))
+			self.logger.warning(str(e))
 		
 		# purge
 		purge = None
@@ -130,28 +129,28 @@ class BackupManager :
 		
 		# Create snapshot
 		self.__actualSnapshot = Snapshot(name)
-		getLogger().info(_("Starting snapshot %(name)s ") % {'name' :str(self.__actualSnapshot)})
+		self.logger.info(_("Starting snapshot %(name)s ") % {'name' :str(self.__actualSnapshot)})
 		
 		# Set the base file
 		if base :
-			getLogger().info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
+			self.logger.info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
 			self.__actualSnapshot.setBase(base.getName())
 		del base
 
 		# Backup list of installed packages (Debian only part)
 		try:
-			getLogger().info(_("Setting packages File "))
+			self.logger.info(_("Setting packages File "))
 			command = "dpkg --get-selections"
 			s = os.popen( command )
 			pkg = s.read()
 			s.close()
 			self.__actualSnapshot.setPackages(pkg)
 		except Exception, e:
-			getLogger().warning(_("Problem when setting the packages : ") + str(e))
+			self.logger.warning(_("Problem when setting the packages : ") + str(e))
 		
 		
 		# set Excludes
-		getLogger().info(_("Setting Excludes File "))
+		self.logger.info(_("Setting Excludes File "))
 		if self.config.has_option( "exclude", "regex" ):
 			gexclude = str(self.config.get( "exclude", "regex" )).split(",")
 		else :
@@ -159,12 +158,12 @@ class BackupManager :
 		self.__actualSnapshot.setExcludes(gexclude)
 		
 		# set format
-		getLogger().info(_("Setting compression format "))
+		self.logger.info(_("Setting compression format "))
 		if self.config.has_option( "general", "format" ):
 			self.__actualSnapshot.setFormat(self.config.get("general","format"))
 			
 		# set splited size
-		getLogger().info(_("Setting split size"))
+		self.logger.info(_("Setting split size"))
 		if self.config.has_option( "general", "splitsize" ):
 			self.__actualSnapshot.setSplitedSize(int(self.config.get("general","splitsize")))
 			
@@ -179,7 +178,7 @@ class BackupManager :
 					n = pynotify.Notification("NSsbackup", _("File list ready , Committing to disk"))
 					n.show()
 				else:
-					getLogger().warning(_("there was a problem initializing the pynotify module"))
+					self.logger.warning(_("there was a problem initializing the pynotify module"))
 				
 		self.__actualSnapshot.commit()
 		
@@ -221,18 +220,18 @@ class BackupManager :
 			"""
 			# excude target
 			if _file2.rstrip(os.sep) == self.config.get("general","target").rstrip(os.sep) :
-				getLogger().info(_("Target '%s' directory is excluded") % self.config.get("general","target") )
+				self.logger.info(_("Target '%s' directory is excluded") % self.config.get("general","target") )
 				return True
 			
 			# return true if the file doesn't exist
 			if not os.path.exists(_file2):
-				getLogger().warning(_("'%(file)s' doesn't exist, it has to be exclude ") % { 'file' : _file2 })
+				self.logger.warning(_("'%(file)s' doesn't exist, it has to be exclude ") % { 'file' : _file2 })
 				return True
 			
 			# get the stats, If not possible , the file has to be exclude , return True
 			try: s = os.lstat( _file2 )
 			except Exception, e :
-				getLogger().warning(_("Problem with '%(file)s' : %(error)s ") % {'file':_file2, 'error':str(e) } )
+				self.logger.warning(_("Problem with '%(file)s' : %(error)s ") % {'file':_file2, 'error':str(e) } )
 				return True
 			
 			# refuse a file if we don't have read access
@@ -242,14 +241,14 @@ class BackupManager :
 				fd = os.open(_file2, os.R_OK)  
 				os.close(fd)
 			except OSError, e:
-				getLogger().warning(_("We don't have read access to '%(file)s', it has to be exclude : %(error)s ") % {'file':_file2, 'error':str(e) }  )
+				self.logger.warning(_("We don't have read access to '%(file)s', it has to be exclude : %(error)s ") % {'file':_file2, 'error':str(e) }  )
 				return True
 			finally :
 				signal.alarm(0)          # Disable the alarm
 			
 			#if the file is too big
 			if self.config.has_option("exclude","maxsize") and s.st_size > int(self.config.get("exclude","maxsize")) > 0 :
-				getLogger().info(_("'%(file)s' size is higher than the specified one ( %(filesize)s > %(maxsize)s), it has to be exclude ") % {'file':_file2,'filesize':str(s.st_size), 'maxsize': str(self.config.get("exclude","maxsize"))} )
+				self.logger.info(_("'%(file)s' size is higher than the specified one ( %(filesize)s > %(maxsize)s), it has to be exclude ") % {'file':_file2,'filesize':str(s.st_size), 'maxsize': str(self.config.get("exclude","maxsize"))} )
 				return True
 			
 			# if the file matches an exclude regexp, return true
@@ -290,7 +289,7 @@ class BackupManager :
 							checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
 						
 					except OSError, e :
-						getLogger().warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
+						self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
 						# Add to exclude file list
 						self.__actualSnapshot.addToExcludeFlist(path)
 			
@@ -303,7 +302,7 @@ class BackupManager :
 			backuplinks=True
 		
 		# regexp to be used for excluding files from flist
-		getLogger().debug("getting exclude list for actual snapshot")
+		self.logger.debug("getting exclude list for actual snapshot")
 		if self.__actualSnapshot.getExcludes() :
 			rexclude = [ re.compile(p) for p in self.__actualSnapshot.getExcludes() if len(p)>0]
 		else :
@@ -313,10 +312,10 @@ class BackupManager :
 		fullsize = 0L
 		
 		# set the list to backup and to exclude
-		getLogger().debug("set the list to backup and to exclude")
+		self.logger.debug("set the list to backup and to exclude")
 		if self.config.has_section( "dirconfig" ):
 			if not len(self.config.items("dirconfig")) :
-				getLogger().warning(_("No directory to backup !"))
+				self.logger.warning(_("No directory to backup !"))
 			else :
 				for k,v in self.config.items("dirconfig") :
 					if int(v) == 1 :
@@ -327,10 +326,10 @@ class BackupManager :
 				for excl in ["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*",self.config.get("general","target")] :
 					self.__actualSnapshot.addToExcludeFlist(excl)
 		else :
-			getLogger().warning(_("No directories to backup !"))	
+			self.logger.warning(_("No directories to backup !"))	
 		
 		# We have now every thing we need , the rexclude, excludelist, includelist and already stored 
-		getLogger().debug("We have now every thing we need, starting the creation of the complete exclude list " )
+		self.logger.debug("We have now every thing we need, starting the creation of the complete exclude list " )
 		
 		for incl in self.__actualSnapshot.getIncludeFlist().getEffectiveFileList():
 			# check into incl for file to exclude
@@ -338,7 +337,7 @@ class BackupManager :
 
 				
 		# check for the available size
-#		getLogger().debug("Free size required is '%s' " % str(fullsize))
+#		self.logger.debug("Free size required is '%s' " % str(fullsize))
 #		vstat = os.statvfs( self.__actualSnapshot.getPath() )
 #		if (vstat.f_bavail * vstat.f_bsize) <= fullsize:
 #			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': self.__fullsize})
@@ -350,7 +349,7 @@ class BackupManager :
 		if self.config.has_option("general", "lockfile") :
 			self.__lockfile = self.config.get("general", "lockfile")
 		else :
-			getLogger().debug("no lockfile in config, the default will be used ")
+			self.logger.debug("no lockfile in config, the default will be used ")
 			self.__lockfile = "/var/lock/nssbackup.lock"
 		
 		# Create the lockfile so none disturbs us
@@ -363,7 +362,7 @@ class BackupManager :
 				FAM.delete(self.__lockfile)
 		
 		FAM.writetofile(self.__lockfile, str(os.getpid()) )
-		getLogger().debug("Created lockfile at '%s' with info '%s'"% (self.__lockfile, str(os.getpid()) ) )
+		self.logger.debug("Created lockfile at '%s' with info '%s'"% (self.__lockfile, str(os.getpid()) ) )
 
 	def __endSBsession(self):
 		"""
@@ -373,16 +372,16 @@ class BackupManager :
 		"""
 		
 		FAM.delete(self.__lockfile)
-		getLogger().info(_("Session of backup is finished (%s is removed) ") % self.__lockfile)
+		self.logger.info(_("Session of backup is finished (%s is removed) ") % self.__lockfile)
 		
 		if self.config.has_option("log","file") and FAM.exists(self.config.get("log","file")):
 			FAM.copyfile(self.config.get("log","file"), self.__actualSnapshot.getPath()+"/nssbackup.log")
 		elif FAM.exists("nssbackup.log") : 
 			FAM.copyfile(os.path.abspath("nssbackup.log"), self.__actualSnapshot.getPath()+"/nssbackup.log")
 		else :
-			getLogger().warning(_("I didn't find the logfile to copy into snapshot"))
+			self.logger.warning(_("I didn't find the logfile to copy into snapshot"))
 			
-		getLogger().info(_("Terminating FUSE FILE ACCESS MANAGER !"))
+		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.terminate()
 		if os.getuid() != 0 :
 			if pynotify :
@@ -390,7 +389,7 @@ class BackupManager :
 					n = pynotify.Notification("NSsbackup", _("Ending Backup Session"))
 					n.show()
 				else:
-					getLogger().warning(_("there was a problem initializing the pynotify module"))
+					self.logger.warning(_("there was a problem initializing the pynotify module"))
 			
 
 	def __checkTarget(self):
@@ -402,7 +401,7 @@ class BackupManager :
 		
 		# Check if the target dir exists or create it
 		if not FAM.exists(self.config.get("general","target")) :
-			getLogger().info(_("Creating the target dir '%s'") % self.config.get("general","target"))
+			self.logger.info(_("Creating the target dir '%s'") % self.config.get("general","target"))
 			FAM.makedir(self.config.get("general","target"))
 		
 		# Try to write inside so that we don't work for nothing
@@ -410,7 +409,7 @@ class BackupManager :
 			FAM.writetofile(self.config.get("general","target")+"/test", "testWritable")
 			FAM.delete(self.config.get("general","target")+"/test")
 		except Exception, e :
-			getLogger().error(_("Target not writable : ") + str(e))
+			self.logger.error(_("Target not writable : ") + str(e))
 			raise e
 	
 	def __isIncOrFull(self, listing ):
@@ -428,30 +427,30 @@ class BackupManager :
 			# we search for the last full 
 			base = listing[0]
 			if listing[0].isfull() :  # Last backup was full backup
-				getLogger().debug("Last (%s) was a full backup" % listing[0].getName())
+				self.logger.debug("Last (%s) was a full backup" % listing[0].getName())
 				d = listing[0].getDate()
 				if ( datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days < self.config.get("general","maxincrement") :
 					# Less than maxincrement days passed since that -> make an increment
 					increment = True
 				else:
-					getLogger().info("Last full backup is old -> make a full backup")
+					self.logger.info("Last full backup is old -> make a full backup")
 					increment = False      # Too old -> make full backup
 			else: # Last backup was an increment - lets search for the last full one
-				getLogger().debug(" Last backup (%s) was an increment - lets search for the last full one" % listing[0].getName())
+				self.logger.debug(" Last backup (%s) was an increment - lets search for the last full one" % listing[0].getName())
 				for i in listing :
 					if i.isfull():
 						d = i.getDate()
 						age = (datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days
 						if  age < int(self.config.get("general","maxincrement")) :
 							# Last full backup is fresh -> make an increment
-							getLogger().info("Last full backup is fresh (%d days old )-> make an increment" % age )
+							self.logger.info("Last full backup is fresh (%d days old )-> make an increment" % age )
 							increment = True
 						else: # Last full backup is old -> make a full backup
-							getLogger().info("Last full backup is old -> make a full backup")
+							self.logger.info("Last full backup is old -> make a full backup")
 							increment = False
 						break
 				else:
-					getLogger().info(" No full backup found -> lets make a full backup to be safe")
+					self.logger.info(" No full backup found -> lets make a full backup to be safe")
 					increment = False            # No full backup found 8) -> lets make a full backup to be safe
 		
 		# Determine and create backup target directory
