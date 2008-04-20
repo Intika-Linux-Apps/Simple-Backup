@@ -2,7 +2,7 @@ Source: nssbackup
 Section: universe/devel
 Priority: optional
 Maintainer: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
-Build-Depends: debhelper (>= 5), python ( >= 2.5 )
+Build-Depends: debhelper (>= 5), python ( >= 2.5 ), python-support
 Standards-Version: 3.7.2
 
 Package: nssbackup
@@ -17,7 +17,7 @@ Description: Not So Simple Backup Suite
 
 Package: nssbackup-common
 Architecture: all
-Depends: python ( >= 2.5 ),
+Depends: ${python:Depends},
          fuse-utils,
          python-notify
 Conflicts: sbackup

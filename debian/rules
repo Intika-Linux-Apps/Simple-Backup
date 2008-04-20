@@ -52,6 +52,7 @@ binary-common:
 	dh_installman
 	dh_installmenu
 	dh_link
+	dh_pysupport
 	dh_strip
 	dh_compress 
 	dh_fixperms
