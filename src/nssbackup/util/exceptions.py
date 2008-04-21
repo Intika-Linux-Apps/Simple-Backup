@@ -61,3 +61,8 @@ class RebaseFullSnpForbidden(RebaseSnpException):
 	"""
 	Thrown when trying to rebase a full snapshot
 	"""
+	
+class NotifyException(SBException) :
+	"""
+	This Exception is thrown by notifiers and listeners.
+	"""
