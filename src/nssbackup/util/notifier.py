@@ -20,13 +20,12 @@ from nssbackup.util.log import LogFactory
 
 class Notifier:
 	"""
-	"""
+	""" 
 	
 	class __Notifier:
 		"""
 		Internal class to use for implementing the Singleton Design pattern
 		"""		
-		logger = None 
 		
 		def __init__(self):
 			self.listeners = []
