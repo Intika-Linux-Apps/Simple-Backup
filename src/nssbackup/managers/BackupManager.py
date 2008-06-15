@@ -274,24 +274,34 @@ class BackupManager :
 				if not self.__actualSnapshot.getIncludeFlist().hasFile(path):
 					self.__actualSnapshot.addToExcludeFlist(path)
 			else :
-				# if it's a directory
-				if os.path.isdir(path):
-					#enter inside
-					# we remove the dir as an effective file of the exclude list
-					# This will prevent full exclusion of that directory
-					if self.__actualSnapshot.getExcludeFlist().hasFile(path):
-						self.__actualSnapshot.getExcludeFlist()[path][0] = None
-					try :
-						for contents in FAM.listdir(path) :
-							# contents is a path of a file or dir to include 
-							contents = os.path.normpath( os.sep.join([path,contents]) )
-							# if the file is included precisely, don't force exclusion
-							checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
-						
-					except OSError, e :
-						self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
-						# Add to exclude file list
+				# add _file and then check if it's a dir to add the contents , We won't follow links
+				if not os.path.islink(path.rstrip(os.sep)) :
+					# if it's a directory
+					if os.path.isdir(path):
+						#enter inside
+						# we remove the dir as an effective file of the exclude list
+						# This will prevent full exclusion of that directory
+						if self.__actualSnapshot.getExcludeFlist().hasFile(path):
+							self.__actualSnapshot.getExcludeFlist()[path][0] = None
+						try :
+							for contents in FAM.listdir(path) :
+								# contents is a path of a file or dir to include 
+								contents = os.path.normpath( os.sep.join([path,contents]) )
+								# if the file is included precisely, don't force exclusion
+								checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
+							
+						except OSError, e :
+							self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
+							# Add to exclude file list
+							self.__actualSnapshot.addToExcludeFlist(path)
+				else :
+					# we got a link
+					if backuplinks :
+						self.logger.debug("backing up the link '%s' ! " % path)
+					else :
+						self.logger.debug("Excluding link '%s' ! " % path)
 						self.__actualSnapshot.addToExcludeFlist(path)
+						fullsize += os.lstat(path).st_size
 			
 
 		# End of Subroutines
