@@ -1,3 +1,10 @@
+nssbackup (0.2-0~beta3) hardy; urgency=low
+
+  * Bug 240000 : looping in symbolic links
+  * Log refactoring : we now have a proper logger by profile.
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Mon, 16 Jun 2008 20:24:57 +0200
+
 nssbackup (0.2-0~beta2) hardy; urgency=low
 
   * Logarithm purge implemented
