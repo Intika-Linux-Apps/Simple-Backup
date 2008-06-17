@@ -409,7 +409,12 @@ class SBRestoreGTK(GladeWindow):
 					dialog.destroy()
 					self.widgets["snpdetails"].set_sensitive(False)
 				else:
+					self.widgets['progressbarDialog'].show()
+					while gtk.events_pending():
+						gtk.main_iteration(False)
 					self.load_filestree()
+					self.widgets['progressbarDialog'].hide()
+					
 			else:
 				self.widgets["snpdetails"].set_sensitive(False)
 
@@ -427,6 +432,8 @@ class SBRestoreGTK(GladeWindow):
 			progressbar = None
 			try :
 				self.widgets['progressbarDialog'].show()
+				while gtk.events_pending():
+					gtk.main_iteration(False)
 				self.restoreman.restore(self.currentSnp, src)
 				self.widgets['progressbarDialog'].hide()
 			except Exception, e :
@@ -455,7 +462,11 @@ class SBRestoreGTK(GladeWindow):
 			if response == gtk.RESPONSE_YES:
 				# TODO: put a progress bar here
 				try :	
+					self.widgets['progressbarDialog'].show()
+					while gtk.events_pending():
+						gtk.main_iteration(False)
 					self.restoreman.restoreAs(self.currentSnp, src, dirname)
+					self.widgets['progressbarDialog'].hide()
 				except Exception, e :
 					self.logger.error(str(e))
 					self.logger.error(traceback.format_exc())
@@ -479,6 +490,8 @@ class SBRestoreGTK(GladeWindow):
 			progressbar = None
 			try :
 				self.widgets['progressbarDialog'].show()
+				while gtk.events_pending():
+						gtk.main_iteration(False)
 				self.restoreman.revert(self.currentSnp, src)
 				self.widgets['progressbarDialog'].hide()
 			except Exception, e :
@@ -511,6 +524,8 @@ class SBRestoreGTK(GladeWindow):
 				progressbar = None
 				try :
 					self.widgets['progressbarDialog'].show()
+					while gtk.events_pending():
+						gtk.main_iteration(False)
 					self.restoreman.revertAs(self.currentSnp, src,dirname)
 					self.widgets['progressbarDialog'].hide()
 				except Exception, e :

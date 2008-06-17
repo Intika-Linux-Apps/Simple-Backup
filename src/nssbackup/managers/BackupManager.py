@@ -199,8 +199,7 @@ class BackupManager :
 						-> if changed : add to the tobackuplist				
 		@param prev :
 		"""
-		global fullsize
-		
+				
 		# -----------------------------------------------------------------
 		# sub routines 
 		
@@ -294,6 +293,8 @@ class BackupManager :
 							self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
 							# Add to exclude file list
 							self.__actualSnapshot.addToExcludeFlist(path)
+					else:
+						self.fullsize += os.lstat(path).st_size
 				else :
 					# we got a link
 					if backuplinks :
@@ -301,7 +302,7 @@ class BackupManager :
 					else :
 						self.logger.debug("Excluding link '%s' ! " % path)
 						self.__actualSnapshot.addToExcludeFlist(path)
-						fullsize += os.lstat(path).st_size
+						self.fullsize += os.lstat(path).st_size
 			
 
 		# End of Subroutines
@@ -311,15 +312,16 @@ class BackupManager :
 		if self.config.has_option("general","backuplinks") and str(self.config.get("general","backuplinks")) == "1" :
 			backuplinks=True
 		
+		
+		# Use this for getting the size limit 
+		self.fullsize = 0L
+		
 		# regexp to be used for excluding files from flist
 		self.logger.debug("getting exclude list for actual snapshot")
 		if self.__actualSnapshot.getExcludes() :
 			rexclude = [ re.compile(p) for p in self.__actualSnapshot.getExcludes() if len(p)>0]
 		else :
 			rexclude = []
-		
-		# Use this for getting the size limit 
-		fullsize = 0L
 		
 		# set the list to backup and to exclude
 		self.logger.debug("set the list to backup and to exclude")
@@ -344,13 +346,16 @@ class BackupManager :
 		for incl in self.__actualSnapshot.getIncludeFlist().getEffectiveFileList():
 			# check into incl for file to exclude
 			checkForExclude(incl)
-
 				
 		# check for the available size
-#		self.logger.debug("Free size required is '%s' " % str(fullsize))
-#		vstat = os.statvfs( self.__actualSnapshot.getPath() )
-#		if (vstat.f_bavail * vstat.f_bsize) <= fullsize:
-#			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)d)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': self.__fullsize})
+		mb = self.fullsize / (1024*1024)
+		kb = ( self.fullsize % (1024*1024) ) / 1024
+		b = ( self.fullsize % (1024*1024) ) % 1024
+		neededspace = "%d Mb %d Kb %d" % (mb,kb,b)
+		self.logger.debug("Maximum free size required is '%s' " % neededspace)
+		vstat = os.statvfs( self.__actualSnapshot.getPath() )
+		if (vstat.f_bavail * vstat.f_bsize) <= self.fullsize:
+			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
 	
 	
 	def __setlockfile(self):
