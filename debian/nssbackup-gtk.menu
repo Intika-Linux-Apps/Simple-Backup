@@ -1,4 +1,0 @@
-?package(nssbackup):needs="X11" section="Apps/System"\
-  title="NSsbackup Configuration GUI" command="/usr/bin/nssbackup-config-gui"
-?package(nssbackup):needs="X11" section="Apps/System"\
-  title="NSsbackup Restoration GUI" command="/usr/bin/nssbackup-restore-gui"
