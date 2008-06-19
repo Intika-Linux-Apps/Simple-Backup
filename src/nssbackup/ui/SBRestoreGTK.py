@@ -144,6 +144,7 @@ class SBRestoreGTK(GladeWindow):
 			'historytv',
 			'statusBar',
 			'statusBarLabel',
+			'progressbar',
 			]
 
 		handlers = [
@@ -491,7 +492,7 @@ class SBRestoreGTK(GladeWindow):
 			try :
 				self.widgets['progressbarDialog'].show()
 				while gtk.events_pending():
-						gtk.main_iteration(False)
+					gtk.main_iteration(False)
 				self.restoreman.revert(self.currentSnp, src)
 				self.widgets['progressbarDialog'].hide()
 			except Exception, e :
@@ -502,7 +503,7 @@ class SBRestoreGTK(GladeWindow):
 				dialog.run()
 				dialog.destroy()
 
-	#----------------------------------------------------------------------
+	#---------------------------------------------------------------------
 
 	def on_revertas_clicked(self, *args):
 		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
@@ -520,14 +521,15 @@ class SBRestoreGTK(GladeWindow):
 			response = dialog.run()
 			dialog.destroy()
 			if response == gtk.RESPONSE_YES:
-				# TODO: put a progress bar here
-				progressbar = None
 				try :
-					self.widgets['progressbarDialog'].show()
+					source_id = gobject.timeout_add(10, self.pulse, self, "Reverting %s ...." % src, True )
+					self.stopPulse = False
+					#self.pulse("Reverting %s ...." % src, True)
 					while gtk.events_pending():
 						gtk.main_iteration(False)
 					self.restoreman.revertAs(self.currentSnp, src,dirname)
-					self.widgets['progressbarDialog'].hide()
+					self.pulse("", False)
+					gobject.source_remove(source_id)
 				except Exception, e :
 					self.logger.error(str(e))
 					self.logger.error(traceback.format_exc())
@@ -629,6 +631,19 @@ class SBRestoreGTK(GladeWindow):
 
 	#----------------------------------------------------------------------
 
+	def pulse(self,message, active):
+		if active:
+			self.widgets['progressbar'].set_text(message)
+			self.widgets['progressbar'].pulse()
+			return True
+		else :
+			self.widgets['progressbar'].set_text(message)
+			self.widgets['progressbar'].set_fraction(0.0)
+			return False
+		
+		
+	#----------------------------------------------------------------------
+	
 	def on_exportmanExpander_activate(self, *args):
 		print("TODO: on_exportmanExpander_activate")
 		pass
