@@ -40,13 +40,14 @@ class NSsbackupd () :
 	
 	logger = LogFactory.getLogger()
 	
-	__confFilesRE = "^nssbackup-.+?\.conf$"
+	__confFilesRE = "^nssbackup-(.+?)\.conf$"
 
 	def __init__(self):
 		"""
 		Initialisation
 		"""
 		self.__bm = None
+		self.__profileName = None
 
 	def __sendEmail(self):
 		"""
@@ -65,7 +66,7 @@ class NSsbackupd () :
 			_from = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {'login' : os.getenv("USERNAME"), 'hostname': mailsuffix}
 		
 		_to = self.__bm.config.get("report","to")
-		_title = _("[NSsbackup] Report of %(date)s") % {'date': datetime.datetime.now()}
+		_title = _("[NSsbackup] [%(profile)s] Report of %(date)s") % {'profile':self.__profileName, 'date': datetime.datetime.now()}
 		if self.__bm.config.has_option("log","file") :
 			_content = FAM.readfile(self.__bm.config.get("log","file"))
 		else :
@@ -108,12 +109,13 @@ class NSsbackupd () :
 		
 		global __bm
 		
-		try : 
-			try :
-				
-				if os.getuid() == 0 : 
-					# --------------
-					# we are root
+		try :
+			
+			if os.getuid() == 0 : 
+				# --------------
+				# we are root
+				try :
+					self.__profileName = _("Default Profile")
 					if os.path.exists("/etc/nssbackup.conf") :
 						# first launch the default config 
 						self.__bm = BackupManager("/etc/nssbackup.conf")
@@ -121,87 +123,121 @@ class NSsbackupd () :
 						self.__bm = BackupManager()
 					# do the backup
 					self.__bm.makeBackup()
+				except Exception, e:
+					self.__onError(e)
+				finally:
+					self.__onFinish()
+				
+				# Now search for alternate configuration files
+				# They are located in /etc/nssbackup.d/
+				if os.path.exists("/etc/nssbackup.d") and os.path.isdir("/etc/nssbackup.d") :
+					# The path exists, search  inside
+					r = re.compile(self.__confFilesRE)
 					
-					# Now search for alternate configuration files
-					# They are located in /etc/nssbackup.d/
-					if os.path.exists("/etc/nssbackup.d") and os.path.isdir("/etc/nssbackup.d") :
-						# The path exists, search  inside
-						r = re.compile(self.__confFilesRE)
-						
-						for cf in os.listdir("/etc/nssbackup.d") :
-							if os.path.isfile("/etc/nssbackup.d/"+cf) :
-								m = r.match(cf)
-								if m : 
+					for cf in os.listdir("/etc/nssbackup.d") :
+						if os.path.isfile("/etc/nssbackup.d/"+cf) :
+							m = r.match(cf)
+							if m : 
+								try:
+									self.__profileName = m.group(1) 
 									self.__bm = BackupManager("/etc/nssbackup.d/"+cf)
 									self.__bm.makeBackup()
-					
-					# ---------------------
-				else :  
-					# ---------------------
-					# we are others
+								except Exception, e:
+									self.__onError(e)
+								finally:
+									self.__onFinish()
+				
+				# ---------------------
+			else :  
+				# ---------------------
+				# we are others
+				try:
+					self.__profileName = _("Default Profile")
 					if os.path.exists(getUserConfDir()+ "nssbackup.conf") :
 						self.__bm = BackupManager(getUserConfDir()+ "nssbackup.conf")
 					else :
 						self.__bm = BackupManager()
 					# do the backup
 					self.__bm.makeBackup()
+				except Exception, e:
+					self.__onError(e)
+				finally:
+					self.__onFinish()
+				
+				# Now search for alternate configuration files
+				# They are located in getUserConfDir()+"/nssbackup.d"
+				if os.path.exists(getUserConfDir()+"/nssbackup.d") and os.path.isdir(getUserConfDir()+"/nssbackup.d") :
+					# The path exists, search  inside
+					r = re.compile(self.__confFilesRE)
 					
-					# Now search for alternate configuration files
-					# They are located in getUserConfDir()+"/nssbackup.d"
-					if os.path.exists(getUserConfDir()+"/nssbackup.d") and os.path.isdir(getUserConfDir()+"/nssbackup.d") :
-						# The path exists, search  inside
-						r = re.compile(self.__confFilesRE)
-						
-						for cf in os.listdir(getUserConfDir()+"/nssbackup.d") :
-							if os.path.isfile(getUserConfDir()+"/nssbackup.d/"+cf) :
-								m = r.match(cf)
-								if m : 
+					for cf in os.listdir(getUserConfDir()+"/nssbackup.d") :
+						if os.path.isfile(getUserConfDir()+"/nssbackup.d/"+cf) :
+							m = r.match(cf)
+							if m : 
+								try:
+									self.__profileName = m.group(1)
 									self.__bm = BackupManager(getUserConfDir()+"/nssbackup.d/"+cf)
 									self.__bm.makeBackup()
-									
-									
-					# ----------------
-				
-			except Exception, e :
-				if os.getuid() != 0 :
-					try:
-						import pynotify
-						if pynotify.init("NSsbackup"):
-							n = pynotify.Notification("NSsbackup", "CRASH : '%s'" % str(e))
-							n.show()
-						else:
-							self.logger.warning(_("there was a problem initializing the pynotify module"))
-					except Exception, e1:
-						self.logger.warning(str(e1))
-				self.logger.error(str(e))
-				self.logger.error(traceback.format_exc())
-				
-				if self.__bm and self.__bm.config :
-					# remove any left lockfile
-					if self.__bm.config.has_option("general","lockfile") and FAM.exists(self.__bm.config.get("general","lockfile")) :
-						self.logger.info(_("Session of backup is finished (lockfile is removed) "))
-						FAM.delete(self.__bm.config.get("general","lockfile"))
-					
-					# put the logfile in the snapshotdir
-					logfile = None
-					if self.__bm.config.has_option("log","file") and FAM.exists(self.__bm.config.get("log","file")) :
-						logfile = self.__bm.config.get("log","file")
-					elif FAM.exists("nssbackup.log") :
-						logfile =os.path.abspath("nssbackup.log")
-					# check for the avaibility of the snapshot
-					snp = self.__bm.getActualSnapshot()
-					if snp and logfile :
-						import shutil
-						shutil.copy(logfile, snp.getPath())
-					else :
-						self.logger.error(_("Couldn't copy the logfile into the snapshot directory"))
-					
-			finally :
-				if self.__bm and self.__bm.config :
-					# send the mail
-					if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
-						self.__sendEmail()
-					
+								except Exception, e:
+									self.__onError(e)
+								finally:
+									self.__onFinish()
+								
+				# ----------------
+			
 		except Exception, e :
 			self.logger.error(str(e))
 			self.logger.error(traceback.format_exc())
+			if os.getuid() != 0 :
+				try:
+					import pynotify
+					if pynotify.init("NSsbackup"):
+						n = pynotify.Notification("NSsbackup", "CRASH [%s] : '%s'" % (self.__profileName,str(e)))
+						n.show()
+					else:
+						self.logger.warning(_("there was a problem initializing the pynotify module"))
+				except Exception, e1:
+					self.logger.warning(str(e1))
+
+	def __onError(self, e):
+		"""
+		"""
+		self.logger.error(str(e))
+		self.logger.error(traceback.format_exc())
+		
+		if os.getuid() != 0 :
+			try:
+				import pynotify
+				if pynotify.init("NSsbackup"):
+					n = pynotify.Notification("NSsbackup", "CRASH [%s]: '%s'" % (self.__profileName, str(e)))
+					n.show()
+				else:
+					self.logger.warning(_("there was a problem initializing the pynotify module"))
+			except Exception, e1:
+				self.logger.warning(str(e1))
+		
+		if self.__bm and self.__bm.config :
+			# remove any left lockfile
+			if self.__bm.config.has_option("general","lockfile") and FAM.exists(self.__bm.config.get("general","lockfile")) :
+				self.logger.info(_("Session of backup is finished (lockfile is removed) "))
+				FAM.delete(self.__bm.config.get("general","lockfile"))
+			
+			# put the logfile in the snapshotdir
+			logfile = None
+			if self.__bm.config.has_option("log","file") and FAM.exists(self.__bm.config.get("log","file")) :
+				logfile = self.__bm.config.get("log","file")
+			elif FAM.exists("nssbackup.log") :
+				logfile =os.path.abspath("nssbackup.log")
+			# check for the avaibility of the snapshot
+			snp = self.__bm.getActualSnapshot()
+			if snp and logfile :
+				import shutil
+				shutil.copy(logfile, snp.getPath())
+			else :
+				self.logger.error(_("Couldn't copy the logfile into the snapshot directory"))
+
+	def __onFinish(self):
+		if self.__bm and self.__bm.config :
+			# send the mail
+			if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
+				self.__sendEmail()

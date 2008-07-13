@@ -19,6 +19,7 @@ from nssbackup.managers.SnapshotManager import SnapshotManager
 from nssbackup.util.log import getLogger
 from nssbackup.util.Snapshot import Snapshot
 import unittest
+
 import os
 
 class TestSnapshotManager(unittest.TestCase) :

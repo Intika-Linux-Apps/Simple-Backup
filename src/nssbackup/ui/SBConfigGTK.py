@@ -584,14 +584,14 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["TLScheckbutton"].set_active(False)
 		
 		if self.configman.has_section("report") :
-			if not self.configman.options("report") :
+			opts = self.configman.options("report")
+			if not opts or len(opts)==0:
 				unfillreportentries()
 				# LP Bug #153605
 				self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
 				self.widgets['smtplogininfo'].set_sensitive(False)
 				self.widgets['TLSinfos'].set_sensitive(False)
 			else :
-				
 				if self.configman.has_option("report", "from") :
 					self.widgets["smtpfrom"].set_text(self.configman.get("report", "from"))
 				if self.configman.has_option("report", "to") :
@@ -610,6 +610,8 @@ class SBconfigGTK(GladeGnomeApp):
 				if self.configman.has_option("report", "smtptls"):
 					self.widgets["TLScheckbutton"].set_active(True)
 					self.widgets['TLSinfos'].set_sensitive(True)
+				else:
+					self.widgets["TLScheckbutton"].set_active(False)
 				if self.configman.has_option("report", "smtpcert") or self.configman.has_option("report", "smtpkey") :
 					self.widgets["SSLradiobutton"].set_active(True)
 					self.widgets['SSLinfos'].set_sensitive(True)
@@ -1431,14 +1433,12 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_TLScheckbutton_toggled(self, *args):
 		if not self.widgets['TLScheckbutton'].get_active():
 			self.widgets['TLSinfos'].set_sensitive(False)
-			if self.configman.has_option("report", "smpttls") :
-				self.configman.remove_option("report", "smpttls")
-			if self.configman.has_option("report", "smptcert") :
-				self.configman.remove_option("report", "smptcert")
-			if self.configman.has_option("report", "smptkey") :
-				self.configman.remove_option("report", "smptkey")
 			if self.configman.has_option("report", "smtptls") :
 				self.configman.remove_option("report", "smtptls")
+			if self.configman.has_option("report", "smtpcert") :
+				self.configman.remove_option("report", "smtpcert")
+			if self.configman.has_option("report", "smtpkey") :
+				self.configman.remove_option("report", "smtpkey")
 			self.isConfigChanged()
 		else :
 			self.configman.set("report", "smtptls","1")
@@ -1712,18 +1712,21 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.remove_option("report", "smtppassword")
 			self.isConfigChanged()
 	#----------------------------------------------------------------------
-
 	def on_crtfilechooser_selection_changed(self, *args):
-		self.configman.set("report", "smtpcert", self.widgets['crtfilechooser'].get_filename())
-		self.isConfigChanged()
-		self.logger.debug("Certificate : " + str(self.configman.get("report", "smtpcert")))
+		smtpcert = self.widgets['crtfilechooser'].get_filename()
+		if os.path.isfile(smtpcert):
+			self.configman.set("report", "smtpcert", self.widgets['crtfilechooser'].get_filename())
+			self.isConfigChanged()
+			self.logger.debug("Certificate : " + str(self.configman.get("report", "smtpcert")))
 
 	#----------------------------------------------------------------------
 
 	def on_keyfilechooser_selection_changed(self, *args):
-		self.configman.set("report", "smtpkey", self.widgets['keyfilechooser'].get_filename())
-		self.isConfigChanged()
-		self.logger.debug("Key : " + str(self.configman.get("report", "smtpkey")))
+		smtpkey = self.widgets['keyfilechooser'].get_filename()
+		if os.path.isfile(smtpkey):
+			self.configman.set("report", "smtpkey", smtpkey)
+			self.isConfigChanged()
+			self.logger.debug("Key : " + str(self.configman.get("report", "smtpkey")))
 
 	#----------------------------------------------------------------------
 
