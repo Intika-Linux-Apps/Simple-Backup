@@ -351,6 +351,7 @@ class SBconfigGTK(GladeGnomeApp):
 			'askNewPrfNameDialog',
 			'enableNewPrfCB',
 			'newPrfNameEntry',
+			'backuplinks',
 			]
 
 		handlers = [
@@ -425,6 +426,7 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_ex_pathstv_key_press_event',
 			'on_ex_ftypetv_key_press_event',
 			'on_ex_regextv_key_press_event',
+			'on_backuplinks_toggled',
 			]
 
 		top_window = 'nssbackupConfApp'
@@ -527,6 +529,12 @@ class SBconfigGTK(GladeGnomeApp):
 			else:
 				self.widgets["ex_maxsize"].set_sensitive( True )
 				self.widgets["ex_max"].set_active( True )
+		
+		# backup links
+		if self.configman.has_option("general", "backuplinks") :
+			self.widgets["backuplinks"].set_active(True)
+		else :
+			self.widgets["backuplinks"].set_active(False)
 		
 		# Maximum of inc
 		if self.configman.has_option("general", "maxincrement") :
@@ -1581,6 +1589,13 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.remove_option("exclude", "maxsize")
 			self.isConfigChanged()
 
+	def on_backuplinks_toggled(self, *args):
+		if self.widgets['backuplinks'].get_active():
+			self.configman.set("general", "backuplinks", 1)
+		else :
+			self.configman.remove_option("general", "backuplinks")
+		self.isConfigChanged()
+
 	def on_ex_maxsize_changed(self, *args):
 		self.configman.set( "exclude", "maxsize", str(int(self.widgets["ex_maxsize"].get_value())*1024*1024) )
 		self.isConfigChanged()
@@ -1714,7 +1729,7 @@ class SBconfigGTK(GladeGnomeApp):
 	#----------------------------------------------------------------------
 	def on_crtfilechooser_selection_changed(self, *args):
 		smtpcert = self.widgets['crtfilechooser'].get_filename()
-		if os.path.isfile(smtpcert):
+		if smtpcert !=None and os.path.isfile(smtpcert):
 			self.configman.set("report", "smtpcert", self.widgets['crtfilechooser'].get_filename())
 			self.isConfigChanged()
 			self.logger.debug("Certificate : " + str(self.configman.get("report", "smtpcert")))
@@ -1723,7 +1738,7 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_keyfilechooser_selection_changed(self, *args):
 		smtpkey = self.widgets['keyfilechooser'].get_filename()
-		if os.path.isfile(smtpkey):
+		if smtpkey !=None and os.path.isfile(smtpkey):
 			self.configman.set("report", "smtpkey", smtpkey)
 			self.isConfigChanged()
 			self.logger.debug("Key : " + str(self.configman.get("report", "smtpkey")))
