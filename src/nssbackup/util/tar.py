@@ -25,8 +25,6 @@ from nssbackup.util.exceptions import SBException
 from datetime import datetime
 import time
 
-logger = LogFactory.getLogger()
-
 def getArchiveType(archive):
 	"""
 	return the type of an archive 
@@ -85,12 +83,12 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	
 	options.extend(['--file='+sourcetgz,file])
 	
-	logger.debug("Launching TAR with options : %s" % options)
+	LogFactory.getLogger().debug("Launching TAR with options : %s" % options)
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		logger.debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	logger.debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 	
 def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None ):
 	"""
@@ -131,9 +129,9 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None 
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		logger.debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	logger.debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 
 def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	"""
@@ -170,9 +168,9 @@ def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		logger.debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	logger.debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 
 def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
 	"""
@@ -196,9 +194,9 @@ def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		logger.debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	logger.debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 
 
 def __prepareTarCommonOpts(snapshot):
@@ -207,11 +205,11 @@ def __prepareTarCommonOpts(snapshot):
 	@param snapshot: The snapshot to fill in
 	@return: a list of options to be use to launch tar
 	"""
-	tdir = snapshot.getPath().replace(" ", "\ ")
+	tdir = snapshot.getPath()
 	options = list()
 	
-	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile().replace(" ", "\ ")+".tmp"])
-	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ ")+".tmp")
+	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile()+".tmp"])
+	options.append ("--exclude-from="+snapshot.getExcludeFListFile()+".tmp")
 	
 	archivename = "files.tar"
 	if snapshot.getFormat() == "gzip":
@@ -223,15 +221,15 @@ def __prepareTarCommonOpts(snapshot):
 	elif snapshot.getFormat() == "none":
 		pass
 	else :
-		logger.debug("Defaulting to gzip ! ")
+		LogFactory.getLogger().debug("Defaulting to gzip ! ")
 		options.insert(1,"--gzip")
 		archivename+=".gz"
 	
-	options.append("--file="+tdir+os.sep +archivename)
+	options.append("--file="+os.sep.join([tdir,archivename]) )
 	
-	logger.debug(options)
+	LogFactory.getLogger().debug(options)
 	
-	logger.debug("Common TAR options : " + str(options))
+	LogFactory.getLogger().debug("Common TAR options : " + str(options))
 	
 	return options 
 	
@@ -258,7 +256,7 @@ def makeTarIncBackup(snapshot):
 	@param snapshot: the snapshot in which to make the backup
 	@raise SBException: if there was a problem with tar
 	"""
-	logger.info(_("Launching TAR to make Inc backup "))
+	LogFactory.getLogger().info(_("Launching TAR to make Inc backup "))
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
@@ -268,18 +266,19 @@ def makeTarIncBackup(snapshot):
 	
 	# For an INC backup the base SNAR file should exists
 	if not os.path.exists(snapshot.getBaseSnapshot().getSnarFile()) :
-		logger.error(_("Unable to find the SNAR file to make an Incremental backup"))
-		logger.error(_("Falling back to full backup"))
+		LogFactory.getLogger().error(_("Unable to find the SNAR file to make an Incremental backup"))
+		LogFactory.getLogger().error(_("Falling back to full backup"))
 		makeTarFullBackup(snapshot)
 	else:
 		shutil.copy(snapshot.getBaseSnapshot().getSnarFile(), snapshot.getSnarFile())
 		options.append("--listed-incremental="+snapshot.getSnarFile())
 		
 		outStr, errStr, retVal = Util.launch("tar", options)
-		logger.debug("TAR Output : " + outStr)
+		LogFactory.getLogger().debug("TAR Output : " + outStr)
 		if retVal != 0 :
 			# list-incremental is not compatible with ignore failed read
-			logger.error(_("Couldn't make a proper backup, finishing backup though :") + errStr )
+			LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
+			raise SBException(_("Couldn't make a proper backup : ") + errStr )
 		
 
 def makeTarFullBackup(snapshot):
@@ -288,7 +287,7 @@ def makeTarFullBackup(snapshot):
 	@param snapshot: the snapshot in which to make the backup
 	@raise SBException: if there was a problem with tar
 	"""
-	logger.info(_("Launching TAR to make a Full backup "))
+	LogFactory.getLogger().info(_("Launching TAR to make a Full backup "))
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
@@ -303,10 +302,11 @@ def makeTarFullBackup(snapshot):
 	options.append("--listed-incremental="+snapshot.getSnarFile())
 	
 	outStr, errStr, retVal = Util.launch("tar", options)
-	logger.debug("TAR Output : " + outStr)
+	LogFactory.getLogger().debug("TAR Output : " + outStr)
 	if retVal != 0 :
 		# list-incremental is not compatible with ignore failed read
-		logger.error(_("Couldn't make a proper backup, finishing backup though : ") + errStr )
+		LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
+		raise SBException(_("Couldn't make a proper backup : ") + errStr )
 	
 # ---
 

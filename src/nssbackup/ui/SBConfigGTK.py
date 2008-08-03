@@ -45,7 +45,7 @@ class SBconfigGTK(GladeGnomeApp):
 		else :
 			if os.path.exists(getUserConfDir()+"nssbackup.conf") :
 				self.default_conffile = getUserConfDir()+"nssbackup.conf"
-				self.configman = ConfigManager(getUserConfDir()+"nssbackup.conf")
+				self.configman = ConfigManager(self.default_conffile)
 			else :
 				self.configman = ConfigManager()
 		
@@ -816,6 +816,9 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_save_clicked(self, *args):
 		self.logger.debug("Saving Config")
 		self.configman.saveConf()
+		self.conffile=self.configman.conffile
+		if not self.default_conffile:
+			self.default_conffile = self.conffile
 		self.orig_configman = ConfigManager(self.configman.conffile)
 		self.isConfigChanged()
 		
