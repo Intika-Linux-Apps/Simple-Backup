@@ -18,8 +18,8 @@ import inspect
 import os
 import sys
 import glob
-import nssbackup, subprocess
 from gettext import gettext as _
+import nssbackup, subprocess
 from tempfile import *
 from nssbackup.managers.FileAccessManager import *
 from nssbackup.util.log import LogFactory
@@ -103,7 +103,6 @@ class pluginFAM :
 class PluginManager :
 	"""
 	"""
-	logger = LogFactory.getLogger()
 	# This should be a dictionary of plugins
 	__pluginList = None
 
@@ -136,7 +135,8 @@ class PluginManager :
 								self.__pluginList[symbol_name] = symbol
 	                            
 					except Exception, e:
-						self.logger.warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
+						from gettext import gettext as _
+						LogFactory.getLogger().warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
 						continue
 			return self.__pluginList
 		
