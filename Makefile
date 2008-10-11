@@ -7,11 +7,11 @@ BIN=$(DESTDIR)/bin
 PYDIR=$(DESTDIR)/lib/python2.5/site-packages
 CLSDIR=$(PYDIR)/nssbackup
 
-all:
+all: po-data fill-templates
 
 default:
 
-install: po-data install-po fill-templates install-bin install-classes install-data
+install: install-po install-bin install-classes install-data
 	chmod +x $(BIN)/nssbackup* $(BIN)/upgrade-backups $(DESTDIR)/share/nssbackup/multipleTarScript  $(DESTDIR)/share/nssbackup/nssbackup
 
 fill-templates:
