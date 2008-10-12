@@ -16,143 +16,46 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 import os, shutil,pickle
-try:
-	import gnomevfs
-except ImportError:
-	import gnome.vfs as gnomevfs
 
 
 def delete(  uri ):
 	" Deletes a file or a dir (recursively) "
-	if islocal( uri ):
-		if isdir( uri ):
-			shutil.rmtree( uri, False )
-			return True
-		else : 
-			os.unlink(uri)
-			return True
-	else:
-		if not isdir( uri ):
-			gnomevfs.unlink( uri )
-		else:
-			d = gnomevfs.open_directory( uri )
-			for f in d:
-				if f.name=="." or f.name=="..":
-					continue
-				if f.type==2:
-					delete( uri+"/"+f.name )
-				else:
-					gnomevfs.unlink( uri+"/"+f.name )
-			d.close()
-			gnomevfs.remove_directory( uri )
-
-def isdir(  uri ):
-	"checks if the given uri is a dir"
-	if uri.startswith(os.sep) :
-		return os.path.isdir(uri)
-	else :
-		return ( gnomevfs.get_file_info( uri ).type == 2 )
-
-def rename(  uri, name ) :
-	"""
-	Rename the given uri file name to the new file name. 
-	ex: rename("/my/dir/filename", "newfilename") => "/my/dir/newfilename"
-	"""
-	p = gnomevfs.get_file_info( uri )
-	p.name = name
-	gnomevfs.set_file_info( uri, p, 1 )
-
-def chmod(  uri, mode ):
-	" Applies a chmod to the given file "
-	p = gnomevfs.get_file_info( uri )
-	p.permissions = mode
-	gnomevfs.set_file_info( uri, p, 2 )
+	
+	if os.path.isdir( uri ):
+		shutil.rmtree( uri, False )
+		return True
+	else : 
+		os.unlink(uri)
+		return True
 
 def copyfile(src, dest ):
 	"copy the source file to the dest one"
-	if islocal(src) and not isdir(src):
-		if islocal(dest) :
-			shutil.copy2(src, dest)
-		else :
-			s1 = open( src, "r" )
-			if exists(dest) and isdir(dest) :
-				splited = src.split("/")
-				turi = gnomevfs.URI( dest +"/"+ splited[len(splited)-1] )
-			else :
-				turi = gnomevfs.URI( dest )
-			d1 = gnomevfs.create( turi, 2 )
-			shutil.copyfileobj( s1, d1 )
-			s1.close()
-			d1.close()		
-	else : 
-		print(" No support for copying from remote file/dir ")
-		return
-
-def permissions(  uri ):
-	" Gets the permissions on the given file "
-	return gnomevfs.get_file_info( uri ).permissions
+	if not os.path.isdir(src):
+		shutil.copy2(src, dest)
 
 def exists(  uri ):
 	" checks if the given uri exists "
-	if islocal(uri):
-		return os.access( uri, os.F_OK )
-	else:
-		return gnomevfs.exists( uri )
-
-def islocal(  uri ):
-	" checks if the file is local or remote "
-	return gnomevfs.URI( uri ).is_local
+	return os.access( uri, os.F_OK )
 
 def openfile(  uri, write=False ):
 	" opens a file for reading or writing. Default is reading "
-	if islocal( uri ):
-		if write:
-			return open( uri, "w" )
-		else:
-			return open( uri, "r" )
+	if write:
+		return open( uri, "w" )
 	else:
-		if write:
-			if exists( uri ):
-				return gnomevfs.open( uri, 2 )
-			else:
-				return gnomevfs.create( uri, 2 )
-		else:
-			return gnomevfs.open( uri, 1 )
+		return open( uri, "r" )
 			
-def perm_secure(  tdir ):
-	" Secures permissions "
-	chmod( tdir, 0750 )
-	chmod( tdir+"/ver", 0640 )
-	chmod( tdir+"/tree", 0640 )
-	chmod( tdir+"/flist", 0640 )
-	chmod( tdir+"/fprops", 0640 )
-	chmod( tdir+"/files.tgz", 0640 )
-	chmod( tdir+"/packages", 0640 )
-	chmod( tdir+"/excludes", 0640 )
-	chmod( tdir+"/base", 0640 )
-
 def listdir( target) :
 	""" 
 	List a directory.
 	@param target: The dir to list de content 
 	@return: a list ['file1','file2','file3' ...]
 	"""
-	if islocal( target ):
-		listing = os.listdir( target )
-	else:
-		d = gnomevfs.open_directory( target )
-		listing = []
-		for f in d:
-			if f.name != "." and f.name != "..":
-				listing.append( f.name )
+	listing = os.listdir( target )
 	return listing
 
 def makedir( target) :
 	" make a directory "
-	if islocal(target):
-		os.makedirs( target, 0750 )
-	else:
-		gnomevfs.make_directory( target, 0750 )
+	os.makedirs( target, 0750 )
 		
 def createfile(filepath):
 	"""
@@ -173,13 +76,10 @@ def createfile(filepath):
 		
 def readfile( uri) :
 	" Read a file from a given URI and return a string with the read content "
-	if islocal( uri ) :
-		f = open( uri, "r" )
-		value = f.read()
-		f.close()
-		return str( value )
-	else :
-		return str( gnomevfs.read_entire_file( uri ) )
+	f = open( uri, "r" )
+	value = f.read()
+	f.close()
+	return str( value )
 
 def writetofile( File, StringToWrite ) :
 	"""

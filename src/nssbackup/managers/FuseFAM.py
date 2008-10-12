@@ -124,7 +124,7 @@ class FuseFAM:
 					self.logger.debug("Removing '%s' from configManager" % remotedir)
 					self.__config.remove_option("dirconfig",remotedir)
 				elif self.__config.has_option("general","target") and self.__config.get("general","target") == remotedir :
-					self.logger.error("We are unable to mount the target dir ! We will not abort right now and will fall back on GnomeVFS !")
+					raise SBException("We are unable to mount the target dir !")
 				return False
 		self.logger.warning("No plugin could deal with that schema '%s', disabling it" % remotedir)
 		self.__config.remove_option("dirconfig",remotedir)
