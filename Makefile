@@ -19,10 +19,10 @@ fill-templates:
 
 install-bin:
 	mkdir -p $(BIN)
-	cp -a src/nssbackupd $(BIN)/nssbackupd
-	cp -a src/nssbackup-config-gui $(BIN)/nssbackup-config-gui
-	cp -a src/nssbackup-restore-gui $(BIN)/nssbackup-restore-gui
-	cp -a src/upgrade-backups $(BIN)/upgrade-backups
+	cp -a src/nssbackupd.py $(BIN)/nssbackupd
+	cp -a src/nssbackup-config-gui.py $(BIN)/nssbackup-config-gui
+	cp -a src/nssbackup-restore-gui.py $(BIN)/nssbackup-restore-gui
+	cp -a src/upgrade-backups.py $(BIN)/upgrade-backups
 
 install-classes:
 	mkdir -p $(CLSDIR)

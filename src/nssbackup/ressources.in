@@ -1,4 +1,5 @@
-@prefix@/share/pixmaps/
-@prefix@/share/application/
-@prefix@/share/nssbackup/
-@prefix@/share/doc/nssbackup/
+@prefix@/share/locale
+@prefix@/share/pixmaps
+@prefix@/share/application
+@prefix@/share/nssbackup
+@prefix@/share/doc/nssbackup

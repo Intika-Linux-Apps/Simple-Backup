@@ -21,10 +21,15 @@ from gettext import gettext as _
 from nssbackup.util.log import getLogger
 from nssbackup.managers.UpgradeManager import UpgradeManager
 import traceback
+from nssbackup.util import getResource
 
 if __name__ == "__main__" :
 	# i18n init
-	gettext.textdomain("nssbackup")
+	application = 'nssbackup'
+	locale_dir = getResource('locale')
+    
+	gettext.bindtextdomain(application, locale_dir)
+	gettext.textdomain(application)
 	
 	if not len(sys.argv) in [2]:
 		print _("""

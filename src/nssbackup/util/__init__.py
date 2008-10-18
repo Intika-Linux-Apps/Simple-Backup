@@ -90,6 +90,8 @@ def getResource(resourceName):
 		dir = dir.strip()
 		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
 		if os.path.exists(dir) and os.path.isdir(dir):
+			if dir.endswith(resourceName):
+				return dir 
 			list = os.listdir(dir)
 			#LogFactory.getLogger().debug("File list is :" + str(list))
 			for f in list :
