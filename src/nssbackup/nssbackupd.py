@@ -76,7 +76,7 @@ class NSsbackupd () :
 				_content = _("I didn't find the log file. Please set it up in nssbackup.conf ")
 		
 		server = smtplib.SMTP()
-		
+
 		# getting the connection
 		if self.__bm.config.has_option("report","smtpserver") :
 			if self.__bm.config.has_option("report","smtpport") :
@@ -92,10 +92,14 @@ class NSsbackupd () :
 			server.login(self.__bm.config.get("report","smtpuser"), self.__bm.config.get("report","smtppassword"))
 		
 		# send and close connection
-		_subject = "SUBJECT : %s \r\n" % _title
-		_header = "From : %s \r\nTo : %s \r\n" % (_from, _to)
-		server.sendmail(_from, _to, _header+_subject+_content)
-		server.close()
+		_subject = "Subject: %s\r\n\r\n" % _title
+		_header = "From: %s\r\nTo: %s\r\n" % (_from, _to)
+		self.logger.info("Report is sent by mail: From: '%s' To: '%s'" % (_from,
+																	      _to))
+		self.logger.info("Report is sent by mail: '%s'" % (_subject.strip()))
+		_msg = _header + _subject + _content
+		server.sendmail(_from, _to, _msg)
+		server.quit()
 	
 		
 	def run(self):
