@@ -17,6 +17,8 @@
 import os
 import traceback
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 import socket
 import datetime
 import re
@@ -76,7 +78,18 @@ class NSsbackupd () :
 				_content = _("I didn't find the log file. Please set it up in nssbackup.conf ")
 		
 		server = smtplib.SMTP()
-
+		msg = MIMEMultipart()
+		
+		msg['Subject'] = _title
+		msg['From'] = _from
+		msg['To'] = _to
+		msg.preamble = _title
+		
+		msg_content = MIMEText(_content)
+		# Set the filename parameter
+		msg_content.add_header('Content-Disposition', 'attachment', filename="nssbackup.log")
+		msg.attach(msg_content)
+		
 		# getting the connection
 		if self.__bm.config.has_option("report","smtpserver") :
 			if self.__bm.config.has_option("report","smtpport") :
@@ -92,14 +105,8 @@ class NSsbackupd () :
 			server.login(self.__bm.config.get("report","smtpuser"), self.__bm.config.get("report","smtppassword"))
 		
 		# send and close connection
-		_subject = "Subject: %s\r\n\r\n" % _title
-		_header = "From: %s\r\nTo: %s\r\n" % (_from, _to)
-		self.logger.info("Report is sent by mail: From: '%s' To: '%s'" % (_from,
-																	      _to))
-		self.logger.info("Report is sent by mail: '%s'" % (_subject.strip()))
-		_msg = _header + _subject + _content
-		server.sendmail(_from, _to, _msg)
-		server.quit()
+		server.sendmail(_from, _to, msg.as_string())
+		server.close()
 	
 		
 	def run(self):
