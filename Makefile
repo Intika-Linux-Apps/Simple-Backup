@@ -58,6 +58,7 @@ uninstall-data:
 	rm -f $(DESTDIR)/share/nssbackup/nssbackup-restore.glade
 	rm -f $(DESTDIR)/share/nssbackup/nssbackup
 	rm -rf $(PYDIR)/nssbackup $(PYDIR)/NSsbackup*
+	find $(DESTDIR)/share/locale -name nssbackup.mo -exec rm -f '{}' \;
 	
 reinstall: uninstall install
 
