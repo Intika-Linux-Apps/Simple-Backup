@@ -483,7 +483,6 @@ Thanks to this you can configure backup of different kinds to different places.
                                 <property name="can_focus">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                 <property name="enable_search">False</property>
-                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                               </widget>
                             </child>
                           </widget>
@@ -885,6 +884,7 @@ Thanks to this you can configure backup of different kinds to different places.
                   <widget class="GtkToolButton" id="saveButton">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="tooltip" translatable="yes">Saves the current profile.</property>
                     <property name="label">Save</property>
                     <property name="stock_id">gtk-save</property>
                     <signal name="clicked" handler="on_save_clicked"/>
@@ -929,6 +929,7 @@ Thanks to this you can configure backup of different kinds to different places.
                   <widget class="GtkToolButton" id="prfManToolButton">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="tooltip" translatable="yes">Opens the profile manager.</property>
                     <property name="label" translatable="yes">Profiles</property>
                     <property name="stock_id">gtk-home</property>
                     <signal name="clicked" handler="on_prfManager_activate"/>
@@ -1230,6 +1231,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                 <child>
                   <widget class="GtkLabel" id="label8">
                     <property name="visible">True</property>
+                    <property name="tooltip" translatable="yes">Basic preferences for creation of backups.</property>
                     <property name="label" translatable="yes">General</property>
                   </widget>
                   <packing>
@@ -1254,7 +1256,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="border_width">2</property>
                             <property name="headers_visible">False</property>
                             <property name="search_column">1</property>
-                            <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                             <signal name="key_press_event" handler="on_includetv_key_press_event"/>
                           </widget>
                         </child>
@@ -1402,7 +1403,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="can_focus">True</property>
                             <property name="headers_visible">False</property>
                             <property name="search_column">1</property>
-                            <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                             <signal name="key_press_event" handler="on_remote_includetv_key_press_event"/>
                           </widget>
                         </child>
@@ -1500,6 +1500,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                 <child>
                   <widget class="GtkLabel" id="label11">
                     <property name="visible">True</property>
+                    <property name="tooltip" translatable="yes">Define here the files and directories to backup.</property>
                     <property name="label" translatable="yes">Include</property>
                   </widget>
                   <packing>
@@ -1682,7 +1683,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="can_focus">True</property>
                                 <property name="headers_visible">False</property>
                                 <property name="search_column">1</property>
-                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                                 <signal name="key_press_event" handler="on_ex_ftypetv_key_press_event"/>
                               </widget>
                             </child>
@@ -1757,7 +1757,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="can_focus">True</property>
                                 <property name="headers_visible">False</property>
                                 <property name="search_column">1</property>
-                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                                 <signal name="key_press_event" handler="on_ex_regextv_key_press_event"/>
                               </widget>
                             </child>
@@ -1928,6 +1927,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                 <child>
                   <widget class="GtkLabel" id="label19">
                     <property name="visible">True</property>
+                    <property name="tooltip" translatable="yes">Here you can define what files and directories to exclude.</property>
                     <property name="label" translatable="yes">Exclude</property>
                   </widget>
                   <packing>
@@ -2724,6 +2724,7 @@ Erase all other backups.&lt;/small&gt;
                 <child>
                   <widget class="GtkLabel" id="label35">
                     <property name="visible">True</property>
+                    <property name="tooltip" translatable="yes">Settings how to clean up older backups.</property>
                     <property name="label" translatable="yes">Purging</property>
                     <accessibility>
                       <atkproperty name="AtkObject::accessible_description" translatable="yes">Cleaning old backups</atkproperty>
