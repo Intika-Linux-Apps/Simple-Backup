@@ -45,6 +45,7 @@ class SBconfigGTK(GladeGnomeApp):
 		else :
 			if os.path.exists(getUserConfDir()+"nssbackup.conf") :
 				self.default_conffile = getUserConfDir()+"nssbackup.conf"
+				self.conffile = getUserConfDir()+"nssbackup.conf"
 				self.configman = ConfigManager(self.default_conffile)
 			else :
 				self.configman = ConfigManager()

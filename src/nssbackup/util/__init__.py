@@ -97,7 +97,7 @@ def getResource(resourceName):
 			for f in list :
 				if f == resourceName :
 					return os.path.normpath(os.sep.join([dir,resourceName]))
-	devvalue = os.path.dirname(tmp)+"/../datas/"
+	devvalue = os.path.dirname(tmp)+"/../../datas/"
 	if os.path.exists(devvalue + resourceName) :
 		return os.path.normpath(devvalue + resourceName)
 	raise SBException("'%s' hasn't been found in the ressource list"% resourceName)
