@@ -729,6 +729,14 @@ class SBconfigGTK(GladeGnomeApp):
 			dialog.destroy()
 			return
 		
+		try:
+			dummy = re.compile(new_text)
+		except:
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_OK, message_format=_("Provided regular expression is not valid."))
+			dialog.run()
+			dialog.destroy()
+			return
+		
 		# Remove old expression and add the new one
 		value = self.ex_regex[path][0]
 		r = self.configman.get( "exclude", "regex" )
@@ -1526,6 +1534,14 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.hide()
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
+			
+			try:
+				dummy = re.compile(regex)
+			except:
+				dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_OK, message_format=_("Provided regular expression is not valid."))
+				dialog.run()
+				dialog.destroy()
+				return
 			
 			if self.configman.has_option("exclude", "regex") :
 				r = self.configman.get( "exclude", "regex" )
