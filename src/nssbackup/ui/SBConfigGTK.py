@@ -45,6 +45,7 @@ class SBconfigGTK(GladeGnomeApp):
 		else :
 			if os.path.exists(getUserConfDir()+"nssbackup.conf") :
 				self.default_conffile = getUserConfDir()+"nssbackup.conf"
+				self.conffile = getUserConfDir()+"nssbackup.conf"
 				self.configman = ConfigManager(self.default_conffile)
 			else :
 				self.configman = ConfigManager()
@@ -725,6 +726,14 @@ class SBconfigGTK(GladeGnomeApp):
 		# Check if new path is empty
 		if (new_text == None) or (new_text == ""):
 			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Empty expression. Please enter a valid regular expression."))
+			dialog.run()
+			dialog.destroy()
+			return
+		
+		try:
+			dummy = re.compile(new_text)
+		except:
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_OK, message_format=_("Provided regular expression is not valid."))
 			dialog.run()
 			dialog.destroy()
 			return
@@ -1526,6 +1535,14 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.hide()
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
+			
+			try:
+				dummy = re.compile(regex)
+			except:
+				dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_OK, message_format=_("Provided regular expression is not valid."))
+				dialog.run()
+				dialog.destroy()
+				return
 			
 			if self.configman.has_option("exclude", "regex") :
 				r = self.configman.get( "exclude", "regex" )
