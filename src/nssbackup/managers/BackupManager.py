@@ -24,6 +24,7 @@ from SnapshotManager import SnapshotManager
 from ConfigManager import ConfigManager
 from UpgradeManager import UpgradeManager
 import FileAccessManager as FAM
+import nssbackup.util as Util
 from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import *
@@ -318,11 +319,20 @@ class BackupManager :
 		
 		# regexp to be used for excluding files from flist
 		self.logger.debug("getting exclude list for actual snapshot")
+		rexclude = []
 		if self.__actualSnapshot.getExcludes() :
-			rexclude = [ re.compile(p) for p in self.__actualSnapshot.getExcludes() if len(p)>0]
-		else :
-			rexclude = []
-		
+			for p in self.__actualSnapshot.getExcludes():
+				if Util.is_empty_regexp(p):
+					self.logger.error(_("Empty regular expression found. "\
+										"Skipped."))
+				else:
+					if Util.is_valid_regexp(p):
+						p_compiled = re.compile(p)
+						rexclude.append(p_compiled)
+					else:
+						self.logger.error(_("Invalid regular expression ('%s')"\
+										" found. Skipped.") % p )
+							
 		# set the list to backup and to exclude
 		self.logger.debug("set the list to backup and to exclude")
 		if self.config.has_section( "dirconfig" ):

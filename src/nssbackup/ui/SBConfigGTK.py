@@ -20,7 +20,7 @@ from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getU
 from nssbackup.ui.GladeGnomeApp import *
 from gettext import gettext as _
 import nssbackup.util as Util
-
+import gobject
 #----------------------------------------------------------------------
 
 class SBconfigGTK(GladeGnomeApp):
@@ -508,18 +508,40 @@ class SBconfigGTK(GladeGnomeApp):
 					print ("TODO: add a remote ex widget")
 					
 		# regexp
+		_invalid_regex_found = False
+		_invalid_regex = ""
 		self.ex_ftype.clear()
 		self.ex_regex.clear()
 		if self.configman.has_option("exclude", "regex") :
-			list = str(self.configman.get( "exclude", "regex" )).split(",")
-			for i in list:
-				if re.match( r"\\\.\w+", i ):
-					if i[2:] in self.known_ftypes:
-						self.ex_ftype.append( [self.known_ftypes[i[2:]], i[2:]] )
+			r = self.configman.get( "exclude", "regex" )
+			if not Util.is_empty_regexp(r):
+				list = str(r).split(",")
+				for i in list:
+					if re.match( r"\\\.\w+", i ):
+						if i[2:] in self.known_ftypes:
+							self.ex_ftype.append( [self.known_ftypes[i[2:]], i[2:]] )
+						else:
+							self.ex_ftype.append( [_("Custom"), i[2:]] )
 					else:
-						self.ex_ftype.append( [_("Custom"), i[2:]] )
-				else:
-					self.ex_regex.append( [i] )
+						if (not Util.is_empty_regexp( i )) and Util.is_valid_regexp( i ):
+							self.ex_regex.append( [i] )
+						else:
+							r = Util.remove_conf_entry(r, i); print "r: %s" % r
+							self.logger.warning(_("Invalid regular "\
+										"expression ('%s') found in "\
+										"configuration. Removed.") % i )
+							_invalid_regex_found = True
+							_invalid_regex = "%s, %s" % (_invalid_regex, i)
+
+		if _invalid_regex_found:
+			self.configman.set( "exclude", "regex", r )
+			self.isConfigChanged()
+			_msg = _("Invalid regular expressions found\n"\
+					 "in configuration file:\n"\
+					 "'%s'\n\nThese expressions are not used and were\n"\
+					 "removed from the "\
+					 "configuration.") % (_invalid_regex.lstrip(","))
+			gobject.idle_add(self._show_errdialog, _msg)
 		
 		# Set maximum size limits
 		if self.configman.has_option("exclude", "maxsize") :
@@ -724,29 +746,21 @@ class SBconfigGTK(GladeGnomeApp):
 	
 	def cell_regex_edited_callback(self, cell, path, new_text):
 		# Check if new path is empty
-		if (new_text == None) or (new_text == ""):
-			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Empty expression. Please enter a valid regular expression."))
-			dialog.run()
-			dialog.destroy()
-			return
-		
-		try:
-			dummy = re.compile(new_text)
-		except:
-			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_OK, message_format=_("Provided regular expression is not valid."))
-			dialog.run()
-			dialog.destroy()
-			return
-		
-		# Remove old expression and add the new one
-		value = self.ex_regex[path][0]
-		r = self.configman.get( "exclude", "regex" )
-		r = re.sub( r","+re.escape(value) , "", r )
-		r = r + r"," + new_text.strip()
-		self.configman.set( "exclude", "regex", r )
-		self.ex_regex[path][0] = new_text
-		self.isConfigChanged()
-		
+		if Util.is_empty_regexp(new_text):
+			self._show_errdialog(message_format=_("Empty expression. Please enter a valid regular expression."))
+		else:
+			if Util.is_valid_regexp(new_text):				
+				# Remove old expression and add the new one
+				value = self.ex_regex[path][0]
+				r = self.configman.get( "exclude", "regex" )
+				r = Util.remove_conf_entry(r, value)
+				r = r + r"," + new_text.strip()
+				r = r.strip(",")
+				self.configman.set( "exclude", "regex", r )
+				self.ex_regex[path][0] = new_text
+				self.isConfigChanged()
+			else:
+				self._show_errdialog(message_format=_("Provided regular expression is not valid."))		
 
 	def cell_edited_callback(self, cell, path, new_text, data):
 		# Check if new path is empty
@@ -1535,24 +1549,22 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.hide()
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
-			
-			try:
-				dummy = re.compile(regex)
-			except:
-				dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_OK, message_format=_("Provided regular expression is not valid."))
-				dialog.run()
-				dialog.destroy()
-				return
-			
-			if self.configman.has_option("exclude", "regex") :
-				r = self.configman.get( "exclude", "regex" )
+			if Util.is_empty_regexp(regex):
+				self._show_errdialog(message_format=_("Empty expression. Please enter a valid regular expression."))
 			else:
-				r=""
-			r = r + r"," + regex.strip()
-			self.configman.set( "exclude", "regex", r )
-			
-			self.ex_regex.append( [regex] )
-			self.isConfigChanged()
+				if Util.is_valid_regexp(regex):			
+					if self.configman.has_option("exclude", "regex") :
+						r = self.configman.get( "exclude", "regex" )
+					else:
+						r=""
+					r = r + r"," + regex.strip()
+					r = r.strip(",")
+					self.configman.set( "exclude", "regex", r )					
+					self.ex_regex.append( [regex] )
+					self.isConfigChanged()
+				else:
+					self._show_errdialog(message_format=_("Provided regular expression is not valid."))
+
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
 	
@@ -1563,7 +1575,7 @@ class SBconfigGTK(GladeGnomeApp):
 		if store and iter:
 			value = store.get_value( iter, 0 )
 			r = self.configman.get( "exclude", "regex" )
-			r = re.sub( r","+re.escape(value) , "", r )
+			r = Util.remove_conf_entry(r, value)
 			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
 			store.remove( iter )
@@ -1910,7 +1922,21 @@ class SBconfigGTK(GladeGnomeApp):
 			self.profiles.set_value(iter, 0, True)
 			self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
 		
-
+	def _show_errdialog(self, message_format):
+		"""Creates und displays a modal dialog box. Main purpose is
+		displaying of error messages.
+		
+		@param message_format: error message to show
+		@type message_format: String
+		
+		@todo: Should we use the button OK or CLOSE?
+		"""
+		dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,
+						flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+						buttons=gtk.BUTTONS_OK,	# buttons=gtk.BUTTONS_CLOSE
+						message_format=message_format)
+		dialog.run()
+		dialog.destroy()
 
 #----------------------------------------------------------------------
 
