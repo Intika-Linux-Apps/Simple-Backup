@@ -410,8 +410,9 @@ class SnapshotManager :
 			self.statusNumber = None
 			self.statusMessage = None
 			self.substatusMessage = None
-		except Exception,e :
-			self.logger.error(_("Got an exception when Pulling '%s' : "+str(e)) % snapshot.getName() ) 
+		except Exception, e :
+			_msg = _("Got an exception when Pulling '%s' : ") + str(e)
+			self.logger.error( _msg % ( snapshot.getName()) ) 
 			self.__cancelPull(snapshot)
 			raise e
 		
