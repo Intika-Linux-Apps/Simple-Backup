@@ -23,6 +23,8 @@ from nssbackup.util.exceptions import SBException
 from tempfile import *
 import inspect, shutil
 from shutil import *
+import types
+import re
 
 
 def nssb_copytree(src, dst, symlinks=False):
@@ -244,4 +246,70 @@ def progress_timeout(pbobj):
 	# As this is a timeout function, return TRUE so that it
 	# continues to get called
 	return True
+
+def is_valid_regexp( aregex ):
+	"""Checks if the given string is a valid regular expression.
+	@type aregex: String
 	
+	@todo: Is an empty expression valid or not? Can we combine both checks?
+	"""
+	if not isinstance( aregex, types.StringTypes):
+		raise TypeError("is_valid_regexp: Given parameter must be a string. "\
+					    "Got %s instead." % (type(aregex)))
+	_res = True
+	try:
+		dummy = re.compile(aregex)
+	except re.error:
+		_res = False
+	return _res
+
+def is_empty_regexp( aregex ):
+	"""Checks if the given parameter is empty, i.e. is None or a string
+	containing only whitespaces.
+	
+	@type aregex: String 
+	"""
+	if not isinstance( aregex, (types.StringTypes, types.NoneType)):
+		raise TypeError("is_empty_regexp: Given parameter must be a string "\
+						"or None. Got %s instead." % (type(aregex)))
+	_res = False
+	if aregex is None:
+		_res = True
+	else:
+		_stripped_aregex = aregex.strip()
+		if _stripped_aregex == "":
+			_res = True
+	return _res
+
+def remove_conf_entry(confline, entry, separator = ","):
+	"""Removes the given entry from the given string. Entries in configurations
+	were separated by specified token. Leading and trailing separators are
+	taken into account.
+	
+	@param confline:  the string from which the entry should be removed
+	@param entry:	  the string that is removed
+	@param separator: the token that separates the entries
+	
+	@type confline:	  String
+	@type entry:      String
+	@type separator:  String
+	
+	@return: the configuration line without the removed entry
+	@rtype:  String
+	
+	@raise TypeError: If one of the given parameters is not of string type
+	"""
+	if not isinstance( confline, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(confline)))
+	if not isinstance( entry, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(entry)))
+	if not isinstance( separator, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(separator)))
+	_line = "%s%s%s" % (separator, confline, separator)
+	_mentry = r"%s%s%s" % (separator, re.escape( entry ), separator)
+	_line = re.sub( _mentry , separator, _line )
+	_line = _line.strip( separator )
+	return _line
