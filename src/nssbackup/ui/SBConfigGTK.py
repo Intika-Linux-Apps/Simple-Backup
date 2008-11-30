@@ -459,8 +459,51 @@ class SBconfigGTK(GladeGnomeApp):
 	def prefillWindow(self, recommened_setting=False):
 		"""
 		Prefill the GTK window with config infos
-		"""
 		
+		@todo: Opening of directories (e.g. target) must be unified over all
+			   modules that use such functionality!
+		"""
+		def __prefill_destination_widgets():
+			# Target 
+			if self.configman.has_option("general", "target" ) :
+				ctarget = self.configman.get("general", "target" )
+				if ctarget.startswith(os.sep) :
+					if self.__is_target_set_to_default(ctarget):
+						self.__set_destination_widgets_to_default()
+					else :
+						if not os.path.exists(ctarget ):
+							try:
+								os.mkdir(ctarget) # makedirs is not good
+							except OSError, _exc:
+								self.__set_target_to_default()
+								self.__set_destination_widgets_to_default()
+								
+								_sec_msg = _("Please make "\
+						 "sure the missing directory exists (e.g. by mounting "\
+						 "an external disk) or change the specified target "\
+						 "to an existing one.")
+								_message_str = "While attempting to create "\
+						 "the backup target the the following error occured:\n"\
+						 "%s\n\n"\
+						 "Attention: The target will be set to the default "\
+						 "value. Check this on the destination settings page "\
+						 "before saving the configuration." % str(_exc)
+								_boxtitle = _("NSsbackup configuration error")
+								_headline_str =\
+								_("Unable to create backup target")
+
+								gobject.idle_add( self._show_errdialog,
+												  _message_str, _boxtitle,
+												  _headline_str, _sec_msg )
+								return
+							
+						self.__set_destination_widgets_to_local(ctarget)
+				else :
+					self.__set_destination_widgets_to_remote(ctarget)
+			else :
+				self.__set_destination_widgets_to_default()
+				
+			
 		# General tab
 		croninfos = self.configman.getSchedule()
 		if not recommened_setting :	
@@ -563,31 +606,7 @@ class SBconfigGTK(GladeGnomeApp):
 		if self.configman.has_option("general", "maxincrement") :
 			self.widgets["time_maxinc"].set_value( int(self.configman.get("general", "maxincrement")))
 	
-		# Target 
-		if self.configman.has_option("general", "target" ) :
-			ctarget = self.configman.get("general", "target" )
-			if ctarget.startswith(os.sep) :
-				if (os.getuid() == 0 and ctarget == "/var/backup") or (os.getuid() != 0 and ctarget == getUserDatasDir()+"backups"):
-					self.widgets["dest1"].set_active( True )
-					self.widgets["hbox9"].set_sensitive( False )
-					self.widgets["hbox10"].set_sensitive( False )
-				else :
-					if not os.path.exists(ctarget ): 
-						os.makedirs(ctarget)
-					self.widgets["dest2"].set_active( True )			
-					self.widgets["hbox9"].set_sensitive( True )
-					self.widgets["dest_localpath"].set_current_folder( ctarget )
-					self.widgets["hbox10"].set_sensitive( False )
-			else :
-				self.widgets["dest3"].set_active( True )			
-				self.widgets["hbox9"].set_sensitive( False )
-				self.widgets["hbox10"].set_sensitive( True )
-				self.widgets["dest_remote"].set_text( ctarget )
-		else :
-			self.widgets["dest1"].set_active( True )
-			self.widgets["hbox9"].set_sensitive( False )
-			self.widgets["hbox10"].set_sensitive( False )
-			#self.on_dest1_toggled()
+		__prefill_destination_widgets()
 		
 		# log
 		if self.configman.has_option("log", "level") :
@@ -698,6 +717,33 @@ class SBconfigGTK(GladeGnomeApp):
 		self.isConfigChanged()
 	#----------------------------------------------------------------------
 	
+	def __set_destination_widgets_to_default(self):
+		"""The widgets within the 'Destination' page are enabled/disabled/set
+		according to default setting.
+		""" 
+		self.widgets["dest1"].set_active( True )
+		self.widgets["hbox9"].set_sensitive( False )
+		self.widgets["hbox10"].set_sensitive( False )
+		#self.on_dest1_toggled()
+		
+	def __set_destination_widgets_to_local(self, atarget):
+		"""The widgets within the 'Destination' page are enabled/disabled/set
+		according to the given local target directory.
+		""" 
+		self.widgets["dest2"].set_active( True )			
+		self.widgets["hbox9"].set_sensitive( True )
+		self.widgets["dest_localpath"].set_current_folder( atarget )
+		self.widgets["hbox10"].set_sensitive( False )
+
+	def __set_destination_widgets_to_remote(self, atarget):
+		"""The widgets within the 'Destination' page are enabled/disabled/set
+		according to the given remote target.
+		""" 
+		self.widgets["dest3"].set_active( True )			
+		self.widgets["hbox9"].set_sensitive( False )
+		self.widgets["hbox10"].set_sensitive( True )
+		self.widgets["dest_remote"].set_text( atarget )
+	
 	#   configlist is like self.conf.items( "dirconfig" ) 
 	#	return True if the dir is already included
 	#			False if not
@@ -747,7 +793,7 @@ class SBconfigGTK(GladeGnomeApp):
 	def cell_regex_edited_callback(self, cell, path, new_text):
 		# Check if new path is empty
 		if Util.is_empty_regexp(new_text):
-			self._show_errdialog(message_format=_("Empty expression. Please enter a valid regular expression."))
+			self._show_errdialog(message_str = _("Empty expression. Please enter a valid regular expression."))
 		else:
 			if Util.is_valid_regexp(new_text):				
 				# Remove old expression and add the new one
@@ -760,7 +806,7 @@ class SBconfigGTK(GladeGnomeApp):
 				self.ex_regex[path][0] = new_text
 				self.isConfigChanged()
 			else:
-				self._show_errdialog(message_format=_("Provided regular expression is not valid."))		
+				self._show_errdialog(message_str = _("Provided regular expression is not valid."))		
 
 	def cell_edited_callback(self, cell, path, new_text, data):
 		# Check if new path is empty
@@ -823,7 +869,9 @@ class SBconfigGTK(GladeGnomeApp):
 		about.set_transient_for(self.widgets["nssbackupConfApp"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
-		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>", "Mathias HOUNGBO <mathias.houngbo@gmail.com>"])
+		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>",
+						   "Mathias HOUNGBO <mathias.houngbo@gmail.com>",
+						   "Jean-Peer Lorenz <peer.loz@gmx.net>"])
 		about.set_website(Infos.WEBSITE)
 		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
 		about.run()
@@ -1145,17 +1193,40 @@ class SBconfigGTK(GladeGnomeApp):
 
 	#----------------------------------------------------------------------
 
+	def __is_target_set_to_default(self, atarget):
+		"""Checks if the given target directory is equal to the
+		default settings:
+		/var/backup/ for root, homedir+/backups/ for non-admins.
+		@rtype: Boolean
+		"""
+		_reslt = False
+		if (os.getuid() == 0 and atarget == "/var/backup") or\
+		   (os.getuid() != 0 and atarget == getUserDatasDir()+"backups"):
+			_reslt = True
+		return _reslt
+
+	def __set_target_to_default(self):
+		"""The target option within the configuration is set to the default:
+		/var/backup/ for root, homedir+/backups/ for non-admins.
+		
+		@todo: The result of 'os.getuid' should be retrieved during the
+			   initialization process and stored in a member attribute, so
+			   we don't need to use operation system call over and over!
+		"""
+		if os.getuid() == 0 :
+			self.configman.set( "general", "target", "/var/backup/")
+			self.isConfigChanged()
+		else :
+			self.configman.set( "general", "target", getUserDatasDir()+"backups")
+			self.isConfigChanged()
+
+
 	def on_dest1_toggled(self, *args):
 		if self.widgets["dest1"].get_active():
 			self.widgets["hbox9"].set_sensitive( False )
 			self.widgets["hbox10"].set_sensitive( False )
 			self.widgets["dest_unusable"].hide()
-			if os.getuid() == 0 :
-				self.configman.set( "general", "target", "/var/backup/")
-				self.isConfigChanged()
-			else :
-				self.configman.set( "general", "target", getUserDatasDir()+"backups")
-				self.isConfigChanged()
+			self.__set_target_to_default()
 		elif self.widgets["dest2"].get_active():
 			self.widgets["hbox9"].set_sensitive( True )
 			self.widgets["hbox10"].set_sensitive( False )
@@ -1550,7 +1621,7 @@ class SBconfigGTK(GladeGnomeApp):
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
 			if Util.is_empty_regexp(regex):
-				self._show_errdialog(message_format=_("Empty expression. Please enter a valid regular expression."))
+				self._show_errdialog(message_str = _("Empty expression. Please enter a valid regular expression."))
 			else:
 				if Util.is_valid_regexp(regex):			
 					if self.configman.has_option("exclude", "regex") :
@@ -1563,7 +1634,7 @@ class SBconfigGTK(GladeGnomeApp):
 					self.ex_regex.append( [regex] )
 					self.isConfigChanged()
 				else:
-					self._show_errdialog(message_format=_("Provided regular expression is not valid."))
+					self._show_errdialog(message_str = _("Provided regular expression is not valid."))
 
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
@@ -1921,8 +1992,9 @@ class SBconfigGTK(GladeGnomeApp):
 			os.rename(prfConf, prfConf.rstrip("-disable"))
 			self.profiles.set_value(iter, 0, True)
 			self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
-		
-	def _show_errdialog(self, message_format):
+
+	def _show_errdialog(self, message_str, boxtitle = "",
+							   headline_str = "", secmsg_str = ""):
 		"""Creates und displays a modal dialog box. Main purpose is
 		displaying of error messages.
 		
@@ -1931,10 +2003,26 @@ class SBconfigGTK(GladeGnomeApp):
 		
 		@todo: Should we use the button OK or CLOSE?
 		"""
-		dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,
-						flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-						buttons=gtk.BUTTONS_OK,	# buttons=gtk.BUTTONS_CLOSE
-						message_format=message_format)
+		dialog = gtk.MessageDialog(
+					flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+					type = gtk.MESSAGE_ERROR,
+					buttons=gtk.BUTTONS_CLOSE)
+		if boxtitle.strip() != "":
+			dialog.set_title( boxtitle )
+			
+		_hdl = headline_str.strip(" \n\t")
+		if _hdl != "":
+			_hdl = "<b>%s</b>\n\n" % _hdl
+		_msg = "%s%s" % ( _hdl, message_str )
+		dialog.set_markup(_msg)
+
+		# an optional secondary message is added
+		_sec = secmsg_str.strip(" \n\t")
+		if _sec != "":
+			_sec = "<small>%s</small>" % ( _sec )
+			dialog.format_secondary_markup(_sec)
+			
+		# the message box is showed
 		dialog.run()
 		dialog.destroy()
 
