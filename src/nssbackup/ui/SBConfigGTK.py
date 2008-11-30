@@ -1196,7 +1196,7 @@ class SBconfigGTK(GladeGnomeApp):
 	def __is_target_set_to_default(self, atarget):
 		"""Checks if the given target directory is equal to the
 		default settings:
-		/var/backup/ for root, homedir+/backups/ for non-admins.
+		'/var/backup' for root, 'homedir+/backups' for non-admins.
 		@rtype: Boolean
 		"""
 		_reslt = False
@@ -1207,14 +1207,14 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def __set_target_to_default(self):
 		"""The target option within the configuration is set to the default:
-		/var/backup/ for root, homedir+/backups/ for non-admins.
+		'/var/backup' for root, 'homedir+/backups' for non-admins.
 		
 		@todo: The result of 'os.getuid' should be retrieved during the
 			   initialization process and stored in a member attribute, so
 			   we don't need to use operation system call over and over!
 		"""
 		if os.getuid() == 0 :
-			self.configman.set( "general", "target", "/var/backup/")
+			self.configman.set( "general", "target", "/var/backup")
 			self.isConfigChanged()
 		else :
 			self.configman.set( "general", "target", getUserDatasDir()+"backups")
