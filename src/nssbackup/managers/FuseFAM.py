@@ -22,7 +22,9 @@ from nssbackup.util.log import LogFactory
 from nssbackup.plugins import PluginManager
 from FileAccessManager import *
 from nssbackup.util.exceptions import SBException
+from nssbackup.util import exceptions
 from nssbackup.managers.ConfigManager import getUserDatasDir
+from gettext import gettext as _
 
 class FuseFAM:
 	"""
@@ -163,6 +165,7 @@ class FuseFAM:
 		Get the list of dir to mount and mount them. If the keep alive tag is set , it creates a Thread that will keep the mounted dir alive.
 		@param keepAlive: Optional int that is used to determine the loop time (number of seconds) to keep the mount pint alive  
 		"""
+		self.logger.info(_("Initializing FUSE FILE ACCESS MANAGER !"))
 		global __mountdir
 		if not self.__config : 
 			raise SBException("Can't launch initialize without a configManager")
@@ -188,9 +191,12 @@ class FuseFAM:
 		#  mount target
 		if self.__config.has_option("general","target") and not self.__config.get("general","target").startswith(os.sep):
 			self.__mount(self.__config.get("general","target"))
-		elif self.__config.get("general","target").startswith(os.sep) :
+		elif self.__config.get("general","target").startswith(os.sep) :   # this assumes absolute paths
 			if not os.path.exists(self.__config.get("general","target")) :
-				os.mkdir(self.__config.get("general","target"))
+				try:
+					os.mkdir(self.__config.get("general","target"))
+				except OSError, exc:
+					raise exceptions.FuseFAMException(_("Unable to open target directory.\n")+str(exc))
 		#mount dirs from dirconfig if needed
 		if self.__config.has_section("dirconfig") and self.__config.has_option("dirconfig", "remote") :
 			remotes = self.__config.get("dirconfig", "remote")
@@ -231,6 +237,7 @@ class FuseFAM:
 		"""
 		Unmount all nssbackup mounted dir.
 		"""
+		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		plugin_manager = PluginManager()
 		for src, dir in self.__mountedDirs.iteritems() :
 			if src is not os.sep :

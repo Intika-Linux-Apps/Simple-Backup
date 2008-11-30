@@ -15,6 +15,7 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
 from gettext import gettext as _
+import sys
 import traceback, time, gobject
 from thread import *
 from GladeWindow import *
@@ -29,6 +30,7 @@ import nssbackup.util.Snapshot
 from nssbackup.util.Snapshot import Snapshot
 import nssbackup.util.tar as TAR
 from nssbackup import Infos
+from nssbackup.util import exceptions
 
 #----------------------------------------------------------------------
 
@@ -62,8 +64,22 @@ class SBRestoreGTK(GladeWindow):
 		
 		# set fusefam
 		self.fusefam = FuseFAM(self.config)
-		self.fusefam.initialize()
-		
+		try:
+			self.fusefam.initialize()
+		except exceptions.FuseFAMException, exc:
+			_sec_msg = _("The program is going to be terminated. Please make "\
+						 "sure the missing directory exists (e.g. by mounting "\
+						 "an external disk) or change the specified target "\
+						 "in NSsbackup configuration tool and restart this "\
+						 "application.")
+			self._show_errmessage( message_str = str(exc),
+					boxtitle = _("NSsbackup error"),
+					headline_str = _("An error occured during initialization:"),
+					secmsg_str = _sec_msg)
+			self.fusefam.terminate()
+			sys.exit(-1)
+
+			
 		# set the default label
 		self.widgets['defaultfolderlabel'].set_text(self.config.get("general", "target"))
 		
@@ -208,7 +224,7 @@ class SBRestoreGTK(GladeWindow):
 	def change_target(self, newtarget):
 		"""
 		"""
-		global snpman, target
+#		global snpman, target
 		try :
 			self.target =  self.fusefam.mount(newtarget)
 			self.snpman = SnapshotManager(self.target)
@@ -653,6 +669,31 @@ class SBRestoreGTK(GladeWindow):
 	def gtk_main_quit( self, *args):
 		self.fusefam.terminate()
 		gtk.main_quit()
+		
+	def _show_errmessage(self, message_str, boxtitle = "",
+							   headline_str = "", secmsg_str = ""):
+		dialog = gtk.MessageDialog(
+					flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+					type = gtk.MESSAGE_ERROR,
+					buttons=gtk.BUTTONS_CLOSE)
+		if boxtitle.strip() != "":
+			dialog.set_title( boxtitle )
+			
+		_hdl = headline_str.strip(" \n\t")
+		if _hdl != "":
+			_hdl = "<b>%s</b>\n\n" % _hdl
+		_msg = "%s%s" % ( _hdl, message_str )
+		dialog.set_markup(_msg)
+
+		# an optional secondary message is added
+		_sec = secmsg_str.strip(" \n\t")
+		if _sec != "":
+			_sec = "<small>%s</small>" % ( _sec )
+			dialog.format_secondary_markup(_sec)
+			
+		# the message box is showed
+		dialog.run()
+		dialog.destroy()
 
 	
 #----------------------------------------------------------------------

@@ -199,24 +199,6 @@ class NSsbackupd () :
 		except Exception, e :
 			self.logger.error(str(e))
 			self.logger.error(traceback.format_exc())
-			if os.getuid() != 0 :
-				try:
-					import pynotify
-					if pynotify.init("NSsbackup"):
-						n = pynotify.Notification("NSsbackup", "CRASH [%s] : '%s'" % (self.__profileName,str(e)))
-						n.show()
-					else:
-						self.logger.warning(_("there was a problem initializing the pynotify module"))
-				except Exception, e1:
-					self.logger.warning(str(e1))
-
-	def __onError(self, e):
-		"""
-		"""
-		self.logger.error(str(e))
-		self.logger.error(traceback.format_exc())
-		
-		if os.getuid() != 0 :
 			try:
 				import pynotify
 				if pynotify.init("NSsbackup"):
@@ -226,6 +208,22 @@ class NSsbackupd () :
 					self.logger.warning(_("there was a problem initializing the pynotify module"))
 			except Exception, e1:
 				self.logger.warning(str(e1))
+
+	def __onError(self, e):
+		"""
+		"""
+		self.logger.error(str(e))
+		self.logger.error(traceback.format_exc())
+		
+		try:
+			import pynotify
+			if pynotify.init("NSsbackup"):
+				n = pynotify.Notification("NSsbackup", "CRASH [%s]: '%s'" % (self.__profileName, str(e)))
+				n.show()
+			else:
+				self.logger.warning(_("there was a problem initializing the pynotify module"))
+		except Exception, e1:
+			self.logger.warning(str(e1))
 		
 		if self.__bm and self.__bm.config :
 			# remove any left lockfile

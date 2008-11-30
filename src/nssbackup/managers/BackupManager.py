@@ -27,7 +27,7 @@ import FileAccessManager as FAM
 import nssbackup.util as Util
 from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import *
+from nssbackup.util import exceptions
 
 try:
 	import pynotify
@@ -93,8 +93,11 @@ class BackupManager :
 		# set the lockfile
 		self.__setlockfile()
 		
-		self.logger.info(_("Initializing FUSE FILE ACCESS MANAGER !"))
-		self.__fusefam.initialize()
+		try:
+			self.__fusefam.initialize()
+		except exceptions.FuseFAMException:
+			self.__fusefam.terminate()
+			raise
 		
 		self.__snpman = SnapshotManager(self.config.get("general","target"))
 		
@@ -112,7 +115,7 @@ class BackupManager :
 		# Upgrade Target 
 		try :
 			self.__um.upgradeAll( self.config.get("general","target")  )
-		except SBException, e:
+		except exceptions.SBException, e:
 			self.logger.warning(str(e))
 		
 		# purge
@@ -365,7 +368,7 @@ class BackupManager :
 		self.logger.debug("Maximum free size required is '%s' " % neededspace)
 		vstat = os.statvfs( self.__actualSnapshot.getPath() )
 		if (vstat.f_bavail * vstat.f_bsize) <= self.fullsize:
-			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
+			raise exceptions.SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
 	
 	
 	def __setlockfile(self):
@@ -382,7 +385,7 @@ class BackupManager :
 			# the lockfile exists, is it valid ?
 			last_sb_pid = FAM.readfile(self.__lockfile)
 			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read()) ) :
-				raise SBException(_("Another NSsbackup daemon already running (pid = %s )!") % last_sb_pid )
+				raise exceptions.SBException(_("Another NSsbackup daemon already running (pid = %s )!") % last_sb_pid )
 			else :
 				FAM.delete(self.__lockfile)
 		
@@ -422,7 +425,7 @@ class BackupManager :
 		"""
 		# Check if the mandatory target option exists
 		if not self.config.has_option("general","target") :
-			raise SBException (_("Option 'target' is missing, aborting."))
+			raise exceptions.SBException (_("Option 'target' is missing, aborting."))
 		
 		# Check if the target dir exists or create it
 		if not FAM.exists(self.config.get("general","target")) :
