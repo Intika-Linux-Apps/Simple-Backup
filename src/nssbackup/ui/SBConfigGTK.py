@@ -1727,7 +1727,8 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_dest_remotetest_clicked(self, *args):
 		_fusefam = FuseFAM()
 		try :
-			if (_fusefam.testFusePlugins(self.widgets['dest_remote'].get_text())) :
+			_remote_dest = self.widgets['dest_remote'].get_text()
+			if (_fusefam.testFusePlugins( _remote_dest )) :
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Test Succeeded !"))
 				dialog.run()
 				dialog.destroy()
