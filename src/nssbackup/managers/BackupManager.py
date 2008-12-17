@@ -29,14 +29,10 @@ from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import LogFactory
 from nssbackup.util import exceptions
 
-try:
-	import pynotify
-except Exception, e:
-	LogFactory.getLogger().warning(str(e))
-	pynotify = False
 				
 class BackupManager :
 	"""
+	@todo: The BackupManager should not does any GUI related tasks!
 	"""
 	
 	def __init__(self, configfile = None):
@@ -69,9 +65,11 @@ class BackupManager :
 		self.__fusefam = FuseFAM(self.config)
 		
 		self.__pynotif_avail = False
+		self.__pynotif_mod   = None
 		try:
 			import pynotify
-			if pynotify.init("NSsbackup"):
+			self.__pynotif_mod = pynotify
+			if self.__pynotif_mod.init("NSsbackup"):
 				self.__pynotif_avail = True
 			else:
 				self.logger.warning(_("there was a problem initializing the pynotify module"))
@@ -84,10 +82,8 @@ class BackupManager :
 		"""
 		Runs the whole backup process 
 		"""
-		global __actualSnapshot, __snpman
-		
 		if self.__pynotif_avail:
-			n = pynotify.Notification("NSsbackup", _("Starting backup Session"))
+			n = self.__pynotif_mod.Notification("NSsbackup", _("Starting backup Session"))
 			n.show()
 		
 		self.logger.info(_("Starting backup"))
@@ -179,7 +175,7 @@ class BackupManager :
 		self.__fillSnapshot(prev)
 					
 		if self.__pynotif_avail:
-			n = pynotify.Notification("NSsbackup", _("File list ready , Committing to disk"))
+			n = self.__pynotif_mod.Notification("NSsbackup", _("File list ready , Committing to disk"))
 			n.show()
 				
 		self.__actualSnapshot.commit()
@@ -398,12 +394,27 @@ class BackupManager :
 		"""
 		
 		FAM.delete(self.__lockfile)
-		self.logger.info(_("Session of backup is finished (%s is removed) ") % self.__lockfile)
+		self.logger.info(_("Session of backup is finished (%s is removed) ")\
+														% self.__lockfile)
+
+		# destination for copying the logfile
+		logf_target = os.path.join( self.__actualSnapshot.getPath(),
+								    "nssbackup.log" )
 		
 		if self.config.has_option("log","file") and FAM.exists(self.config.get("log","file")):
-			FAM.copyfile(self.config.get("log","file"), self.__actualSnapshot.getPath()+"/nssbackup.log")
+			try:
+				Util.nssb_copy( self.config.get("log","file"), logf_target )
+			except exceptions.ChmodNotSupportedError:
+				self.logger.warning(_("Unable to change permissions for "\
+									  "file '%s'.") % logf_target )
+				
 		elif FAM.exists("nssbackup.log") : 
-			FAM.copyfile(os.path.abspath("nssbackup.log"), self.__actualSnapshot.getPath()+"/nssbackup.log")
+			try:
+				Util.nssb_copy( os.path.abspath("nssbackup.log"), logf_target)
+			except exceptions.ChmodNotSupportedError:
+				self.logger.warning(_("Unable to change permissions for "\
+									  "file '%s'.") % logf_target)
+
 		else :
 			self.logger.warning(_("I didn't find the logfile to copy into snapshot"))
 			
@@ -411,7 +422,7 @@ class BackupManager :
 		self.__fusefam.terminate()
 
 		if self.__pynotif_avail:
-			n = pynotify.Notification("NSsbackup", _("Ending Backup Session"))
+			n = self.__pynotif_mod.Notification("NSsbackup", _("Ending Backup Session"))
 			n.show()
 			
 

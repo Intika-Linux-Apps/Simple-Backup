@@ -115,7 +115,6 @@ class SnapshotManager :
 			self.logger.debug("[Snapshots Listing]") 
 			for snp in snapshots :
 				self.logger.debug(str(snp)) 
-			self.logger.debug("")
 			
 		return snapshots
 	

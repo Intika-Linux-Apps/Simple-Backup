@@ -687,7 +687,7 @@ class ConfigManager (ConfigParser.ConfigParser):
 					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.monthly/nssbackup")
 				else : 
-					getLogger.warning("'%s' is not a valid value" % self.get("schedule", "anacron"))
+					self.logger.warning("'%s' is not a valid value" % self.get("schedule", "anacron"))
 
 	def erase_services(self):
 			listServ = ["/etc/cron.hourly/nssbackup", "/etc/cron.daily/nssbackup", 

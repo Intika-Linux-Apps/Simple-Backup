@@ -16,8 +16,6 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 import logging
-import sys
-import traceback
 import os.path
 import nssbackup.managers.FileAccessManager as FAM
 

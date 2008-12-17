@@ -20,9 +20,10 @@ import os
 import subprocess, nssbackup
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
-from tempfile import *
+from nssbackup.util.exceptions import ChmodNotSupportedError
+import tempfile
 import inspect, shutil
-from shutil import *
+import shutil
 import types
 import re
 
@@ -46,20 +47,20 @@ def nssb_copytree(src, dst, symlinks=False):
 			elif os.path.isdir(srcname):
 				nssb_copytree(srcname, dstname, symlinks)
 			else:
-				copy2(srcname, dstname)
+				shutil.copy2(srcname, dstname)
 			# XXX What about devices, sockets etc.?
 		except (IOError, os.error), why:
 			errors.append((srcname, dstname, str(why)))
 		# catch the Error from the recursive copytree so that we can
 		# continue with other files
-		except Error, err:
+		except shutil.Error, err:
 			errors.extend(err.args[0])
 	try:
-		copystat(src, dst)
+		shutil.copystat(src, dst)
 	except OSError, why:
 		errors.extend((src, dst, str(why)))
 	if errors:
-		raise Error, errors
+		raise shutil.Error, errors
 
 def nssb_move(src, dst):
 	"""
@@ -71,12 +72,80 @@ def nssb_move(src, dst):
 	except OSError:
 		if os.path.isdir(src):
 			if shutil.destinsrc(src, dst):
-				raise Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
+				raise shutil.Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
 			nssb_copytree(src, dst, symlinks=True)
-			rmtree(src)
+			shutil.rmtree(src)
 		else:
-			copy2(src,dst)
+			shutil.copy2(src,dst)
 			os.unlink(src)
+			
+def nssb_copy(src, dst):
+	"""Customized copy routine that copies the fileobject and afterwards
+	tries to copy the file permissions. If this fails a custom exception
+	is raised. The date and archive bit of the file is not copied. 
+	
+	@param src: an existing file that should be copied
+	@param dst: copy destination - an existing directory or full path to new
+				file (the directory must exist too)
+				
+	@return: None
+	
+	@raise ChmodNotSupportedError: if the permissions could not be copied
+	"""
+	prep_src, prep_dst = _prepare_nssb_copy(src, dst)
+	shutil.copyfile(prep_src, prep_dst)
+	try:
+		shutil.copymode(prep_src, prep_dst)
+	except OSError:
+		raise ChmodNotSupportedError("Unable to change permissions of file '%s'." % prep_dst)
+		
+def _prepare_nssb_copy(src, dst):
+	"""Helper function that prepares the given paths for copying
+	using 'nssb_copy'.
+	
+	Source must be a file or symbolic link to a file!
+	
+	@todo: Implement test case for symbolic links!
+	"""
+	# firstly the types are checked
+	if not isinstance( src, types.StringTypes):
+		raise TypeError("Given parameter must be a string. "\
+					    "Got %s instead." % (type(src)))
+	if not isinstance( dst, types.StringTypes):
+		raise TypeError("Given parameter must be a string. "\
+					    "Got %s instead." % (type(dst)))
+		
+	# only absolute paths are supported
+	if not os.path.isabs(src):
+		raise ValueError("Given copy source '%s' must be absolute." % src)
+	if not os.path.isabs(dst):
+		raise ValueError("Given copy destination '%s' must be absolute." % dst)
+
+	# the source must be a file and exist
+	if not os.path.isfile(src):	
+		raise IOError("Given copy source '%s' does not exist." % src)
+
+	_src_file = os.path.basename(src)
+	_src_dir = os.path.dirname(src)
+
+	if os.path.isdir(dst):
+		_dst_file = _src_file
+		_dst_dir = dst
+	elif dst.endswith(os.path.sep):
+		_dst_file = _src_file
+		_dst_dir = dst		
+	else:
+		_dst_file = os.path.basename(dst)
+		_dst_dir = os.path.dirname(dst)
+	
+	if not os.path.isdir(_dst_dir):
+		raise IOError("Given copy destination '%s' does not exist." % _dst_dir)
+
+	_dst_path = os.path.join( _dst_dir, _dst_file )
+	retval = (src, _dst_path)
+
+	return retval
+	
 
 def getResource(resourceName):
 	"""
@@ -88,17 +157,17 @@ def getResource(resourceName):
 	"""
 	tmp = inspect.getabsfile(nssbackup)
 	resfile = open(os.sep.join([os.path.dirname(tmp),"ressources"]))
-	for dir in resfile.readlines() :
-		dir = dir.strip()
+	for _dir in resfile.readlines() :
+		_dir = _dir.strip()
 		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
-		if os.path.exists(dir) and os.path.isdir(dir):
-			if dir.endswith(resourceName):
-				return dir 
-			list = os.listdir(dir)
+		if os.path.exists(_dir) and os.path.isdir(_dir):
+			if _dir.endswith(resourceName):
+				return _dir 
+			list = os.listdir(_dir)
 			#LogFactory.getLogger().debug("File list is :" + str(list))
 			for f in list :
 				if f == resourceName :
-					return os.path.normpath(os.sep.join([dir,resourceName]))
+					return os.path.normpath(os.sep.join([_dir,resourceName]))
 	devvalue = os.path.dirname(tmp)+"/../../datas/"
 	if os.path.exists(devvalue + resourceName) :
 		return os.path.normpath(devvalue + resourceName)
@@ -114,10 +183,10 @@ def launch(cmd, opts):
 	@return: (outStr, errStr, retVal)
 	"""
 	# Create output log file
-	outptr,outFile = mkstemp(prefix="output_")
+	outptr,outFile = tempfile.mkstemp(prefix="output_")
 
 	# Create error log file
-	errptr, errFile = mkstemp(prefix="error_")
+	errptr, errFile = tempfile.mkstemp(prefix="error_")
 
 	# Call the subprocess using convenience method
 	opts.insert(0,cmd)
@@ -232,20 +301,6 @@ def readlineNULSep(fd,fd1):
 			raise SBException("The length of flist and Fprops are not equals")
 		yield (currentline,currentline1)
 
-	
-import pygtk
-pygtk.require('2.0')
-import gtk, gobject
-
-# Update the value of the progress bar so that we get
-# some movement
-def progress_timeout(pbobj):
-	
-	pbobj.pbar.pulse()
-	
-	# As this is a timeout function, return TRUE so that it
-	# continues to get called
-	return True
 
 def is_valid_regexp( aregex ):
 	"""Checks if the given string is a valid regular expression.
@@ -262,6 +317,7 @@ def is_valid_regexp( aregex ):
 	except re.error:
 		_res = False
 	return _res
+
 
 def is_empty_regexp( aregex ):
 	"""Checks if the given parameter is empty, i.e. is None or a string
@@ -280,6 +336,7 @@ def is_empty_regexp( aregex ):
 		if _stripped_aregex == "":
 			_res = True
 	return _res
+
 
 def remove_conf_entry(confline, entry, separator = ","):
 	"""Removes the given entry from the given string. Entries in configurations

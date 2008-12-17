@@ -22,8 +22,11 @@ from nssbackup.util.log import LogFactory
 import nssbackup.util as Util
 from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
+from nssbackup.util import exceptions
 from datetime import datetime
 import time
+from nssbackup.managers import ConfigManager
+
 
 def getArchiveType(archive):
 	"""
@@ -263,18 +266,44 @@ def makeTarIncBackup(snapshot):
 	splitSize = snapshot.getSplitedSize()
 	if splitSize :
 		options = __addSplitOpts(snapshot, options, splitSize)
+
+	base_snarfile = snapshot.getBaseSnapshot().getSnarFile()
+	snarfile = snapshot.getSnarFile()
+	tmp_snarfile = os.path.join( ConfigManager.getUserTempDir(),
+								 os.path.basename(snarfile) )
+	
+	LogFactory.getLogger().debug("Snapshot's base snarfile: %s" % base_snarfile)	
+	LogFactory.getLogger().debug("Snapshot's snarfile: %s" % snarfile)
+	LogFactory.getLogger().debug("Temporary snarfile: %s" % tmp_snarfile)
 	
 	# For an INC backup the base SNAR file should exists
-	if not os.path.exists(snapshot.getBaseSnapshot().getSnarFile()) :
+	if not os.path.exists( base_snarfile ) :
 		LogFactory.getLogger().error(_("Unable to find the SNAR file to make an Incremental backup"))
 		LogFactory.getLogger().error(_("Falling back to full backup"))
 		makeTarFullBackup(snapshot)
 	else:
-		shutil.copy(snapshot.getBaseSnapshot().getSnarFile(), snapshot.getSnarFile())
-		options.append("--listed-incremental="+snapshot.getSnarFile())
+		shutil.copy( base_snarfile, tmp_snarfile )		
+		# check (and set) the permission bits; necessary if the file's origin
+		# does not support user rights (e.g. some ftp servers, filesystems...)
+		if not os.access(tmp_snarfile, os.W_OK):
+			os.chmod(tmp_snarfile, 0644)
+
+		# create the snarfile within a local directory; necessary if the
+		# backup target does not support 'open' within the TAR process and
+		# would fail
+		options.append("--listed-incremental="+tmp_snarfile)
 		
 		outStr, errStr, retVal = Util.launch("tar", options)
 		LogFactory.getLogger().debug("TAR Output : " + outStr)
+		
+		# and move the temporary snarfile back into the backup directory
+		try:
+			Util.nssb_copy( tmp_snarfile, snarfile )
+		except exceptions.ChmodNotSupportedError:
+			LogFactory.getLogger().warning(_("Unable to change permissions for "\
+									  "file '%s'.") % snarfile )
+		os.remove( tmp_snarfile )
+
 		if retVal != 0 :
 			# list-incremental is not compatible with ignore failed read
 			LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
@@ -295,14 +324,32 @@ def makeTarFullBackup(snapshot):
 	if splitSize :
 		options = __addSplitOpts(snapshot, options, splitSize)
 	
+	snarfile = snapshot.getSnarFile()
+	tmp_snarfile = os.path.join( ConfigManager.getUserTempDir(),
+								 os.path.basename(snarfile) )
+	
+	LogFactory.getLogger().debug("Snapshot's snarfile: %s" % snarfile)
+	LogFactory.getLogger().debug("Temporary snarfile: %s" % tmp_snarfile)
+	 
 	# For a full backup the SNAR file shouldn't exists
-	if os.path.exists(snapshot.getSnarFile()) :
-		os.remove(snapshot.getSnarFile())
+	if os.path.exists( snarfile ) :
+		os.remove( snarfile )		
+	if os.path.exists( tmp_snarfile ) :
+		os.remove( tmp_snarfile )
 	
-	options.append("--listed-incremental="+snapshot.getSnarFile())
-	
+	options.append( "--listed-incremental="+tmp_snarfile )
+
 	outStr, errStr, retVal = Util.launch("tar", options)
 	LogFactory.getLogger().debug("TAR Output : " + outStr)
+
+	# and move the temporary snarfile into the backup directory
+	try:
+		Util.nssb_copy( tmp_snarfile, snarfile )
+	except exceptions.ChmodNotSupportedError:
+		LogFactory.getLogger().warning(_("Unable to change permissions for "\
+									  "file '%s'.") % snarfile )
+	os.remove( tmp_snarfile )
+
 	if retVal != 0 :
 		# list-incremental is not compatible with ignore failed read
 		LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )

@@ -25,7 +25,7 @@ import os
 class TestSnapshotManager(unittest.TestCase) :
 	
 	def setUp(self):
-		getLogger(level=10)
+		LogFactory.getLogger(level=10)
 		self.snpman = SnapshotManager(os.path.abspath("test-datas/backupdir"))
 	
 	def testGetSnapshots(self):
