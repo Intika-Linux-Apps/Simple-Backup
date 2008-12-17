@@ -45,8 +45,6 @@ class BackupManager :
 		If the config file is not given, BackupManager will try to set the configuration to default
 		@param configfile : The config file
 		"""
-		global config
-		
 		#-------------------------------
 		self.config = None
 		self.__um = UpgradeManager()
@@ -69,6 +67,17 @@ class BackupManager :
 		self.logger = LogFactory.getLogger()
 		
 		self.__fusefam = FuseFAM(self.config)
+		
+		self.__pynotif_avail = False
+		try:
+			import pynotify
+			if pynotify.init("NSsbackup"):
+				self.__pynotif_avail = True
+			else:
+				self.logger.warning(_("there was a problem initializing the pynotify module"))
+		except Exception, e:
+			self.logger.warning(str(e))
+			
 		self.logger.info(_("BackupManager created "))
 		
 	def makeBackup(self ):
@@ -77,16 +86,9 @@ class BackupManager :
 		"""
 		global __actualSnapshot, __snpman
 		
-		try:
-			import pynotify
-			if pynotify.init("NSsbackup"):
-				n = pynotify.Notification("NSsbackup", _("Starting backup Session"))
-				n.show()
-			else:
-				self.logger.warning(_("there was a problem initializing the pynotify module"))
-		except Exception, e:
-			self.logger.warning(str(e))
-		
+		if self.__pynotif_avail:
+			n = pynotify.Notification("NSsbackup", _("Starting backup Session"))
+			n.show()
 		
 		self.logger.info(_("Starting backup"))
 		
@@ -175,14 +177,10 @@ class BackupManager :
 		os.nice(20)
 		
 		self.__fillSnapshot(prev)
-		
-		if os.getuid() != 0 :
-			if pynotify :
-				if pynotify.init("NSsbackup"):
-					n = pynotify.Notification("NSsbackup", _("File list ready , Committing to disk"))
-					n.show()
-				else:
-					self.logger.warning(_("there was a problem initializing the pynotify module"))
+					
+		if self.__pynotif_avail:
+			n = pynotify.Notification("NSsbackup", _("File list ready , Committing to disk"))
+			n.show()
 				
 		self.__actualSnapshot.commit()
 		
@@ -411,13 +409,10 @@ class BackupManager :
 			
 		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.terminate()
-		if os.getuid() != 0 :
-			if pynotify :
-				if pynotify.init("NSsbackup"):
-					n = pynotify.Notification("NSsbackup", _("Ending Backup Session"))
-					n.show()
-				else:
-					self.logger.warning(_("there was a problem initializing the pynotify module"))
+
+		if self.__pynotif_avail:
+			n = pynotify.Notification("NSsbackup", _("Ending Backup Session"))
+			n.show()
 			
 
 	def __checkTarget(self):
@@ -498,10 +493,10 @@ class BackupManager :
 		get the config for the instance of nssbackup 
 		(/etc/nssbackup.conf if root  or ~/.nssbackup/nssbackup.conf if normal user)
 		"""
-		global __config
-		if self.__config : return self.__config
+		if self.config:
+			return self.config
 		else :
-			self.__config = ConfigManager()
+			self.config = ConfigManager()
 
 	def getActualSnapshot(self):
 		"""

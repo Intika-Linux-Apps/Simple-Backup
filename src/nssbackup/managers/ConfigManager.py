@@ -50,6 +50,20 @@ def getUserDatasDir():
 		os.makedirs(datadir)
 	return datadir
 
+def getUserTempDir():
+	"""Returns the user's temporary directory. It is always the directory
+	'/tmp' used.
+	
+	@return: full path to the NSsbackup tempdir
+	
+	@todo: Review the use of '/tmp' as tempdir as solution for several different distributions?
+	"""
+	tempdir = os.path.join( "/tmp", "nssbackup/" ) 
+	if not os.path.exists(tempdir) :
+		os.mkdir(tempdir)
+	return tempdir
+
+
 class ConfigManager (ConfigParser.ConfigParser):
 	"""
 	nssbackup config manager 

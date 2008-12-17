@@ -85,7 +85,6 @@ class SnapshotManager :
 		@param forceReload: True or false
 		@return: 
 		"""
-		global __snapshots
 		snapshots = list()
 		
 		if fromDate and toDate :
