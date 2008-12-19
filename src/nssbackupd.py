@@ -19,13 +19,14 @@
 import gettext
 from nssbackup.nssbackupd import NSsbackupd
 from nssbackup.util import getResource
-
+import os, time
 # i18n init
 application = 'nssbackup'
 locale_dir = getResource('locale')
 
 gettext.bindtextdomain(application, locale_dir)
 gettext.textdomain(application)
-
+pid = os.spawnl(os.P_NOWAIT, "nssbackup-tray-gui.py"); print "pid: %s" % pid
+#time.sleep(10)
 sbd = NSsbackupd()
 sbd.run()
