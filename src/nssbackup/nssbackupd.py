@@ -27,6 +27,8 @@ from nssbackup.util.log import LogFactory
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.managers.ConfigManager import getUserConfDir
 from nssbackup.managers.BackupManager import BackupManager
+from nssbackup import util as Util
+from nssbackup.util import exceptions
 
 ##
 #This class is intended to be a wrapper of nssbackup instances . 
@@ -37,10 +39,9 @@ from nssbackup.managers.BackupManager import BackupManager
 # - the sent of emails
 #
 # @author: Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
-# @version: 1.0
+
+
 class NSsbackupd () :
-	
-	logger = LogFactory.getLogger()
 	
 	__confFilesRE = "^nssbackup-(.+?)\.conf$"
 
@@ -48,6 +49,7 @@ class NSsbackupd () :
 		"""
 		Initialisation
 		"""
+		self.logger = LogFactory.getLogger()
 		self.__bm = None
 		self.__profileName = None
 
@@ -199,24 +201,6 @@ class NSsbackupd () :
 		except Exception, e :
 			self.logger.error(str(e))
 			self.logger.error(traceback.format_exc())
-			if os.getuid() != 0 :
-				try:
-					import pynotify
-					if pynotify.init("NSsbackup"):
-						n = pynotify.Notification("NSsbackup", "CRASH [%s] : '%s'" % (self.__profileName,str(e)))
-						n.show()
-					else:
-						self.logger.warning(_("there was a problem initializing the pynotify module"))
-				except Exception, e1:
-					self.logger.warning(str(e1))
-
-	def __onError(self, e):
-		"""
-		"""
-		self.logger.error(str(e))
-		self.logger.error(traceback.format_exc())
-		
-		if os.getuid() != 0 :
 			try:
 				import pynotify
 				if pynotify.init("NSsbackup"):
@@ -226,6 +210,22 @@ class NSsbackupd () :
 					self.logger.warning(_("there was a problem initializing the pynotify module"))
 			except Exception, e1:
 				self.logger.warning(str(e1))
+
+	def __onError(self, e):
+		"""
+		"""
+		self.logger.error(str(e))
+		self.logger.error(traceback.format_exc())
+		
+		try:
+			import pynotify
+			if pynotify.init("NSsbackup"):
+				n = pynotify.Notification("NSsbackup", "CRASH [%s]: '%s'" % (self.__profileName, str(e)))
+				n.show()
+			else:
+				self.logger.warning(_("there was a problem initializing the pynotify module"))
+		except Exception, e1:
+			self.logger.warning(str(e1))
 		
 		if self.__bm and self.__bm.config :
 			# remove any left lockfile
@@ -242,8 +242,13 @@ class NSsbackupd () :
 			# check for the avaibility of the snapshot
 			snp = self.__bm.getActualSnapshot()
 			if snp and logfile :
-				import shutil
-				shutil.copy(logfile, snp.getPath())
+				try:
+					Util.nssb_copy(logfile, snp.getPath())
+				except exceptions.ChmodNotSupportedError:
+					self.logger.warning(_("Unable to change permissions for "\
+									"file '%s'.") % os.path.join(\
+									os.path.dirname(snp.getPath()), logfile ))
+					
 			else :
 				self.logger.error(_("Couldn't copy the logfile into the snapshot directory"))
 

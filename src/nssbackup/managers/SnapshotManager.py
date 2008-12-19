@@ -85,7 +85,6 @@ class SnapshotManager :
 		@param forceReload: True or false
 		@return: 
 		"""
-		global __snapshots
 		snapshots = list()
 		
 		if fromDate and toDate :
@@ -116,7 +115,6 @@ class SnapshotManager :
 			self.logger.debug("[Snapshots Listing]") 
 			for snp in snapshots :
 				self.logger.debug(str(snp)) 
-			self.logger.debug("")
 			
 		return snapshots
 	
@@ -410,8 +408,9 @@ class SnapshotManager :
 			self.statusNumber = None
 			self.statusMessage = None
 			self.substatusMessage = None
-		except Exception,e :
-			self.logger.error(_("Got an exception when Pulling '%s' : "+str(e)) % snapshot.getName() ) 
+		except Exception, e :
+			_msg = _("Got an exception when Pulling '%s' : ") + str(e)
+			self.logger.error( _msg % ( snapshot.getName()) ) 
 			self.__cancelPull(snapshot)
 			raise e
 		

@@ -83,7 +83,7 @@ class pluginFAM :
 		delete(errFile)
 		if retval != 0 :
 			raise SBException("Couldn't unmount '%s' : %s" %  (mounteddir,errStr))
-		
+		self.logger.info("Successfully unmounted: '%s'" % mounteddir)
 	
 	def checkifmounted (self,source, mountbase):
 		"""
@@ -111,7 +111,6 @@ class PluginManager :
 		Search for plugins into the plugin directory and load them.
 		@return : The plugins dictionary list {'name':class}. Look at FuseFAM to know how it's used
 		"""
-		global __pluginList
 		
 		if self.__pluginList : return self.__pluginList
 		else :

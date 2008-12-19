@@ -24,18 +24,15 @@ from SnapshotManager import SnapshotManager
 from ConfigManager import ConfigManager
 from UpgradeManager import UpgradeManager
 import FileAccessManager as FAM
+import nssbackup.util as Util
 from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import *
+from nssbackup.util import exceptions
 
-try:
-	import pynotify
-except Exception, e:
-	LogFactory.getLogger().warning(str(e))
-	pynotify = False
 				
 class BackupManager :
 	"""
+	@todo: The BackupManager should not does any GUI related tasks!
 	"""
 	
 	def __init__(self, configfile = None):
@@ -44,8 +41,6 @@ class BackupManager :
 		If the config file is not given, BackupManager will try to set the configuration to default
 		@param configfile : The config file
 		"""
-		global config
-		
 		#-------------------------------
 		self.config = None
 		self.__um = UpgradeManager()
@@ -68,32 +63,39 @@ class BackupManager :
 		self.logger = LogFactory.getLogger()
 		
 		self.__fusefam = FuseFAM(self.config)
+		
+		self.__pynotif_avail = False
+		self.__pynotif_mod   = None
+		try:
+			import pynotify
+			self.__pynotif_mod = pynotify
+			if self.__pynotif_mod.init("NSsbackup"):
+				self.__pynotif_avail = True
+			else:
+				self.logger.warning(_("there was a problem initializing the pynotify module"))
+		except Exception, e:
+			self.logger.warning(str(e))
+			
 		self.logger.info(_("BackupManager created "))
 		
 	def makeBackup(self ):
 		"""
 		Runs the whole backup process 
 		"""
-		global __actualSnapshot, __snpman
-		
-		try:
-			import pynotify
-			if pynotify.init("NSsbackup"):
-				n = pynotify.Notification("NSsbackup", _("Starting backup Session"))
-				n.show()
-			else:
-				self.logger.warning(_("there was a problem initializing the pynotify module"))
-		except Exception, e:
-			self.logger.warning(str(e))
-		
+		if self.__pynotif_avail:
+			n = self.__pynotif_mod.Notification("NSsbackup", _("Starting backup Session"))
+			n.show()
 		
 		self.logger.info(_("Starting backup"))
 		
 		# set the lockfile
 		self.__setlockfile()
 		
-		self.logger.info(_("Initializing FUSE FILE ACCESS MANAGER !"))
-		self.__fusefam.initialize()
+		try:
+			self.__fusefam.initialize()
+		except exceptions.FuseFAMException:
+			self.__fusefam.terminate()
+			raise
 		
 		self.__snpman = SnapshotManager(self.config.get("general","target"))
 		
@@ -111,7 +113,7 @@ class BackupManager :
 		# Upgrade Target 
 		try :
 			self.__um.upgradeAll( self.config.get("general","target")  )
-		except SBException, e:
+		except exceptions.SBException, e:
 			self.logger.warning(str(e))
 		
 		# purge
@@ -171,14 +173,10 @@ class BackupManager :
 		os.nice(20)
 		
 		self.__fillSnapshot(prev)
-		
-		if os.getuid() != 0 :
-			if pynotify :
-				if pynotify.init("NSsbackup"):
-					n = pynotify.Notification("NSsbackup", _("File list ready , Committing to disk"))
-					n.show()
-				else:
-					self.logger.warning(_("there was a problem initializing the pynotify module"))
+					
+		if self.__pynotif_avail:
+			n = self.__pynotif_mod.Notification("NSsbackup", _("File list ready , Committing to disk"))
+			n.show()
 				
 		self.__actualSnapshot.commit()
 		
@@ -318,11 +316,20 @@ class BackupManager :
 		
 		# regexp to be used for excluding files from flist
 		self.logger.debug("getting exclude list for actual snapshot")
+		rexclude = []
 		if self.__actualSnapshot.getExcludes() :
-			rexclude = [ re.compile(p) for p in self.__actualSnapshot.getExcludes() if len(p)>0]
-		else :
-			rexclude = []
-		
+			for p in self.__actualSnapshot.getExcludes():
+				if Util.is_empty_regexp(p):
+					self.logger.error(_("Empty regular expression found. "\
+										"Skipped."))
+				else:
+					if Util.is_valid_regexp(p):
+						p_compiled = re.compile(p)
+						rexclude.append(p_compiled)
+					else:
+						self.logger.error(_("Invalid regular expression ('%s')"\
+										" found. Skipped.") % p )
+							
 		# set the list to backup and to exclude
 		self.logger.debug("set the list to backup and to exclude")
 		if self.config.has_section( "dirconfig" ):
@@ -355,7 +362,7 @@ class BackupManager :
 		self.logger.debug("Maximum free size required is '%s' " % neededspace)
 		vstat = os.statvfs( self.__actualSnapshot.getPath() )
 		if (vstat.f_bavail * vstat.f_bsize) <= self.fullsize:
-			raise SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
+			raise exceptions.SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
 	
 	
 	def __setlockfile(self):
@@ -372,7 +379,7 @@ class BackupManager :
 			# the lockfile exists, is it valid ?
 			last_sb_pid = FAM.readfile(self.__lockfile)
 			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read()) ) :
-				raise SBException(_("Another NSsbackup daemon already running (pid = %s )!") % last_sb_pid )
+				raise exceptions.SBException(_("Another NSsbackup daemon already running (pid = %s )!") % last_sb_pid )
 			else :
 				FAM.delete(self.__lockfile)
 		
@@ -387,24 +394,36 @@ class BackupManager :
 		"""
 		
 		FAM.delete(self.__lockfile)
-		self.logger.info(_("Session of backup is finished (%s is removed) ") % self.__lockfile)
+		self.logger.info(_("Session of backup is finished (%s is removed) ")\
+														% self.__lockfile)
+
+		# destination for copying the logfile
+		logf_target = os.path.join( self.__actualSnapshot.getPath(),
+								    "nssbackup.log" )
 		
 		if self.config.has_option("log","file") and FAM.exists(self.config.get("log","file")):
-			FAM.copyfile(self.config.get("log","file"), self.__actualSnapshot.getPath()+"/nssbackup.log")
+			try:
+				Util.nssb_copy( self.config.get("log","file"), logf_target )
+			except exceptions.ChmodNotSupportedError:
+				self.logger.warning(_("Unable to change permissions for "\
+									  "file '%s'.") % logf_target )
+				
 		elif FAM.exists("nssbackup.log") : 
-			FAM.copyfile(os.path.abspath("nssbackup.log"), self.__actualSnapshot.getPath()+"/nssbackup.log")
+			try:
+				Util.nssb_copy( os.path.abspath("nssbackup.log"), logf_target)
+			except exceptions.ChmodNotSupportedError:
+				self.logger.warning(_("Unable to change permissions for "\
+									  "file '%s'.") % logf_target)
+
 		else :
 			self.logger.warning(_("I didn't find the logfile to copy into snapshot"))
 			
 		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.terminate()
-		if os.getuid() != 0 :
-			if pynotify :
-				if pynotify.init("NSsbackup"):
-					n = pynotify.Notification("NSsbackup", _("Ending Backup Session"))
-					n.show()
-				else:
-					self.logger.warning(_("there was a problem initializing the pynotify module"))
+
+		if self.__pynotif_avail:
+			n = self.__pynotif_mod.Notification("NSsbackup", _("Ending Backup Session"))
+			n.show()
 			
 
 	def __checkTarget(self):
@@ -412,7 +431,7 @@ class BackupManager :
 		"""
 		# Check if the mandatory target option exists
 		if not self.config.has_option("general","target") :
-			raise SBException (_("Option 'target' is missing, aborting."))
+			raise exceptions.SBException (_("Option 'target' is missing, aborting."))
 		
 		# Check if the target dir exists or create it
 		if not FAM.exists(self.config.get("general","target")) :
@@ -485,10 +504,10 @@ class BackupManager :
 		get the config for the instance of nssbackup 
 		(/etc/nssbackup.conf if root  or ~/.nssbackup/nssbackup.conf if normal user)
 		"""
-		global __config
-		if self.__config : return self.__config
+		if self.config:
+			return self.config
 		else :
-			self.__config = ConfigManager()
+			self.config = ConfigManager()
 
 	def getActualSnapshot(self):
 		"""

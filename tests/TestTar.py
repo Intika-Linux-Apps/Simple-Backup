@@ -16,7 +16,7 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
 from nssbackup.util.tar import SnapshotFile, MemSnapshotFile,ProcSnapshotFile, Dumpdir
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 import unittest,os
 from nssbackup.util.exceptions import *
 
@@ -25,7 +25,7 @@ class TestSnapshotManager(unittest.TestCase) :
 	"""
 	
 	def setUp(self):
-		getLogger(level=20)
+		LogFactory.getLogger(level=20)
 		self.snarSNPfile = SnapshotFile("test-datas"+os.sep+"files.snar")
 		self.snarSNPfile2 = SnapshotFile("test-datas"+os.sep+"files-2.snar")
 		

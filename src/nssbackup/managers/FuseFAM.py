@@ -22,23 +22,25 @@ from nssbackup.util.log import LogFactory
 from nssbackup.plugins import PluginManager
 from FileAccessManager import *
 from nssbackup.util.exceptions import SBException
+from nssbackup.util import exceptions
 from nssbackup.managers.ConfigManager import getUserDatasDir
+from gettext import gettext as _
 
 class FuseFAM:
 	"""
 	The Fuse File access Manager
 	"""
-	logger = LogFactory.getLogger()
 	
 	def __init__(self, configManager=None):
 		"""
 		Constructor
 		@param configManager: 
 		"""
-		global __config
+		self.logger = LogFactory.getLogger()
 		
 		#-------------------------------------
-		## The dir tjat will be the base for all mount points
+		## This is the base directory where all
+		#  mountpoints of remote sites will be located
 		self.__mountdir = None
 		
 		## the config manager from which to get the dir list to be mounted.
@@ -161,8 +163,12 @@ class FuseFAM:
 	def initialize(self,keepAlive = False):
 		"""
 		Get the list of dir to mount and mount them. If the keep alive tag is set , it creates a Thread that will keep the mounted dir alive.
-		@param keepAlive: Optional int that is used to determine the loop time (number of seconds) to keep the mount pint alive  
+		@param keepAlive: Optional int that is used to determine the loop time (number of seconds) to keep the mount pint alive
+		
+		@todo: For later releases: The distinction between local and remote
+			   sites must be improved in some way!  
 		"""
+		self.logger.info(_("Initializing FUSE FILE ACCESS MANAGER !"))
 		global __mountdir
 		if not self.__config : 
 			raise SBException("Can't launch initialize without a configManager")
@@ -188,9 +194,12 @@ class FuseFAM:
 		#  mount target
 		if self.__config.has_option("general","target") and not self.__config.get("general","target").startswith(os.sep):
 			self.__mount(self.__config.get("general","target"))
-		elif self.__config.get("general","target").startswith(os.sep) :
+		elif self.__config.get("general","target").startswith(os.sep) :   # this assumes absolute paths
 			if not os.path.exists(self.__config.get("general","target")) :
-				os.mkdir(self.__config.get("general","target"))
+				try:
+					os.mkdir(self.__config.get("general","target"))
+				except OSError, exc:
+					raise exceptions.FuseFAMException(_("Unable to open target directory.\n")+str(exc))
 		#mount dirs from dirconfig if needed
 		if self.__config.has_section("dirconfig") and self.__config.has_option("dirconfig", "remote") :
 			remotes = self.__config.get("dirconfig", "remote")
@@ -231,9 +240,11 @@ class FuseFAM:
 		"""
 		Unmount all nssbackup mounted dir.
 		"""
+		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		plugin_manager = PluginManager()
 		for src, dir in self.__mountedDirs.iteritems() :
 			if src is not os.sep :
+				_umounted = False
 				for p_name, p_class in plugin_manager.getPlugins().iteritems():
 					#we got the plugin
 					self.logger.debug("Trying '%s' plugin to match '%s' " % (p_name,src))
@@ -242,9 +253,23 @@ class FuseFAM:
 						self.logger.debug("Unmounting with '%s' plugin " % p_name)
 						plugin.umount(dir)
 						os.rmdir(dir)
-				self.logger.warning("Couldn't unmount %s " % dir)
-			
+						_umounted = True
+				if not _umounted:
+					self.logger.warning("Couldn't unmount %s " % dir)
+
 	def testFusePlugins(self, remotedir):
+		"""The given remote directory is applied to any found plugins to
+		decide whether one of the plugins is able to handle this (remote)
+		protocol. The tests cover:
+		* checking of the adress scheme and the validity of the adress
+		* mounting of the remote site
+		* write and read access on the remote site.
+		
+		If no plugin is able to handle the given path, an exception is
+		raised.
+		
+		@todo: Customize the raised exception to provided more informations!
+		"""
 		if remotedir.startswith(os.sep) :
 			raise SBException("Nothing to do for localpath '%s'." %remotedir)
 		# set the defaults 
@@ -258,18 +283,21 @@ class FuseFAM:
 			os.mkdir(mountdir)
 			
 		plugin_manager = PluginManager()
-		for p_name, p_class in plugin_manager.getPlugins().iteritems():
+		_plugins = plugin_manager.getPlugins()
+		_iterator = _plugins.iteritems()
+		for p_name, p_class in _iterator:
 			try :
 				#we got the plugin
+				self.logger.debug("Testing of plugin '%s'" % str( p_name ))
 				plugin = p_class()
 				if plugin.matchScheme(remotedir):
-					self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name,remotedir))
+					self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name, remotedir))
 					rsource,mpoint,pathinside = plugin.mount(remotedir, mountdir)
 					self.logger.debug("Mount Succeeded !")
 					#write
 					self.logger.debug("Testing Writability")
 					test = "testFuseFam"
-					testfile = os.sep.join([mpoint,pathinside,test])
+					testfile = os.path.join( mpoint, pathinside, test )
 					os.mkdir(testfile)
 					os.rmdir(testfile)
 					# Unmount 
