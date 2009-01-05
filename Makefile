@@ -1,5 +1,5 @@
 #PO=`for file in \`ls po/*.po\`; do f1=${file##*/}; echo ${f1%%.*}; done`
-PO=ca cs de en_GB es fr gl hu id it lv ms nb nl pl pt_BR pt sv tr uk zh_CN zh_TW
+PO=ca cs de en_GB es fr gl hu id it lv ms nb nl pl pt pt_BR sv tr uk zh_CN zh_TW bg he
 PREFIX=/usr/local
 DESTDIR=/usr/local
 BIN=$(DESTDIR)/bin
@@ -81,5 +81,6 @@ po-data: po-dir
 	for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 	
 po-gen:
-	xgettext -o po/messages.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop src/upgrade-backups
+	xgettext -o po/messages.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop src/upgrade-backups.py
 	for lang in $(PO); do msgmerge -U po/$$lang.po po/messages.pot; done
+
