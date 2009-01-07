@@ -1,10 +1,16 @@
 Blueprints on : https://blueprints.edge.launchpad.net/nssbackup/
 
-For 0.10:
-+ Check how sbackupd reacts if it can not get into a folder (FUSE used by a user)
-+ Check filesizes (2 Gb and 4 Gb limits)
+TODO :
+* plugins for exporting snapshot (will be used for tape, CD ... )
+* encription will be via a FusePlugin , find the fuse encripted FS
+* Backup media management (via SnapshotManager )
+* (Ana)Cron for non root
+* Check how sbackupd reacts if it can not get into a folder (FUSE used by a user)
+* Check filesizes (2 Gb and 4 Gb limits)
+* manpage
 
-Planned for 1.0:
+
+Planned for later releases:
 For UI
 * show forever excluded paths in the GUI (including the backup target dir)
 * no "help" on restore :)
@@ -20,11 +26,3 @@ For core
 * syslog logging
 * testable system
 
-
-TODO :
-* plugins for exporting snapshot (will be used for tape, CD ... )
-* encription will be via a FusePlugin , find the fuse encripted FS
-* Backup media management (via SnapshotManager )
-* (Ana)Cron for non root
-* progress bar on Restore
-* logarithmic purge 

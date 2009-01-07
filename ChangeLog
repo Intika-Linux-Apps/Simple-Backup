@@ -1,7 +1,30 @@
+nssbackup (0.2-0~rc2-ppa1) hardy; urgency=medium
+
+  * [FIX] LP Bug #299967: the regular expressions from the configuration file
+  	were checked before they are added to any lists in ui; if found regexp are
+  	invalid they were removed from the configuration and the users gets informed
+  * [FIX] LP Bug #299964: errorneous string formatting fixed
+  * [FIX] LP Bug #303648: if the target directory isn't accessible, execution of
+    backup daemon and restoration gui fails.
+  * [FIX] LP Bug #303661: * the target directory is not longer recursivly
+    created (within the configuartion GUI)
+  * [FIX] in FuseFAM.py: logger issue solved
+  * [FIX] FTP plugin: problems related to FTP solved
+  * [FIX] Bug LP #137293: display of restoration dialog fixed
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Mon, 05 Jan 2009 13:53:01 +0100
+
+nssbackup (0.2-rc1~ppa1) hardy; urgency=low
+
+  * Bug #191127 : Check the regexp before adding it to the configuration.
+  * Change the format of the mail sent to be compliant with the standards (Fix LP #285927)
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Thu, 30 Oct 2008 20:52:53 +0100
+ 
 nssbackup (0.2-0~beta8) hardy; urgency=low
 
-  * Fixed I18N when making customized installs (LP Bug #284013). Thanks a lot to Peer Lorenz 
-    (https://bugs.edge.launchpad.net/~carafour)
+  * Fixed I18N when making customized installs (LP Bug #284013). Thanks a lot
+    to Jean-Peer Lorenz (https://bugs.edge.launchpad.net/~peer.loz)
   * [Tech] Get rid of GnomeVFS dependancy
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 18 Oct 2008 19:28:44 +0200

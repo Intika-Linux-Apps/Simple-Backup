@@ -18,6 +18,7 @@ Easiest way
 
 * If you use Debian or Ubuntu, try apt-get:
  * Install the nssbackup team repository 
+  * deb http://ppa.launchpad.net/nssbackup-team/ubuntu intrepid main
   * deb http://ppa.launchpad.net/nssbackup-team/ubuntu hardy main
   * deb http://ppa.launchpad.net/nssbackup-team/ubuntu gutsy main
  * sudo apt-get install nssbackup
@@ -29,7 +30,9 @@ From source code way
 * Install python and python-gnome2 libraries, fuse-utils and pynotify.
   - probably it's already installed in your dist
 
-* Run 'make install' in the same directory as this README file
+* Walk into the same directory as this README file
+* Run 'make'
+* Run 'sudo make install' 
 
 * By default, nssbackup will be installed under "/usr/local" folder.
 
@@ -39,4 +42,6 @@ Uninstalling
 
 * If installed via apt: 'sudo apt-get remove nssbackup'. Else:
 
-* Just type 'make uninstall' in the source code folder
+* Just type 'sudo make uninstall' in the source code folder
+
+
