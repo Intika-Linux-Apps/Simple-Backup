@@ -1,15 +1,21 @@
 [Desktop Entry]
-Version=1.0
-Encoding=UTF-8
-Name=NSsbackup Configuration GUI
-Comment=Configuration tool for NSsbackup
-Exec=nssbackup-config-gui
-Terminal=false
 Type=Application
+#
+Name=NSsbackup Configuration
+Name[fr]=Configurateur de la NSsbackup
+Name[de]=NSsbackup Einstellungen
+Name[pt_BR]=Configuração do Backup
+#
+Comment=NSsbackup configuration tool for non-admins.
+Comment[de]=NSsbackup Konfiguration für Nicht-Admins.
+Comment[pt_BR]=Configure como seus backups são feitos (non-admins).
+#
+GenericName=Backup configuration tool
+GenericName[de]=Backup Einstellungen
+#
+Exec=nssbackup-config-gui
+#
+Terminal=false
 Categories=Utility;
 StartupNotify=true
-Icon=nssbackup-conf.png
-Name[pt_BR]=Configuração do Backup
-Comment[pt_BR]=Configure como seus backups são feitos
-GenericName[en_GB]=
-GenericName[fr_FR]=Configurateur de la Suite NSsbackup
+Icon=nssbackup-conf

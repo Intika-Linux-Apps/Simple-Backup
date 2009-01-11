@@ -12,7 +12,9 @@ all: po-data fill-templates
 default:
 
 install: install-po install-bin install-classes install-data
-	chmod +x $(BIN)/nssbackup* $(BIN)/upgrade-backups $(DESTDIR)/share/nssbackup/multipleTarScript  $(DESTDIR)/share/nssbackup/nssbackup
+	chmod +x $(BIN)/nssbackup* $(BIN)/upgrade-backups
+	chmod +x $(DESTDIR)/share/nssbackup/multipleTarScript
+	chmod +x $(DESTDIR)/share/nssbackup/nssbackup
 
 fill-templates:
 	sed s+@prefix@+$(PREFIX)+ src/nssbackup/ressources.in > src/nssbackup/ressources
@@ -50,6 +52,8 @@ uninstall-bin:
 uninstall-data:
 	rm -f $(DESTDIR)/share/pixmaps/nssbackup-restore.png
 	rm -f $(DESTDIR)/share/pixmaps/nssbackup-conf.png
+	rm -f $(DESTDIR)/share/pixmaps/nssbackup.png
+	rm -f $(DESTDIR)/share/pixmaps/nssbackup32x32.png
 	rm -f $(DESTDIR)/share/applications/nssbackup-config.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-restore.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-config-su.desktop

@@ -1,16 +1,23 @@
 [Desktop Entry]
-Version=1.0
-Encoding=UTF-8
-Name=NSsbackup Configuration GUI
-Comment=Configuration tool for NSsbackup
-Exec=gksu nssbackup-config-gui
-Terminal=false
 Type=Application
-Categories=Application;System;Settings
+#
+Name=NSsbackup Configuration for admins
+Name[fr]=Configurateur de la NSsbackup (admin)
+Name[de]=NSsbackup Einstellungen für Admins
+Name[pt_BR]=Configuração do Backup (admin)
+#
+Comment=NSsbackup configuration tool for admins. Requires superuser rights.
+Comment[de]=NSsbackup Konfiguration für Administratoren. Erfordert Superuser-Rechte.
+Comment[pt_BR]=Configure como seus backups são feitos. Requires superuser rights.
+#
+GenericName=Backup configuration tool
+GenericName[de]=Backup Einstellungen
+#
+Exec=gksu nssbackup-config-gui
+#
+Terminal=false
+Categories=System;Settings;
 StartupNotify=true
-Icon=nssbackup-conf.png
-Name[pt_BR]=Configuração do Backup
-Comment[pt_BR]=Configure como seus backups são feitos
-GenericName[en_GB]=
-GenericName[fr_FR]=Configurateur de la Suite NSsbackup
+Icon=nssbackup-conf
+#
 X-KDE-SubstituteUID = true

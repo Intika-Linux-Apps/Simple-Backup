@@ -1,15 +1,23 @@
 [Desktop Entry]
-Version=1.0
-Encoding=UTF-8
-Name=NSsbackup Restoration GUI
-Comment=Restore tool for NSsbackup
-Exec=gksu nssbackup-restore-gui
-Terminal=false
 Type=Application
-Categories=Application;System;Settings
-X-KDE-SubstituteUID = true
-StartupNotify=true
-Icon=nssbackup-restore.png
-Name[pt_BR]=Restauração de Backup
-Comment[pt_BR]=Restaure seu backup feito anteriormente
+#
+Name=NSsbackup Restoration for admins
+Name[de]=NSsbackup Wiederherstellung für Admins
+Name[pt_BR]=Restauração de Backup (admin)
+#
+Comment=NSsbackup restoration tool for admins. Requires superuser rights.
+Comment[de]=NSsbackup Wiederherstellung für Admins. Erfordert Superuser-Rechte.
+Comment[pt_BR]=Restaure seu backup feito anteriormente. Requires superuser rights.
+#
+GenericName=Restoration tool
 GenericName[fr_FR]=Utilitaire de restauration
+GenericName[de]=Backup Wiederherstellung
+#
+Exec=gksu nssbackup-restore-gui
+#
+Terminal=false
+Categories=System;Settings
+StartupNotify=true
+Icon=nssbackup-restore
+#
+X-KDE-SubstituteUID = true

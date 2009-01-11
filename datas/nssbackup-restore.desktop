@@ -1,14 +1,21 @@
 [Desktop Entry]
-Version=1.0
-Encoding=UTF-8
-Name=NSsbackup Restoration GUI
-Comment=Restore tool for NSsbackup
-Exec=nssbackup-restore-gui
-Terminal=false
 Type=Application
+#
+Name=NSsbackup Restoration
+Name[de]=NSsbackup Wiederherstellung
+Name[pt_BR]=Restauração de Backup
+#
+Comment=NSsbackup restoration tool for non-admins.
+Comment[de]=NSsbackup Wiederherstellung für Nicht-Admins.
+Comment[pt_BR]=Restaure seu backup feito anteriormente (non-admins).
+#
+GenericName=Restoration tool
+GenericName[fr_FR]=Utilitaire de restauration
+GenericName[de]=Backup Wiederherstellung
+#
+Exec=nssbackup-restore-gui
+#
+Terminal=false
 Categories=Utility;
 StartupNotify=true
-Icon=nssbackup-restore.png
-Name[pt_BR]=Restauração de Backup
-Comment[pt_BR]=Restaure seu backup feito anteriormente
-GenericName[fr_FR]=Utilitaire de restauration
+Icon=nssbackup-restore

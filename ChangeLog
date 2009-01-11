@@ -1,37 +1,40 @@
 nssbackup (0.2-0~rc2-ppa1) hardy; urgency=medium
 
   * [FIX] LP Bug #299967: the regular expressions from the configuration file
-  	were checked before they are added to any lists in ui; if found regexp are
-  	invalid they were removed from the configuration and the users gets informed
-  * [FIX] LP Bug #299964: errorneous string formatting fixed
-  * [FIX] LP Bug #303648: if the target directory isn't accessible, execution of
-    backup daemon and restoration gui fails.
-  * [FIX] LP Bug #303661: * the target directory is not longer recursivly
-    created (within the configuartion GUI)
+  	were checked before they are added to any lists in UI; if found regular
+  	expression are invalid they were removed from the configuration and the
+  	users gets informed
+  * [FIX] LP Bug #299964: erroneous string formatting fixed
+  * [FIX] LP Bug #303648: if the target directory isn't accessible, execution
+    of backup daemon and restoration GUI fails.
+  * [FIX] LP Bug #303661: * the target directory is not longer recursively
+    created (within the configuration GUI)
   * [FIX] in FuseFAM.py: logger issue solved
-  * [FIX] FTP plugin: problems related to FTP solved
+  * [FIX] FTP plug-in: problems related to FTP solved
   * [FIX] Bug LP #137293: display of restoration dialog fixed
 
  -- Jean-Peer Lorenz <peer.loz@gmx.net>  Mon, 05 Jan 2009 13:53:01 +0100
 
 nssbackup (0.2-rc1~ppa1) hardy; urgency=low
 
-  * Bug #191127 : Check the regexp before adding it to the configuration.
-  * Change the format of the mail sent to be compliant with the standards (Fix LP #285927)
+  * [FIX] LP Bug #191127: Check the regular expression before adding it to
+    the configuration.
+  * [FIX] LP Bug #285927: Change the format of the mail sent to be compliant
+    with the standards
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Thu, 30 Oct 2008 20:52:53 +0100
  
 nssbackup (0.2-0~beta8) hardy; urgency=low
 
-  * Fixed I18N when making customized installs (LP Bug #284013). Thanks a lot
-    to Jean-Peer Lorenz (https://bugs.edge.launchpad.net/~peer.loz)
+  * [FIX] LP Bug #284013: Fixed I18N when making customized installs.
+    Thanks a lot to Jean-Peer Lorenz (https://bugs.edge.launchpad.net/~peer.loz)
   * [Tech] Get rid of GnomeVFS dependancy
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 18 Oct 2008 19:28:44 +0200
 
 nssbackup (0.2-0~beta6) hardy; urgency=low
 
-  * [FIX] LP Bug 281852 : Restore Gui crashing on exception in some plugins
+  * [FIX] LP Bug #281852: Restoration GUI crashes on exception in some plug-ins
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 11 Oct 2008 23:19:47 +0200
 
@@ -45,7 +48,7 @@ nssbackup (0.2-0~beta5) hardy; urgency=low
 
 nssbackup (0.2-0~beta3) hardy; urgency=low
 
-  * Bug 240000 : looping in symbolic links
+  * [FIX] LP Bug #240000: looping in symbolic links
   * Log refactoring : we now have a proper logger by profile.
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Mon, 16 Jun 2008 20:24:57 +0200
@@ -65,7 +68,7 @@ nssbackup (0.2-0~alpha3ppa1) hardy; urgency=low
 
 nssbackup (0.2-0~alpha2ppa1) hardy; urgency=low
 
-  * Fixed bug #189879 : NSSbackup cannot find files.snar -> crash
+  * [FIX] LP Bug #189879: NSSbackup cannot find files.snar -> crash
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 10 Feb 2008 02:10:37 +0100
 
@@ -73,29 +76,29 @@ nssbackup (0.2-0~alpha1) hardy; urgency=low
 
   * First alpha of version 0.2
   * New multi binaries strategy
-  * LP Bug 181998 typo in an error message
-  * LP Bug #181987 DEL key is now usable to remove some entries
+  * [FIX] LP Bug #181998: typo in an error message
+  * [FIX] LP Bug #181987: DEL key is now usable to remove some entries
   * avoid an exception in regex tab of configGUI when adding the first regexp
-  * LP Bug #153605 Prefill the 'From' text entry in the report tab
+  * [FIX] LP Bug #153605: Prefill the 'From' text entry in the report tab
   * add necessary import in upgrade-backup script
   * Upgrade backus scripts takes relative path
-  * LP BUG #184713 nssbackup doesn't backup
-  * LP BUG #184713 add a backuplinks option to backup link
+  * [FIX] LP BUG #184713: nssbackup doesn't backup
+  * [FIX] LP BUG #184713: add a backuplinks option to backup link
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Mon, 04 Feb 2008 00:03:18 +0100
 
 nssbackup (0.1-5~ppa1) gutsy; urgency=low
 
-  * LP BUG #184713 nssbackup doesn't backup
+  * [FIX] LP BUG #184713: nssbackup doesn't backup
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Thu, 24 Jan 2008 21:36:34 +0100
 
 nssbackup (0.1-4~ppa1) gutsy; urgency=low
 
-  * LP Bug 181998 typo in an error message
-  * LP Bug #181987 DEL key is now usable to remove some entries
+  * [FIX] LP Bug #181998: typo in an error message
+  * [FIX] LP Bug #181987: DEL key is now usable to remove some entries
   * avoid an exception in regex tab of configGUI when adding the first regexp
-  * LP Bug #153605 Prefill the 'From' text entry in the report tab
+  * [FIX] LP Bug #153605: Prefill the 'From' text entry in the report tab
   * add necessary import in upgrade-backup script
   * Upgrade backus scripts takes relative path
 
@@ -104,8 +107,8 @@ nssbackup (0.1-4~ppa1) gutsy; urgency=low
 nssbackup (0.1-3~ppa2) gutsy; urgency=low
 
   * removed build dependancy on pyGTK
-  * Fixed [Bug 157250] simple-backup-config has incorrect example exclusion regex 
-  * fixed LP Bug #177385 : Maxincrement option is not working
+  * [FIX] LP Bug #157250: simple-backup-config has incorrect example exclusion regex 
+  * [FIX] LP Bug #177385: Maxincrement option is not working
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Fri, 21 Dec 2007 22:06:25 +0100
 
@@ -117,8 +120,9 @@ nssbackup (0.1-2~ppa1) gutsy; urgency=low
   * Changed nssbackup icons
   * changed the whole revert process ( closes LP Bug #146617 )
   * base was always set as the last full snapshot
-  * Launchpad Bug #146618 : remove the file size limit recommendation
-  * LP #138750 & #138749 fixed
+  * [FIX] LP Bug #146618: remove the file size limit recommendation
+  * [FIX] LP Bug #138750
+  * [FIX] LP Bug #138749
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 21 Oct 2007 07:42:55 +0200
 
