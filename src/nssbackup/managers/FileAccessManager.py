@@ -18,6 +18,9 @@
 import os, shutil,pickle
 
 
+def rename(src, dst):
+	os.rename(src, dst)
+
 def delete(  uri ):
 	" Deletes a file or a dir (recursively) "
 	
