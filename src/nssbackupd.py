@@ -16,8 +16,9 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
+import sys
 import gettext
-from nssbackup.nssbackupd import NSsbackupd
+from nssbackup.nssbackupd import main
 from nssbackup.util import getResource
 
 # i18n init
@@ -27,5 +28,4 @@ locale_dir = getResource('locale')
 gettext.bindtextdomain(application, locale_dir)
 gettext.textdomain(application)
 
-sbd = NSsbackupd()
-sbd.run()
+main(sys.argv)
