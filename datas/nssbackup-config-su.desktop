@@ -5,13 +5,16 @@ Name=NSsbackup Configuration for admins
 Name[fr]=Configurateur de la NSsbackup (admin)
 Name[de]=NSsbackup Einstellungen für Admins
 Name[pt_BR]=Configuração do Backup (admin)
+Name[es]=Configuración de NSsbackup para administradores
 #
 Comment=NSsbackup configuration tool for admins. Requires superuser rights.
 Comment[de]=NSsbackup Konfiguration für Administratoren. Erfordert Superuser-Rechte.
 Comment[pt_BR]=Configure como seus backups são feitos. Requires superuser rights.
+Comment[es]=Configuración de NSsbackup para administradores. Requiere privilegios de superusuario.
 #
 GenericName=Backup configuration tool
 GenericName[de]=Backup Einstellungen
+GenericName[es]=Herramienta de copia de seguridad
 #
 Exec=gksu nssbackup-config-gui
 #

@@ -4,14 +4,17 @@ Type=Application
 Name=NSsbackup Restoration for admins
 Name[de]=NSsbackup Wiederherstellung für Admins
 Name[pt_BR]=Restauração de Backup (admin)
+Name[es]=Restauración de copia de seguridad para administradores
 #
 Comment=NSsbackup restoration tool for admins. Requires superuser rights.
 Comment[de]=NSsbackup Wiederherstellung für Admins. Erfordert Superuser-Rechte.
 Comment[pt_BR]=Restaure seu backup feito anteriormente. Requires superuser rights.
+Comment[es]=Restauración de NSsbackup para administradores. Requiere privilegios de superusuario.
 #
 GenericName=Restoration tool
 GenericName[fr_FR]=Utilitaire de restauration
 GenericName[de]=Backup Wiederherstellung
+GenericName[es]=Herramienta de restauración
 #
 Exec=gksu nssbackup-restore-gui
 #

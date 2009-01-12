@@ -4,14 +4,17 @@ Type=Application
 Name=NSsbackup Restoration
 Name[de]=NSsbackup Wiederherstellung
 Name[pt_BR]=Restauração de Backup
+Name[es]=Restauración de copia de seguridad
 #
 Comment=NSsbackup restoration tool for non-admins.
 Comment[de]=NSsbackup Wiederherstellung für Nicht-Admins.
 Comment[pt_BR]=Restaure seu backup feito anteriormente (non-admins).
+Comment[es]=Restauración de copia de seguridad para no administradores.
 #
 GenericName=Restoration tool
 GenericName[fr_FR]=Utilitaire de restauration
 GenericName[de]=Backup Wiederherstellung
+GenericName[es]=Herramienta de restauración
 #
 Exec=nssbackup-restore-gui
 #
