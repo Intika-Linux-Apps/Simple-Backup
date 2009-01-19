@@ -22,6 +22,10 @@ import os.path
 import nssbackup.managers.FileAccessManager as FAM
 
 
+def shutdown_logging():
+	logging.shutdown()
+
+
 class LogFactory(object):
 	"""
 	"""

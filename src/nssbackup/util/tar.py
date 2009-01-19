@@ -358,20 +358,22 @@ def makeTarFullBackup(snapshot):
 # ---
 
 class Dumpdir():
-	"""
-	Dumpdir is a sequence of entries of the following form:
-		C filename \0
-	where C is one of the control codes described below, filename is the name of the file C operates upon, and '\0' represents a nul character (ASCII 0). The white space characters were added for readability, real dumpdirs do not contain them.
-	Each dumpdir ends with a single nul character. 
+	"""Dumpdir is a sequence of entries of the following form: C filename \0
+	where C is one of the control codes described below, filename is the name
+	of the file C operates upon, and '\0' represents a nul character (ASCII 0).
 	
-	@see: http://www.gnu.org/software/tar/manual/html_chapter/tar_13.html#SEC171
+	The white space characters were added for readability, real dumpdirs do not
+	contain them. Each dumpdir ends with a single nul character. 
+	
+	@see: http://www.gnu.org/software/tar/manual/html_chapter/Tar-Internals.html#SEC173
 	"""
 	
 	INCLUDED = 'Y'
 	UNCHANGED = 'N'
 	DIRECTORY = 'D'
 	
-	__HRCtrls = {'Y':_('Included'),'N':_('Excluded'),'D':_('Directory')} #: The dictionary mapping control with their meanings
+	# The dictionary mapping control with their meanings
+	__HRCtrls = {'Y':_('Included'),'N':_('Excluded'),'D':_('Directory')}
 	
 	control = None
 	filename = None
@@ -437,7 +439,7 @@ class Dumpdir():
 class SnapshotFile():
 	"""
 	
-	@see: http://www.gnu.org/software/tar/manual/html_chapter/tar_13.html#SEC170
+	@see: http://www.gnu.org/software/tar/manual/html_chapter/Tar-Internals.html#SEC172
 	"""
 	header = None
 	snpfile = None

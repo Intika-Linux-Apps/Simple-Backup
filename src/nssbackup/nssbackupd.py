@@ -27,7 +27,8 @@ import socket
 import datetime
 import re
 from gettext import gettext as _
-from nssbackup.util.log import LogFactory
+
+from nssbackup.util import log
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.managers.ConfigManager import getUserConfDir
 from nssbackup.managers.ConfigManager import ConfigManager
@@ -38,11 +39,13 @@ from nssbackup.managers.BackupManager import PyNotifyMixin
 class NSsbackupd(PyNotifyMixin) :
 	"""This class is intended to be a wrapper of nssbackup instances . 
 	It manages :
-	- the full backup process : creation of instances of the BackupManager with the corresponding config file 
+	- the full backup process : creation of instances of the BackupManager
+	  with the corresponding config file 
 	- the logging of exception not handled by BackupManager
 	- the removal of lockfiles
 	- the sent of emails
 	"""
+	
 	__confFilesRE = "^nssbackup-(.+?)\.conf$"
 
 	def __init__(self):
@@ -62,7 +65,7 @@ class NSsbackupd(PyNotifyMixin) :
 		self.__retrieve_confm()
 
 		# here the logger created for the default profile is used
-		self.logger			= LogFactory.getLogger(self.__profileName)
+		self.logger			= log.LogFactory.getLogger(self.__profileName)
 
 		# the currently used instance of the BackupManager
 		self.__bm				= None
@@ -123,13 +126,16 @@ class NSsbackupd(PyNotifyMixin) :
 							   self.__bm.config.get("report","smtpport"))
 			else : 
 				server.connect(self.__bm.config.get("report","smtpserver"))
-		if self.__bm.config.has_option("report","smtptls") and self.__bm.config.get("report","smtptls") == 1 : 
-			if self.__bm.config.has_option("report","smtpcert") and self.__bm.config.has_option("report","smtpkey") :
+		if self.__bm.config.has_option("report","smtptls") and\
+					self.__bm.config.get("report","smtptls") == 1 : 
+			if self.__bm.config.has_option("report","smtpcert") and\
+					self.__bm.config.has_option("report","smtpkey") :
 				server.starttls(self.__bm.config.get("report","smtpkey"),
 							    self.__bm.config.get("report","smtpcert"))
 			else :
 				server.starttls()
-		if self.__bm.config.has_option("report","smtpuser") and self.__bm.config.has_option("report","smtppassword") : 
+		if self.__bm.config.has_option("report","smtpuser") and\
+				self.__bm.config.has_option("report","smtppassword") : 
 			server.login(self.__bm.config.get("report","smtpuser"),
 						 self.__bm.config.get("report","smtppassword"))
 		
@@ -191,7 +197,7 @@ class NSsbackupd(PyNotifyMixin) :
 		for confm in self.__confm:
 			try:
 				self.__profileName 	= confm.getProfileName()
-				self.logger			= LogFactory.getLogger(self.__profileName)
+				self.logger			= log.LogFactory.getLogger(self.__profileName)
 				self.__bm 			= BackupManager( confm )
 				self.__log_errlist()
 				self.__bm.makeBackup()
@@ -245,3 +251,4 @@ def main(argv):
 	"""
 	sbd = NSsbackupd()
 	sbd.run()
+	log.shutdown_logging()
