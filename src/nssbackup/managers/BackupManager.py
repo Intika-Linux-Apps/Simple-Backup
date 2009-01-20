@@ -21,6 +21,8 @@ import os , grp, signal
 import datetime
 import re
 import socket
+import gobject
+
 from FuseFAM import FuseFAM
 from SnapshotManager import SnapshotManager
 from UpgradeManager import UpgradeManager
@@ -78,9 +80,13 @@ class PyNotifyMixin(object):
 		if self.__pynotif_avail:
 			notif = self.__get_notification(message)
 			if isinstance(notif, self.__pynotif_mod.Notification):
-				notif.set_urgency(self.__pynotif_mod.URGENCY_CRITICAL)
-				notif.set_timeout(self.__pynotif_mod.EXPIRES_NEVER)
-				notif.show()
+				try:
+					notif.set_urgency(self.__pynotif_mod.URGENCY_CRITICAL)
+					notif.set_timeout(self.__pynotif_mod.EXPIRES_NEVER)
+					notif.show()
+				except gobject.GError, exc:
+				 	# Connection to notification-daemon failed 
+				 	self.logger.warning("Connection to notification-daemon failed: " + str(exc))
 
 	def _notify_info( self, message ):
 		"""Shows up a pop-up window to inform the user. The notification
@@ -92,7 +98,11 @@ class PyNotifyMixin(object):
 		if self.__pynotif_avail:
 			notif = self.__get_notification(message)
 			if isinstance(notif, self.__pynotif_mod.Notification):
-				notif.show()
+				try:
+					notif.show()
+				except gobject.GError, exc:
+				 	# Connection to notification-daemon failed 
+				 	self.logger.warning("Connection to notification-daemon failed: " + str(exc))
 
 	def __get_notification(self, message):
  		"""Returns a notification object but does not display it. The
@@ -113,7 +123,12 @@ class PyNotifyMixin(object):
 		if self.__pynotif_avail:
 			message = message.replace("<", "&lt;")
 			ico = Util.getResource("nssbackup32x32.png")
-			notif = self.__pynotif_mod.Notification("NSsbackup", message, ico)
+			try:
+				notif = self.__pynotif_mod.Notification("NSsbackup", message, ico)
+			except gobject.GError, exc:
+			 	# Connection to notification-daemon failed 
+			 	self.logger.warning("Connection to notification-daemon failed: " + str(exc))
+			 	notif = None
 		return notif
 
 				
@@ -205,8 +220,11 @@ class BackupManager(PyNotifyMixin):
 		
 		# Set the base file
 		if base :
-			self.logger.info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
-			self.__actualSnapshot.setBase(base.getName())
+			if self.__actualSnapshot.isfull():
+				self.logger.info("Base is not set for full snapshot")
+			else:
+				self.logger.info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
+				self.__actualSnapshot.setBase(base.getName())
 		del base
 
 		# Backup list of installed packages (Debian only part)
