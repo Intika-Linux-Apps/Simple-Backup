@@ -16,13 +16,22 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
-import gettext
-from nssbackup.nssbackupd import NSsbackupd
+import gettext, sys
+from nssbackup.ui.SBConfigGTK import main
+from nssbackup.util import getResource
+import gtk
 
-# i18n init
-gettext.textdomain("nssbackup")
-application = 'nssbackup'
-gettext.install(application)
+#----------------------------------------------------------------------
 
-sbd = NSsbackupd()
-sbd.run()
+if __name__ == '__main__':
+	# i18n init
+	application = 'nssbackup'
+	locale_dir = getResource('locale')
+    
+	gettext.bindtextdomain(application, locale_dir)
+	gettext.textdomain(application)
+
+	gtk.glade.bindtextdomain(application, locale_dir)
+	gtk.glade.textdomain(application)
+
+	main(sys.argv)

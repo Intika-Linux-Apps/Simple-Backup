@@ -62,7 +62,13 @@ class RebaseFullSnpForbidden(RebaseSnpException):
 	Thrown when trying to rebase a full snapshot
 	"""
 	
+class ChmodNotSupportedError(SBException):
+	"""Thrown when a destination does not support file modes (e.g. some
+	ftp servers or FAT filesystems).
+	"""
+
 class NotifyException(SBException) :
 	"""
 	This Exception is thrown by notifiers and listeners.
 	"""
+

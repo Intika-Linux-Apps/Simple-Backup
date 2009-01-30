@@ -17,7 +17,6 @@
 
 from nssbackup.plugins import pluginFAM
 import os
-from nssbackup.util.log import getLogger
 
 class localFuseFAM (pluginFAM):
 	"""

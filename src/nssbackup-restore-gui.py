@@ -18,10 +18,20 @@
 
 import gettext, sys
 from nssbackup.ui.SBRestoreGTK import main
+from nssbackup.util import getResource
+import gtk
 
 #----------------------------------------------------------------------
 
 if __name__ == '__main__':
+	# i18n init
 	application = 'nssbackup'
-	gettext.install(application)
+	locale_dir = getResource('locale')
+    
+	gettext.bindtextdomain(application, locale_dir)
+	gettext.textdomain(application)
+
+	gtk.glade.bindtextdomain(application, locale_dir)
+	gtk.glade.textdomain(application)
+
 	main(sys.argv)

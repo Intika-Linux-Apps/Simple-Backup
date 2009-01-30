@@ -33,7 +33,7 @@ from nssbackup.util.log import LogFactory
 #@author: Oumar Aziz Ouattara <wattazoum@gmail.com>
 #@version: 1.0
 ##
-class SnapshotManager :
+class SnapshotManager(object):
 
 	## This is the current diectory use by this SnapshotManager
 	#
@@ -45,8 +45,7 @@ class SnapshotManager :
 	
 	REBASEDIR = "rebaseTmpDir"
 	
-	def __init__(self,targetDir):
-		global __targetDir
+	def __init__(self, targetDir):
 		self.logger = LogFactory.getLogger()
 		
 		## 
@@ -85,7 +84,6 @@ class SnapshotManager :
 		@param forceReload: True or false
 		@return: 
 		"""
-		global __snapshots
 		snapshots = list()
 		
 		if fromDate and toDate :
@@ -106,7 +104,7 @@ class SnapshotManager :
 				listing = FAM.listdir(self.__targetDir)
 				for dir in listing :
 					try :
-						snapshots.append( Snapshot( self.__targetDir+"/"+str(dir) ) )
+						snapshots.append( Snapshot( self.__targetDir+"/"+str(dir)) )
 					except NotValidSnapshotException, e :
 						self.logger.warning(e.message)
 				snapshots.sort(key=Snapshot.getName,reverse=True)
@@ -116,7 +114,6 @@ class SnapshotManager :
 			self.logger.debug("[Snapshots Listing]") 
 			for snp in snapshots :
 				self.logger.debug(str(snp)) 
-			self.logger.debug("")
 			
 		return snapshots
 	
@@ -132,16 +129,15 @@ class SnapshotManager :
 		
 		
 	def rebaseSnapshot(self,torebase, newbase=None):
-		"""
-		The rebase operation consists in changing the base of a snapshot. 
-		Basicaly , That means for 3 snapshots A,B,C if we rebase C to A, 
-		we can remove B with no problem, the information contained in C will be updated to 
-		keep the changed occurred in B inside C.
+		"""The re-base operation consists in changing the base of a snapshot. 
+		Basically , that means for 3 snapshots A,B,C if we rebase C to A, 
+		we can remove B with no problems. The informations contained in C
+		will be updated to keep the changes occurred in B inside C.
 		
-		Rebase principle:
+		Re-base principle:
 		snp1 -> snp2 -> snp3
 		
-		rebase snp3 on snp1 :
+		re-base snp3 on snp1 :
 		(snp3 has the newer version of the file it contains)
 			remove snp3 "ver" file ( means the snapshot is being processed )
 			for each file in snp2 :
@@ -150,16 +146,21 @@ class SnapshotManager :
 			when finished, checks and merge the includes.list and excludes.list
 			change the base file content to the new base
 			write the "ver" file
-		If an error is encountered -> cancel Rebase ( we shouldn't loose the snapshot !)
+		If an error is encountered -> cancel Rebase ( we shouldn't
+		loose the snapshot !)
 
 		@raise SBException: if torebase is a full backup or newbase is ealier
 		"""
 		#if the snapshot to rebase is full, no need to do the operation. 
 		if torebase.isfull() : 
-			raise RebaseFullSnpForbidden(_("No need to rebase a full snapshot '%s'") % torebase.getName()) 
+			raise RebaseFullSnpForbidden(\
+			   _("No need to rebase a full snapshot '%s'") % torebase.getName()) 
 		# if the new base is earlier, t
 		if newbase and torebase.getName() <= newbase.getName() :
-			raise RebaseSnpException(_("Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")% {'snapshotToRebase':torebase.getName(), 'NewBaseSnapshot': newbase.getName()}) 
+			raise RebaseSnpException(_("Cannot rebase a snapshot on an earlier"\
+					" one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")\
+					% { 'snapshotToRebase':torebase.getName(),
+					    'NewBaseSnapshot': newbase.getName() }) 
 		if not torebase.getBase():
 			raise RebaseSnpException(_("'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken ")% {'snapshotToRebase':torebase.getName()})
 		
@@ -410,8 +411,9 @@ class SnapshotManager :
 			self.statusNumber = None
 			self.statusMessage = None
 			self.substatusMessage = None
-		except Exception,e :
-			self.logger.error(_("Got an exception when Pulling '%s' : "+str(e)) % snapshot.getName() ) 
+		except Exception, e :
+			_msg = _("Got an exception when Pulling '%s' : ") + str(e)
+			self.logger.error( _msg % ( snapshot.getName()) ) 
 			self.__cancelPull(snapshot)
 			raise e
 		
@@ -532,6 +534,9 @@ class SnapshotManager :
 		"""
 		
 		def purgeinterval(_from,_to):
+			"""
+			@todo: Unify the formatting of snapshot timestamp!
+			"""
 			f,t = datetime.date.fromtimestamp(_from),datetime.date.fromtimestamp(_to)
 			_fromD = '%04d-%02d-%02d' % (f.year,f.month,f.day)
 			_toD = '%04d-%02d-%02d' % (t.year,t.month,t.day)
@@ -539,14 +544,15 @@ class SnapshotManager :
 			snps = self.getSnapshots(fromDate=_fromD, toDate=_toD)
 			if not snps is None and len(snps) != 0 :
 				try :
-					self.rebaseSnapshot(snps[0],snps[-1])
+					if len(snps) > 1:
+						self.rebaseSnapshot(snps[0],snps[-1])
 				except RebaseFullSnpForbidden, e:
 					self.logger.warning(_("Got till a Full backup before the end of the rebase ! Stopping here !"))  
-				if len(snps[1:-1]) > 0:
-					# remove the snapshot
-					for s in snps[1:-1]:
-						if not s.isfull():
-							FAM.delete(s.getPath())
+#				if len(snps[1:-1]) > 0: not necessary
+				# remove the snapshot
+				for s in snps[1:-1]:
+					if not s.isfull():
+						FAM.delete(s.getPath())
 						
 			
 		snapshots = []
@@ -580,6 +586,10 @@ class SnapshotManager :
 			_1monthbefore = t - 30*daytime
 			_1yearbefore = t - 365*daytime
 			currentday = _2daysbefore
+			
+			# the appropriate interval is given as parameter e.g. a single day
+			# within the last week or a single week within the last month
+			# Within these timespans the defined number of backups must remain
 			
 			# check for last week 
 			self.logger.info("Logarithm Purging [Last week]!")

@@ -1,5 +1,5 @@
 #PO=`for file in \`ls po/*.po\`; do f1=${file##*/}; echo ${f1%%.*}; done`
-PO=ca cs de en_GB es fr gl hu id it lv ms nb nl pl pt_BR pt sv tr uk zh_CN zh_TW
+PO=ca cs de en_GB es fr gl hu id it lv ms nb nl pl pt pt_BR sv tr uk zh_CN zh_TW bg he
 PREFIX=/usr/local
 DESTDIR=/usr/local
 BIN=$(DESTDIR)/bin
@@ -7,22 +7,24 @@ BIN=$(DESTDIR)/bin
 PYDIR=$(DESTDIR)/lib/python2.5/site-packages
 CLSDIR=$(PYDIR)/nssbackup
 
-all:
+all: po-data fill-templates
 
 default:
 
-install: po-data install-po fill-templates install-bin install-classes install-data
-	chmod +x $(BIN)/nssbackup* $(BIN)/upgrade-backups $(DESTDIR)/share/nssbackup/multipleTarScript  $(DESTDIR)/share/nssbackup/nssbackup
+install: install-po install-bin install-classes install-data
+	chmod +x $(BIN)/nssbackup* $(BIN)/upgrade-backups
+	chmod +x $(DESTDIR)/share/nssbackup/multipleTarScript
+	chmod +x $(DESTDIR)/share/nssbackup/nssbackup
 
 fill-templates:
 	sed s+@prefix@+$(PREFIX)+ src/nssbackup/ressources.in > src/nssbackup/ressources
 
 install-bin:
 	mkdir -p $(BIN)
-	cp -a src/nssbackupd $(BIN)/nssbackupd
-	cp -a src/nssbackup-config-gui $(BIN)/nssbackup-config-gui
-	cp -a src/nssbackup-restore-gui $(BIN)/nssbackup-restore-gui
-	cp -a src/upgrade-backups $(BIN)/upgrade-backups
+	cp -a src/nssbackupd.py $(BIN)/nssbackupd
+	cp -a src/nssbackup-config-gui.py $(BIN)/nssbackup-config-gui
+	cp -a src/nssbackup-restore-gui.py $(BIN)/nssbackup-restore-gui
+	cp -a src/upgrade-backups.py $(BIN)/upgrade-backups
 
 install-classes:
 	mkdir -p $(CLSDIR)
@@ -50,6 +52,8 @@ uninstall-bin:
 uninstall-data:
 	rm -f $(DESTDIR)/share/pixmaps/nssbackup-restore.png
 	rm -f $(DESTDIR)/share/pixmaps/nssbackup-conf.png
+	rm -f $(DESTDIR)/share/pixmaps/nssbackup.png
+	rm -f $(DESTDIR)/share/pixmaps/nssbackup32x32.png
 	rm -f $(DESTDIR)/share/applications/nssbackup-config.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-restore.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-config-su.desktop
@@ -58,6 +62,7 @@ uninstall-data:
 	rm -f $(DESTDIR)/share/nssbackup/nssbackup-restore.glade
 	rm -f $(DESTDIR)/share/nssbackup/nssbackup
 	rm -rf $(PYDIR)/nssbackup $(PYDIR)/NSsbackup*
+	find $(DESTDIR)/share/locale -name nssbackup.mo -exec rm -f '{}' \;
 	
 reinstall: uninstall install
 
@@ -80,5 +85,6 @@ po-data: po-dir
 	for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 	
 po-gen:
-	xgettext -o po/messages.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop src/upgrade-backups
+	xgettext -o po/messages.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop src/upgrade-backups.py
 	for lang in $(PO); do msgmerge -U po/$$lang.po po/messages.pot; done
+

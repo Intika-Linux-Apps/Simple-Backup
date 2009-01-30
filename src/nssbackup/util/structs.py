@@ -15,7 +15,7 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from exceptions import CorruptedSBdictException,SBException
+from nssbackup.util.exceptions import CorruptedSBdictException,SBException
 import os
 
 class SBdict (dict) :
@@ -99,7 +99,7 @@ class SBdict (dict) :
 		if son != None and type(son) != SBdict :
 			raise CorruptedSBdictException("You can't set '%s' as a son " % str(son))
 		if not self[path] or self[path][0] == None :
-			self.__setitem(path,[None,son])
+			self.__setitem__(path,[None,son])
 		else :
 			self.__setitem__(path,[self[path][0],son])
 		

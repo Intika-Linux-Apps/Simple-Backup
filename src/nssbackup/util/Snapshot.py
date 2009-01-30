@@ -20,36 +20,30 @@ import nssbackup.managers.FileAccessManager as FAM
 import re
 import os
 from gettext import gettext as _
-from exceptions import NotValidSnapshotNameException,SBException, NotValidSnapshotException
+from nssbackup.util.exceptions import NotValidSnapshotNameException,SBException, NotValidSnapshotException
 from log import LogFactory
 from structs import SBdict
 import nssbackup.util.tar as TAR
 from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
 
-class Snapshot : 
+class Snapshot(object): 
 	"The snapshot class represents one snapshot in the backup directory"
-	
-	logger = LogFactory.getLogger()
-	
+		
 	__validname_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})_(\d{2})[\:\.](\d{2})[\:\.](\d{2})\.\d+\..*?\.(.+)$")
 	
-	# Constructor
-	def __init__ (self, path, fam=False) :
+	def __init__ (self, path):
 		"""
 		The snapshot constructor.
 		@param path : the path to the snapshot dir.
 		@param fam : The File Access Manager to use. False will create a default one
 		"""
-		global __name, __snapshotpath
-		
-		# -----------------
+		self.logger = LogFactory.getLogger()
 		
 		# Attributes
 		self.__name = False
 		self.__base = False
 		self.__format = "gzip" # default value
 		
-		# TODO (in|ex)cludeFlist should be an SBdict
 		self.__snarfile = None
 		self.__includeFlist = SBdict()
 		self.__includeFlistFile = None # Str
@@ -64,9 +58,6 @@ class Snapshot :
 		self.__snapshotpath = False
 		
 		self.__baseSnapshot = None
-		
-		#------------------
-		
 		
 		self.__snapshotpath = os.path.normpath(str(path))
 		
@@ -106,7 +97,6 @@ class Snapshot :
 		date = {"year" : int(m.group(1)),"month":int(m.group(2)),"day":int(m.group(3)),
 			"hour":int(m.group(4)),"minute":int(m.group(5)),"second":int(m.group(6))}
 		return date
-	# ---
 	
 	def getIncludeFlist(self):
 		"""
@@ -126,8 +116,6 @@ class Snapshot :
 		"""
 		@return: the path to the exclude file list file
 		"""
-		global __excludeFlistFile
-		
 		if not self.__excludeFlistFile :
 			self.__excludeFlistFile = self.getPath()+os.sep+"excludes.list"
 			
@@ -137,8 +125,6 @@ class Snapshot :
 		"""
 		@return: the path to the include file list file
 		"""
-		global __includeFlistFile
-		
 		if not self.__includeFlistFile :
 			self.__includeFlistFile = self.getPath()+os.sep+"includes.list"
 			
@@ -148,8 +134,6 @@ class Snapshot :
 		"""
 		@return: the path to the TAR SNAR file
 		"""
-		global __snarfile
-		
 		if not self.__snarfile : 
 			self.__snarfile = self.getPath()+os.sep+"files.snar"
 		return self.__snarfile
@@ -165,7 +149,6 @@ class Snapshot :
 		"""
 		Returns the compression format of the snapshot (from the "format" file or default to "gzip")
 		"""
-		global __format
 		if os.path.exists(os.sep.join([self.getPath(),"format"])):
 			self.__format = FAM.readfile(os.sep.join([self.getPath(),"format"])).split('\n')[0]
 		return self.__format
@@ -175,7 +158,6 @@ class Snapshot :
 		return the name of the base snapshot of this snapshot if its an Inc backup
 		return False if it's a full backup
 		"""
-		global __base
 		if self.__base : return self.__base
 		else :
 			basefile = self.__snapshotpath +os.sep +"base"
@@ -189,13 +171,12 @@ class Snapshot :
 		Return the base snapshot (as a Snapshot ) not only the name
 		@return: the base Snapshot if it exists or None otherwise (we are a full snapshot) 
 		"""
-		global __baseSnapshot
 		if self.__baseSnapshot : return self.__baseSnapshot
 		else :
 			# check if we are not a full snapshot 
 			if self.getBase():
 				path = os.path.dirname(self.getPath())
-				self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])) )
+				self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])))
 			else :
 				self.__baseSnapshot = None
 			return self.__baseSnapshot
@@ -234,8 +215,6 @@ class Snapshot :
 	
 	def getVersion(self) :
 		"Return the version of the snapshot comming from the 'ver' file"
-		global __version
-		
 		if self.__version : return self.__version
 		elif ":" in self.getName() : 
 			self.__version = "1.0"
@@ -258,7 +237,6 @@ class Snapshot :
 	
 	def getExcludes(self) :
 		"Return the content of excludes"
-		global __excludes
 		if self.__excludes : return self.__excludes
 		else :
 			excludefile = self.getPath() +os.sep +"excludes"
@@ -270,7 +248,6 @@ class Snapshot :
 		
 	def getPackages(self) :
 		"Return the packages"
-		global __packages
 		if self.__packages : return self.__packages
 		else :
 			packagesfile = self.getPath() +os.sep +"packages"
@@ -311,7 +288,8 @@ class Snapshot :
 		"""
 		@return: True if the snapshot is full and false if inc
 		"""
-		return self.getName().endswith(".ful")
+		_name = str(self.getName())
+		return _name.endswith(".ful")
 
 	
 	def commit (self) :
@@ -325,17 +303,12 @@ class Snapshot :
 		self.__clean()
 		self.commitverfile()
 	
-	
-	#----------------------------
-	
 	def addToIncludeFlist (self, item) :
 		"""
 		Add an item to be backup into the snapshot.
 		Usage :  addToIncludeFlist(item) where
 		- item is the item to be add (file, dir, or link)
 		"""
-		global __includeFlist
-		
 		self.__includeFlist[item] = "1"
 	
 	def addToExcludeFlist (self, item) :
@@ -344,20 +317,14 @@ class Snapshot :
 		Usage :  addToExcludeFlist(item) where
 		- item is the item to be add (file, dir, or link)
 		"""
-		global __excludeFlist
-		
 		self.__excludeFlist[item] = "0"
 	
-	#---------------------------------
-	
-	# Setters
-	
+	# Setters	
 	def setFormat(self,cformat=None):
 		"""
 		Sets the backup compression format
 		cformat : the format to set
 		"""
-		global __format
 		supported = ["none","bzip2", "gzip"]
 		if cformat and cformat in supported :
 			self.logger.debug("Set the compression format to %s" % cformat)
@@ -366,7 +333,6 @@ class Snapshot :
 	
 	def setPath(self, path) :
 		"Set the complete path of the snapshot. That path will be used to get the name of the snapshot"
-		global __snapshotpath, __name
 		self.__snapshotpath = path
 		splited = str(self.__snapshotpath).split(os.sep)
 		name = splited[len(splited) - 1]
@@ -378,7 +344,6 @@ class Snapshot :
 	
 	def setBase(self, baseName) :
 		"Set the name of the base snapshot of this snapshot"
-		global __base
 		if not self.__isValidName(baseName) :
 			raise SBException (_("Name of base not valid : %s") % self.__name)
 		self.__base = baseName
@@ -398,14 +363,12 @@ class Snapshot :
 		set the packages list for debian based distros
 		@param packages: Must be the results of the 'dpkg --get-selections' command . default = '' 
 		"""
-		global __packages
 		self.__packages = packages
 	
 	def setSplitedSize(self, size):
 		"""
 		@param size: The size in KB to set
 		"""
-		global __splitedSize
 		if type(size) != int :
 			raise SBException("The size parameter must be an integer")
 		self.__splitedSize = size

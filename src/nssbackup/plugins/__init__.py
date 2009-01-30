@@ -18,14 +18,14 @@ import inspect
 import os
 import sys
 import glob
-import nssbackup, subprocess
 from gettext import gettext as _
+import nssbackup, subprocess
 from tempfile import *
 from nssbackup.managers.FileAccessManager import *
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 
-class pluginFAM :
+class pluginFAM(object):
 	"""
 	The fuseFAM plugin interface
 	@author: Oumar Aziz Ouattara <wattazoum@gmail.com>
@@ -83,7 +83,7 @@ class pluginFAM :
 		delete(errFile)
 		if retval != 0 :
 			raise SBException("Couldn't unmount '%s' : %s" %  (mounteddir,errStr))
-		
+		self.logger.info("Successfully unmounted: '%s'" % mounteddir)
 	
 	def checkifmounted (self,source, mountbase):
 		"""
@@ -100,19 +100,20 @@ class pluginFAM :
 		"""
 		raise SBException("Help not implemented for this plugin")
 		
-class PluginManager :
+class PluginManager(object):
 	"""
 	"""
-	logger = LogFactory.getLogger()
 	# This should be a dictionary of plugins
 	__pluginList = None
 
+	def __init__(self):
+		self.logger = LogFactory.getLogger()
+		
 	def getPlugins(self):
 		"""
 		Search for plugins into the plugin directory and load them.
 		@return : The plugins dictionary list {'name':class}. Look at FuseFAM to know how it's used
 		"""
-		global __pluginList
 		
 		if self.__pluginList : return self.__pluginList
 		else :
@@ -136,6 +137,7 @@ class PluginManager :
 								self.__pluginList[symbol_name] = symbol
 	                            
 					except Exception, e:
+						from gettext import gettext as _
 						self.logger.warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
 						continue
 			return self.__pluginList

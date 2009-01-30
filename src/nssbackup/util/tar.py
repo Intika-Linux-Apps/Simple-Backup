@@ -22,10 +22,11 @@ from nssbackup.util.log import LogFactory
 import nssbackup.util as Util
 from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
+from nssbackup.util import exceptions
 from datetime import datetime
 import time
+from nssbackup.managers import ConfigManager
 
-logger = LogFactory.getLogger()
 
 def getArchiveType(archive):
 	"""
@@ -85,12 +86,12 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	
 	options.extend(['--file='+sourcetgz,file])
 	
-	logger.debug("Launching TAR with options : %s" % options)
+	LogFactory.getLogger().debug("Launching TAR with options : %s" % options)
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		logger.debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	logger.debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 	
 def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None ):
 	"""
@@ -131,9 +132,9 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None 
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		logger.debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	logger.debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 
 def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	"""
@@ -170,9 +171,9 @@ def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		logger.debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	logger.debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 
 def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
 	"""
@@ -196,9 +197,9 @@ def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		logger.debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	logger.debug("output was : " + outStr)
+	LogFactory.getLogger().debug("output was : " + outStr)
 
 
 def __prepareTarCommonOpts(snapshot):
@@ -210,7 +211,7 @@ def __prepareTarCommonOpts(snapshot):
 	tdir = snapshot.getPath().replace(" ", "\ ")
 	options = list()
 	
-	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile().replace(" ", "\ ")+".tmp"])
+	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile()+".tmp"])
 	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ ")+".tmp")
 	
 	archivename = "files.tar"
@@ -223,15 +224,15 @@ def __prepareTarCommonOpts(snapshot):
 	elif snapshot.getFormat() == "none":
 		pass
 	else :
-		logger.debug("Defaulting to gzip ! ")
+		LogFactory.getLogger().debug("Defaulting to gzip ! ")
 		options.insert(1,"--gzip")
 		archivename+=".gz"
 	
-	options.append("--file="+tdir+os.sep +archivename)
+	options.append("--file="+os.sep.join([tdir,archivename]) )
 	
-	logger.debug(options)
+	LogFactory.getLogger().debug(options)
 	
-	logger.debug("Common TAR options : " + str(options))
+	LogFactory.getLogger().debug("Common TAR options : " + str(options))
 	
 	return options 
 	
@@ -258,28 +259,55 @@ def makeTarIncBackup(snapshot):
 	@param snapshot: the snapshot in which to make the backup
 	@raise SBException: if there was a problem with tar
 	"""
-	logger.info(_("Launching TAR to make Inc backup "))
+	LogFactory.getLogger().info(_("Launching TAR to make Inc backup "))
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
 	splitSize = snapshot.getSplitedSize()
 	if splitSize :
 		options = __addSplitOpts(snapshot, options, splitSize)
+
+	base_snarfile = snapshot.getBaseSnapshot().getSnarFile()
+	snarfile = snapshot.getSnarFile()
+	tmp_snarfile = os.path.join( ConfigManager.getUserTempDir(),
+								 os.path.basename(snarfile) )
+	
+	LogFactory.getLogger().debug("Snapshot's base snarfile: %s" % base_snarfile)	
+	LogFactory.getLogger().debug("Snapshot's snarfile: %s" % snarfile)
+	LogFactory.getLogger().debug("Temporary snarfile: %s" % tmp_snarfile)
 	
 	# For an INC backup the base SNAR file should exists
-	if not os.path.exists(snapshot.getBaseSnapshot().getSnarFile()) :
-		logger.error(_("Unable to find the SNAR file to make an Incremental backup"))
-		logger.error(_("Falling back to full backup"))
+	if not os.path.exists( base_snarfile ) :
+		LogFactory.getLogger().error(_("Unable to find the SNAR file to make an Incremental backup"))
+		LogFactory.getLogger().error(_("Falling back to full backup"))
 		makeTarFullBackup(snapshot)
 	else:
-		shutil.copy(snapshot.getBaseSnapshot().getSnarFile(), snapshot.getSnarFile())
-		options.append("--listed-incremental="+snapshot.getSnarFile())
+		shutil.copy( base_snarfile, tmp_snarfile )		
+		# check (and set) the permission bits; necessary if the file's origin
+		# does not support user rights (e.g. some ftp servers, filesystems...)
+		if not os.access(tmp_snarfile, os.W_OK):
+			os.chmod(tmp_snarfile, 0644)
+
+		# create the snarfile within a local directory; necessary if the
+		# backup target does not support 'open' within the TAR process and
+		# would fail
+		options.append("--listed-incremental="+tmp_snarfile)
 		
 		outStr, errStr, retVal = Util.launch("tar", options)
-		logger.debug("TAR Output : " + outStr)
+		LogFactory.getLogger().debug("TAR Output : " + outStr)
+		
+		# and move the temporary snarfile back into the backup directory
+		try:
+			Util.nssb_copy( tmp_snarfile, snarfile )
+		except exceptions.ChmodNotSupportedError:
+			LogFactory.getLogger().warning(_("Unable to change permissions for "\
+									  "file '%s'.") % snarfile )
+		os.remove( tmp_snarfile )
+
 		if retVal != 0 :
 			# list-incremental is not compatible with ignore failed read
-			logger.error(_("Couldn't make a proper backup, finishing backup though :") + errStr )
+			LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
+			raise SBException(_("Couldn't make a proper backup : ") + errStr )
 		
 
 def makeTarFullBackup(snapshot):
@@ -288,7 +316,7 @@ def makeTarFullBackup(snapshot):
 	@param snapshot: the snapshot in which to make the backup
 	@raise SBException: if there was a problem with tar
 	"""
-	logger.info(_("Launching TAR to make a Full backup "))
+	LogFactory.getLogger().info(_("Launching TAR to make a Full backup "))
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
@@ -296,35 +324,56 @@ def makeTarFullBackup(snapshot):
 	if splitSize :
 		options = __addSplitOpts(snapshot, options, splitSize)
 	
+	snarfile = snapshot.getSnarFile()
+	tmp_snarfile = os.path.join( ConfigManager.getUserTempDir(),
+								 os.path.basename(snarfile) )
+	
+	LogFactory.getLogger().debug("Snapshot's snarfile: %s" % snarfile)
+	LogFactory.getLogger().debug("Temporary snarfile: %s" % tmp_snarfile)
+	 
 	# For a full backup the SNAR file shouldn't exists
-	if os.path.exists(snapshot.getSnarFile()) :
-		os.remove(snapshot.getSnarFile())
+	if os.path.exists( snarfile ) :
+		os.remove( snarfile )		
+	if os.path.exists( tmp_snarfile ) :
+		os.remove( tmp_snarfile )
 	
-	options.append("--listed-incremental="+snapshot.getSnarFile())
-	
+	options.append( "--listed-incremental="+tmp_snarfile )
+
 	outStr, errStr, retVal = Util.launch("tar", options)
-	logger.debug("TAR Output : " + outStr)
+	LogFactory.getLogger().debug("TAR Output : " + outStr)
+
+	# and move the temporary snarfile into the backup directory
+	try:
+		Util.nssb_copy( tmp_snarfile, snarfile )
+	except exceptions.ChmodNotSupportedError:
+		LogFactory.getLogger().warning(_("Unable to change permissions for "\
+									  "file '%s'.") % snarfile )
+	os.remove( tmp_snarfile )
+
 	if retVal != 0 :
 		# list-incremental is not compatible with ignore failed read
-		logger.error(_("Couldn't make a proper backup, finishing backup though : ") + errStr )
+		LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
+		raise SBException(_("Couldn't make a proper backup : ") + errStr )
 	
 # ---
 
 class Dumpdir():
-	"""
-	Dumpdir is a sequence of entries of the following form:
-		C filename \0
-	where C is one of the control codes described below, filename is the name of the file C operates upon, and '\0' represents a nul character (ASCII 0). The white space characters were added for readability, real dumpdirs do not contain them.
-	Each dumpdir ends with a single nul character. 
+	"""Dumpdir is a sequence of entries of the following form: C filename \0
+	where C is one of the control codes described below, filename is the name
+	of the file C operates upon, and '\0' represents a nul character (ASCII 0).
 	
-	@see: http://www.gnu.org/software/tar/manual/html_chapter/tar_13.html#SEC171
+	The white space characters were added for readability, real dumpdirs do not
+	contain them. Each dumpdir ends with a single nul character. 
+	
+	@see: http://www.gnu.org/software/tar/manual/html_chapter/Tar-Internals.html#SEC173
 	"""
 	
 	INCLUDED = 'Y'
 	UNCHANGED = 'N'
 	DIRECTORY = 'D'
 	
-	__HRCtrls = {'Y':_('Included'),'N':_('Excluded'),'D':_('Directory')} #: The dictionary mapping control with their meanings
+	# The dictionary mapping control with their meanings
+	__HRCtrls = {'Y':_('Included'),'N':_('Excluded'),'D':_('Directory')}
 	
 	control = None
 	filename = None
@@ -390,7 +439,7 @@ class Dumpdir():
 class SnapshotFile():
 	"""
 	
-	@see: http://www.gnu.org/software/tar/manual/html_chapter/tar_13.html#SEC170
+	@see: http://www.gnu.org/software/tar/manual/html_chapter/Tar-Internals.html#SEC172
 	"""
 	header = None
 	snpfile = None
