@@ -77,7 +77,7 @@ def createfile(filepath):
 			makedir(dir)
 			writetofile(filepath, "")
 		
-def readfile( uri) :
+def readfile( uri ) :
 	" Read a file from a given URI and return a string with the read content "
 	f = open( uri, "r" )
 	value = f.read()
@@ -90,9 +90,9 @@ def writetofile( File, StringToWrite ) :
 	- File = path to the file
 	- StringToWrite = String to write into the file.
 	"""
-	f = openfile(File, True)
-	f.write( StringToWrite )
-	f.close()
+	fobj = openfile(File, write=True)
+	fobj.write( StringToWrite )
+	fobj.close()
 
 def pickledump( datas, file ):
 	"""

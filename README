@@ -1,3 +1,8 @@
+
+To ensure that the modified log file names are stored in the configuration,
+please open all of your profiles in 'NSsbackup configuration'. Then save
+them again.
+
 Install
 =======
 
