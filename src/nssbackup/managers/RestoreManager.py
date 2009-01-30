@@ -15,16 +15,20 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
+import tempfile
+import os
+import datetime
+import shutil
 from gettext import gettext as _
-from nssbackup.util.Snapshot import Snapshot
+
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.SnapshotManager import SnapshotManager
 import nssbackup.util as Util
 import nssbackup.util.tar as Tar
-import tempfile, datetime,os, shutil
 
-class RestoreManager :
+
+class RestoreManager(object):
 	"""
 	"""
 	

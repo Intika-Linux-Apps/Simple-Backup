@@ -26,13 +26,12 @@ from structs import SBdict
 import nssbackup.util.tar as TAR
 from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
 
-class Snapshot : 
+class Snapshot(object): 
 	"The snapshot class represents one snapshot in the backup directory"
 		
 	__validname_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})_(\d{2})[\:\.](\d{2})[\:\.](\d{2})\.\d+\..*?\.(.+)$")
 	
-	# Constructor
-	def __init__ (self, path, fam=False) :
+	def __init__ (self, path):
 		"""
 		The snapshot constructor.
 		@param path : the path to the snapshot dir.
@@ -45,7 +44,6 @@ class Snapshot :
 		self.__base = False
 		self.__format = "gzip" # default value
 		
-		# TODO (in|ex)cludeFlist should be an SBdict
 		self.__snarfile = None
 		self.__includeFlist = SBdict()
 		self.__includeFlistFile = None # Str
@@ -60,9 +58,6 @@ class Snapshot :
 		self.__snapshotpath = False
 		
 		self.__baseSnapshot = None
-		
-		#------------------
-		
 		
 		self.__snapshotpath = os.path.normpath(str(path))
 		
@@ -102,7 +97,6 @@ class Snapshot :
 		date = {"year" : int(m.group(1)),"month":int(m.group(2)),"day":int(m.group(3)),
 			"hour":int(m.group(4)),"minute":int(m.group(5)),"second":int(m.group(6))}
 		return date
-	# ---
 	
 	def getIncludeFlist(self):
 		"""
@@ -182,7 +176,7 @@ class Snapshot :
 			# check if we are not a full snapshot 
 			if self.getBase():
 				path = os.path.dirname(self.getPath())
-				self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])) )
+				self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])))
 			else :
 				self.__baseSnapshot = None
 			return self.__baseSnapshot
@@ -309,9 +303,6 @@ class Snapshot :
 		self.__clean()
 		self.commitverfile()
 	
-	
-	#----------------------------
-	
 	def addToIncludeFlist (self, item) :
 		"""
 		Add an item to be backup into the snapshot.
@@ -328,10 +319,7 @@ class Snapshot :
 		"""
 		self.__excludeFlist[item] = "0"
 	
-	#---------------------------------
-	
-	# Setters
-	
+	# Setters	
 	def setFormat(self,cformat=None):
 		"""
 		Sets the backup compression format

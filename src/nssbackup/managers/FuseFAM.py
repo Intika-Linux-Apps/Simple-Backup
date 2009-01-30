@@ -17,16 +17,18 @@
 
 import subprocess
 import os
-from tempfile import *
+import tempfile
+from gettext import gettext as _
+
 from nssbackup.util.log import LogFactory
 from nssbackup.plugins import PluginManager
-from FileAccessManager import *
 from nssbackup.util.exceptions import SBException
 from nssbackup.util import exceptions
 from nssbackup.managers.ConfigManager import getUserDatasDir
-from gettext import gettext as _
+import FileAccessManager as FAM
 
-class FuseFAM:
+
+class FuseFAM(object):
 	"""
 	The Fuse File access Manager
 	"""
@@ -38,7 +40,6 @@ class FuseFAM:
 		"""
 		self.logger = LogFactory.getLogger()
 		
-		#-------------------------------------
 		## This is the base directory where all
 		#  mountpoints of remote sites will be located
 		self.__mountdir = None
@@ -49,7 +50,6 @@ class FuseFAM:
 		## the list of all mounted dirs , should be filled by initialize.
 		# It's a dict with key = remoteSource and value = mountpoint
 		self.__mountedDirs = {}
-		#-------------------------------------
 		
 		self.__config = configManager
 		#sets the default mount dir 
@@ -140,17 +140,17 @@ class FuseFAM:
 			# mountpoint is not mounted 
 			return
 		# Create output log file
-		outptr,outFile = mkstemp(prefix="fuseUmount_output_")
+		outptr,outFile = tempfile.mkstemp(prefix="fuseUmount_output_")
 		# Create error log file
-		errptr, errFile = mkstemp(prefix="fuseUmount_error_")
+		errptr, errFile = tempfile.mkstemp(prefix="fuseUmount_error_")
 		# Call the subprocess using convenience method
 		retval = subprocess.call(["fusermount","-u",mounteddir], 0, None, None, outptr, errptr)
 		# Close log handles
 		os.close(errptr)
 		os.close(outptr)
-		outStr, errStr = readfile(outFile), readfile(errFile)	
-		delete(outFile)
-		delete(errFile)
+		outStr, errStr = FAM.readfile(outFile), FAM.readfile(errFile)	
+		FAM.delete(outFile)
+		FAM.delete(errFile)
 		if retval != 0 :
 			raise SBException("Couldn't unmount '%s' : %s" %  (mounteddir,errStr))
 		
@@ -159,6 +159,7 @@ class FuseFAM:
 		"""
 		Launch a command on the mounted dirs to keep the mount alive
 		"""
+		pass
 	
 	def initialize(self,keepAlive = False):
 		"""

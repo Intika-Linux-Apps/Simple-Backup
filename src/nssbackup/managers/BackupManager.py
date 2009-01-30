@@ -11,8 +11,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# Authors: Oumar Aziz OUATTARA <wattazoum@gmail.com>
+#		   Jean-Peer Lorenz <peer.loz@gmx.net>
 
-# Author: Oumar Aziz OUATTARA <wattazoum at gmail dot com>
 
 from gettext import gettext as _
 import os , grp, signal
@@ -21,7 +23,6 @@ import re
 import socket
 from FuseFAM import FuseFAM
 from SnapshotManager import SnapshotManager
-from ConfigManager import ConfigManager
 from UpgradeManager import UpgradeManager
 import FileAccessManager as FAM
 import nssbackup.util as Util
@@ -29,64 +30,133 @@ from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import LogFactory
 from nssbackup.util import exceptions
 
-				
-class BackupManager :
-	"""
-	@todo: The BackupManager should not does any GUI related tasks!
-	"""
+
+class PyNotifyMixin(object):
+	"""Mix-in class that provides the displaying of notifications using the
+	pynotify module. The notifications use the icon 'nssbackup32x32.png'.
 	
-	def __init__(self, configfile = None):
+	@todo: This is not the right place for the definition!
+	@todo: It would be more general if we give the icon to use as parameter!
+	"""
+	def __init__(self, logger):
+		"""Default constructor.
+		
+		@param logger: Instance of logger to be used.
+		
+		@todo: The notification domain should be retrieved from a central place!
 		"""
-		The BackupManager Constructor.
-		If the config file is not given, BackupManager will try to set the configuration to default
-		@param configfile : The config file
-		"""
-		#-------------------------------
-		self.config = None
-		self.__um = UpgradeManager()
-		self.__snpman = None
-		
-		self.__fusefam = None
-		# The whole snapshot path
-		self.__actualSnapshot = None
-		
-		self.__lockfile = None
-		
-		self.__includeInSnp = None
-		#-----------------------------------
-		
-		if configfile :
-			self.config = ConfigManager(configfile)
-		else :
-			self.config = ConfigManager()
-		
-		self.logger = LogFactory.getLogger()
-		
-		self.__fusefam = FuseFAM(self.config)
-		
+		self.__logger = logger
+
+		# internal flag whether the notification module is usable
 		self.__pynotif_avail = False
+		
+		# the pynotify module is stored in this variable
 		self.__pynotif_mod   = None
+		
+		# trying to initialize the notification module
 		try:
 			import pynotify
 			self.__pynotif_mod = pynotify
 			if self.__pynotif_mod.init("NSsbackup"):
 				self.__pynotif_avail = True
 			else:
-				self.logger.warning(_("there was a problem initializing the pynotify module"))
-		except Exception, e:
-			self.logger.warning(str(e))
-			
+				self.__pynotif_avail = False	# yes, this is insane!
+				self.__logger.warning(_("there was a problem initializing the "\
+									    "pynotify module"))
+		except ImportError, exc:
+			self.__pynotif_avail = False
+			self.__logger.warning(str(exc))
+		
+	def _notify_error( self, message ):
+		"""Shows up a pop-up window to inform the user that an error occured.
+		Such error notifications are emphasized and must be closed manual. The
+		notifications support mark-up.
+
+ 		@param message: The message (body) that should be displayed.
+ 		@type message:  String
+		"""
+		if self.__pynotif_avail:
+			notif = self.__get_notification(message)
+			if isinstance(notif, self.__pynotif_mod.Notification):
+				notif.set_urgency(self.__pynotif_mod.URGENCY_CRITICAL)
+				notif.set_timeout(self.__pynotif_mod.EXPIRES_NEVER)
+				notif.show()
+
+	def _notify_info( self, message ):
+		"""Shows up a pop-up window to inform the user. The notification
+		supports mark-up.		
+
+ 		@param message: The message (body) that should be displayed.
+ 		@type message:  String
+		"""
+		if self.__pynotif_avail:
+			notif = self.__get_notification(message)
+			if isinstance(notif, self.__pynotif_mod.Notification):
+				notif.show()
+
+	def __get_notification(self, message):
+ 		"""Returns a notification object but does not display it. The
+ 		notification supports mark-up. If notifications aren't supported
+ 		the method returns None.
+ 		
+ 		@param message: The message (body) that should be displayed.
+ 		@type message:  String
+ 		
+ 		@return: The created notification object or None
+ 		@rtype: Notification or None
+		
+		@todo: Replace single '<' characters by '&lt;' in a more reliable way!
+		@todo: The header and the icon should be given as parameter to make
+			   this mix-in class more generic!
+		"""
+		notif = None
+		if self.__pynotif_avail:
+			message = message.replace("<", "&lt;")
+			ico = Util.getResource("nssbackup32x32.png")
+			notif = self.__pynotif_mod.Notification("NSsbackup", message, ico)
+		return notif
+
+				
+class BackupManager(PyNotifyMixin):
+	"""Class that handles the backup process.
+	
+	@todo: The BackupManager should not does any GUI related tasks!
+	"""
+	
+	def __init__(self, configmanager):
+		"""The BackupManager Constructor.
+
+		@param configmanager : The current configuration manager
+		
+		@note: Make sure to call for the appropriate logger before instantiating
+			   this class!
+		"""
+		self.config			= configmanager
+		self.logger			= LogFactory.getLogger()		
+		self.__profilename	= self.config.getProfileName()
+		
+		self.__um			= UpgradeManager()
+		self.__snpman		= None
+		
+		self.__fusefam 		= None
+		# The whole snapshot path
+		self.__actualSnapshot = None
+		self.fullsize 		= 0L
+		
+		self.__lockfile 	= None
+		
+		self.__includeInSnp = None
+		
+		self.__fusefam		= FuseFAM(self.config)
+		
+		PyNotifyMixin.__init__(self, self.logger)
 		self.logger.info(_("BackupManager created "))
 		
 	def makeBackup(self ):
+		"""Runs the whole backup process. 
 		"""
-		Runs the whole backup process 
-		"""
-		if self.__pynotif_avail:
-			n = self.__pynotif_mod.Notification("NSsbackup", _("Starting backup Session"))
-			n.show()
-		
-		self.logger.info(_("Starting backup"))
+		self._notify_info(_("Starting backup Session") + " [%s]" % self.__profilename)
+		self.logger.info(_("Starting backup") + " [%s]" % self.__profilename)
 		
 		# set the lockfile
 		self.__setlockfile()
@@ -174,18 +244,15 @@ class BackupManager :
 		
 		self.__fillSnapshot(prev)
 					
-		if self.__pynotif_avail:
-			n = self.__pynotif_mod.Notification("NSsbackup", _("File list ready , Committing to disk"))
-			n.show()
+		self._notify_info(_("File list ready , Committing to disk") + " [%s]" % self.__profilename)
 				
 		self.__actualSnapshot.commit()
 		
 		# End session
-		self.__endSBsession()
+		self.endSBsession()
 		
 	def __fillSnapshot(self, prev):
-		"""
-		Fill the snapshot with informations.
+		"""Fill the snapshot with informations.
 		-> Get the list of already stored files in successive snapshots.
 		-> for each file to store:  get the stats :
 			-> if the file match an exclude criteria (regex or explicitely in exclude ) : pass
@@ -196,14 +263,11 @@ class BackupManager :
 						-> if not changed : pass , don't backup it
 						-> if changed : add to the tobackuplist				
 		@param prev :
-		"""
-				
-		# -----------------------------------------------------------------
-		# sub routines 
-		
+		"""		
+		# sub routines 		
 		def handler(signum, frame):
 			print 'Signal handler called with signal', signum
-			raise OSError, "Couldn't open device!"
+			raise OSError("Couldn't open device!")
 
 		# Set the signal handler 
 		signal.signal(signal.SIGALRM, handler)
@@ -301,10 +365,7 @@ class BackupManager :
 						self.logger.debug("Excluding link '%s' ! " % path)
 						self.__actualSnapshot.addToExcludeFlist(path)
 						self.fullsize += os.lstat(path).st_size
-			
-
 		# End of Subroutines
-		# -----------------------------------------------------------------
 		
 		backuplinks=None
 		if self.config.has_option("general","backuplinks") and str(self.config.get("general","backuplinks")) == "1" :
@@ -364,10 +425,9 @@ class BackupManager :
 		if (vstat.f_bavail * vstat.f_bsize) <= self.fullsize:
 			raise exceptions.SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
 	
-	
 	def __setlockfile(self):
-		"Set the lockfile "
-		global __lockfile
+		"""Set the lockfile.
+		"""
 		if self.config.has_option("general", "lockfile") :
 			self.__lockfile = self.config.get("general", "lockfile")
 		else :
@@ -383,48 +443,51 @@ class BackupManager :
 			else :
 				FAM.delete(self.__lockfile)
 		
-		FAM.writetofile(self.__lockfile, str(os.getpid()) )
-		self.logger.debug("Created lockfile at '%s' with info '%s'"% (self.__lockfile, str(os.getpid()) ) )
-
-	def __endSBsession(self):
-		"""
-		End nssbackup session :
-		- copy the log file into the snapshot dir
-		- remove the lockfile
-		"""
+		FAM.writetofile(self.__lockfile, str(os.getpid()))
+		self.logger.debug("Created lockfile at '%s' with info '%s'"\
+						  % (self.__lockfile, str(os.getpid()) ))
 		
+	def __unsetlockfile(self):
+		"""Remove lockfile.
+		"""
 		FAM.delete(self.__lockfile)
 		self.logger.info(_("Session of backup is finished (%s is removed) ")\
 														% self.__lockfile)
 
+	def __copylogfile(self):
 		# destination for copying the logfile
-		logf_target = os.path.join( self.__actualSnapshot.getPath(),
-								    "nssbackup.log" )
+		if self.__actualSnapshot:
+			logf_src = self.config.get_logfile()
+			logf_name = os.path.basename(logf_src)
+			logf_target = os.path.join( self.__actualSnapshot.getPath(),
+									    logf_name )
+			if FAM.exists(logf_src):
+				try:
+					Util.nssb_copy( self.config.get("log","file"), logf_target )
+				except exceptions.ChmodNotSupportedError:
+					self.logger.warning(_("Unable to change permissions for "\
+										  "file '%s'.") % logf_target )
+			else :
+				self.logger.warning(_("Unable to find logfile to copy into snapshot"))
+		else:
+			self.logger.warning(_("No snapshot to copy logfile."))
 		
-		if self.config.has_option("log","file") and FAM.exists(self.config.get("log","file")):
-			try:
-				Util.nssb_copy( self.config.get("log","file"), logf_target )
-			except exceptions.ChmodNotSupportedError:
-				self.logger.warning(_("Unable to change permissions for "\
-									  "file '%s'.") % logf_target )
-				
-		elif FAM.exists("nssbackup.log") : 
-			try:
-				Util.nssb_copy( os.path.abspath("nssbackup.log"), logf_target)
-			except exceptions.ChmodNotSupportedError:
-				self.logger.warning(_("Unable to change permissions for "\
-									  "file '%s'.") % logf_target)
-
-		else :
-			self.logger.warning(_("I didn't find the logfile to copy into snapshot"))
+	def endSBsession(self):
+		"""End nssbackup session :
+		
+		- copy the log file into the snapshot dir
+		- remove the lockfile
+		
+		If this method is called it is unsure whether the backup was
+		successful or not.
+		"""
+		self.__unsetlockfile()
+		self.__copylogfile()
 			
 		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.terminate()
 
-		if self.__pynotif_avail:
-			n = self.__pynotif_mod.Notification("NSsbackup", _("Ending Backup Session"))
-			n.show()
-			
+		self._notify_info(_("Ending Backup Session") + " [%s]" % self.__profilename)
 
 	def __checkTarget(self):
 		"""
@@ -497,21 +560,9 @@ class BackupManager :
 			tdir = tdir + "ful"
 			
 		return (tdir, base, prev)
-	
-	
-	def getConfig(self) :
-		"""
-		get the config for the instance of nssbackup 
-		(/etc/nssbackup.conf if root  or ~/.nssbackup/nssbackup.conf if normal user)
-		"""
-		if self.config:
-			return self.config
-		else :
-			self.config = ConfigManager()
 
 	def getActualSnapshot(self):
 		"""
 		get the actual snapshot
 		"""
 		return self.__actualSnapshot
-

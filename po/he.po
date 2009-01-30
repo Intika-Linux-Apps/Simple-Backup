@@ -1,16 +1,16 @@
-# Galician translation for sbackup
-# Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
-# This file is distributed under the same license as the sbackup package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2007.
+# Hebrew translation for nssbackup
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the nssbackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: sbackup\n"
+"Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-01-05 12:35+0100\n"
-"PO-Revision-Date: 2008-08-18 14:03+0000\n"
-"Last-Translator: iago Ramos <Unknown>\n"
-"Language-Team: Galician <gl@li.org>\n"
+"PO-Revision-Date: 2008-11-09 08:19+0000\n"
+"Last-Translator: itzik_b <itzik_b@012.net.il>\n"
+"Language-Team: Hebrew <he@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -33,12 +33,12 @@ msgstr ""
 
 #: src/nssbackup/nssbackupd.py:80
 msgid "I didn't find the log file. Please set it up in nssbackup.conf "
-msgstr ""
+msgstr "קובץ לוג לא נמצא, נא להגדירו בnssbackup.conf "
 
 #: src/nssbackup/nssbackupd.py:131 src/nssbackup/nssbackupd.py:168
 #: src/nssbackup/managers/ConfigManager.py:543
 msgid "Default Profile"
-msgstr ""
+msgstr "פרופיל ברירת מחדל"
 
 #: src/nssbackup/nssbackupd.py:210 src/nssbackup/nssbackupd.py:226
 #: src/nssbackup/managers/BackupManager.py:75
@@ -69,7 +69,7 @@ msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:89
 msgid "Starting backup"
-msgstr ""
+msgstr "גיבוי מתחיל"
 
 #: src/nssbackup/managers/BackupManager.py:108
 msgid "Failed to set the gid to 'admin' one :"
@@ -470,7 +470,7 @@ msgstr ""
 #: src/nssbackup/ui/SBConfigGTK.py:60 src/nssbackup/ui/SBConfigGTK.py:567
 #: src/nssbackup/ui/SBConfigGTK.py:1595
 msgid "Custom"
-msgstr "Personalizados"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:79 src/nssbackup/ui/SBConfigGTK.py:88
 #: src/nssbackup/ui/SBConfigGTK.py:122 src/nssbackup/ui/SBConfigGTK.py:130
@@ -493,27 +493,27 @@ msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:144
 msgid "MP3 Music"
-msgstr "Música MP3"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:144
 msgid "AVI Video"
-msgstr "Video AVI"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:144
 msgid "MPEG Video"
-msgstr "Video MPEG"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:144
 msgid "Matrjoshka Video"
-msgstr "Video Matrjoshka"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:144
 msgid "OGG Multimedia container"
-msgstr "Contido multimedia OGG"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:144
 msgid "CD Images"
-msgstr "Imaxe de CD"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:162 datas/nssbackup-config.glade:637
 msgid "Enable"
@@ -569,11 +569,10 @@ msgstr ""
 #: src/nssbackup/ui/SBConfigGTK.py:782 src/nssbackup/ui/SBConfigGTK.py:814
 msgid "Empty filename or path. Please enter a valid filename or path."
 msgstr ""
-"Nome ou ruta do ficheiro baldeiros. Introduza un nome ou unha ruta válido."
 
 #: src/nssbackup/ui/SBConfigGTK.py:796 src/nssbackup/ui/SBConfigGTK.py:1624
 msgid "Empty expression. Please enter a valid regular expression."
-msgstr "Expresión baldeira. Introduza unha RegEx válida."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:809 src/nssbackup/ui/SBConfigGTK.py:1637
 msgid "Provided regular expression is not valid."
@@ -584,8 +583,6 @@ msgid ""
 "It seems the path you entered does not exists. Do you want to add this wrong "
 "path?"
 msgstr ""
-"Semella que a ruta introducida non existe. ¿Quere engadirla de tódolos "
-"xeitos?"
 
 #: src/nssbackup/ui/SBConfigGTK.py:850
 msgid "Save to file ..."
@@ -594,26 +591,24 @@ msgstr ""
 #: src/nssbackup/ui/SBConfigGTK.py:871
 msgid "translator-credits"
 msgstr ""
-"Tradución feita pola comunidade en launchpad.net\n"
-"\n"
 "Launchpad Contributions:\n"
-"  iago Ramos https://launchpad.net/~iago"
+"  itzik_b https://launchpad.net/~itzik-b"
 
 #: src/nssbackup/ui/SBConfigGTK.py:903
 msgid "A backup run is initiated in the background. The process id is: "
-msgstr "Estase a realizar un backup en segundo plano. A id do proceso é: "
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1014 src/nssbackup/ui/SBConfigGTK.py:1157
 msgid "Include file ..."
-msgstr "Engadir ficheiro..."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1017 src/nssbackup/ui/SBConfigGTK.py:1160
 msgid "All files"
-msgstr "Tódolos ficheiros"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1031
 msgid "Include folder ..."
-msgstr "Engadir cartafol ..."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1152
 #, python-format
@@ -622,7 +617,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1174
 msgid "Exclude folder ..."
-msgstr "Excluír cartafol ..."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1511 src/nssbackup/ui/SBConfigGTK.py:1732
 msgid "Test Succeeded !"
@@ -658,14 +653,12 @@ msgid ""
 msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:55
-#, fuzzy
 msgid "Restore..."
-msgstr "Restaurar"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:56
-#, fuzzy
 msgid "Restore as..."
-msgstr "Restaurar"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:57
 msgid "Revert..."
@@ -700,7 +693,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:115
 msgid "Path"
-msgstr "Ruta"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:120
 msgid "State"
@@ -716,7 +709,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:385 src/nssbackup/ui/SBRestoreGTK.py:412
 msgid "Loading ..."
-msgstr "Cargando..."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:461
 msgid "NSsbackup restore error"
@@ -747,7 +740,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:548
 msgid "Select restore location"
-msgstr "Escolla o lugar da restauración"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:579
 msgid "Select revert location"
@@ -775,9 +768,8 @@ msgstr ""
 #: src/nssbackup/ui/SBRestoreGTK.py:754 src/nssbackup/ui/SBRestoreGTK.py:760
 #: src/nssbackup/ui/SBRestoreGTK.py:766 src/nssbackup/ui/SBRestoreGTK.py:772
 #: datas/nssbackup-restore.glade:981
-#, fuzzy
 msgid "NSsbackup restoration"
-msgstr "Escolla o lugar da restauración"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:755 src/nssbackup/ui/SBRestoreGTK.py:761
 msgid "<b>Restoring of selected files</b>"
@@ -1499,7 +1491,7 @@ msgstr ""
 
 #: datas/nssbackup-restore.glade:453
 msgid "Restore"
-msgstr "Restaurar"
+msgstr ""
 
 #: datas/nssbackup-restore.glade:492
 msgid "Revert As"
@@ -1577,66 +1569,3 @@ msgid ""
 "\n"
 "Use simple-restore-gnome for more ease of use.\n"
 msgstr ""
-"\n"
-"Formato do comando de Simple Backup Suite para actualizar\n"
-"Uso: upgrade-backup enderezo-do-backup\n"
-"Nota: enderezo-do-backup-sinalado non debe incluir o nome do cartafol do "
-"backup, por exemplo:\n"
-"\n"
-"    /var/backup/\n"
-"\n"
-"Use simple-restore-gnome para que lle resulte máis sinxelo\n"
-
-#~ msgid "Configuration save successful"
-#~ msgstr "Gardouse a configuración correctamente"
-
-#~ msgid "Error: backups directory does not exist!"
-#~ msgstr "Erro: o directorio cos backups non existe"
-
-#~ msgid ""
-#~ "Some of your backups are in an old backup format. Do you want to upgrade "
-#~ "them?\n"
-#~ "It should take only a few minutes."
-#~ msgstr ""
-#~ "Algúns dos backups teñen un formato vello. ¿Quere actualizado?\n"
-#~ "Debería ser cuestión de poucos minutos."
-
-#~ msgid ""
-#~ "Select any of the available backups to see list of files that can be "
-#~ "restored."
-#~ msgstr ""
-#~ "Escolla un dos backups dispoñibles para ve-la lista de ficheiros que pode "
-#~ "recuperar."
-
-#~ msgid ""
-#~ " Usage: simple-restore backup-url file-or-dir-to-restore [target-file-or-"
-#~ "dir]"
-#~ msgstr ""
-#~ " Uso: simple-restore enderezo-do-backup ficheiro-ou-cartafol-a-restaurar "
-#~ "[ficheiro-ou-cartafor-sinalado]"
-
-#~ msgid "Backup Properties"
-#~ msgstr "Propiedades do backup"
-
-#~ msgid "<b>Files and Folders to restore</b>"
-#~ msgstr "<b>Ficheiros e cartafoles para restaurar</b>"
-
-#~ msgid "Simple Backup Suite"
-#~ msgstr "Simple Backup Suite"
-
-#~ msgid "Simple Backup suit command line restore utility\n"
-#~ msgstr ""
-#~ "Utilidade de restauración para a liña de comandos de Simple Backup Suite\n"
-
-#~ msgid ""
-#~ " Note: backup-url must include the snapshot subdirectory name, for "
-#~ "example:"
-#~ msgstr ""
-#~ " Nota: enderezo-do-backup ha de incluír o nome do cartafol no que se topa "
-#~ "o respaldo, por exemplo:"
-
-#~ msgid " Use simple-restore-gnome for more ease of use.\n"
-#~ msgstr " Use simple-restore-gnome para que lle resulte máis sinxelo\n"
-
-#~ msgid "Restore FAILED! Please check you parameters."
-#~ msgstr "¡A restauración FALLOU! Comprobe os parámetros indiciados."

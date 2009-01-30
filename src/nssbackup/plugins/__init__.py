@@ -25,7 +25,7 @@ from nssbackup.managers.FileAccessManager import *
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 
-class pluginFAM :
+class pluginFAM(object):
 	"""
 	The fuseFAM plugin interface
 	@author: Oumar Aziz Ouattara <wattazoum@gmail.com>
@@ -100,12 +100,15 @@ class pluginFAM :
 		"""
 		raise SBException("Help not implemented for this plugin")
 		
-class PluginManager :
+class PluginManager(object):
 	"""
 	"""
 	# This should be a dictionary of plugins
 	__pluginList = None
 
+	def __init__(self):
+		self.logger = LogFactory.getLogger()
+		
 	def getPlugins(self):
 		"""
 		Search for plugins into the plugin directory and load them.
@@ -135,7 +138,7 @@ class PluginManager :
 	                            
 					except Exception, e:
 						from gettext import gettext as _
-						LogFactory.getLogger().warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
+						self.logger.warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
 						continue
 			return self.__pluginList
 		

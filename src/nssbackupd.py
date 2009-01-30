@@ -16,8 +16,9 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
+import sys
 import gettext
-from nssbackup.nssbackupd import NSsbackupd
+from nssbackup.nssbackupd import main
 from nssbackup.util import getResource
 import os, time
 # i18n init
@@ -28,5 +29,4 @@ gettext.bindtextdomain(application, locale_dir)
 gettext.textdomain(application)
 pid = os.spawnl(os.P_NOWAIT, "nssbackup-tray-gui.py"); print "pid: %s" % pid
 #time.sleep(10)
-sbd = NSsbackupd()
-sbd.run()
+main(sys.argv)

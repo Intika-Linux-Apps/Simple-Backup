@@ -50,7 +50,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 	currentSnp = None
 	currentsbdict = None
 	currSnpFilesInfos = None
-	restoreman = RestoreManager()
+	restoreman = None
 		
 	__msg_statusbar = { "restore"	 : _("Restore..."),
 						"restore_as" : _("Restore as..."),
@@ -76,6 +76,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 				self.config = ConfigManager()
 		
 		self.logger = LogFactory.getLogger()
+
+		self.restoreman = RestoreManager()
 		
 		# set fusefam
 		self.fusefam = FuseFAM(self.config)

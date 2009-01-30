@@ -18,28 +18,27 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 # IMPORTS #
+import os
+import stat
+import time
+import datetime
 import FileAccessManager as FAM
 import nssbackup.util as Util
 from SnapshotManager import SnapshotManager
-from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 from nssbackup.util.Snapshot import Snapshot
 from gettext import gettext as _
 import cPickle as pickle
 from nssbackup.util.tar import Dumpdir
 from nssbackup.util.structs import SBdict
-import datetime, time
-import os
-from stat import *
+from nssbackup.util.log import LogFactory
 
-# ------------------ #
 
-class UpgradeManager() :
+class UpgradeManager(object):
 	"""
 	The UpgradeManager class
 	"""
-	
-	
+
 	__possibleVersion = ["1.0","1.1","1.2","1.3","1.4","1.5"]
 
 	statusMessage = None
@@ -78,7 +77,7 @@ class UpgradeManager() :
 							newname = snapshot.getName().replace( ":", "." )
 							self.logger.info("Renaming directory: '"+snapshot.getName()+"' to '"+newname+"'" )
 							FAM.rename(snapshot.getPath(), newname )
-							snapshot = Snapshot( os.path.dirname(snapshot.getPath()) + os.sep + newname)
+							snapshot = Snapshot( os.path.dirname(snapshot.getPath()) + os.sep + newname )
 						self.__upgrade_v12(snapshot)
 					elif snapshot.getVersion() < "1.3" :
 						self.__upgrade_v13(snapshot)
@@ -257,8 +256,8 @@ class UpgradeManager() :
 						self.logger.debug("processing '%s'" % parentdir)
 						
 						if os.path.exists(parentdir) :
-							result.append(str(os.stat(parentdir)[ST_DEV]))
-							result.append(str(os.stat(parentdir)[ST_INO]))
+							result.append(str(os.stat(parentdir)[stat.ST_DEV]))
+							result.append(str(os.stat(parentdir)[stat.ST_INO]))
 						else :
 							result.extend(['0','0'])
 						

@@ -182,6 +182,7 @@ def launch(cmd, opts):
 	@param cmd: The command to launch
 	@return: (outStr, errStr, retVal)
 	"""
+	_logger = LogFactory.getLogger()
 	# Create output log file
 	outptr,outFile = tempfile.mkstemp(prefix="output_")
 
@@ -190,7 +191,7 @@ def launch(cmd, opts):
 
 	# Call the subprocess using convenience method
 	opts.insert(0,cmd)
-	LogFactory.getLogger().debug("Lauching : "+str(opts))
+	_logger.debug("Lauching : "+str(opts))
 	retval = subprocess.call(opts, 0, None, None, outptr, errptr)
 
 	# Close log handles
