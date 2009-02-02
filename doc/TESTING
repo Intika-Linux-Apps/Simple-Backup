@@ -1,0 +1,61 @@
+====================
+Testing of NSsbackup
+====================
+
+Testing strategy
+================
+
+this MUST be tested:
+
+* the backup strategy (incremental/full backups)
+* purging of old backups
+* upgrade
+* backup in general
+
+Important: combination of both automated and static testdata!
+
+ 
+1. Snapshots
+
+2. Snapshot handling by SnapshotManager
+	* reading snapshots from a certain target directory
+	* merging of snapshot consisting of following subprocesses
+		- merging of snar files
+		- moving of files from one snapshot into another
+		- merging of includes.list and excludes.list
+
+
+Helper scripts
+==============
+
+Automated tests with helper scripts:
+
+1. script that creates a large number of directories and files in several
+   levels (points in time)
+    - initially creates a large number of directories and files
+    - then for a certain number of levels:
+		- store all files and dirs in a list
+		- add the md5sum and cksum to the list
+		- randomly remove existing files and create new files
+		- modify existing files
+		- updates the stored list
+	  
+
+
+
+How to run tests
+================
+
+First read the paragraph about hacking on NSsbackup. If you understood this
+you can do the following to run Unittest cases:
+
+1. Move to the test directory within your development environment. This is
+   important since some tests determine their test data files by evaluating the
+   current working directory.
+   
+	cd /Path-to-development/0.2/tests
+	
+
+2. Run all testcases
+	
+	python test_all_suites.py
