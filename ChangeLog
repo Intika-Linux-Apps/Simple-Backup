@@ -34,7 +34,7 @@ nssbackup (0.2-0~rc3-ppa1) hardy; urgency=high
   		   reason was an IndexError if only 1 snapshot was left -> check
   		   length of snapshots list
 
- -- Jean-Peer Lorenz <peer.loz@gmx.net>  Sun, 15 Feb 2009 16:41:01 +0100
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Mon, 16 Feb 2009 14:26:06 +0100
 
 nssbackup (0.2-0~rc2-ppa1) hardy; urgency=medium
 
