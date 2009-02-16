@@ -252,7 +252,7 @@ class UpgradeLogOption(object):
 		"""
 		if os.path.isfile(conffile) and\
 		   os.access(conffile, os.F_OK and os.R_OK and os.W_OK):
-			print "now modifying: %s" % conffile
+			print "checking file: %s" % conffile
 			config = self._Config(conffile)			
 			if config.has_section("log"):
 				if config.has_option("log", "file"):
@@ -262,11 +262,14 @@ class UpgradeLogOption(object):
 					new_logfn = ConfigManager.get_logfile_name(conffile)
 					new_log = os.path.join(logdir, new_logfn)
 					
-					print "   log file changed from `%s` to `%s`" % (logfile,
-																	 new_log)
-					
-					config.set("log", "file", str(new_log))
-					config.commit_to_disk()
+					if logfile == new_log:
+						print "   nothing to do. skipped"
+					else:
+						print "   changing log file option"
+						print "   from `%s`" % (logfile)
+						print "   to   `%s`" % (new_log)						
+						config.set("log", "file", str(new_log))
+						config.commit_to_disk()
 	
 	def do_upgrade(self):
 		"""Public method that actually processes the upgrade
@@ -305,7 +308,7 @@ class UpgradeApplication(object):
 		self.__logoption_upgrader = UpgradeLogOption()
 	
 	def main(self):
-		"""Main meethod that actually does the upgrade process. It returns
+		"""Main method that actually does the upgrade process. It returns
 		an appropriate error code. 
 		
 		"""
@@ -314,7 +317,7 @@ class UpgradeApplication(object):
 		print "-"*60
 		
 		if os.getuid() != 0:
-			print "Upgrade script must be invoked as root!"
+			print "Upgrade script must be run with root privileges!"
 			retcode = NO_SUPERUSER
 		else:
 			retcode = self.__logoption_upgrader.do_upgrade()
@@ -326,7 +329,9 @@ if __name__ == "__main__":
 	try:
 		_UPGRADER = UpgradeApplication()
 		RETC = _UPGRADER.main()
+		print "successful finished."
 	except:
-		print traceback.print_exc()
+		print "errors occurred:"
+		traceback.print_exc()
 		RETC = UNKNOWN_ERROR
 	sys.exit(RETC)

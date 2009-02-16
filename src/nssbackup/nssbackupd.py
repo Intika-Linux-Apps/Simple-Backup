@@ -1,20 +1,32 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+#	NSsbackup - the actual backup service
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
 #
-# Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
-#   Jean-Peer Lorenz <peer.loz@gmx.net>
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+"""
+:mod:`nssbackupd` --- the actual backup service
+================================================
+
+.. module:: nssbackupd
+   :synopsis: Defines the actual backup service
+.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
+.. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+
+"""
 
 
 import os
@@ -37,13 +49,14 @@ from nssbackup.managers.BackupManager import PyNotifyMixin
 
 
 class NSsbackupd(PyNotifyMixin) :
-	"""This class is intended to be a wrapper of nssbackup instances . 
+	"""This class is intended to be a wrapper of nssbackup instances. 
 	It manages :
 	- the full backup process : creation of instances of the BackupManager
 	  with the corresponding config file 
 	- the logging of exception not handled by BackupManager
 	- the removal of lockfiles
-	- the sent of emails
+	- the sending of emails
+	
 	"""
 	
 	__confFilesRE = "^nssbackup-(.+?)\.conf$"
@@ -51,8 +64,9 @@ class NSsbackupd(PyNotifyMixin) :
 	def __init__(self):
 		"""Default constructor. Basic initializations are done here.
 
-		@note: Retrieve the configuration manager very early to ensure that 
+		:note: Retrieve the configuration manager very early to ensure that 
 			   an appropriate logger instances are created.
+		
 		"""
 		self.__errors			= []
 		self.__super_user		= False
@@ -213,8 +227,8 @@ class NSsbackupd(PyNotifyMixin) :
 		self.logger.error(traceback.format_exc())
 
 		try:
-			n_body = "CRASH [%s]: '%s'" % (self.__profileName, str(e))
-			self._notify_error(n_body)
+			n_body = "An error occured: '%s'" % (str(e))
+			self._notify_error(self.__profileName, n_body)
 		except Exception, e1:
 			self.logger.warning(str(e1))
 		
@@ -235,14 +249,14 @@ class NSsbackupd(PyNotifyMixin) :
 		"""
 		if len(self.__errors) > 0:
 			for errmsg in self.__errors:
-				self._notify_error(errmsg)
+				self._notify_error(self.__profileName, errmsg)
 
 	def __log_errlist(self):
 		"""Errors that occured during the initialization process were stored
 		in an error list. This error list is added to the current log.
 		"""
 		if len(self.__errors) > 0:
-			self.logger.info(_("The following error(s) occurced before:"))
+			self.logger.info(_("The following error(s) occurred before:"))
 			for errmsg in self.__errors:
 				self.logger.error(errmsg.replace("\n", " "))
 	

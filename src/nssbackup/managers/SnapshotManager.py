@@ -34,6 +34,7 @@ import datetime
 import time
 from gettext import gettext as _
 
+from nssbackup import Infos
 import nssbackup.util.tar as TAR
 import FileAccessManager as FAM
 import nssbackup.util as Util
@@ -99,24 +100,26 @@ class SnapshotManager(object):
 		"""
 		return [self.statusNumber, self.statusMessage, self.substatusMessage]
 	
-	def getSnapshot(self, name):
+	def get_snapshot_allformats(self, name):
 		"""Returns a certain snapshot, specified by its name, from the stored
 		snapshots. If the snapshot could not be found, an exception is raised.
 		
 		:param name: the snapshot that is to be returned
 		
 		"""
-		for snp in self.getSnapshots() :
+		for snp in self.get_snapshots_allformats() :
 			if snp.getName() == name :
 				return snp
 		raise SBException(_("Snapshot '%s' not found ") % name)
-	
-	def getSnapshots(self, fromDate=None, toDate=None, byDate=None, forceReload=False):
-		"""
-		Return a list with all the found snapshots (according to the options set).
-		This list is sorted from the latest snapshot to the earliest . 
-		0 => most recent snapshot 
-		len(list) => oldest one
+
+	def get_snapshots_allformats(self, fromDate=None, toDate=None, byDate=None,
+								 forceReload=False):	
+		"""Returns a list with *all* found snapshots, according to the
+		given parameters. All versions of snapshots were returned. The
+		list is sorted from the latest snapshot to the earliest:
+		
+		- index 0  --- most recent snapshot 
+		- index -1 --- oldest snapshot.
 		
 		:param fromDate: eg. 2007-02-17
 		:param toDate:  2007-02-17
@@ -130,48 +133,84 @@ class SnapshotManager(object):
 		:todo: Clarify whether to rename or to delete corrupt snapshots!
 		       
 		"""
+		self._read_snps_from_disk_allformats()
 		snapshots = list()
 		
 		if fromDate and toDate :
 			# get the snapshots from list
-			for snp in self.getSnapshots() :
+			for snp in self.get_snapshots_allformats() :
 				if fromDate <= snp.getName()[:10] <= toDate :
 					snapshots.append( snp )
 			snapshots.sort(key=Snapshot.getName,reverse=True)
 		elif byDate :
 			# get the snapshots from list
-			for snp in self.getSnapshots() :
-				if snp.getName().startswith(byDate) :
+			for snp in self.get_snapshots_allformats() :
+				if snp.getName().startswith(byDate):
 					snapshots.append( snp )
 			snapshots.sort(key=Snapshot.getName,reverse=True)
 		else :
 			if self.__snapshots and not forceReload:
 				return self.__snapshots
 			else :
-				# Remove broken backup snapshots after first intact snapshot
-				listing = FAM.listdir(self.__targetDir)
-				for _dir in listing :
-					_snppath = os.path.join(self.__targetDir, str(_dir))
-					try :
-						snapshots.append(Snapshot(_snppath))
-					except NotValidSnapshotException, e :
-						if isinstance(e, NotValidSnapshotNameException) :
-							self.logger.warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(_dir),'error_cause' :e.message})
-						else : 
-							self.logger.warning(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(_dir),'error_cause' :e.message})							
-#TODO: remove the bad snapshot from disk? Renaming would be better I guess!
-							os.rename(_snppath, _snppath[:-3] + "corrupt")
-#							FAM.delete(_snppath)
-				snapshots.sort(key=Snapshot.getName, reverse=True)
-				self.__snapshots = snapshots
+				self._read_snps_from_disk_allformats()
 			
 		# debugging output
-		if self.logger.isEnabledFor(10) :
-			self.logger.debug("[Snapshots Listing]") 
-			for snp in snapshots :
+		if self.logger.isEnabledFor(10):
+			self.logger.debug("[Snapshots Listing - all formats]") 
+			for snp in snapshots:
 				self.logger.debug(str(snp)) 
 		###
 		return snapshots
+	
+	def _read_snps_from_disk_allformats(self):
+		snapshots = []
+		listing = FAM.listdir(self.__targetDir)
+		for _dir in listing :
+			_snppath = os.path.join(self.__targetDir, str(_dir))
+			try :
+				snapshots.append(Snapshot(_snppath))
+			except NotValidSnapshotException, e :
+				if isinstance(e, NotValidSnapshotNameException) :
+					self.logger.warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(_dir),'error_cause' :e.message})
+				else : 
+					self.logger.warning(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(_dir),'error_cause' :e.message})							
+#TODO: remove the bad snapshot from disk? Renaming would be better I guess!
+					self.logger.info("Invalid snapshot '%s' is going to be renamed!" % _snppath)
+					os.rename(_snppath, _snppath[:-3] + "corrupt")
+#							FAM.delete(_snppath)
+		snapshots.sort(key=Snapshot.getName, reverse=True)
+		self.__snapshots = snapshots
+		
+	def get_snapshots(self, fromDate=None, toDate=None, byDate=None,
+					  forceReload=False):
+		"""Returns a list with found snapshots that matches the current
+		snapshot format, according to the given parameters. The list is
+		sorted from the latest snapshot to the earliest:
+		
+		- index 0  --- most recent snapshot 
+		- index -1 --- oldest snapshot.
+		
+		:param fromDate: eg. 2007-02-17
+		:param toDate:  2007-02-17
+		:param byDate: 2007-02-17
+		:param forceReload: True or false
+		:return: list of snapshots
+		
+		"""
+		snps = []
+		snps_all = self.get_snapshots_allformats(fromDate, toDate, byDate,
+												  forceReload)
+		for csnp in snps_all:
+			if csnp.getVersion() == Infos.SNPCURVERSION:
+				snps.append(csnp)
+		self.__snapshots = snps
+		# debugging output
+		if self.logger.isEnabledFor(10):
+			self.logger.debug("[Snapshots Listing - current format]") 
+			for csnp in snps:
+				self.logger.debug(str(csnp)) 
+		###
+		return snps
 	
 	def exportSnapshot(self,snapshot, target, rebase=False):
 		"""There are two ways of exporting a snapshot. You can either
@@ -671,7 +710,7 @@ class SnapshotManager(object):
 		`snapshot` and returns a list containing all child snapshots.
 		
 		"""
-		listing = self.getSnapshots(forceReload = True)
+		listing = self.get_snapshots(forceReload = True)
 		child_snps = []
 		for snp in listing :
 			if snp.getBase() == snapshot.getName() :
@@ -695,14 +734,14 @@ class SnapshotManager(object):
 			self.__remove_full_snapshot(snapshot)
 		else:
 			# rebase all child snapshots to the base of this snapshot
-			listing = self.getSnapshots(forceReload = True)
+			listing = self.get_snapshots(forceReload = True)
 			for snp in listing :
 				if snp.getBase() == snapshot.getName() :
 					self.logger.debug("Re-basing '%s' to new base '%s' " % (snp.getName(), snapshot.getBaseSnapshot().getName()))
 					self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
 			self.logger.debug("Removing '%s'" % snapshot.getName())
 			FAM.delete(snapshot.getPath())
-			listing = self.getSnapshots(forceReload = True)
+			listing = self.get_snapshots(forceReload = True)
 		
 	def __remove_full_snapshot(self, snapshot):
 		"""Method that removes the given full backup snapshot. The removal of
@@ -720,12 +759,12 @@ class SnapshotManager(object):
 			raise ValueError("Snapshot must be a full snapshot!")
 
 		# merge all child snapshots with this snapshot
-		listing = self.getSnapshots(forceReload = True)
+		listing = self.get_snapshots(forceReload = True)
 		for snp in listing :
 			if snp.getBase() == snapshot.getName() :
 				self.logger.debug("Merging full '%s' with inc '%s' " % (snapshot, snp))
 				self.rebaseSnapshot(snp)
-		listing = self.getSnapshots(forceReload = True)
+		listing = self.get_snapshots(forceReload = True)
 		is_standalone = True
 		for snp in listing :
 			if snp.getBase() == snapshot.getName() :
@@ -738,7 +777,7 @@ class SnapshotManager(object):
 			raise RemoveFullSnpForbidden("It's impossible to delete a full "\
 				   "snapshot as long as it is the base of any other snapshots!")	
 		
-		listing = self.getSnapshots(forceReload = True)
+		listing = self.get_snapshots(forceReload = True)
 
 	def compareSnapshots(self, snap1, snap2):
 		"""Compare 2 snapshots and return and SBdict with the
@@ -784,12 +823,12 @@ class SnapshotManager(object):
 		:todo: We should try to remove the snapshots from fresh to old to avoid multiple re-base operations!
 		
 		"""
-		self.getSnapshots(forceReload = True)
+		self.get_snapshots(forceReload = True)
 		if purge == "log":
 			self._do_log_purge()
 		else:
 			self._do_cutoff_purge(purge)
-		self.getSnapshots(forceReload = True)
+		self.get_snapshots(forceReload = True)
 
 	def _do_log_purge(self):
 		"""Does a logarithmic purge...
@@ -804,7 +843,7 @@ class SnapshotManager(object):
 			_fromD = '%04d-%02d-%02d' % (f.year,f.month,f.day)
 			_toD = '%04d-%02d-%02d' % (t.year,t.month,t.day)
 			self.logger.debug("Purging from %s to %s" % (_fromD,_toD))
-			snps = self.getSnapshots(fromDate=_fromD, toDate=_toD)
+			snps = self.get_snapshots(fromDate=_fromD, toDate=_toD)
 			if snps is not None:
 				self.logger.debug("Found %s snapshots in timespan (%s..%s)" % (len(snps), _fromD, _toD))
 				if len(snps) > 1: # we need 3 snapshots to delete 1!
@@ -873,7 +912,7 @@ class SnapshotManager(object):
 		if purge > 0:
 			self.logger.info("Simple purge - remove all backups older "\
 							 "then %s days" % purge)
-			snapshots = self.getSnapshots()
+			snapshots = self.get_snapshots()
 			for snp in snapshots:
 				self.logger.debug("Checking snapshot '%s' for simple purge!" % snp)
 				date = snp.getDate()

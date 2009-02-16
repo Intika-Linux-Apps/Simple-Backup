@@ -1,7 +1,12 @@
-#PO=`for file in \`ls po/*.po\`; do f1=${file##*/}; echo ${f1%%.*}; done`
+# makefile for NSsbackup
+
+# available languages
 PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR sv tr uk zh_CN zh_TW
+
+# installation into /usr/local to be compliant to GNU standards
 PREFIX=/usr/local
 DESTDIR=/usr/local
+
 BIN=$(DESTDIR)/bin
 SBIN=$(DESTDIR)/sbin
 
@@ -20,7 +25,7 @@ install: install-po install-bin install-sbin install-package install-data
 	chmod +x $(DESTDIR)/share/nssbackup/nssbackup
 
 fill-templates:
-	sed s+@prefix@+$(PREFIX)+ src/nssbackup/ressources.in > src/nssbackup/ressources
+	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/ressources.in > src/nssbackup/ressources
 
 # application's binaries
 install-bin:
@@ -39,6 +44,10 @@ install-package:
 	mkdir -p $(CLSDIR)
 	cp -a src/nssbackup/* $(CLSDIR)
 	rm -f $(CLSDIR)/ressources.in  
+
+install-po:
+	set -e; for lang in $(PO); do install -d $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
+	set -e; for lang in $(PO); do install -m 644 po/$$lang/LC_MESSAGES/* $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
 
 install-data:
 	mkdir -p $(DESTDIR)/share/nssbackup
@@ -75,31 +84,25 @@ uninstall-data:
 	rm -f $(DESTDIR)/share/applications/nssbackup-restore.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-config-su.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-restore-su.desktop
-	rm -f $(DESTDIR)/share/nssbackup/nssbackup-config.glade
-	rm -f $(DESTDIR)/share/nssbackup/nssbackup-restore.glade
-	rm -f $(DESTDIR)/share/nssbackup/nssbackup
-	find $(DESTDIR)/share/locale -name nssbackup.mo -exec rm -f '{}' \;
+	rm -rf $(DESTDIR)/share/nssbackup
+	set -e; find $(DESTDIR)/share/locale -name nssbackup.mo -exec rm -f '{}' \;
 	
 reinstall: uninstall install
 
 clean:
-	find . -name '*.pyc' -exec rm -f '{}' \;
-	find . -name '*~' -exec rm -f '{}' \;
-	find . -name '*.bak' -exec rm -f '{}' \;
+	set -e; find . -name '*.pyc' -exec rm -f '{}' \;
+	set -e; find . -name '*~' -exec rm -f '{}' \;
+	set -e; find . -name '*.bak' -exec rm -f '{}' \;
 	rm -rf build
 	rm -f src/nssbackup/ressources
-	for lang in $(PO); do rm -rf po/$$lang ; done
-
-install-po:
-	for lang in $(PO); do install -d $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
-	for lang in $(PO); do install -m 644 po/$$lang/LC_MESSAGES/* $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
+	set -e; for lang in $(PO); do rm -rf po/$$lang ; done
 	
 po-dir:
-	for lang in $(PO); do mkdir -p po/$$lang/LC_MESSAGES/ ; done
+	set -e; for lang in $(PO); do mkdir -p po/$$lang/LC_MESSAGES/ ; done
 
 po-data: po-dir
-	for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
+	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 	
 po-gen:
-	xgettext -o po/messages.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop src/nssbackup-upgrade-backups.py src/nssbackupconfig.py
-	for lang in $(PO); do msgmerge -U po/$$lang.po po/messages.pot; done
+	set -e; xgettext -o po/messages.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop src/nssbackup-upgrade-backups.py src/nssbackupconfig.py
+	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/messages.pot; done

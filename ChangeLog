@@ -1,3 +1,41 @@
+nssbackup (0.2-0~rc3-ppa1) hardy; urgency=high
+
+  * Arabic translation file added and German and Spanish translation updated
+  * Spanish translation of menu entries added: Thanks to Luis J. Claros
+  * [CHANGE]: 'upgrade-backups' renamed into 'nssbackup-upgrade-backups' 
+  * [CHANGE]: 'nssbackupconfig' added for modification of configuration files
+              during the installation
+  * [CHANGE]: existing backups are no longer upgraded automatically
+  * [FIX]: re-base was not working:
+  		   due to errorneous merging of snapshot files
+  		   and missing variable assignment -> fixed
+  * [FIX]: converting an incremental snapshot to a full one was errorneous:
+  		   base references of child snapshots was
+  		   not updated with *.ful name -> fixed
+  * [FIX] LP Bug #319294: catch execptions raised by notification daemon
+  * [FIX]: logger issue (hopefully) finally solved:
+  		   log messages were not printed and log files couldn't copied
+  		   after backups: problem was the use of log files with equal
+  		   names, the use of some static variables in ConfigManager and
+  		   errors in logger implementation: now profiles use their own
+  		   log files, some minor problems were fixed, code simplifications
+  * [FIX]: not all messages were displayed in notification pop-ups:
+  		   reason was an unescaped character: this character is now
+  		   replaced, the notification code is extracted into a mix-in
+  		   class to avoid multiple code definitions
+  * [FIX]: pathnames to log files were incorrect and copying failed:
+  		   fixed by centralized path determination
+  * [FIX]: LogFactory was re-setting log level and log file when calling for
+           a prior created logger: check if a logger was already created and
+           don't overwrite previous settings if so
+  * [FIX]: UpgradeManager used not existing FAM function:
+  		   function 'rename' added
+  * [FIX]: SnapshotManager tried to rebase a snapshot on itself:
+  		   reason was an IndexError if only 1 snapshot was left -> check
+  		   length of snapshots list
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Sun, 15 Feb 2009 16:41:01 +0100
+
 nssbackup (0.2-0~rc2-ppa1) hardy; urgency=medium
 
   * [FIX] LP Bug #299967: the regular expressions from the configuration file

@@ -32,7 +32,7 @@ class TestRestoreManager(unittest.TestCase) :
 		"""
 		Restore a dir into it's location
 		"""
-		snapshots = self.snpman.getSnapshots()
+		snapshots = self.snpman.get_snapshots_allversions()
 		self.rvtman.restore(snapshots[0],"/home/wattazoum/Desktop/sbackup-test/d17/")
 		self.assertTrue(os.path.exists("/home/wattazoum/Desktop/sbackup-test/d17/"))
 		
@@ -40,7 +40,7 @@ class TestRestoreManager(unittest.TestCase) :
 	def testRestoreAs(self):
 		"""
 		"""
-		snapshots = self.snpman.getSnapshots()
+		snapshots = self.snpman.get_snapshots_allversions()
 		self.rvtman.restoreAs(snapshots[0],"/home/wattazoum/Desktop/sbackup-test/d17/", os.path.abspath('./test-datas/restoredir/') )
 		self.assertTrue(os.path.exists(os.path.abspath('./test-datas/restoredir/')+"/home/wattazoum/Desktop/sbackup-test/d17/"))
 		
@@ -48,14 +48,14 @@ class TestRestoreManager(unittest.TestCase) :
 	def testRevert(self):
 		"""
 		"""
-		snapshots = self.snpman.getSnapshots()
+		snapshots = self.snpman.get_snapshots_allversions()
 		self.rvtman.revert(snapshots[0],"/home/wattazoum/Desktop/sbackup-test/")
 		self.assertTrue(os.path.exists("/home/wattazoum/Desktop/sbackup-test/"))
 	
 	def testRevertAs(self):
 		"""
 		"""
-		snapshots = self.snpman.getSnapshots()
+		snapshots = self.snpman.get_snapshots_allversions()
 		self.rvtman.revertAs(snapshots[0],"/home/wattazoum/Desktop/sbackup-test/",os.path.abspath('./test-datas/restoredir/'))
 		self.assertTrue(os.path.exists(os.path.abspath('./test-datas/restoredir/')+"/home/wattazoum/Desktop/sbackup-test/"))
 

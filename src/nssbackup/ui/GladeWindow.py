@@ -63,8 +63,8 @@ class GladeWindow(object):
 		pull_down_dict: a dictionary that maps combo names to a tuple of
 			strings to put in the combo
 			
-		@todo: JPL: I don't want to change too much in this release but for
-			   later realeases: Create the XML external and give it to the
+		@todo: JPL: I don't want to change too much in this release but for\
+			   later releases: Create the XML external and give it to the\
 			   widget classes to avoid multiple instantiations!
 		'''
 #TODO: Needs improvement - not so good style!

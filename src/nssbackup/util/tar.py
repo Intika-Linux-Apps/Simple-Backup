@@ -218,20 +218,21 @@ def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
 		raise SBException("Error when extracting : " + errStr )
 	LogFactory.getLogger().debug("output was : " + outStr)
 
-
 def __prepareTarCommonOpts(snapshot):
-	"""
-	Prepare the options to fill tar in .
-	@param snapshot: The snapshot to fill in
-	@return: a list of options to be use to launch tar
+	"""Prepare the options to fill tar in.
 	
-	:todo: Check if it is neccessary to escape white spaces in path names!
+	:param snapshot: The snapshot to fill in
+	:return: a list of options to be use to launch tar
+	
+	:todo: Check whether it's necessary to escape white spaces in path names!
 	
 	"""
 	tdir = snapshot.getPath().replace(" ", "\ ")
 	options = list()
 	
-	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile()+".tmp"])
+	options.extend(["-cS","--directory="+ os.sep,
+				    "--ignore-failed-read",
+				    "--files-from="+snapshot.getIncludeFListFile()+".tmp"])
 	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ ")+".tmp")
 	
 	archivename = "files.tar"
@@ -304,7 +305,7 @@ def makeTarIncBackup(snapshot):
 	else:
 		shutil.copy( base_snarfile, tmp_snarfile )		
 		# check (and set) the permission bits; necessary if the file's origin
-		# does not support user rights (e.g. some ftp servers, filesystems...)
+		# does not support user rights (e.g. some FTP servers, file systems...)
 		if not os.access(tmp_snarfile, os.W_OK):
 			os.chmod(tmp_snarfile, 0644)
 

@@ -243,14 +243,18 @@ class Snapshot(object):
 			raise NotValidSnapshotException(_("The snapshot compression format is supposed to be '%s' but the corresponding well named file wasn't found") % self.getFormat())
 	
 	def getVersion(self) :
-		"Return the version of the snapshot comming from the 'ver' file"
-		if self.__version : return self.__version
-		elif ":" in self.getName() : 
+		"""Retrieves and returns the version of the snapshot.
+
+		"""
+		if self.__version:
+			return self.__version
+		elif ":" in self.getName(): 
 			self.__version = "1.0"
 			return self.__version
-		else :
+		else:
 			verfile = self.getPath() +os.sep +"ver"
-			if not FAM.exists(verfile) : return False
+			if not FAM.exists(verfile):
+				return False
 			else :
 				ver = FAM.readfile(verfile)
 				try : 
@@ -450,7 +454,7 @@ class Snapshot(object):
 
 	def commitverfile(self) :
 		" Commit ver file on the disk "
-		if not self.getVersion() :
+		if not self.getVersion():
 			self.setVersion()
 		FAM.writetofile(self.getPath()+os.sep +"ver", self.getVersion())
 		

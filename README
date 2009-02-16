@@ -29,7 +29,7 @@ In RC3 the naming convention of log files was changed.
 To change the names of the log files in your configuration files you
 have 2 possibilities:
 
-1. run 'nssbackupconfig'
+1. run 'sudo nssbackupconfig' afterwards you've installed NSsbackup
 2. open each of your profiles in 'NSsbackup configuration tool' and
    afterwards save them again.
 

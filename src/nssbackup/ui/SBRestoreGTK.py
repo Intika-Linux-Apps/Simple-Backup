@@ -1,19 +1,33 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+#	NSsbackup - Restoration GUI in GTK+
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-# Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
-#	Jean-Peer Lorenz <peer.loz@gmx.net>
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+"""
+:mod:`SBRestoreGTK` --- Restoration GUI in GTK+
+================================================
+
+.. module:: SBRestoreGTK
+   :synopsis: Implements the Restoration GUI in GTK+
+.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
+.. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+
+"""
+
 
 import os
 import os.path
@@ -286,7 +300,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		date = self.widgets["calendar"].get_date()
 		fromDate = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"01"])
 		toDate = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"31"])
-		snplist = self.snpman.getSnapshots(fromDate, toDate)
+		snplist = self.snpman.get_snapshots_allformats(fromDate, toDate)
 		
 		for snapshot in snplist :
 			self.widgets["calendar"].mark_day( int(snapshot.getDate()["day"]) )
@@ -347,7 +361,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		self.widgets["restoreExpander"].set_expanded(False)
 		self.widgets['snpmanExpander'].set_expanded(False)
 		tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
-		self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
+		self.currentSnp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter,0)))
 
 	def on_filelisttreeview_row_expanded(self, tv, iter, path, user_data=None):
 		"""
@@ -499,7 +513,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		"""
 		day = "-".join([str(date[0]),"%02d" % (int(date[1])+1),"%02d" % date[2]])
 		self.logger.debug("Selected day : " + day)
-		snplist = self.snpman.getSnapshots(byDate=day)
+		snplist = self.snpman.get_snapshots_allformats(byDate=day)
 		
 		self.snplisttreestore.clear()
 		self.flisttreestore.clear()
@@ -518,7 +532,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		if not self.widgets["restoreExpander"].get_expanded():
 			tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
 			if iter:
-				self.currentSnp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
+				self.currentSnp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter,0)))
 				if self.currentSnp.getVersion() != Infos.SNPCURVERSION:
 					message = _("The snapshot version is not supported (Just %(supportedversion)s is supported). Version '%(currentversion)s' found. You should upgrade it. ") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
 					self.logger.warning(message) 
@@ -688,8 +702,20 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		
 	def on_upgradeButton_clicked(self, *args):
 		um = UpgradeManager()
-		self.timer = gobject.timeout_add (100, self.status_callback, um.getStatus)
-		um.upgradeSnapshot(self.currentSnp)
+#		self.timer = gobject.timeout_add (100, self.status_callback, um.getStatus)
+		try:
+			um.upgradeSnapshot(self.currentSnp)
+		except Exception, _exc:
+			_message_str = "While attempting to upgrade "\
+				 "snapshot the following error occured:\n"\
+				 "%s" % str(_exc)
+			_boxtitle = _("NSsbackup restoration error")
+			_headline_str =\
+			_("Unable to upgrade snapshot")
+			gobject.idle_add( self._show_errmessage,
+							  _message_str, _boxtitle,
+							  _headline_str )
+			
 		self.load_snapshotslist(self.widgets['calendar'].get_date())
 		self.widgets['snpmanExpander'].set_expanded(False)
 		self.on_snpmanExpander_activate()
@@ -705,7 +731,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 			# get the selected base and rebase on it.
 			tstore, iter = self.widgets['historytv'].get_selection().get_selected()
 			if iter :
-				snp = self.snpman.getSnapshot(str(tstore.get_value(iter,0)))
+				snp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter,0)))
 				try:
 					message = _("Do you really want to rebase '%s' on '%s' ?") % (self.currentSnp, snp)
 					dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=message)
@@ -737,7 +763,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
 				dialog.destroy()
-			self.snpman.getSnapshots(forceReload=True)
+			self.snpman.get_snapshots_allformats(forceReload=True)
 			self.on_calendar_day_selected()
 		
 	def on_exportmanExpander_activate(self, *args):
@@ -753,30 +779,31 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 	"""This is the window that appears if the restoration process is invoked.
 	"""
 	
-	__messages 		= { "restore"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
-										 "msg_headline"    : _("<b>Restoring of selected files</b>"),
-										 "msg_progress"    : _("Restoring of <tt>'%s'</tt> is in progress."),
-										 "msg_sucess"  	   : _("Restoring of <tt>'%s'</tt> was sucessful."),
-										 "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
-										 
-						"restore_as" : { "dialog_titletxt" : _("NSsbackup restoration"),
-										 "msg_headline"    : _("<b>Restoring of selected files</b>"),
-										 "msg_progress"    : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> is in progress."),
-										 "msg_sucess"      : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> was sucessful."),
-										 "msg_failure"     : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
-										 
-						"revert"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
-										 "msg_headline"    : _("<b>Reverting selected files</b>"),
-										 "msg_progress"    : _("Reverting of <tt>'%s'</tt> is in progress.\n"),
-										 "msg_sucess"  	   : _("Reverting of <tt>'%s'</tt> was sucessful."),
-										 "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+	__messages =\
+	  { "restore"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
+						 "msg_headline"    : _("<b>Restoring of selected files</b>"),
+						 "msg_progress"    : _("Restoring of <tt>'%s'</tt> is in progress."),
+						 "msg_sucess"  	   : _("Restoring of <tt>'%s'</tt> was sucessful."),
+						 "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 
+		"restore_as" : { "dialog_titletxt" : _("NSsbackup restoration"),
+						 "msg_headline"    : _("<b>Restoring of selected files</b>"),
+						 "msg_progress"    : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> is in progress."),
+						 "msg_sucess"      : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> was sucessful."),
+						 "msg_failure"     : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 
+		"revert"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
+						 "msg_headline"    : _("<b>Reverting selected files</b>"),
+						 "msg_progress"    : _("Reverting of <tt>'%s'</tt> is in progress.\n"),
+						 "msg_sucess"  	   : _("Reverting of <tt>'%s'</tt> was sucessful."),
+						 "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
 
-						"revert_as"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
-										 "msg_headline"    : _("<b>Reverting selected files</b>"),
-										 "msg_progress"    : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> is in progress."),
-										 "msg_sucess"      : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> was sucessful."),
-										 "msg_failure"     : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
-					  }
+		"revert_as"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
+						 "msg_headline"    : _("<b>Reverting selected files</b>"),
+						 "msg_progress"    : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> is in progress."),
+						 "msg_sucess"      : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> was sucessful."),
+						 "msg_failure"     : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+	  }
 
 	def __init__(self, parent):
 		"""Default constructor.

@@ -32,8 +32,9 @@ from nssbackup.util.exceptions import NotValidSectionException
 
 
 def getUserConfDir():
-	"""
-	Get the user config dir using the XDG specification
+	"""Get the user config dir using the XDG specification.
+	:todo: Use the constants defined in `ConfigStaticData`!
+	
 	"""
 	if os.getuid() == 0 :
 		confdir = "/etc/"
@@ -47,8 +48,9 @@ def getUserConfDir():
 	return confdir
 
 def getUserDatasDir():
-	"""
-	Get the user datas dir using the XDG specification
+	"""Get the user datas dir using the XDG specification.
+	:todo: Use the constants defined in `ConfigStaticData`!	
+	
 	"""
 	datadir = os.sep.join([os.getenv("XDG_DATA_HOME", 
 				os.path.normpath(os.sep.join( [os.getenv("HOME"),".local","share"] )) ),
@@ -58,19 +60,74 @@ def getUserDatasDir():
 	return datadir
 
 def getUserTempDir():
-	"""Returns the user's temporary directory. It is always the directory
-	'/tmp' used.
+	"""Returns the user's temporary directory. Currently always
+	the directory `/tmp` is used.
 	
-	@return: full path to the NSsbackup tempdir
+	:return: full path to the NSsbackup tempdir
 	
-	@todo: Review the use of '/tmp' as tempdir as solution for several different distributions?
+	:todo: Review the use of '/tmp' as tempdir as solution for several\
+		   different distributions?
+	:todo: Put the definition of used paths into `ConfigStaticData`!
+		   
 	"""
 	tempdir = os.path.join( "/tmp", "nssbackup/" ) 
 	if not os.path.exists(tempdir) :
 		os.mkdir(tempdir)
 	return tempdir
 
+def get_profilename(conffile):
+	if not os.path.isfile(conffile):
+		raise SBException("Configuration file does not exist!")
+			
+	# find the profile 
+	cfile = os.path.basename(conffile)
 
+	if cfile == ConfigStaticData.get_default_conffile():
+		profilename = ConfigStaticData.get_default_profilename()
+	else :
+		m = ConfigStaticData.get_profilename_re().match(cfile)
+		if not m:
+			profilename = ConfigStaticData.get_unknown_profilename()
+		else :
+			profilename = m.group(1)
+			
+	return profilename
+
+def get_logfile_name(conffile):
+	if not os.path.isfile(conffile):
+		raise SBException("Configuration file does not exist!")
+	profilename = get_profilename(conffile)
+	if profilename == ConfigStaticData.get_default_profilename():
+		logfname = "%s.%s" % (ConfigStaticData.get_logfile_basename(),
+							  ConfigStaticData.get_logfile_extension())
+	else:
+		logfname = "%s-%s.%s" % (ConfigStaticData.get_logfile_basename(),
+								 profilename,
+								 ConfigStaticData.get_logfile_extension())
+	return logfname
+
+def get_profiles(prfdir):
+	"""Get the configuration profiles list
+	 
+	@return: a dictionarity of { name: [path_to_conffile, enable] } 
+	"""
+	if not os.path.exists(prfdir) or not os.path.isdir(prfdir) :
+		return dict()
+	
+	profiles = dict()
+	
+	for conff in os.listdir(prfdir) :
+		mobj = ConfigStaticData.get_profilename_re().match(conff)
+		if mobj: 
+			name = mobj.group(1)
+			path = os.path.join(prfdir, mobj.group(0))
+			enable = (mobj.group(2) is None)
+			profiles[name] = [path, enable]
+	
+	return profiles
+
+
+# TODO: Use the RawConfigParser instead of ConfigParser! And maybe the parser should be a member of NSsbackup config!
 class ConfigManager(ConfigParser.ConfigParser):
 	"""nssbackup config manager
 	
@@ -165,37 +222,6 @@ class ConfigManager(ConfigParser.ConfigParser):
 	cronheader = "SHELL=/bin/bash \nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\n"
 	
 	servicefile 		 = Util.getResource("nssbackup")
-	default_profile_name = _("Default Profile")
-	unknown_profile_name = _("Unknown Profile")
-	
-	# these variables should be read-only
-	__logfile_basename 	= "nssbackup"
-	__logfile_ext		= "log"
-
-	
-	prfRE = re.compile('^nssbackup-(.+?).conf(-disable)?$')
-	
-	# Default values, constants and the like
-	our_options = {
-	 'general' 		: { 'mountdir'		: str,
-				        'target'  		: str ,
-				   		'lockfile' 		: str ,
-				   		'maxincrement' 	: int ,
-				   		'format' 		: str,
-				   		'splitsize' 	: int,
-				   		'purge' 		: str,
-				   		'run4others' 	: int,
-				   		'backuplinks' 	: int },
-	 'log' 			: {'level' : int , 'file' : str },
-	 'report' 		: {'from' :str, 'to' : str,'smtpserver' : str,
-				 	   'smtpport' : int, 'smtpuser' : str,
-				 	   'smtppassword' : str, 'smtptls' : int,
-				       'smtpcert': str, 'smtpkey': str },
-	 'dirconfig'	: { '*' : str },
-	 'exclude' 		: { 'regex' : list, 'maxsize' : int },
-	 'places' 		: { 'prefix' : str },
-	 'schedule' 	: {'anacron' : str , 'cron' : str }
-	}
 	
 	def __init__(self, configfile = None):
 		"""Default constructor.
@@ -236,11 +262,11 @@ class ConfigManager(ConfigParser.ConfigParser):
 		self.filename_from_argv = None
 		self.argv_options 		= {}
 		
-		self.setValidOpts( self.our_options )
+		self.setValidOpts( ConfigStaticData.get_our_options() )
 		
 		# command line preempt default option location
 		self.parseCmdLine()
-# TODO: remove command-line parsing from here; this class should only take a filenam eas parameter
+# TODO: remove command-line parsing from here; this class should only take a filenam as parameter
 
 		# use the given conf-file only if no was given on cmdline
 		if not self.conffile and configfile:
@@ -629,19 +655,8 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 		if not self.conffile: 
 			raise SBException(_("The config file is not set yet into this "\
-							    "ConfigManager"))		
-		# find the profile 
-		cfile = os.path.basename(self.conffile)
-
-		if cfile == "nssbackup.conf" :
-			self.__profileName = self.default_profile_name
-		else :
-			m = self.prfRE.match(cfile)
-			if not m:
-				self.__profileName = self.unknown_profile_name
-			else :
-				self.__profileName = m.group(1)
-				
+							    "ConfigManager"))
+		self.__profileName = get_profilename(self.conffile)
 		return self.__profileName
 	
 	def getProfiles(self):
@@ -653,18 +668,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 		self.logger.debug("Getting profiles from '%s'" % prfDir)
 		
-		if not os.path.exists(prfDir) or not os.path.isdir(prfDir) :
-			return dict()
-		
-		profiles = dict()
-		
-		for cf in os.listdir(prfDir) :
-			m = self.prfRE.match(cf)
-			if m : 
-				self.logger.debug("Found %s "% m.group(0))
-				name, path, enable = m.group(1), prfDir+m.group(0), (m.group(2) is None)
-				profiles[name] = [path,enable]
-		
+		profiles = get_profiles(prfDir)
 		return profiles
 	
 	def set_logdir(self, logdir):
@@ -691,12 +695,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		'nssbackup.log', log files for other profiles are extended by
 		the profile's name to keep them unique and avoid problems while logging.
 		"""
-		self.getProfileName()
-		if self.__profileName == self.default_profile_name:
-			logfname = "%s.%s" % (self.__logfile_basename, self.__logfile_ext)
-		else:
-			logfname = "%s-%s.%s" % (self.__logfile_basename, self.__profileName,
-									 self.__logfile_ext)
+		logfname = get_logfile_name(self.conffile)
 		logf = os.path.join(self.__logfile_dir, logfname)
 		return logf
 		
@@ -909,15 +908,109 @@ class ConfigManager(ConfigParser.ConfigParser):
 		return True
 		
 		
-class ConfigStaticDatas(object):
-	"""
-	Config Datas storage
-	"""
+class ConfigStaticData(object):
+	"""Any static data related to configurations are stored here. 
+	
+	"""	
+	__loglevels = {'20' : ("Info",1),
+				   '10' : ("Debug", 0),
+				   '30' : ("Warning", 2),
+				   '50' : ("Error", 3)}
+	
+	__timefreqs = {"never"  : 0,
+				   "hourly" : 1,
+				   "daily"  : 2,
+				   "weekly" : 3,
+				   "monthly": 4,
+				   "custom" : 5}
+	
+	__cformat = {'none':0, 'gzip':1, 'bzip2':2}
+	
+	__splitSize = {'Unlimited'    : 0,
+				   '100 MB'       : 100,
+				   '250 MB'       : 250,
+				   '650 MB'       : 650,
+				   '2 GB (FAT16)' : 2000,
+				   '4 GB (FAT32)' : 4000,
+				   'Custom'       : -1}
+
+	__default_profilename = _("Default Profile")
+	__unknown_profilename = _("Unknown Profile")
+	
+	# these variables should be read-only
+	__logfile_basename 	= "nssbackup"
+	__logfile_ext		= "log"
+
+	__superuser_confdir = "/etc"
+	__user_confdir_template = ".config/nssbackup"
+	__default_config_file = "nssbackup.conf"
+
+	__profiles_dir = "nssbackup.d"
+	
+	__profilename_re = re.compile('^nssbackup-(.+?).conf(-disable)?$')
+	
+	# Default values, constants and the like
+	__our_options = {
+	 'general' 		: { 'mountdir'		: str,
+				        'target'  		: str ,
+				   		'lockfile' 		: str ,
+				   		'maxincrement' 	: int ,
+				   		'format' 		: str,
+				   		'splitsize' 	: int,
+				   		'purge' 		: str,
+				   		'run4others' 	: int,
+				   		'backuplinks' 	: int },
+	 'log' 			: {'level' : int , 'file' : str },
+	 'report' 		: {'from' :str, 'to' : str,'smtpserver' : str,
+				 	   'smtpport' : int, 'smtpuser' : str,
+				 	   'smtppassword' : str, 'smtptls' : int,
+				       'smtpcert': str, 'smtpkey': str },
+	 'dirconfig'	: { '*' : str },
+	 'exclude' 		: { 'regex' : list, 'maxsize' : int },
+	 'places' 		: { 'prefix' : str },
+	 'schedule' 	: {'anacron' : str , 'cron' : str }
+	}
+	
 	def __init__(self):
 		pass
+
+	@classmethod
+	def get_logfile_basename(cls):
+		return cls.__logfile_basename
 	
-	loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
-	timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
-	cformat = {'none':0, 'gzip':1, 'bzip2':2}
+	@classmethod
+	def get_logfile_extension(cls):
+		return cls.__logfile_ext
+
+	@classmethod
+	def get_profiles_dir(cls):
+		return cls.__profiles_dir
+
+	@classmethod
+	def get_profilename_re(cls):
+		return cls.__profilename_re
+
+	@classmethod		
+	def get_default_profilename(cls):
+		return cls.__default_profilename
+
+	@classmethod		
+	def get_unknown_profilename(cls):
+		return cls.__unknown_profilename
 	
-	splitSize = {'Unlimited':0,'100 MB': 100,'250 MB':250,'650 MB': 650,'2 GB (FAT16)':2000,'2 GB (FAT16)': 4000, 'Custom': -1}
+	@classmethod
+	def get_superuser_confdir(cls):
+		return cls.__superuser_confdir
+		
+	@classmethod
+	def get_user_confdir_template(cls):
+		return cls.__user_confdir_template
+
+	@classmethod		
+	def get_default_conffile(cls):
+		return cls.__default_config_file
+	
+	@classmethod		
+	def get_our_options(cls):
+		return cls.__our_options
+	

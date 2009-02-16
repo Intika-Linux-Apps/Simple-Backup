@@ -34,20 +34,17 @@ import socket
 from gettext import gettext as _
 
 class Infos(object):
-    """
-    Collects general informations about NSsbackup.
+    """Collects general informations about NSsbackup.
     
     `name` The application's full name
-    
 	`version` Full current version
-	
 	`description` some description
 
     """
     
     NAME = "Not So Simple Backup Suite"
 
-    VERSION = "0.2-0 RC2"
+    VERSION = "0.2-0 RC3"
     
     DESCRIPTION = _("This is a user friendly backup solution for common desktop needs.")
     WEBSITE = "https://launchpad.net/nssbackup/"
@@ -57,6 +54,13 @@ class Infos(object):
         mailsuffix = hostname
     else :
         mailsuffix = hostname + ".ext"
-    SMTPFROM = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {'login' : os.getenv("USERNAME"), 'hostname': mailsuffix}
+    SMTPFROM = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {
+					'login' : os.getenv("USERNAME"), 'hostname': mailsuffix }
     
     SNPCURVERSION = "1.5"
+    
+    AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
+			   "Jean-Peer Lorenz <peer.loz@gmx.net>",
+			   "Aigars Mahinovs <aigarius@debian.org>",
+			   "Mathias Houngbo <mathias.houngbo@gmail.com>"
+			  ]
