@@ -44,7 +44,7 @@ class Infos(object):
     
     NAME = "Not So Simple Backup Suite"
 
-    VERSION = "0.2-0 RC3"
+    VERSION = "0.2-0 RC4"
     
     DESCRIPTION = _("This is a user friendly backup solution for common desktop needs.")
     WEBSITE = "https://launchpad.net/nssbackup/"

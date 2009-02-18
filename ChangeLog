@@ -1,3 +1,9 @@
+nssbackup (0.2-0~rc4-ppa1) hardy; urgency=high
+
+  * [FIX] LP Bug #331282: Installation fails due to configuration error
+  
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Wed, 18 Feb 2009 23:35:49 +0100
+    
 nssbackup (0.2-0~rc3-ppa1) hardy; urgency=high
 
   * Arabic translation file added and German and Spanish translation updated

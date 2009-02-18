@@ -38,6 +38,7 @@ import os
 import os.path
 import pwd
 import ConfigParser
+import re
 
 import nssbackup
 from nssbackup.managers import ConfigManager 
@@ -139,10 +140,16 @@ class UpgradeLogOption(object):
 		"""Constructor of the log option upgrader.
 		
 		"""
-		self.__min_uid = 100
+		self.__min_uid = 1000
 		self.__max_uid = 60000
 		self.__users = []
 		self.__configdirs = []
+		
+		reexp_templ = "^%s[ \t]+(\d+)$"
+		self.__reexp_min_uid = re.compile(reexp_templ
+										   % self._Settings.get_uidmin_name())
+		self.__reexp_max_uid = re.compile(reexp_templ
+										   % self._Settings.get_uidmax_name())
 		
 	def __repr__(self):
 		_repr = ["min uid: %s" % self.__min_uid,
@@ -160,20 +167,29 @@ class UpgradeLogOption(object):
 		defspath = self._Settings.get_logindefs_path()
 		if os.path.isfile(defspath) and os.access(defspath, os.F_OK and os.R_OK):
 			eof = False
-			defsfile = file(defspath, "r")
-			while not eof:
-				defsline = defsfile.readline()
-				if defsline == "":
-					eof = True
-				else:
-					defsline = defsline.strip()
-					defsline = defsline.replace("\t", " ")
-					defssplit = defsline.split(" ")
-					if defsline.startswith(self._Settings.get_uidmin_name()):
-						self.__min_uid = int(defssplit[1])
-					elif defsline.startswith(self._Settings.get_uidmax_name()):
-						self.__max_uid = int(defssplit[1])					
-			defsfile.close()
+			try:
+				defsfile = file(defspath, "r")
+				while not eof:
+					defsline = defsfile.readline()
+					if defsline == "":
+						eof = True
+					else:
+						defsline = defsline.strip()
+						match = self.__reexp_min_uid.search(defsline)
+						if match is not None:
+						    self.__min_uid = int(match.group(1))
+						    
+						match = self.__reexp_max_uid.search(defsline)
+						if match is not None:
+						    self.__max_uid = int(match.group(1))
+			except IOError:
+				print "Error while reading definitions from '%s'. "\
+					  "Using defaults." % (defspath)
+			else:
+				defsfile.close()
+		else:
+			print "Unable to read definitions from '%s'. "\
+				  "Using defaults." % (defspath)
 		
 	def _retrieve_users(self):
 		"""Retrieves all users from the password database that are
