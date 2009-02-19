@@ -42,6 +42,8 @@ class SBconfigGTK(GladeGnomeApp):
 	
 	def __init__(self):
 		''' '''
+		# it is distinguished between the 'current' conffile and
+		# the 'default file' configuring the default profile
 		self.default_conffile = None 
 		
 		if os.geteuid() == 0 :

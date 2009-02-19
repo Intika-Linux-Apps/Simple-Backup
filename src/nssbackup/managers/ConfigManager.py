@@ -76,9 +76,6 @@ def getUserTempDir():
 	return tempdir
 
 def get_profilename(conffile):
-	if not os.path.isfile(conffile):
-		raise SBException("Configuration file does not exist!")
-			
 	# find the profile 
 	cfile = os.path.basename(conffile)
 
@@ -94,16 +91,17 @@ def get_profilename(conffile):
 	return profilename
 
 def get_logfile_name(conffile):
-	if not os.path.isfile(conffile):
-		raise SBException("Configuration file does not exist!")
+	"""Determines the profilename from the given pathname `conffile`
+	and returns an appropriate logfile name.
+	
+	The given `conffile` may not exist.
+	 	
+	"""
 	profilename = get_profilename(conffile)
 	if profilename == ConfigStaticData.get_default_profilename():
-		logfname = "%s.%s" % (ConfigStaticData.get_logfile_basename(),
-							  ConfigStaticData.get_logfile_extension())
+		logfname = ConfigStaticData.get_default_logfile()
 	else:
-		logfname = "%s-%s.%s" % (ConfigStaticData.get_logfile_basename(),
-								 profilename,
-								 ConfigStaticData.get_logfile_extension())
+		logfname = ConfigStaticData.get_profile_logfile(profilename)
 	return logfname
 
 def get_profiles(prfdir):
@@ -287,11 +285,12 @@ class ConfigManager(ConfigParser.ConfigParser):
 			self.validateConfigFileOpts()
 
 		if _conffile_used:
-			self.logger.info("ConfigManager created from config file '%s'." % self.conffile)
+			self.logger.info("ConfigManager created from config file '%s'."\
+							  % self.conffile)
 		else :
-			self.logger.info("ConfigManager created with default values. Config file set to '%s'.")
+			self.logger.info("ConfigManager created with default values. "\
+							 "Config file set to '%s'." % self.conffile)
 			
-
 	def initSection(self):
 		"""Init the config sections.
 		"""
@@ -694,6 +693,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		returns it. The log file for the default profile is named
 		'nssbackup.log', log files for other profiles are extended by
 		the profile's name to keep them unique and avoid problems while logging.
+		
 		"""
 		logfname = get_logfile_name(self.conffile)
 		logf = os.path.join(self.__logfile_dir, logfname)
@@ -975,12 +975,24 @@ class ConfigStaticData(object):
 		pass
 
 	@classmethod
-	def get_logfile_basename(cls):
-		return cls.__logfile_basename
-	
+	def get_default_logfile(cls):
+		"""Returns the name of the logfile for the default profile.
+		
+		"""
+		logfname = "%s.%s" % (cls.__logfile_basename,
+							  cls.__logfile_ext)
+		return logfname
+
 	@classmethod
-	def get_logfile_extension(cls):
-		return cls.__logfile_ext
+	def get_profile_logfile(cls, profilename):
+		"""Returns the name of the logfile for a certain profile
+		named `profilename`.
+		
+		"""
+		logfname = "%s-%s.%s" % (cls.__logfile_basename,
+								 profilename,
+								 cls.__logfile_ext)
+		return logfname
 
 	@classmethod
 	def get_profiles_dir(cls):

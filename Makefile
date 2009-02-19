@@ -33,13 +33,13 @@ install-bin:
 	cp -a src/nssbackupd.py $(BIN)/nssbackupd
 	cp -a src/nssbackup-config-gui.py $(BIN)/nssbackup-config-gui
 	cp -a src/nssbackup-restore-gui.py $(BIN)/nssbackup-restore-gui
+	cp -a src/nssbackup-upgrade-backups.py $(BIN)/nssbackup-upgrade-backups
 
 # Configuration and setup tools
 install-sbin:
 	mkdir -p $(SBIN)
 	cp -a src/nssbackupconfig.py $(SBIN)/nssbackupconfig
-	cp -a src/nssbackup-upgrade-backups.py $(SBIN)/nssbackup-upgrade-backups
-
+	
 install-package:
 	mkdir -p $(CLSDIR)
 	cp -a src/nssbackup/* $(CLSDIR)
@@ -67,10 +67,10 @@ uninstall-bin:
 	rm -f $(BIN)/nssbackupd
 	rm -f $(BIN)/nssbackup-config-gui
 	rm -f $(BIN)/nssbackup-restore-gui
+	rm -f $(BIN)/nssbackup-upgrade-backups
 
 uninstall-sbin:
 	rm -f $(SBIN)/nssbackupconfig
-	rm -f $(SBIN)/nssbackup-upgrade-backups
 
 uninstall-package:
 	rm -rf $(CLSDIR)
