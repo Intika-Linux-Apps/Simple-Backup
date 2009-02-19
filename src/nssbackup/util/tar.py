@@ -227,13 +227,14 @@ def __prepareTarCommonOpts(snapshot):
 	:todo: Check whether it's necessary to escape white spaces in path names!
 	
 	"""
-	tdir = snapshot.getPath().replace(" ", "\ ")
+	# don't escape spaces i.e. do not replace them with '\ '; this will fail
+	tdir = snapshot.getPath()
 	options = list()
 	
 	options.extend(["-cS","--directory="+ os.sep,
 				    "--ignore-failed-read",
 				    "--files-from="+snapshot.getIncludeFListFile()+".tmp"])
-	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ ")+".tmp")
+	options.append ("--exclude-from="+snapshot.getExcludeFListFile()+".tmp")
 	
 	archivename = "files.tar"
 	if snapshot.getFormat() == "gzip":
@@ -433,7 +434,6 @@ class Dumpdir(object):
 	DIRECTORY = 'D'
 	
 	# The dictionary mapping control with their meanings
-#	__HRCtrls = {'Y':_('Included'),'N':_('Excluded'),'D':_('Directory')}
 	__HRCtrls = {'Y':_('Included'),'N':_('Not changed'),'D':_('Directory')}
 		
 	def __init__(self, line):
@@ -667,7 +667,6 @@ class SnapshotFile(object):
 			"""
 			subroutine to format a line including NUL char to have and array
 			"""
-#			print "'%s'" % line
 			nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents = line.lstrip("\0").split("\0",6)
 			return [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,formatDumpDirs(contents)]
 			
@@ -693,7 +692,6 @@ class SnapshotFile(object):
 				currentline += c
 				if c == '\0' and last_c == '\0' :
 					# we got a line
-#					print "LINE: '%s'" % currentline
 					yield format(currentline)
 					
 					currentline = ''
@@ -750,18 +748,12 @@ class SnapshotFile(object):
 		"""
 		if len(record) != 7:
 			raise ValueError("Record must contain of 7 elments. Got %s instead." % str(len(record)))
-		
-		print "\nRECORD TO ADD: %s" % record[:-1]
-		for __debugout in record[-1]:
-			print str(__debugout)
-		print
-		
+				
 		woContent,contents = record[:-1],record[-1]
 		# compute contents
 		strContent = self.createContent(contents)
 		toAdd = self.__SEP.join(woContent)+self.__SEP+strContent
 		
-		print "THIS WILL BE ADDED: %s" % toAdd
 		fd = open(self.snpfile,'a+')
 		fd.write(toAdd + self.__entrySEP)
 		fd.close()
@@ -904,12 +896,8 @@ class ProcSnapshotFile(SnapshotFileWrapper):
 		@rtype: boolean
 		"""
 		for f in self.__snapshotFile.parseFormat2():
-#			if f[-2].rstrip(os.sep) == path.rstrip(os.sep) :
-			print "HAS PATH: %s ?=? %s" % (f[SnapshotFile.REC_DIRNAME].rstrip(os.sep), path.rstrip(os.sep)) 
 			if f[SnapshotFile.REC_DIRNAME].rstrip(os.sep) == path.rstrip(os.sep):
-				print "is found (equal)"
 				return True
-		print "is not found"
 		return False
 	
 	def hasFile(self,_file):
@@ -920,15 +908,11 @@ class ProcSnapshotFile(SnapshotFileWrapper):
 		@rtype: boolean
 		"""
 		dir, inFile = _file.rsplit(os.sep,1)
-		print "HAS FILE: dir='%s'; infile='%s'" % (dir, inFile)
 		if not self.hasPath(dir):
-			print "file not found (cause dir not found)"
 			return False
 		for f in self.getContent(dir):
 			if f.getFilename() == inFile and f.getControl() != Dumpdir.UNCHANGED:
-				print "file is found"
 				return True
-		print "file not found"
 		return False
 	
 	def iterfiles(self):
