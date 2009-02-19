@@ -147,9 +147,11 @@ class UpgradeLogOption(object):
 		
 		reexp_templ = "^%s[ \t]+(\d+)$"
 		self.__reexp_min_uid = re.compile(reexp_templ
-										   % self._Settings.get_uidmin_name())
+										   % self._Settings.get_uidmin_name(),
+										   re.IGNORECASE)
 		self.__reexp_max_uid = re.compile(reexp_templ
-										   % self._Settings.get_uidmax_name())
+										   % self._Settings.get_uidmax_name(),
+										   re.IGNORECASE)
 		
 	def __repr__(self):
 		_repr = ["min uid: %s" % self.__min_uid,
@@ -345,9 +347,12 @@ if __name__ == "__main__":
 	try:
 		_UPGRADER = UpgradeApplication()
 		RETC = _UPGRADER.main()
-		print "successful finished."
 	except:
 		print "errors occurred:"
 		traceback.print_exc()
 		RETC = UNKNOWN_ERROR
+
+	if RETC == NO_ERRORS:
+		print "successful finished."
+		
 	sys.exit(RETC)

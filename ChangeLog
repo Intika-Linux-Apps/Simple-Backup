@@ -3,7 +3,7 @@ nssbackup (0.2-0~rc5-ppa1) hardy; urgency=medium
   * [FIX] LP Bug #331507: GUI fails, if configuration file does not exist
   * [FIX] LP Bug #331349: Backup into target directory containing spaces fails
   
- -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 19 Feb 2009 13:17:35 +0100
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 19 Feb 2009 20:59:49 +0100
 
 nssbackup (0.2-0~rc4-ppa1) hardy; urgency=high
 
