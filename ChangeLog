@@ -1,3 +1,9 @@
+nssbackup (0.2-0~rc6-ppa1) hardy; urgency=high
+
+  * Re-upload due to errors in packacking binary packages
+  
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Fri, 20 Feb 2009 02:51:33 +0100
+
 nssbackup (0.2-0~rc5-ppa1) hardy; urgency=medium
 
   * [FIX] LP Bug #331507: GUI fails, if configuration file does not exist
