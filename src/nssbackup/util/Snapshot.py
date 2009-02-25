@@ -1,47 +1,78 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 3 of the License, or
-#    (at your option) any later version.
+#	NSsbackup - snapshot definition
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+"""
+:mod:`nssbackup.util.Snapshot` -- Snapshot definition
+=====================================================
 
-# Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
+.. module:: Snapshot
+   :synopsis: Defines snapshots
+.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
+.. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+
+"""
 
 # Imports
-import nssbackup.managers.FileAccessManager as FAM
 import re
 import os
 from gettext import gettext as _
-from nssbackup.util.exceptions import NotValidSnapshotNameException,SBException, NotValidSnapshotException
+
+from nssbackup.util.exceptions import NotValidSnapshotNameException
+from nssbackup.util.exceptions import SBException
+from nssbackup.util.exceptions import NotValidSnapshotException
+
 from log import LogFactory
 from structs import SBdict
 import nssbackup.util.tar as TAR
-from nssbackup.util.tar import SnapshotFile, MemSnapshotFile, ProcSnapshotFile
+import nssbackup.managers.FileAccessManager as FAM
 
-class Snapshot(object): 
-	"The snapshot class represents one snapshot in the backup directory"
+from nssbackup.util.tar import SnapshotFile
+from nssbackup.util.tar import MemSnapshotFile
+from nssbackup.util.tar import ProcSnapshotFile
+
+
+class Snapshot(object):
+	"""The snapshot class represents one snapshot in the backup directory.
+	
+	"""
 		
 	__validname_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})_(\d{2})[\:\.](\d{2})[\:\.](\d{2})\.\d+\..*?\.(.+)$")
 	
+	
 	def __init__ (self, path):
-		"""
-		The snapshot constructor.
-		@param path : the path to the snapshot dir.
-		@param fam : The File Access Manager to use. False will create a default one
+		"""The snapshot constructor.
+		
+		:param path : the path to the snapshot dir.
+		
+		:todo: Any distinction between creation of a new snapshot and opening\
+		       an existing one from disk would be useful! The reason is that\
+		       instantiation a Snapshot with a not existing path creates a\
+		       snapshot directory in any case, currently! We need to handle the\
+		       case: opening an snapshot that is supposed to exist but in fact\
+		       doesn't!
+
 		"""
 		self.logger = LogFactory.getLogger()
 		
 		# Attributes
 		self.__name = False
-		self.__base = False
+		self.__base = None
 		self.__format = "gzip" # default value
 		
 		self.__snarfile = None
@@ -55,28 +86,22 @@ class Snapshot(object):
 		
 		self.__packages = False
 		self.__version = False
-		self.__snapshotpath = False
+		self.__snapshotpath = None
 		
 		self.__baseSnapshot = None
-		
-		self.__snapshotpath = os.path.normpath(str(path))
-		
-		self.__name = os.path.basename(self.__snapshotpath)
-				
+
+		# set some attributes
+		self.setPath(path)	# sets path and validates name
+
 		# check if it's an existing snapshot
-		if FAM.exists(self.__snapshotpath) :
-			#snapshot exists
+		if FAM.exists(self.__snapshotpath):
 			self.__validateSnapshot(self.__snapshotpath, self.__name)
 		else : # Snapshot for creation
-			# validate the name
-			if not self.__isValidName(self.__name) :
-				raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
 			FAM.makedir(self.__snapshotpath)
 	
 	def __str__(self):
 		"Return the snapshot name"
 		return self.getName()
-	
 	
 	# Public Methods
 	def getName(self) :
@@ -154,33 +179,37 @@ class Snapshot(object):
 		return self.__format
 	
 	def getBase(self) :
+		"""Returns the name of the base snapshot of this snapshot. If this
+		is a full dump, None is returned. Please note that, if a base name
+		was successful read from the snapshot directory once, this name is
+		returned on any further calls to this method. If you don't want this
+		you need to reset `self.__base` to None before.
+		
 		"""
-		return the name of the base snapshot of this snapshot if its an Inc backup
-		return False if it's a full backup
-		"""
-		if self.__base : return self.__base
-		else :
+		if not self.__base:
 			basefile = self.__snapshotpath +os.sep +"base"
-			if not FAM.exists(basefile) : return False
-			else :
+			if not FAM.exists(basefile):
+				self.__base = None
+			else:
+				if self.isfull():
+					raise AssertionError("Assertion failed when retrieving "\
+							"snapshot's base: A full backup ('%s') should not "\
+							"have a base file!" % self)
 				self.__base = FAM.readfile(basefile).strip()
-				return self.__base
+		return self.__base
 	
 	def getBaseSnapshot(self):
 		"""
 		Return the base snapshot (as a Snapshot ) not only the name
 		@return: the base Snapshot if it exists or None otherwise (we are a full snapshot) 
 		"""
-		if self.__baseSnapshot : return self.__baseSnapshot
-		else :
-			# check if we are not a full snapshot 
-			if self.getBase():
-				path = os.path.dirname(self.getPath())
-				self.__baseSnapshot = Snapshot( os.path.normpath(os.sep.join([path, self.getBase()])))
-			else :
-				self.__baseSnapshot = None
-			return self.__baseSnapshot
-			
+		if self.__baseSnapshot is None:
+			if not self.isfull():
+				if self.getBase():
+					path = os.path.dirname(self.getPath())
+					self.__baseSnapshot = Snapshot(os.path.normpath(
+											os.path.join(path, self.getBase())))
+		return self.__baseSnapshot
 	
 	def getArchive(self):
 		"""
@@ -214,14 +243,18 @@ class Snapshot(object):
 			raise NotValidSnapshotException(_("The snapshot compression format is supposed to be '%s' but the corresponding well named file wasn't found") % self.getFormat())
 	
 	def getVersion(self) :
-		"Return the version of the snapshot comming from the 'ver' file"
-		if self.__version : return self.__version
-		elif ":" in self.getName() : 
+		"""Retrieves and returns the version of the snapshot.
+
+		"""
+		if self.__version:
+			return self.__version
+		elif ":" in self.getName(): 
 			self.__version = "1.0"
 			return self.__version
-		else :
+		else:
 			verfile = self.getPath() +os.sep +"ver"
-			if not FAM.exists(verfile) : return False
+			if not FAM.exists(verfile):
+				return False
 			else :
 				ver = FAM.readfile(verfile)
 				try : 
@@ -245,7 +278,6 @@ class Snapshot(object):
 				self.__excludes = FAM.pickleload(excludefile)
 				return self.__excludes
 	
-		
 	def getPackages(self) :
 		"Return the packages"
 		if self.__packages : return self.__packages
@@ -257,12 +289,17 @@ class Snapshot(object):
 				return self.__packages
 	
 	def getSnapshotFileInfos(self,useMem=False,writeFlag=False):
-		"""
+		"""Returns a wrapper for the SnapshotFile resp. DirectoryFile that
+		contains information what files are stored in this snapshot.
+		
 		@param useMem: use or not the memory to store infos about the SNAR file
-		@type useMem: boolean
+		@type useMem:  boolean
 		@param writeFlag: Will be passed to the SnapshotFile to permit writing
-		@type writeFlag: boolean
-		@return: the corresponding SnapshotFile (Mem ou Proc), the only method usable afterward is getContent(path) 
+		@type writeFlag:  boolean
+		
+		@return: the corresponding SnapshotFile (Mem or Proc)
+		
+		@note: The only method usable afterward is getContent(path) 
 		"""
 		snpfile = SnapshotFile(self.getSnarFile(),writeFlag)
 		
@@ -275,10 +312,11 @@ class Snapshot(object):
 		
 		return snpfileInfo
 	
-		
 	def getSplitedSize(self):
 		"""
 		@return: the size of each archive in the snapshot (0 means unlimited )
+		
+		@todo: Implement CQS pattern!
 		"""
 		if os.path.exists(os.sep.join([self.getPath(),"format"])):
 			self.__splitedSize = int(FAM.readfile(os.sep.join([self.getPath(),"format"])).split('\n')[1])
@@ -291,7 +329,6 @@ class Snapshot(object):
 		_name = str(self.getName())
 		return _name.endswith(".ful")
 
-	
 	def commit (self) :
 		"Commit the snapshot infos ( write to the disk )"
 		self.commitbasefile()
@@ -330,24 +367,32 @@ class Snapshot(object):
 			self.logger.debug("Set the compression format to %s" % cformat)
 			self.__format = cformat
 	
-	
 	def setPath(self, path) :
 		"Set the complete path of the snapshot. That path will be used to get the name of the snapshot"
-		self.__snapshotpath = path
-		splited = str(self.__snapshotpath).split(os.sep)
-		name = splited[len(splited) - 1]
+		self.__snapshotpath = os.path.normpath(str(path))
+		name = os.path.basename(self.__snapshotpath)
 		if not self.__isValidName(name) :
-			raise SBException (_("Name of Snapshot not valid : %s") % self.__name)
+			raise NotValidSnapshotNameException(_("Name of Snapshot not valid : %s") % self.__name)
 		else : 
 			self.__name = name
 		
-	
 	def setBase(self, baseName) :
-		"Set the name of the base snapshot of this snapshot"
+		"""Sets `baseName` as the name of the base snapshot of this
+		snapshot and clears the reference to base snapshot object.
+		It is not possible to set the base for a full backup, this
+		raises a `SBException`. The `baseName` is checked for validity.
+		Note that the base of the snapshot is not committed to disk
+		if it is set using this method. Call `commitbasefile` for this.
+		
+		"""
+		if self.isfull():
+			self.__base = None
+			self.__baseSnapshot = None
+			raise SBException("Base cannot be set for full snapshot!")
 		if not self.__isValidName(baseName) :
 			raise SBException (_("Name of base not valid : %s") % self.__name)
+		# set the name and clean the baseSnapshot
 		self.__base = baseName
-		# clean the baseSnapshot
 		self.__baseSnapshot = None
 	
 	def setVersion(self, ver="1.5") :
@@ -368,9 +413,11 @@ class Snapshot(object):
 	def setSplitedSize(self, size):
 		"""
 		@param size: The size in KB to set
+		
+		@todo: Wrong parameter type should raise a TypeError!
 		"""
 		if type(size) != int :
-			raise SBException("The size parameter must be an integer")
+			raise TypeError("The size parameter must be an integer")
 		self.__splitedSize = size
 	
 	
@@ -384,12 +431,17 @@ class Snapshot(object):
 		# validate the name
 		if not self.__isValidName(self.__name) :
 			raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
-		if  not FAM.exists( self.getPath()+os.sep +"ver" ):
+		if  not FAM.exists( os.path.join(self.getPath(), "ver") ):
+			print "PATH TO 'VER' FILE: '%s'" % os.path.join(self.getPath(), "ver") 
 			raise NotValidSnapshotException (_("The mandatory 'ver' file doesn't exist in [%s]") % self.getName())
 		
 	def __isValidName(self, name ) :
 		" Check if the snapshot name is valid "
-		return str(re.match(self.__validname_re , name )) != "None"
+		_res = False
+		if re.match(self.__validname_re , name ) is not None:
+			if name.endswith(".ful") or name.endswith(".inc"):
+				_res = True
+		return _res
 
 	def commitFormatfile(self):
 		"""
@@ -402,17 +454,24 @@ class Snapshot(object):
 
 	def commitverfile(self) :
 		" Commit ver file on the disk "
-		if not self.getVersion() :
+		if not self.getVersion():
 			self.setVersion()
 		FAM.writetofile(self.getPath()+os.sep +"ver", self.getVersion())
 		
 	def commitbasefile(self):
-		" Commit base file on the disk "
-		if self.getBase() :
-			if self.getName()[-3:] != "ful" :
+		"""In case this snapshot is an incremental snapshot, base file is
+		committed to the disk. If not, this method shouldn't be called.
+		The absence of a base for an incremental backup raises a SBException.
+		
+		"""
+		if self.isfull():
+			self.logger.debug("WARNING: Attempt of committing base file for "\
+							  "full snapshot '%s'!" % self.getName())
+		else:	
+			if self.getBase() :
 				FAM.writetofile(self.getPath()+os.sep +"base", self.getBase())
-		else : # base file was not found or base wasn't set. It MUST be a full backup
-			if self.getName()[-3:] != "ful" :
+			else:
+			# base file was not found or base wasn't set. It MUST be full backup
 				raise SBException(_("Base name must be set for inc backup !"))
 		
 	def commitexcludefile(self):
@@ -421,8 +480,7 @@ class Snapshot(object):
 		@raise SBException: if excludes hasn't been set 
 		"""
 		FAM.pickledump( self.__excludes, self.getPath()+os.sep +"excludes" )
-	
-	
+
 	def commitflistFiles(self):
 		"""
 		Commit the include.list and exclude.list to the disk
@@ -453,7 +511,6 @@ class Snapshot(object):
 		for f in self.__excludeFlist.getEffectiveFileList() :
 			fe.write(str(f) +"\n")
 		fe.close()
-		
 		
 	def commitpackagefile(self):
 		" Commit packages file on the disk"

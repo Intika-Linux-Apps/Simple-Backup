@@ -50,3 +50,4 @@ Use simple-restore-gnome for more ease of use.
 	except Exception, e :
 			getLogger().error(str(e))
 			getLogger().error(traceback.format_exc())
+			

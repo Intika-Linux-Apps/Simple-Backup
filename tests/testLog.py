@@ -1,6 +1,9 @@
 from nssbackup.util.log import LogFactory
 
 class Test:
+	"""
+	@todo: Add tests for different log levels etc.!
+	"""
 	
 	def __init__(self):
 		""

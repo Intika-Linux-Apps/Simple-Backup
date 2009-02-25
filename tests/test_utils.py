@@ -136,8 +136,8 @@ class TestUtilsNssbCopy(unittest.TestCase):
 	def setUp(self):
 		self.src_relpath = "./test-datas/test_utils.src"
 		self.dst_relpath = "./test-datas/test_utils.dst"
-		self.dst_reldir  = "./test-datas/test_utils_dir/"
-		self.dst_reldir_notexist  = "./test-datas/test_utils_dir.notexisting/"
+		self.dst_reldir  = "./test-datas/test-utils/"
+		self.dst_reldir_notexist  = "./test-datas/test-utils.notexisting/"
 		
 		self.src_abspath = os.path.abspath(self.src_relpath)
 		self.dst_abspath = os.path.abspath(self.dst_relpath)
@@ -183,11 +183,14 @@ class TestUtilsNssbCopy(unittest.TestCase):
 		Util.nssb_copy( self.src_abspath, self.dst_absdir )
 		
 		
-if __name__ == "__main__":
-	suite = unittest.TestSuite()
-	suite.addTests([ unittest.TestLoader().loadTestsFromTestCase( TestUtilsRemoveConfEntry ),
+def suite():
+	_suite = unittest.TestSuite()
+	_suite.addTests([ unittest.TestLoader().loadTestsFromTestCase( TestUtilsRemoveConfEntry ),
 				     unittest.TestLoader().loadTestsFromTestCase( TestUtilsRegex ),
 				     unittest.TestLoader().loadTestsFromTestCase( TestUtilsNssbCopy )
 				   ])
-	
-	unittest.TextTestRunner(verbosity=2).run(suite)
+	return _suite
+
+
+if __name__ == "__main__":	
+	unittest.TextTestRunner(verbosity=2).run(suite())

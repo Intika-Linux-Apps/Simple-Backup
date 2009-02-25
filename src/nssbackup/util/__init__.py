@@ -1,19 +1,32 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+#	NSsbackup - Miscellaneous utilities
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+"""
+:mod:`nssbackup.util` -- Miscellaneous utilities
+================================================
 
-# Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+.. module:: util
+   :synopsis: Provide functions for disk operations.
+.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
+.. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+
+"""
 
 import nssbackup.managers.FileAccessManager as FAM
 import os
@@ -29,9 +42,15 @@ import re
 
 
 def nssb_copytree(src, dst, symlinks=False):
-	"""
-	mod of shutil.copytree 
-	This doesn't fail if the directory exists, it copies inside
+	"""mod of `shutil.copytree`. This doesn't fail if the
+	directory exists, it copies inside.
+
+	:param src: source path for copy operation
+	:param dst: destination
+	:param symlinks: copy symlinks?
+	:type src: string
+	:type dst: string
+
 	"""
 	names = os.listdir(src)
 	if not os.path.exists(dst) :
@@ -85,8 +104,7 @@ def nssb_copy(src, dst):
 	is raised. The date and archive bit of the file is not copied. 
 	
 	@param src: an existing file that should be copied
-	@param dst: copy destination - an existing directory or full path to new
-				file (the directory must exist too)
+	@param dst: copy destination - an existing directory or full path to new file (the directory must exist too)
 				
 	@return: None
 	
@@ -148,10 +166,9 @@ def _prepare_nssb_copy(src, dst):
 	
 
 def getResource(resourceName):
-	"""
-	This will look for a ressource installed by nssbackup.
-	The installation script write in the ressources file were it stores the file
-	then getRessource will look for them.
+	"""This will look for a ressource installed by nssbackup. The installation
+	script write in the ressources file were it stores the file then
+	getRessource will look for them.
 	@param ressourceName: the ressource name, as complete as possible.
 	@param the ressource: absolute path. 
 	"""
@@ -205,59 +222,9 @@ def launch(cmd, opts):
 	
 	return (outStr, errStr, retval)
 
-def extract(sourcetgz, file, dest , bckupsuffix = None):
-	"""
-	Extract from source tar.gz the file "file" to dest.
-	@param source:
-	@param file:
-	@param dest:
-	"""
-	# strip leading sep
-	file = file.lstrip(os.sep)
-	
-	options = ["-xzp", "--occurrence=1", "--ignore-failed-read", '--backup=existing']
-	if os.getuid() != 0 :
-		options.append("--same-owner")
-	if dest :
-		options.append( "--directory="+dest )
-	else : 
-		options.append( "--directory="+os.sep )
-	if bckupsuffix :
-		options.append("--suffix="+bckupsuffix)
-	options.extend(['--file='+sourcetgz,file])
-	
-	outStr, errStr, retval = launch("tar", options)
-	if retval != 0 :
-		LogFactory.getLogger().debug("output was : " + outStr)
-		raise SBException("Error when extracting : " + errStr )
-	LogFactory.getLogger().debug("output was : " + outStr)
-	
-def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
-	"""
-	Extract the files listed in the 'fileslist' file to dest. This method 
-	has been created to optimize the time spent by giving to tar a complete 
-	list of file to extract. Use this if ever you have to extract more than 1 dir .
-	@param sourcetgz:
-	@param fileslist: a path to the file containing the list
-	@param dest: destination
-	"""
-	options = ["-xzp", "--ignore-failed-read", '--backup=existing']
-	if os.getuid() != 0 :
-		options.append("--same-owner")
-	if dest :
-		options.append( "--directory="+dest )
-	else : 
-		options.append( "--directory="+os.sep )
-	if bckupsuffix :
-		options.append("--suffix="+bckupsuffix)
-	
-	options.extend(['--file='+sourcetgz,'--null','--files-from='+os.path.normpath(fileslist)])
-	
-	outStr, errStr, retval = launch("tar", options)
-	if retval != 0 :
-		LogFactory.getLogger().debug("output was : " + outStr)
-		raise SBException("Error when extracting : " + errStr )
-	LogFactory.getLogger().debug("output was : " + outStr)
+# defined in module 'tar'
+#def extract(sourcetgz, file, dest , bckupsuffix = None):
+#def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
 
 
 def readlineNULSep(fd,fd1):
@@ -337,7 +304,6 @@ def is_empty_regexp( aregex ):
 		if _stripped_aregex == "":
 			_res = True
 	return _res
-
 
 def remove_conf_entry(confline, entry, separator = ","):
 	"""Removes the given entry from the given string. Entries in configurations

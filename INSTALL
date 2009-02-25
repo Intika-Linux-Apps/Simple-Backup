@@ -32,7 +32,9 @@ From source code way
 
 * Walk into the same directory as this README file
 * Run 'make'
-* Run 'sudo make install' 
+* Run 'sudo make install'
+* Run 'sudo nssbackupconfig'
+
 
 * By default, nssbackup will be installed under "/usr/local" folder.
 

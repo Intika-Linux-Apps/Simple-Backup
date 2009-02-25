@@ -42,6 +42,8 @@ class SBconfigGTK(GladeGnomeApp):
 	
 	def __init__(self):
 		''' '''
+		# it is distinguished between the 'current' conffile and
+		# the 'default file' configuring the default profile
 		self.default_conffile = None 
 		
 		if os.geteuid() == 0 :
@@ -75,7 +77,6 @@ class SBconfigGTK(GladeGnomeApp):
 		if os.geteuid() != 0 :
 			self.widgets['notebook'].remove_page(4)	
 		
-		# ---
 		# Initiate all data structures
 		# Paths to be included or excluded
 		self.include = gtk.ListStore( str )
@@ -859,9 +860,7 @@ class SBconfigGTK(GladeGnomeApp):
 		about.set_transient_for(self.widgets["nssbackupConfApp"])
 		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
 		about.set_translator_credits(_("translator-credits"))
-		about.set_authors(["Oumar Aziz Ouattara <wattazoum@gmail.com>",
-						   "Mathias HOUNGBO <mathias.houngbo@gmail.com>",
-						   "Jean-Peer Lorenz <peer.loz@gmx.net>"])
+		about.set_authors(Infos.AUTHORS)
 		about.set_website(Infos.WEBSITE)
 		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
 		about.run()
@@ -883,7 +882,6 @@ class SBconfigGTK(GladeGnomeApp):
 		self.orig_configman = ConfigManager(self.configman.conffile)
 		self.isConfigChanged()
 		
-
 	def on_backup_clicked(self, *args):
 		
 		self.askSaveConfig()
@@ -898,8 +896,6 @@ class SBconfigGTK(GladeGnomeApp):
 			dialog.run()
 			dialog.destroy()
 			raise e
-
-		
 
 	def on_main_radio_toggled(self, *args):
 		if self.widgets["main_radio"].get_active():

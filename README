@@ -4,10 +4,12 @@ Install
 make
 sudo make install
 
+
 Uninstall
 =========
 
 sudo make uninstall
+
 
 Configuration Hint
 ===================
@@ -18,3 +20,18 @@ Follow links
 use the option in general->backuplinks=1 to activate and general->backuplinks=0 to deactivate
 see the example configuration file for more infos.
 
+
+Notes on Upgrade to 0.2.0-RC3
+=============================
+
+In RC3 the naming convention of log files was changed.
+
+To change the names of the log files in your configuration files you
+have 2 possibilities:
+
+1. run 'sudo nssbackupconfig' afterwards you've installed NSsbackup
+2. open each of your profiles in 'NSsbackup configuration tool' and
+   afterwards save them again.
+
+Please note: your configuration files are modified automatically if you
+install NSsbackup from software packages (PPA) during the installation.

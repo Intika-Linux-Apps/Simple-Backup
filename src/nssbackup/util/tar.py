@@ -1,19 +1,32 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 3 of the License, or
-#    (at your option) any later version.
+#	NSsbackup - provides access to TAR functionality
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+"""
+:mod:`tar` --- provides access to TAR functionality
+===================================================
 
-# Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+.. module:: tar
+   :synopsis: provides access to TAR functionality
+.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
+.. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+
+"""
 
 
 import os,re,shutil
@@ -29,28 +42,29 @@ from nssbackup.managers import ConfigManager
 
 
 def getArchiveType(archive):
-	"""
-	return the type of an archive 
-	@param archive: 
+	"""Determines the type of an archive by its mime type.
+	 
+	@param archive: Full path to file to check  
 	@return: tar, gzip, bzip2 or None
+	@rtype: String
 	"""
+	_res = None
 	command = "file"
-	opts = ["--mime","-b",archive]
+	opts = ["--mime", "-b", archive]
 	out, err, retVal = Util.launch(command, opts)
-	if "x-bzip2" in out :
-		return "bzip2"
-	elif "x-gzip" in out :
-		return "gzip"
-	elif "x-tar" in out :
-		return "tar"
-	else :
-		return None
+	if "x-bzip2" in out:
+		_res = "bzip2"
+	elif "x-gzip" in out:
+		_res = "gzip"
+	elif "x-tar" in out:
+		_res = "tar"
+	return _res
 	
 	
-def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
-	"""
-	Extract from source tar.gz the file "file" to dest.
-	@param source:
+def extract(sourcear, file, dest , bckupsuffix = None, splitsize=None):
+	"""Extract from source archive the file "file" to dest.
+	
+	@param sourcear: path of archive
 	@param file:
 	@param dest:
 	@param bckupsuffix: If set a backup suffix option is set to backup existing files
@@ -62,7 +76,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
-	archType = getArchiveType(sourcetgz)
+	archType = getArchiveType(sourcear)
 	if archType =="tar" :
 		pass
 	elif archType == "gzip" :
@@ -84,7 +98,7 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 	if splitsize :
 		options.extend(["-L "+ str(splitsize) , "-F "+ Util.getResource("multipleTarScript")])
 	
-	options.extend(['--file='+sourcetgz,file])
+	options.extend(['--file='+sourcear,file])
 	
 	LogFactory.getLogger().debug("Launching TAR with options : %s" % options)
 	outStr, errStr, retval = Util.launch("tar", options)
@@ -93,20 +107,23 @@ def extract(sourcetgz, file, dest , bckupsuffix = None, splitsize=None):
 		raise SBException("Error when extracting : " + errStr )
 	LogFactory.getLogger().debug("output was : " + outStr)
 	
-def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None ):
+def extract2(sourcear, fileslist, dest, bckupsuffix = None,additionalOpts=None ):
 	"""
 	Extract the files listed in the 'fileslist' file to dest. This method 
 	has been created to optimize the time spent by giving to tar a complete 
 	list of file to extract. Use this if ever you have to extract more than 1 dir .
-	@param sourcetgz:
+	@param sourcear:
 	@param fileslist: a path to the file containing the list
 	@param dest: destination
 	@param bckupsuffix: 
 	@param additionalOpts: a list of aption to add
 	"""
+	# tar option  -p, --same-permissions, --preserve-permissions:
+    # ignore umask when extracting files (the default for root)
+ 
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
-	archType = getArchiveType(sourcetgz)
+	archType = getArchiveType(sourcear)
 	if archType =="tar" :
 		pass
 	elif archType == "gzip" :
@@ -128,7 +145,7 @@ def extract2(sourcetgz, fileslist, dest, bckupsuffix = None,additionalOpts=None 
 	if additionalOpts and type(additionalOpts) == list :
 		options.extend(additionalOpts)
 		
-	options.extend(['--file='+sourcetgz,'--null','--files-from='+os.path.normpath(fileslist)])
+	options.extend(['--file='+sourcear,'--null','--files-from='+os.path.normpath(fileslist)])
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
@@ -201,18 +218,23 @@ def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
 		raise SBException("Error when extracting : " + errStr )
 	LogFactory.getLogger().debug("output was : " + outStr)
 
-
 def __prepareTarCommonOpts(snapshot):
+	"""Prepare the options to fill tar in.
+	
+	:param snapshot: The snapshot to fill in
+	:return: a list of options to be use to launch tar
+	
+	:todo: Check whether it's necessary to escape white spaces in path names!
+	
 	"""
-	Prepare the options to fill tar in .
-	@param snapshot: The snapshot to fill in
-	@return: a list of options to be use to launch tar
-	"""
-	tdir = snapshot.getPath().replace(" ", "\ ")
+	# don't escape spaces i.e. do not replace them with '\ '; this will fail
+	tdir = snapshot.getPath()
 	options = list()
 	
-	options.extend(["-cS","--directory="+ os.sep , "--ignore-failed-read","--files-from="+snapshot.getIncludeFListFile()+".tmp"])
-	options.append ("--exclude-from="+snapshot.getExcludeFListFile().replace(" ", "\ ")+".tmp")
+	options.extend(["-cS","--directory="+ os.sep,
+				    "--ignore-failed-read",
+				    "--files-from="+snapshot.getIncludeFListFile()+".tmp"])
+	options.append ("--exclude-from="+snapshot.getExcludeFListFile()+".tmp")
 	
 	archivename = "files.tar"
 	if snapshot.getFormat() == "gzip":
@@ -284,7 +306,7 @@ def makeTarIncBackup(snapshot):
 	else:
 		shutil.copy( base_snarfile, tmp_snarfile )		
 		# check (and set) the permission bits; necessary if the file's origin
-		# does not support user rights (e.g. some ftp servers, filesystems...)
+		# does not support user rights (e.g. some FTP servers, file systems...)
 		if not os.access(tmp_snarfile, os.W_OK):
 			os.chmod(tmp_snarfile, 0644)
 
@@ -354,18 +376,57 @@ def makeTarFullBackup(snapshot):
 		# list-incremental is not compatible with ignore failed read
 		LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
 		raise SBException(_("Couldn't make a proper backup : ") + errStr )
-	
-# ---
 
-class Dumpdir():
-	"""Dumpdir is a sequence of entries of the following form: C filename \0
+	
+def get_dumpdir_from_list(lst_dumpdirs, filename):
+	"""Searchs within the given list of dumpdirs for the given filename
+	and the dumpdir if found.
+	
+	@raise SBExcetion: if filename couldn't be found in list  
+	"""
+	_res = None
+
+	if not isinstance(lst_dumpdirs, list):
+		raise TypeError("Given list of dumpdirs must be of type list! Got %s "\
+					    "instead." % type(lst_dumpdirs))
+	for _ddir in lst_dumpdirs:
+		if not isinstance(_ddir, Dumpdir):
+			raise TypeError("Element in list of dumpdirs must be of type "\
+							"Dumpdir! Got %s instead." % type(_ddir))
+
+		if _ddir.getFilename() == filename:
+			_res = _ddir
+			break
+		
+	if _res is None:
+		raise SBException("File '%s' was not found in given list of Dumpdirs."
+																	% filename)
+	return _res
+
+
+class Dumpdir(object):
+	"""This is actually a single dumdir entry.
+	
+	Here is the definition from TAR manual:
+	Dumpdir is a sequence of entries of the following form: C filename \0
 	where C is one of the control codes described below, filename is the name
 	of the file C operates upon, and '\0' represents a nul character (ASCII 0).
 	
 	The white space characters were added for readability, real dumpdirs do not
-	contain them. Each dumpdir ends with a single nul character. 
+	contain them. Each dumpdir ends with a single nul character.
+	
+	Dumpdirs stored in snapshot files contain only records of types 'Y', 'N'
+	and 'D'. 
+
+	
+	@note: Is the nul character stored???
 	
 	@see: http://www.gnu.org/software/tar/manual/html_chapter/Tar-Internals.html#SEC173
+	
+	@todo: It should be distiguished between 'unchanged', 'excluded' and
+		   'removed'!
+	@todo: Rename this class into 'DumpdirEntry'!
+	@todo: Add a 'DumpdirClass' that collects entries and creates output content!
 	"""
 	
 	INCLUDED = 'Y'
@@ -373,25 +434,38 @@ class Dumpdir():
 	DIRECTORY = 'D'
 	
 	# The dictionary mapping control with their meanings
-	__HRCtrls = {'Y':_('Included'),'N':_('Excluded'),'D':_('Directory')}
-	
-	control = None
-	filename = None
-	
+	__HRCtrls = {'Y':_('Included'),'N':_('Not changed'),'D':_('Directory')}
+		
 	def __init__(self, line):
 		"""
 		Constructor that takes a line to create a Dumpdir.
 		we will parse this line and fill the Dumpdir in
 		@param line: the line (in dumpdir point of view ) to parse
 		@raise Exception: when the line doesn't have the requeried format
+		
+		@todo: make the instance variables private!
 		"""
-		if not line :
-			self = None
-			return
+		self.control = None
+		self.filename = None
+		self.__set_entry(line)
 		
-		if (not isinstance(line,str)) :
-			raise Exception(_("Line must be a string"))
+	def __str__(self):
+		return "%s %s" % (self.filename, self.getHumanReadableControl())
+	
+	def __repr__(self):
+		return self.__str__()
+	
+	def __set_entry(self, line):
+		"""Private helper method that sets the given dumdir entry. It checks
+		for type and length of given parameter.
 		
+		@todo: Add checks for validity of control etc.!
+		"""
+		if (not isinstance(line, str)):
+			raise TypeError(_("Line must be a string"))
+		line = line.strip("\0")
+		if len(line) < 2:
+			raise ValueError("Line must contain 2 characters at minimum!")
 		self.control = line[0]
 		self.filename = line[1:]
 
@@ -404,46 +478,58 @@ class Dumpdir():
 		if self.filename :
 			return self.filename
 		else :
-			raise Exception(_("Dumpdir inconsistancy : 'filename' is empty"))
+			raise SBException(_("Dumpdir inconsistancy : 'filename' is empty"))
 		
 	def getControl(self):
 		"""
 		Get the control character from the DumpDir
 		@return: control
-		@raise Exception: if the control is null 
+		@raise Exception: if the control is null
+		
+		@todo: Checking against None is useless here!
 		"""
-		if self.control :
+		if self.control:
 			return self.control
 		else :
-			raise Exception(_("Dumpdir inconsistancy : 'control' is empty"))
+			raise SBException(_("Dumpdir inconsistancy : 'control' is empty"))
 	
 	def getHumanReadableControl(self):
 		"""
 		Get the control character as a Human readable string from the DumpDir
 		"""
 		return self.__HRCtrls[self.getControl()]
-	
-	def __str__(self):
-		return self.filename + " " +self.getHumanReadableControl() 
-	
+		
 	@classmethod
 	def getHRCtrls(Dumpdir):
 		"""
 		@return: The Human Readable control dictionary
 		@rtype: dict
+		
+		@todo: Replace parameter 'Dumpdir' by 'cls'!
 		"""
 		return Dumpdir.__HRCtrls
 	
-# ---
 
-class SnapshotFile():
-	"""
+class SnapshotFile(object):
+	"""A snapshot file (or directory file) is created during incremental
+	backups with TAR. It contains the status of the file system at the time
+	of the dump and is used to determine which files were modified since the
+	last backup. GNU tar version 1.20 supports three snapshot file formats.
+	They are called 'format 0', 'format 1' and 'format 2'.
 	
+	Dumpdirs stored in snapshot files contain only records of types 'Y', 'N'
+	and 'D'. 
+	
+	For displaying the content of an incremental backup manually use:
+	tar --bzip --list --incremental --verbose --verbose --file files.tar.bz2
+
 	@see: http://www.gnu.org/software/tar/manual/html_chapter/Tar-Internals.html#SEC172
+	
+	@todo: Rename into 'DirectoryFile' or 'SnapshotDirectoryFile' since it only
+	       collects directories!
+	       
+	@todo: Add class describing a SnapshotFile record!
 	"""
-	header = None
-	snpfile = None
-	version = None
 	versionRE = re.compile("GNU tar-(.+?)-([0-9]+?)")
 	
 	__SEP = '\000'
@@ -451,28 +537,36 @@ class SnapshotFile():
 	
 	# Infos on indices in a record 
 	REC_NFS = 0
-	REC_MTIME_SEC =1
-	REC_MTIME_NANO=2
-	REC_DEV_NO=3
-	REC_INO=4
-	REC_DIRNAME=5
-	REC_CONTENT=6
+	REC_MTIME_SEC = 1
+	REC_MTIME_NANO = 2
+	REC_DEV_NO = 3
+	REC_INO = 4
+	REC_DIRNAME = 5
+	REC_CONTENT = 6
 	
 	
-	def __init__(self, filename,writeFlag=False):
-		"""
-		Constructor 
+	def __init__(self, filename, writeFlag=False):
+		"""Constructor
+		 
 		@param filename: the snapshot file absolute file path to get the infos (SNAR file)
+		@param writeFlag: if set, the file will be created in case it doesn't exist
 		"""
+		self.header = None
+		self.snpfile = None
+		self.version = None
+
 		if os.path.exists(filename) :
 			self.snpfile = os.path.abspath(filename)
 		else :
 			if writeFlag :
 				self.snpfile = os.path.abspath(filename)
-				fd = open(self.snpfile,'a+')
+				fd = open(self.snpfile, 'a+')
 				fd.close()
 			else :
-				raise Exception (_("'%s' doesn't exist ") % filename)
+				raise SBException(_("'%s' doesn't exist ") % filename)
+
+	def get_filename(self):
+		return self.snpfile
 
 	def getFormatVersion(self):
 		"""
@@ -480,8 +574,6 @@ class SnapshotFile():
 		@return: the version 
 		@rtype: int 
 		"""
-		global header, version
-		
 		if self.version :
 			return self.version
 		
@@ -517,7 +609,7 @@ class SnapshotFile():
 		# skip header which is the first line in this case
 		fd.readline()
 		
-		for line in fd.readlines() :
+		for line in fd.readlines():
 			line = line.rstrip()
 			
 			nfs = line[0] # can be a + or a single white space
@@ -549,10 +641,15 @@ class SnapshotFile():
 		fd.close()
 		
 	def parseFormat2(self):
-		"""
-		Iterator method that gives each line entry
+		"""Iterator method that gives each line entry in SNAR-file.
+		A line contains informations about a directory and its content.
+		
 		@warning: only compatible tar version 2 of Tar format
+		
 		@return: [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a list of Dumpdirs
+		
+		@todo: Iterator methods should have names like 'parseFormat2Iterator' or
+		       'parseFormat2Iter'!
 		"""
 		
 		def formatDumpDirs(content):
@@ -604,8 +701,6 @@ class SnapshotFile():
 				c = fd.read(1)
 			
 			fd.close
-
-	# ---
 	
 	def getHeader(self):
 		"""
@@ -646,11 +741,14 @@ class SnapshotFile():
 		fd.write(2*(str(t)+self.__SEP))
 		fd.close()
 		
-	def addRecord(self,record):
+	def addRecord(self, record):
 		"""
 		Write a record in the snar file. A record is a tuple with 6 entries + a content that is a dict
 		@param record: A tuple that contains the record to add. [nfs,mtime_sec,mtime_nano,dev_no,i_no,name,contents] where contents is a dict of {file:'control'}
 		"""
+		if len(record) != 7:
+			raise ValueError("Record must contain of 7 elments. Got %s instead." % str(len(record)))
+				
 		woContent,contents = record[:-1],record[-1]
 		# compute contents
 		strContent = self.createContent(contents)
@@ -661,36 +759,43 @@ class SnapshotFile():
 		fd.close()
 		
 		
-	def createContent(self,contentList):
-		"""
-		create a content out of a list of Dumpdir
-		@param contentList: the Dumpdir content list
+	def createContent(self, contentList):
+		"""Creates a content item from a list of given Dumpdirs.
+		
+		@param contentList: the list of Dumpdirs
 		@type contentList: list
 		@return: a string containing the computed content
 		@rtype: string
 		"""
 		if type(contentList) != list :
-			raise SBException("contentlist must be a list : %r" % repr(contentList))
+			raise SBException("Contentlist must be a list : %r" % repr(contentList))
 		
 		result = ""
 		
 		for dumpdir in contentList:
+			if not isinstance(dumpdir, Dumpdir):
+				raise TypeError("Contentlist must contain elements of type "\
+							    "'Dumdir'! Got %s instead." % type(dumpdir))
 			result += dumpdir.getControl()+dumpdir.getFilename()+self.__SEP
 		
 		return result
-		
-		
-# ----
 
-class MemSnapshotFile(SBdict):
+
+class SnapshotFileWrapper(object):
+	def __init__(self):
+		pass
+	
+	def get_snapfile_path(self):
+		raise NotImplementedError
+	
+	
+class MemSnapshotFile(SnapshotFileWrapper, SBdict):
 	"""
 	This is a representation in memory of a simplified SNAR file. The used structure is an SBDict.
 	The "prop" value is the content of the directory. wich is a list of L{Dumpdir}
 	"""
-	
-	__snapshotFile = None
-	
-	def __init__(self,snapshotFile):
+		
+	def __init__(self, snapshotFile):
 		"""
 		load the snapshotFile in memory
 		@param snapshotFile: a SnapshotFile to convert in MemSnapshotFile
@@ -699,11 +804,17 @@ class MemSnapshotFile(SBdict):
 		if not isinstance(snapshotFile, SnapshotFile) :
 			raise Exception("A SnapshotFile is required")
 		
+		SnapshotFileWrapper.__init__(self)
+#		SBdict.__init__(self, mapping)
+		
 		self.__snapshotFile = snapshotFile
 		
 		for f in snapshotFile.parseFormat2():
 			self[f[-2]] = f[-1]
 		
+	def get_snapfile_path(self):
+		return self.__snapshotFile.get_filename()
+
 	def hasPath(self,path):
 		"""
 		Checks if a path is include in the SNAR file
@@ -756,24 +867,27 @@ class MemSnapshotFile(SBdict):
 		return result
 		
 		
-class ProcSnapshotFile :
-	"""
-	This is a Snapshotfile that will basically every time parse the snarfile for information
+class ProcSnapshotFile(SnapshotFileWrapper):
+	"""This is a Snapshotfile that will basically every time parse the
+	snarfile for information.
 	"""
 	
-	__snapshotFile = None
-	
-	def __init__(self,snapshotFile):
+	def __init__(self, snapshotFile):
 		"""
 		load the snapshotFile to get a reference on it
 		@param snapshotFile: a SnapshotFile to convert in MemSnapshotFile
 		@type snapshotFile: nssbackup.util.tar.SnapshotFile
 		"""
 		if not isinstance(snapshotFile, SnapshotFile) :
-			raise Exception(_("A SnapshotFile is required"))
+			raise TypeError(_("A SnapshotFile is required"))
+		
+		SnapshotFileWrapper.__init__(self)
 		
 		self.__snapshotFile = snapshotFile
 		
+	def get_snapfile_path(self):
+		return self.__snapshotFile.get_filename()
+
 	def hasPath(self,path):
 		"""
 		Checks if a path is included in the SNAR file
@@ -782,7 +896,7 @@ class ProcSnapshotFile :
 		@rtype: boolean
 		"""
 		for f in self.__snapshotFile.parseFormat2():
-			if f[-2].rstrip(os.sep) == path.rstrip(os.sep) :
+			if f[SnapshotFile.REC_DIRNAME].rstrip(os.sep) == path.rstrip(os.sep):
 				return True
 		return False
 	
@@ -793,7 +907,7 @@ class ProcSnapshotFile :
 		@return: True if the file is included, False otherwise
 		@rtype: boolean
 		"""
-		dir,inFile = _file.rsplit(os.sep,1)
+		dir, inFile = _file.rsplit(os.sep,1)
 		if not self.hasPath(dir):
 			return False
 		for f in self.getContent(dir):
@@ -812,8 +926,8 @@ class ProcSnapshotFile :
 					yield dir+os.sep+dumpdir.getFilename()
 	
 	def iterRecords(self):
-		"""
-		Iter snar file records (wrapper on the parseFormat2 method of SnaspshotFile
+		"""Iterator over snar file records (wrapper on the
+		'parseFormat2' method of SnaspshotFile
 		"""
 		for record in self.__snapshotFile.parseFormat2():
 			yield record
@@ -839,18 +953,21 @@ class ProcSnapshotFile :
 		"""
 		self.__snapshotFile.setHeader(timeofBackup)
 		
-	def getContent(self,dirpath):
-		"""
-		convenance method to get the content of a directory.
+	def getContent(self, dirpath):
+		"""convenance method to get the content of a directory.
+		
 		@param dirpath: The directory absolute path to get
 		@type dirpath: str
+		
 		@return: The content of the dir
 		@rtype: list
+		
 		@raise SBException: if the path isn't found in the snapshot file
 		"""
 		for f in self.__snapshotFile.parseFormat2():
-			if f[-2].rstrip(os.sep) == dirpath.rstrip(os.sep) :
-				return f[-1]
+#			if f[-2].rstrip(os.sep) == dirpath.rstrip(os.sep) :
+			if f[SnapshotFile.REC_DIRNAME].rstrip(os.sep) == dirpath.rstrip(os.sep) :
+				return f[SnapshotFile.REC_CONTENT]
 		raise SBException(_("Non existing directory : %s") % dirpath)
 			
 	def getFirstItems(self):

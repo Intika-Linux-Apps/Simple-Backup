@@ -1,18 +1,45 @@
+******************
 TODO for NSsbackup
+******************
+
+see blueprints on : https://blueprints.edge.launchpad.net/nssbackup/
 
 
-see some blueprints on : https://blueprints.edge.launchpad.net/nssbackup/
+This must be done for milestone 'Release 0.3':
+----------------------------------------------
+
+* Check how sbackupd reacts if it can not get into a folder (FUSE used by a user)
+* Check filesizes (2 Gb and 4 Gb limits)
+* manpage
+* refactor some of the classes:
+  - the Snapshot should only contain data and a SnapshotHandler (maybe the
+    SnapshotManager?) should handle the handling of these data
+* re-structure handling of profiles: the default profile should be a 'normal'
+    profile beside the other profiles, i.e. it can be disabled etc.
+    This requires some changes in the presentation of profiles to the user
+    but would make the profile handling more general and consistent
+* adapt log handling: there should exist a 'main' log file in the default
+    directory (e.g. /var/log for super-users) where ALL messages are logged;
+    this file could be self-rotating; furthermore log files for every profile
+    including the default profile are created containing log messages related
+    to this profile especially when making a backup;
+* extend log handling: among the log files containing a lot of technical
+    informations; there should be some 'end-user' log files containing all
+    important informations related to a profile's backup in a readable and
+    understandable way; this feature is mostly for convenience purpose
+* implementation of verifying the backuped data
+* realize PEP 8 style guide for all modules
+
+
+Planned for later releases:
+---------------------------
 
 Features to implement:
 * plugins for exporting snapshot (will be used for tape, CD ... )
 * encription will be via a FusePlugin , find the fuse encripted FS
 * Backup media management (via SnapshotManager )
 * (Ana)Cron for non root
-* Check how sbackupd reacts if it can not get into a folder (FUSE used by a user)
-* Check filesizes (2 Gb and 4 Gb limits)
-* manpage
 
-Planned for later releases:
 For UI
 * show forever excluded paths in the GUI (including the backup target dir)
 * no "help" on restore :)
@@ -29,18 +56,3 @@ For core
 * testable system
 
 
-This must be done for milestone 'Release 0.3':
-* re-structure handling of profiles: the default profile should be a 'normal'
-    profile beside the other profiles, i.e. it can be disabled etc.
-    This requires some changes in the presentation of profiles to the user
-    but would make the profile handling more general and consistent
-* adapt log handling: there should exist a 'main' log file in the default
-    directory (e.g. /var/log for super-users) where ALL messages are logged;
-    this file could be self-rotating; furthermore log files for every profile
-    including the default profile are created containing log messages related
-    to this profile especially when making a backup;
-* extend log handling: among the log files containing a lot of technical
-    informations; there should be some 'end-user' log files containing all
-    important informations related to a profile's backup in a readable and
-    understandable way; this feature is mostly for convenience purpose
-    

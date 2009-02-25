@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
 #
-Name=NSsbackup Restoration for admins
-Name[de]=NSsbackup Wiederherstellung für Admins
-Name[pt_BR]=Restauração de Backup (admin)
-Name[es]=Restauración de copia de seguridad para administradores
+Name=NSsbackup Restoration
+Name[de]=NSsbackup Wiederherstellung
+Name[pt_BR]=Restauração de Backup
+Name[es]=Restauración de copia de seguridad
 #
 Comment=NSsbackup restoration tool for admins. Requires superuser rights.
 Comment[de]=NSsbackup Wiederherstellung für Admins. Erfordert Superuser-Rechte.

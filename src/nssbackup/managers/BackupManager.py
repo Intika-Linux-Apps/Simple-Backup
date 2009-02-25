@@ -1,19 +1,32 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+#	NSsbackup - snapshot handling
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
 #
-# Authors: Oumar Aziz OUATTARA <wattazoum@gmail.com>
-#		   Jean-Peer Lorenz <peer.loz@gmx.net>
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+"""
+:mod:`BackupManager` --- backup handler class
+====================================================================
+
+.. module:: BackupManager
+   :synopsis: Defines a backup handler class
+.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
+.. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+
+"""
 
 
 from gettext import gettext as _
@@ -21,6 +34,8 @@ import os , grp, signal
 import datetime
 import re
 import socket
+import gobject
+
 from FuseFAM import FuseFAM
 from SnapshotManager import SnapshotManager
 from UpgradeManager import UpgradeManager
@@ -35,15 +50,17 @@ class PyNotifyMixin(object):
 	"""Mix-in class that provides the displaying of notifications using the
 	pynotify module. The notifications use the icon 'nssbackup32x32.png'.
 	
-	@todo: This is not the right place for the definition!
-	@todo: It would be more general if we give the icon to use as parameter!
+	:todo: This is not the right place for the definition!
+	:todo: It would be more general if we give the icon to use as parameter!
+	
 	"""
 	def __init__(self, logger):
 		"""Default constructor.
 		
-		@param logger: Instance of logger to be used.
+		:param logger: Instance of logger to be used.
 		
-		@todo: The notification domain should be retrieved from a central place!
+		:todo: The notification domain should be retrieved from a central place!
+		
 		"""
 		self.__logger = logger
 
@@ -52,6 +69,9 @@ class PyNotifyMixin(object):
 		
 		# the pynotify module is stored in this variable
 		self.__pynotif_mod   = None
+		
+		# the current notification
+		self.__notif = None
 		
 		# trying to initialize the notification module
 		try:
@@ -67,69 +87,143 @@ class PyNotifyMixin(object):
 			self.__pynotif_avail = False
 			self.__logger.warning(str(exc))
 		
-	def _notify_error( self, message ):
+
+	def _notify_info(self, profilename, message):
+		"""Shows up a pop-up window to inform the user. The notification
+		supports mark-up.		
+
+ 		:param message: The message (body) that should be displayed.
+ 		:type message:  String
+ 		
+		"""
+		if self.__pynotif_avail:
+			if self.__notif is None:
+				self.__notif = self.__get_notification(profilename, message)
+			else:
+				self.__update_notification(profilename, message)
+				
+			if isinstance(self.__notif, self.__pynotif_mod.Notification):
+				try:
+					self.__notif.set_urgency(self.__pynotif_mod.URGENCY_LOW)
+					self.__notif.show()
+				except gobject.GError, exc:
+				 	# Connection to notification-daemon failed 
+				 	self.logger.warning("Connection to notification-daemon "\
+										"failed: " + str(exc))
+
+	def _notify_warning(self, profilename, message):
+		"""Shows up a pop-up window to inform the user. The notification
+		supports mark-up.		
+
+ 		:param message: The message (body) that should be displayed.
+ 		:type message:  String
+ 		
+		"""
+		self.__notify_new(profilename, message, mode="warning")
+
+	def _notify_error(self, profilename, message):
 		"""Shows up a pop-up window to inform the user that an error occured.
 		Such error notifications are emphasized and must be closed manual. The
 		notifications support mark-up.
 
- 		@param message: The message (body) that should be displayed.
- 		@type message:  String
+ 		:param message: The message (body) that should be displayed.
+ 		:type message:  String
+ 		
+		"""
+		self.__notify_new(profilename, message, mode="critical")
+				 	
+	def __notify_new(self, profilename, message, mode):
+		"""Shows up a *new* pop-up window to inform the user that an error occured.
+		Such error notifications are emphasized and must be closed manual. The
+		notifications support mark-up.
+
+ 		:param message: The message (body) that should be displayed.
+ 		:type message:  String
+ 		
 		"""
 		if self.__pynotif_avail:
-			notif = self.__get_notification(message)
+			notif = self.__get_notification(profilename, message)
 			if isinstance(notif, self.__pynotif_mod.Notification):
-				notif.set_urgency(self.__pynotif_mod.URGENCY_CRITICAL)
-				notif.set_timeout(self.__pynotif_mod.EXPIRES_NEVER)
-				notif.show()
+				try:
+					notif.set_timeout(self.__pynotif_mod.EXPIRES_NEVER)
+					if mode == "critical":
+						notif.set_urgency(self.__pynotif_mod.URGENCY_CRITICAL)
+					else:
+						notif.set_urgency(self.__pynotif_mod.URGENCY_NORMAL)
+					notif.show()
+				except gobject.GError, exc:
+				 	# Connection to notification-daemon failed 
+				 	self.logger.warning("Connection to notification-daemon "\
+										"failed: " + str(exc))
 
-	def _notify_info( self, message ):
-		"""Shows up a pop-up window to inform the user. The notification
-		supports mark-up.		
-
- 		@param message: The message (body) that should be displayed.
- 		@type message:  String
-		"""
-		if self.__pynotif_avail:
-			notif = self.__get_notification(message)
-			if isinstance(notif, self.__pynotif_mod.Notification):
-				notif.show()
-
-	def __get_notification(self, message):
+	def __get_notification(self, profilename, message):
  		"""Returns a notification object but does not display it. The
  		notification supports mark-up. If notifications aren't supported
  		the method returns None.
  		
- 		@param message: The message (body) that should be displayed.
- 		@type message:  String
+ 		:param message: The message (body) that should be displayed.
+ 		:type message:  String
  		
- 		@return: The created notification object or None
- 		@rtype: Notification or None
+ 		:return: The created notification object or None
+ 		:rtype: Notification or None
 		
-		@todo: Replace single '<' characters by '&lt;' in a more reliable way!
-		@todo: The header and the icon should be given as parameter to make
+		:todo: Replace single '<' characters by '&lt;' in a more reliable way!
+		:todo: The header and the icon should be given as parameter to make
 			   this mix-in class more generic!
+			   
 		"""
 		notif = None
 		if self.__pynotif_avail:
 			message = message.replace("<", "&lt;")
 			ico = Util.getResource("nssbackup32x32.png")
-			notif = self.__pynotif_mod.Notification("NSsbackup", message, ico)
+			try:
+				notif = self.__pynotif_mod.Notification(
+								"NSsbackup [%s]" % profilename, message, ico)
+			except gobject.GError, exc:
+			 	# Connection to notification-daemon failed 
+			 	self.logger.warning("Connection to notification-daemon "\
+									"failed: " + str(exc))
+			 	notif = None
 		return notif
 
+	def __update_notification(self, profilename, message):
+ 		""" 		
+ 		:param message: The message (body) that should be displayed.
+ 		:type message:  String
+ 		
+		:todo: Replace single '<' characters by '&lt;' in a more reliable way!
+		:todo: The header and the icon should be given as parameter to make
+			   this mix-in class more generic!
+			   
+		"""
+		if self.__pynotif_avail:
+			message = message.replace("<", "&lt;")
+			ico = Util.getResource("nssbackup32x32.png")
+			try:
+				self.__notif.update(
+								"NSsbackup [%s]" % profilename, message, ico)
+			except gobject.GError, exc:
+			 	# Connection to notification-daemon failed 
+			 	self.logger.warning("Connection to notification-daemon "\
+									"failed: " + str(exc))
+			 	self.__notif = None
+				
 				
 class BackupManager(PyNotifyMixin):
 	"""Class that handles the backup process.
 	
-	@todo: The BackupManager should not does any GUI related tasks!
+	:todo: The BackupManager should not does any GUI related tasks!
+	
 	"""
 	
 	def __init__(self, configmanager):
 		"""The BackupManager Constructor.
 
-		@param configmanager : The current configuration manager
+		:param configmanager : The current configuration manager
 		
-		@note: Make sure to call for the appropriate logger before instantiating
-			   this class!
+		:note: Make sure to call for the appropriate logger before\
+			   instantiating this class!
+			   
 		"""
 		self.config			= configmanager
 		self.logger			= LogFactory.getLogger()		
@@ -153,10 +247,12 @@ class BackupManager(PyNotifyMixin):
 		self.logger.info(_("BackupManager created "))
 		
 	def makeBackup(self ):
-		"""Runs the whole backup process. 
+		"""Runs the whole backup process.
+		
 		"""
-		self._notify_info(_("Starting backup Session") + " [%s]" % self.__profilename)
-		self.logger.info(_("Starting backup") + " [%s]" % self.__profilename)
+		_msg = _("Starting backup Session")
+		self._notify_info(self.__profilename, _msg)
+		self.logger.info(_msg)
 		
 		# set the lockfile
 		self.__setlockfile()
@@ -173,18 +269,30 @@ class BackupManager(PyNotifyMixin):
 		if os.geteuid() == 0 :
 			try :
 				# The uid is still root and the gid is admin
-				os.setgid( grp.getgrnam("admin").gr_gid )
-			except Exception, e: 
-				self.logger.warning(_("Failed to set the gid to 'admin' one :") + str(e) )
+				os.setgid( grp.getgrnam("admin").gr_gid )				
+			except (KeyError, OSError), exc: 
+				self.logger.warning(_("Failed to set the gid to 'admin' one :") + str(exc))
 
 		# Check the target dir
 		self.__checkTarget()
 		
-		# Upgrade Target 
-		try :
-			self.__um.upgradeAll( self.config.get("general","target")  )
-		except exceptions.SBException, e:
-			self.logger.warning(str(e))
+		# Upgrade Target
+		# But we should not upgrade without user's agreement!
+		# Solution 1: add an option: AutoAupgrade = True/False
+		#          2: start with a new and full dump and inform the user that
+		#			  there are snapshots in older versions 
+		needupgrade = False
+		try:
+			needupgrade = self.__um.need_upgrade(self.config.get("general",
+																  "target"))
+		except exceptions.SBException, exc:
+			self.logger.warning(str(exc))
+
+		if needupgrade:
+			_msg = "There are snapshots with old snapshot format."\
+				   " Please upgrade them if you want to use them."
+			self._notify_warning(self.__profilename, _msg)
+			self.logger.warning(_msg)
 		
 		# purge
 		purge = None
@@ -192,21 +300,22 @@ class BackupManager(PyNotifyMixin):
 			purge = self.config.get("general", "purge")
 		if purge :
 			self.__snpman.purge(purge)
+				
+		# get basic informations about new snapshot
+		(snppath, base, prev) = self.__retrieve_basic_infos()
 		
-		# Get the snapshots list
-		listing = self.__snpman.getSnapshots()
-		
-		# Is Inc or Full ? 
-		(name, base, prev) = self.__isIncOrFull(listing)
-		
-		# Create snapshot
-		self.__actualSnapshot = Snapshot(name)
-		self.logger.info(_("Starting snapshot %(name)s ") % {'name' :str(self.__actualSnapshot)})
+		# Create a new snapshot
+		self.__actualSnapshot = Snapshot(snppath)
+		self.logger.info(_("Starting snapshot %(name)s ")
+						 % {'name' :str(self.__actualSnapshot)})
 		
 		# Set the base file
 		if base :
-			self.logger.info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
-			self.__actualSnapshot.setBase(base.getName())
+			if self.__actualSnapshot.isfull():
+				self.logger.info("Base is not set for full snapshot")
+			else:
+				self.logger.info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
+				self.__actualSnapshot.setBase(base.getName())
 		del base
 
 		# Backup list of installed packages (Debian only part)
@@ -219,7 +328,6 @@ class BackupManager(PyNotifyMixin):
 			self.__actualSnapshot.setPackages(pkg)
 		except Exception, e:
 			self.logger.warning(_("Problem when setting the packages : ") + str(e))
-		
 		
 		# set Excludes
 		self.logger.info(_("Setting Excludes File "))
@@ -244,7 +352,7 @@ class BackupManager(PyNotifyMixin):
 		
 		self.__fillSnapshot(prev)
 					
-		self._notify_info(_("File list ready , Committing to disk") + " [%s]" % self.__profilename)
+		self._notify_info(self.__profilename, _("File list ready , Committing to disk"))
 				
 		self.__actualSnapshot.commit()
 		
@@ -487,7 +595,7 @@ class BackupManager(PyNotifyMixin):
 		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
 		self.__fusefam.terminate()
 
-		self._notify_info(_("Ending Backup Session") + " [%s]" % self.__profilename)
+		self._notify_info(self.__profilename, _("Ending Backup Session"))
 
 	def __checkTarget(self):
 		"""
@@ -502,18 +610,31 @@ class BackupManager(PyNotifyMixin):
 			FAM.makedir(self.config.get("general","target"))
 		
 		# Try to write inside so that we don't work for nothing
+		_testfile = os.path.join(self.config.get("general","target"), "test")
 		try :
-			FAM.writetofile(self.config.get("general","target")+"/test", "testWritable")
-			FAM.delete(self.config.get("general","target")+"/test")
+			
+			FAM.writetofile(_testfile, "testWritable")
+			FAM.delete(_testfile)
 		except Exception, e :
 			self.logger.error(_("Target not writable : ") + str(e))
 			raise e
 	
-	def __isIncOrFull(self, listing ):
+	def __retrieve_basic_infos(self):
+		"""Retrieves basic informations about the snapshot that is going
+		to be created. This informations include:
+		1. the path of the new snapshot
+		2. the base of the new snapshot
+		3. the value `prev` that is currently unused
+		
+		:param listing: a list of snapshots
+		
+		:return: the determined `snppath`, `base` and  `prev`
+		:rtype: a tuple
+		
 		"""
-		@param listing: a list of snapshot
-		@return: a tuple (name, base, prev)
-		""" 
+		# Get the list of snapshots that matches the latest snapshot format
+		listing = self.__snpman.get_snapshots()
+
 		prev = {}
 		base = None
 		if len(listing) == 0 :
@@ -547,22 +668,25 @@ class BackupManager(PyNotifyMixin):
 							increment = False
 						break
 				else:
-					self.logger.info(" No full backup found -> lets make a full backup to be safe")
-					increment = False            # No full backup found 8) -> lets make a full backup to be safe
+					self.logger.info("No full backup found -> lets make a full backup to be safe")
+					increment = False
 		
 		# Determine and create backup target directory
 		hostname = socket.gethostname()
-		
-		tdir = self.config.get("general","target") + "/" + datetime.datetime.now().isoformat("_").replace( ":", "." ) + "." + hostname + "."
+		snpname = "%s.%s" % (datetime.datetime.now().isoformat("_").replace( ":", "." ),
+							 hostname)
 		if increment:
-			tdir = tdir + "inc"
+			snpname = "%s.inc" % snpname
 		else:
-			tdir = tdir + "ful"
+			snpname = "%s.ful" % snpname
+		
+		tdir = os.path.join(self.config.get("general","target"), snpname)
 			
 		return (tdir, base, prev)
 
 	def getActualSnapshot(self):
-		"""
+		"""Apparently unused at the moment!
+		
 		get the actual snapshot
 		"""
 		return self.__actualSnapshot
