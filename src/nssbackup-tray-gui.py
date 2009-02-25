@@ -16,17 +16,22 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 
-import sys
-import gettext
-from nssbackup.nssbackupd import main
+import gettext, sys
+from nssbackup.ui.SBSystrayGTK import main
 from nssbackup.util import getResource
-import os, time
-# i18n init
-application = 'nssbackup'
-locale_dir = getResource('locale')
+#import gtk
 
-gettext.bindtextdomain(application, locale_dir)
-gettext.textdomain(application)
-pid = os.spawnl(os.P_NOWAIT, "nssbackup-tray-gui.py"); print "pid: %s" % pid
-#time.sleep(10)
-main(sys.argv)
+#----------------------------------------------------------------------
+
+if __name__ == '__main__':
+	# i18n init
+	application = 'nssbackup'
+	locale_dir = getResource('locale')
+    
+	gettext.bindtextdomain(application, locale_dir)
+	gettext.textdomain(application)
+
+#	gtk.glade.bindtextdomain(application, locale_dir)
+#	gtk.glade.textdomain(application)
+
+	main(sys.argv)
