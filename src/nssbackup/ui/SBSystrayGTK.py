@@ -50,8 +50,77 @@ import pynotify
 
 from gettext import gettext as _
 
-from nssbackup.util import nssbackup_dbus_support
+from nssbackup.util import dbus_support
 import nssbackup.util as Util
+
+
+class SBackupdGuiDBusObject(dbus.service.Object):
+
+    def __init__(self, session_bus, object_path, systray_gui_obj):
+        dbus.service.Object.__init__(self, session_bus, object_path)
+        self._session_bus   = session_bus
+        self._systray_gui   = systray_gui_obj
+    
+    @dbus.service.method(dbus_support.DBUS_GUI_INTERFACE,
+                         in_signature='s', out_signature='as')
+    def HelloWorld(self, hello_message):
+        """Take care: the reply might timeout!
+        """
+        print (str(hello_message))
+#        self._systray_gui.err_msg(hello_message)
+        gobject.idle_add(self._systray_gui.err_msg, hello_message)
+        return ["Hello", " from sbackup_client_systray.py", "with unique name",
+                self._session_bus.get_unique_name()]
+
+#    @dbus.service.method(dbus_support.DBUS_GUI_INTERFACE,
+#                         in_signature='', out_signature='')
+#    def RaiseException(self):
+#        raise DemoException('The RaiseException method does what you might '
+#                            'expect')
+
+    @dbus.service.method(dbus_support.DBUS_GUI_INTERFACE,
+                         in_signature='', out_signature='(ss)')
+    def GetTuple(self):
+        return ("Hello Tuple", " from example-service.py")
+
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
+                         in_signature='', out_signature='a{ss}')
+    def GetDict(self):
+        return {"first": "Hello Dict", "second": " from example-service.py"}
+
+    @dbus.service.method(dbus_support.DBUS_GUI_INTERFACE,
+                         in_signature='', out_signature='')
+    def Exit(self):
+        print "Exit was called."
+        if self._systray_gui:
+            self._systray_gui.quit()
+
+
+class SBackupdGuiDBusService(object):
+    def __init__(self, systray_gui_obj):
+        print "CONSTRUCTOR 'SBackupdGuiDBusService'"
+        self._session_bus   = None
+        self._dbus_service  = None
+        self._export_obj    = None
+        self._initialize_dbus_service(systray_gui_obj)
+                        
+    def _initialize_dbus_service(self, systray_gui_obj):
+        print "SBackupdGuiDBusService._initialize_dbus_service"
+        if systray_gui_obj is None:
+            raise ValueError("ERR: The systray gui object must not be None!")
+        
+        self._session_bus = dbus.SessionBus()
+        self._dbus_service = dbus.service.BusName(\
+                                      dbus_support.DBUS_GUI_SERVICE,
+                                      self._session_bus)
+        self._export_obj = SBackupdGuiDBusObject(self._session_bus,
+                                      dbus_support.DBUS_GUI_OBJ_PATH,
+                                      systray_gui_obj)
+
+    def get_exported_dbus_obj(self):
+        if self._export_obj is None:
+            raise ValueError("Exported object must be not None!")
+        return self._export_obj
 
 
 class SBackupdSystrayGui(object):
@@ -64,18 +133,16 @@ class SBackupdSystrayGui(object):
         self._sbackupd_dbus_obj = sbackupd_dbus_obj
         self.__connect_signal_handlers()
         
-        self.notification   = pynotify.Notification(" ",
-                                                    " ",
-        "file:///home/peer/programming/python/sbackup/sbackup-mod/sbackup.png")
+        ico = Util.getResource("nssbackup32x32.png")
+        self.notification   = pynotify.Notification(" ", " ", ico)
         
-        print "DIR notif:"
-        print dir(self.notification)
+#        print "DIR notif:"
+#        print dir(self.notification)
         
         self.trayicon     = gtk.StatusIcon()
         self.window         = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.menu           = gtk.Menu()
-        self.sbackupdamon = None
-        self.mainloop = None
+#        self._mainloop = None
         self._blocking_factor = 20
         self._blocksize = 512
         self._total_size = "??"
@@ -90,7 +157,7 @@ class SBackupdSystrayGui(object):
             _val = signal_handlers[_key]
             print "K: %s; V: %s" % (_key, _val)
             self._sbackupd_dbus_obj.connect_to_signal(_key, _val,
-                            dbus_interface=nssbackup_dbus_support.DBUS_INTERFACE)
+                            dbus_interface=dbus_support.DBUS_INTERFACE)
         
     def _hello_signal_handler(self, hello_string):
         msg = "Received signal (by connecting using remote object) and it says: " + hello_string
@@ -115,7 +182,8 @@ class SBackupdSystrayGui(object):
         return False
     
     def quit(self):
-        gobject.idle_add(self.on_exit)
+#        gobject.idle_add(self.on_exit)
+        gobject.timeout_add(5000, self.on_exit)
     
     def quit_cb(self, widget, data = None):
         if data:
@@ -243,8 +311,8 @@ class SBackupdSystrayGui(object):
         
 
     def _create_custom_events(self):
-#        pass
-        gobject.timeout_add(1000, self.on_init_timer)
+        pass
+#        gobject.timeout_add(1000, self.on_init_timer)
 
         
     def main(self):
@@ -265,7 +333,7 @@ class SBackupdGuiApp(object):
         self._sbackup_dbus_obj = remote_sbackupd_dbus_obj
         
         self._systray_gui   = SBackupdSystrayGui(self._sbackup_dbus_obj)
-#        self._dbus_service  = SBackupdGuiDBusService(self._systray_gui)
+        self._dbus_service  = SBackupdGuiDBusService(self._systray_gui)
         
     def main(self):
         self._systray_gui.main()
@@ -294,8 +362,8 @@ def main(args):
     
     try:
         session_bus = dbus.SessionBus()
-        remote_sbackupd_obj  = session_bus.get_object(nssbackup_dbus_support.DBUS_SERVICE,
-                                             nssbackup_dbus_support.DBUS_OBJ_PATH)
+        remote_sbackupd_obj  = session_bus.get_object(dbus_support.DBUS_SERVICE,
+                                             dbus_support.DBUS_OBJ_PATH)
         
     except dbus.DBusException, exc:
         print "ERR: %s" % exc

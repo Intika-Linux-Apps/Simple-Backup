@@ -1,4 +1,4 @@
-#	NSsbackup - the actual backup service
+#    NSsbackup - the actual backup service
 #
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
@@ -29,6 +29,7 @@
 """
 
 
+import sys
 import os
 import os.path
 import traceback
@@ -37,232 +38,402 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import socket
 import datetime
+import time
 import re
 from gettext import gettext as _
+import dbus
 
 from nssbackup.util import log
+from nssbackup.util import dbus_support
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.managers.ConfigManager import getUserConfDir
 from nssbackup.managers.ConfigManager import ConfigManager
 from nssbackup.managers.BackupManager import BackupManager
-from nssbackup.managers.BackupManager import PyNotifyMixin
+from nssbackup.util import exceptions
 
 
-class NSsbackupd(PyNotifyMixin) :
-	"""This class is intended to be a wrapper of nssbackup instances. 
-	It manages :
-	- the full backup process : creation of instances of the BackupManager
-	  with the corresponding config file 
-	- the logging of exception not handled by BackupManager
-	- the removal of lockfiles
-	- the sending of emails
-	
-	"""
-	
-	__confFilesRE = "^nssbackup-(.+?)\.conf$"
+class DBusConnection(object):
+    """This class provides functionality for sending signals
+    and calling methods over the dbus.
+    
+    The sender needs a dbus connection.
+    
+    The Dbus connection is only created on demand. In the case the user
+    don't want to use it, no connection is created.
+    """
+    def __init__(self, logger):
+        """Default constructor.
+        
+        :param logger: Instance of logger to be used.
+        
+        """
+        self.__logger = logger
+        
+        self._session_bus   = None
+        self._remote_obj    = None
+        self._remote_gui    = None
+        self._dbus_present  = False
+        self._gui_present = False
 
-	def __init__(self):
-		"""Default constructor. Basic initializations are done here.
+    def __do_connect(self, service, path):
+        remote_obj = None
+        timeout = 30        # seconds
+        max_trials = 10     # number of max. trials
+        dur = timeout/max_trials
+        
+        trials = 0          # done trials
+        connecting = True
+        while connecting:
+            try:
+                trials += 1
+                print "Trying to connect to `%s` (trial no. %s)" % (service,
+                                                                    trials)
+                remote_obj  = self._session_bus.get_object(service, path)
+                connecting = False
+                print "successfully connected to `%s`" % service
+            except dbus.DBusException, exc:
+                print "\nError while getting service:\n%s" % (str(exc))
+                if trials == max_trials:
+                    print "Number of max. trials reached - timeout!"
+                    connecting = False
+                    remote_obj = None
+                else:
+                    print "Waiting %s sec. before re-connecting" % dur
+                    time.sleep(dur)
+        return remote_obj
+        
+    def connect(self):
+        """
+        :todo: Implement check whether the service is already running!
+        
+        """
+        self._session_bus = dbus.SessionBus()
+        
+        self._remote_obj  = self.__do_connect(dbus_support.DBUS_SERVICE,
+                                              dbus_support.DBUS_OBJ_PATH)
+        if self._remote_obj is not None:
+            self._dbus_present = True
 
-		:note: Retrieve the configuration manager very early to ensure that 
-			   an appropriate logger instances are created.
-		
-		"""
-		self.__errors			= []
-		self.__super_user		= False
-		self.__check_for_superuser()
-		
-		# collection of all config managers
-		self.__confm			= []
-		# the name of the currently processed profile
-		self.__profileName		= None
-		self.__retrieve_confm()
+        # now for the gui service
+        self._remote_gui  = self.__do_connect(dbus_support.DBUS_GUI_SERVICE,
+                                              dbus_support.DBUS_GUI_OBJ_PATH)
+        if self._remote_gui is not None:
+            self._gui_present = True
 
-		# here the logger created for the default profile is used
-		self.logger			= log.LogFactory.getLogger(self.__profileName)
+        print "Dbus service available: %s" % self._dbus_present
+        print "GUI service available: %s" % self._gui_present
+        
+    def handle_reply(self, msg):
+        print msg
+    
+    def handle_error(self, e):
+        print str(e)
+    
+    def emit_signal(self, msg):
+        """Used for sending a signal over the signal dbus.
+        
+        """ 
+        ret_val = self._remote_obj.emitSignal(msg,
+                            dbus_interface=dbus_support.DBUS_INTERFACE)
+                    #reply_handler = handle_reply, error_handler = handle_error)
+        print "Returned value: %s" % ret_val
+        return False
 
-		# the currently used instance of the BackupManager
-		self.__bm				= None
+    def call_method(self, msg):
+        """Used for calling a method on the GUI Dbus.
+        
+        """
+        print "call_method - msg: %s" % msg
+        ret_val = self._remote_gui.HelloWorld(msg,
+                        dbus_interface=dbus_support.DBUS_GUI_INTERFACE)
+        print "returned: %s" % ret_val
 
-		PyNotifyMixin.__init__(self, self.logger)
+    def _notify_info(self, profilename, message):
+        raise exceptions.NotSupportedError("Not yet implemented!")
 
-	def __check_for_superuser(self):
-		"""Checks whether the application was invoked with super-user rights.
-		If so, the member variable 'self.__super_user' is set.
-		"""
-		if os.getuid() == 0:
-			self.__super_user = True
-		
-	def __sendEmail(self):
-		"""Checks if the sent of emails is set in the config file 
-		then send an email with the report
-		"""
-		if self.__bm.config.has_option("report","from") :
-			_from =self.__bm.config.get("report","from")
-		else :
-			hostname = socket.gethostname()
-			if "." in hostname :
-				mailsuffix = hostname
-			else :
-				mailsuffix = hostname + ".ext"
-			_from = _("NSsbackup Daemon <%(login)s@%(hostname)s>")\
-					% {'login' : os.getenv("USERNAME"), 'hostname': mailsuffix}
-		
-		_to = self.__bm.config.get("report","to")
-		_title = _("[NSsbackup] [%(profile)s] Report of %(date)s")\
-					% { 'profile':self.__profileName,
-					    'date': datetime.datetime.now() }
-		logf = self.__bm.config.get_logfile()
-		if FAM.exists( logf ):
-			_content = FAM.readfile( logf )
-		else :
-			_content = _("I didn't find the log file. Please set it up in "\
-						 "nssbackup.conf ")
-		
-		server = smtplib.SMTP()
-		msg = MIMEMultipart()
-		
-		msg['Subject'] = _title
-		msg['From'] = _from
-		msg['To'] = _to
-		msg.preamble = _title
-		
-		msg_content = MIMEText(_content)
-		# Set the filename parameter
-		msg_content.add_header('Content-Disposition', 'attachment',
-							   filename="nssbackup.log")
-		msg.attach(msg_content)
-		
-		# getting the connection
-		if self.__bm.config.has_option("report","smtpserver") :
-			if self.__bm.config.has_option("report","smtpport") :
-				server.connect(self.__bm.config.get("report","smtpserver"),
-							   self.__bm.config.get("report","smtpport"))
-			else : 
-				server.connect(self.__bm.config.get("report","smtpserver"))
-		if self.__bm.config.has_option("report","smtptls") and\
-					self.__bm.config.get("report","smtptls") == 1 : 
-			if self.__bm.config.has_option("report","smtpcert") and\
-					self.__bm.config.has_option("report","smtpkey") :
-				server.starttls(self.__bm.config.get("report","smtpkey"),
-							    self.__bm.config.get("report","smtpcert"))
-			else :
-				server.starttls()
-		if self.__bm.config.has_option("report","smtpuser") and\
-				self.__bm.config.has_option("report","smtppassword") : 
-			server.login(self.__bm.config.get("report","smtpuser"),
-						 self.__bm.config.get("report","smtppassword"))
-		
-		# send and close connection
-		server.sendmail(_from, _to, msg.as_string())
-		server.close()
-	
-	def __retrieve_confm(self):
-		"""Factory method that retrieves the appropriate configuration managers
-		for the existing profiles. Super-user rights are taken into account.
-		The created configuration managers are stored in member variable
-		'self.__confm'.
-		"""
-		self.__confm = []
+    def _notify_warning(self, profilename, message):
+        raise exceptions.NotSupportedError("Not yet implemented!")
 
-		# default profile config file and the config directory is determined
-		if self.__super_user:
-			conffile = "/etc/nssbackup.conf"
-			confdir  = "/etc/nssbackup.d"
-		else:
-			conffile = os.path.join( getUserConfDir(), "nssbackup.conf" )
-			confdir  = os.path.join( getUserConfDir(), "nssbackup.d" )
+    def _notify_error(self, profilename, message):
+        raise exceptions.NotSupportedError("Not yet implemented!")
+    
+    def exit(self):
+        print "Calling 'Exit' on remote objects! Exiting..."
+        if self._remote_obj:
+            self._remote_obj.Exit(dbus_interface=\
+                                  dbus_support.DBUS_INTERFACE)
+        if self._remote_gui:
+            self._remote_gui.Exit(dbus_interface=\
+                                  dbus_support.DBUS_GUI_INTERFACE)
+        
+    
+class NSsbackupd(object):
+    """This class is intended to be a wrapper of nssbackup instances. 
+    It manages :
+    - the full backup process : creation of instances of the BackupManager
+      with the corresponding config file 
+    - the logging of exception not handled by BackupManager
+    - the removal of lockfiles
+    - the sending of emails
+    
+    """
+    
+    __confFilesRE = "^nssbackup-(.+?)\.conf$"
 
-		# create config manager for the default profile and set as current
-		if os.path.exists( conffile ):
-			confm = ConfigManager( conffile )
-			self.__profileName = confm.getProfileName()
-			# store the created ConfigManager in a collection
-			self.__confm.append( confm )
-		else:
-			errmsg = _("Critical Error: No configuration file for the default "\
-					   "profile was found!\n\nNow continue processing "\
-					   "remaining profiles.")
-			self.__errors.append(errmsg)
+    def __init__(self):
+        """Default constructor. Basic initializations are done here.
 
-		# Now search for alternate configuration files
-		# They are located in (configdir)/nssbackup.d/
-		if os.path.exists(confdir) and os.path.isdir(confdir):
-			cregex = re.compile(self.__confFilesRE)
-			cfiles = os.listdir( confdir )
-			for cfil in cfiles:
-				cfil_fullpath = os.path.join( confdir, cfil )
-				if os.path.isfile( cfil_fullpath ):
-					mres = cregex.match( cfil )
-					if mres:	# if filename matches, create manager and add it
-						confm = ConfigManager( cfil_fullpath )
-						self.__confm.append( confm )
+        :note: The configuration managers are retrieved very early
+               to ensure that specific logger instances are created.
+        
+        """
+        self.__errors            = []
+        self.__super_user        = False
+        self.__check_for_superuser()
+        
+        # collection of all config managers
+        self.__confm            = []
+        # the name of the currently processed profile
+        self.__profileName        = None
+        self.__retrieve_confm()
 
-	def run(self):
-		"""Actual main method to make backups using NSsbackup
-		
-		- checks for the user who called it
-		- if it's root, it makes a loop to run sbackup for all users that asked for it.
-	 	- if it's another user, launch BackupManager with the user configuration file
-		- catches all exceptions thrown and logs them (with stacktrace)
-		"""
-		self.__notify_errlist()
-		
-		for confm in self.__confm:
-			try:
-				self.__profileName 	= confm.getProfileName()
-				self.logger			= log.LogFactory.getLogger(self.__profileName)
-				self.__bm 			= BackupManager( confm )
-				self.__log_errlist()
-				self.__bm.makeBackup()
-			except Exception, e:
-				self.__onError(e)
-			finally:
-				self.__onFinish()
+        # here the logger created for the default profile is used
+        self.logger            = log.LogFactory.getLogger(self.__profileName)
 
-	def __onError(self, e):
-		"""Handles errors that occurs during backup process.
-		"""
-		self.logger.error(str(e))
-		self.logger.error(traceback.format_exc())
+        # the currently used instance of the BackupManager
+        self.__bm                = None
 
-		try:
-			n_body = "An error occured: '%s'" % (str(e))
-			self._notify_error(self.__profileName, n_body)
-		except Exception, e1:
-			self.logger.warning(str(e1))
-		
-		if self.__bm:
-			self.__bm.endSBsession()
+        self._dbus_connection = None
+        
+        
+    def __check_for_superuser(self):
+        """Checks whether the application was invoked with super-user rights.
+        If so, the member variable 'self.__super_user' is set.
+        """
+        if os.getuid() == 0:
+            self.__super_user = True
+        
+    def __sendEmail(self):
+        """Checks if the sent of emails is set in the config file 
+        then send an email with the report
+        """
+        if self.__bm.config.has_option("report","from") :
+            _from =self.__bm.config.get("report","from")
+        else :
+            hostname = socket.gethostname()
+            if "." in hostname :
+                mailsuffix = hostname
+            else :
+                mailsuffix = hostname + ".ext"
+            _from = _("NSsbackup Daemon <%(login)s@%(hostname)s>")\
+                    % {'login' : os.getenv("USERNAME"), 'hostname': mailsuffix}
+        
+        _to = self.__bm.config.get("report","to")
+        _title = _("[NSsbackup] [%(profile)s] Report of %(date)s")\
+                    % { 'profile':self.__profileName,
+                        'date': datetime.datetime.now() }
+        logf = self.__bm.config.get_logfile()
+        if FAM.exists( logf ):
+            _content = FAM.readfile( logf )
+        else :
+            _content = _("I didn't find the log file. Please set it up in "\
+                         "nssbackup.conf ")
+        
+        server = smtplib.SMTP()
+        msg = MIMEMultipart()
+        
+        msg['Subject'] = _title
+        msg['From'] = _from
+        msg['To'] = _to
+        msg.preamble = _title
+        
+        msg_content = MIMEText(_content)
+        # Set the filename parameter
+        msg_content.add_header('Content-Disposition', 'attachment',
+                               filename="nssbackup.log")
+        msg.attach(msg_content)
+        
+        # getting the connection
+        if self.__bm.config.has_option("report","smtpserver") :
+            if self.__bm.config.has_option("report","smtpport") :
+                server.connect(self.__bm.config.get("report","smtpserver"),
+                               self.__bm.config.get("report","smtpport"))
+            else : 
+                server.connect(self.__bm.config.get("report","smtpserver"))
+        if self.__bm.config.has_option("report","smtptls") and\
+                    self.__bm.config.get("report","smtptls") == 1 : 
+            if self.__bm.config.has_option("report","smtpcert") and\
+                    self.__bm.config.has_option("report","smtpkey") :
+                server.starttls(self.__bm.config.get("report","smtpkey"),
+                                self.__bm.config.get("report","smtpcert"))
+            else :
+                server.starttls()
+        if self.__bm.config.has_option("report","smtpuser") and\
+                self.__bm.config.has_option("report","smtppassword") : 
+            server.login(self.__bm.config.get("report","smtpuser"),
+                         self.__bm.config.get("report","smtppassword"))
+        
+        # send and close connection
+        server.sendmail(_from, _to, msg.as_string())
+        server.close()
+    
+    def __retrieve_confm(self):
+        """Factory method that retrieves the appropriate configuration managers
+        for the existing profiles. Super-user rights are taken into account.
+        The created configuration managers are stored in member variable
+        'self.__confm'.
+        
+        :todo: Place the path names in class `ConfigStaticData`.
+        
+        """
+        self.__confm = []
 
-	def __onFinish(self):
-		"""Method that is finally called after backup process.
-		"""
-		if self.__bm and self.__bm.config :
-			# send the mail
-			if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
-				self.__sendEmail()
-				
-	def __notify_errlist(self):
-		"""Errors that occured during the initialization process were stored
-		in an error list. This error list is showed to the user by this method.
-		"""
-		if len(self.__errors) > 0:
-			for errmsg in self.__errors:
-				self._notify_error(self.__profileName, errmsg)
+        # default profile config file and the config directory is determined
+        if self.__super_user:
+            conffile = "/etc/nssbackup.conf"
+            confdir  = "/etc/nssbackup.d"
+        else:
+            conffile = os.path.join( getUserConfDir(), "nssbackup.conf" )
+            confdir  = os.path.join( getUserConfDir(), "nssbackup.d" )
 
-	def __log_errlist(self):
-		"""Errors that occured during the initialization process were stored
-		in an error list. This error list is added to the current log.
-		"""
-		if len(self.__errors) > 0:
-			self.logger.info(_("The following error(s) occurred before:"))
-			for errmsg in self.__errors:
-				self.logger.error(errmsg.replace("\n", " "))
-	
+        # create config manager for the default profile and set as current
+        if os.path.exists( conffile ):
+            confm = ConfigManager( conffile )
+            self.__profileName = confm.getProfileName()
+            # store the created ConfigManager in a collection
+            self.__confm.append( confm )
+        else:
+            errmsg = _("Critical Error: No configuration file for the default "\
+                       "profile was found!\n\nNow continue processing "\
+                       "remaining profiles.")
+            self.__errors.append(errmsg)
+
+        # Now search for alternate configuration files
+        # They are located in (configdir)/nssbackup.d/
+        if os.path.exists(confdir) and os.path.isdir(confdir):
+            cregex = re.compile(self.__confFilesRE)
+            cfiles = os.listdir( confdir )
+            for cfil in cfiles:
+                cfil_fullpath = os.path.join( confdir, cfil )
+                if os.path.isfile( cfil_fullpath ):
+                    mres = cregex.match( cfil )
+                    if mres:    # if filename matches, create manager and add it
+                        confm = ConfigManager( cfil_fullpath )
+                        self.__confm.append( confm )
+
+    def __setup_dbus(self):
+        self._dbus_connection = DBusConnection(self.logger)
+        self._dbus_connection.connect()
+
+    def run(self):
+        """Actual main method to make backups using NSsbackup
+        
+        - checks for the user who called it
+        - if it's root, it makes a loop to run sbackup for all users that asked for it.
+         - if it's another user, launch BackupManager with the user configuration file
+        - catches all exceptions thrown and logs them (with stacktrace)
+        """
+        # if config == use_dbus...
+        self.__setup_dbus()
+
+        print "DAEMON - now everything is prepared for doing a backup"
+#        print "Emitting signal now..."
+#        self._dbus_connection.emit_signal("Hello")
+
+#        for i in range(0, 2):
+#            print '.'
+#            time.sleep(1)
+
+#        not suitable for user interaction!
+#        self._dbus_connection.call_method("This is a message call from 'sbackup_sender.py':\n"\
+#                         "We finished.")
+#        print "We finished!"
+            
+#        self.__notify_errlist()
+#        
+        for confm in self.__confm:
+            try:
+                self.__profileName     = confm.getProfileName()
+                self.logger            = log.LogFactory.getLogger(self.__profileName)
+                self.__bm              = BackupManager( confm )
+                self.__log_errlist()
+                self.__attempt_notify(event='start')
+                self.__bm.makeBackup()
+                self.__attempt_notify(event='finish')
+            except Exception, e:
+                self.__onError(e)
+            finally:
+                self.__onFinish()
+
+        self._dbus_connection.exit()
+
+    def __onError(self, e):
+        """Handles errors that occurs during backup process.
+        """
+        self.logger.error(str(e))
+        self.logger.error(traceback.format_exc())
+
+        try:
+            n_body = "An error occured: '%s'" % (str(e))
+            self._notify_error(self.__profileName, n_body)
+        except Exception, e1:
+            self.logger.warning(str(e1))
+        
+        if self.__bm:
+            self.__bm.endSBsession()
+
+    def __onFinish(self):
+        """Method that is finally called after backup process.
+        """
+        if self.__bm and self.__bm.config :
+            # send the mail
+            if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
+                self.__sendEmail()
+                
+    def __notify_errlist(self):
+        """Errors that occured during the initialization process were stored
+        in an error list. This error list is showed to the user by this method.
+        """
+        if len(self.__errors) > 0:
+            for errmsg in self.__errors:
+                self._notify_error(self.__profileName, errmsg)
+
+    def __log_errlist(self):
+        """Errors that occurred during the initialization process
+        were stored in an error list. The full list of errors is
+        added to the current log.
+        
+        """
+        if len(self.__errors) > 0:
+            self.logger.info(_("The following error(s) occurred before:"))
+            for errmsg in self.__errors:
+                self.logger.error(errmsg.replace("\n", " "))
+                
+    def __attempt_notify(self, event):
+        if self._dbus_connection is not None:
+            
+            if event == 'start':
+                print "EVENT: %s" % event
+                _msg = _("Starting backup Session")
+#                self._notify_info(self.__profilename, _msg)
+                self.logger.info(_msg)
+                self._dbus_connection.emit_signal(_msg)
+                
+            elif event == 'finish':
+                self._dbus_connection.emit_signal(_("Ending Backup Session"))
+
+            else:
+                print "EVENT UNSUPPORTED (%s)" % event
+
+
 def main(argv):
-	"""Public function that process the backups.
-	"""
-	sbd = NSsbackupd()
-	sbd.run()
-	log.shutdown_logging()
+    """Public function that process the backups.
+    
+    :todo: Should be give the DBus conenction as parameter? No, because it\
+           cannot be determined whether the dbus should be used at this\
+           time!
+           
+    """
+    sbd = NSsbackupd()
+    sbd.run()
+    log.shutdown_logging()

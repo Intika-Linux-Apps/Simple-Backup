@@ -500,14 +500,13 @@ class Dumpdir(object):
 		return self.__HRCtrls[self.getControl()]
 		
 	@classmethod
-	def getHRCtrls(Dumpdir):
+	def getHRCtrls(cls):
 		"""
 		@return: The Human Readable control dictionary
 		@rtype: dict
 		
-		@todo: Replace parameter 'Dumpdir' by 'cls'!
 		"""
-		return Dumpdir.__HRCtrls
+		return cls.__HRCtrls
 	
 
 class SnapshotFile(object):

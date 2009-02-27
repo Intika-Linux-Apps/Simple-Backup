@@ -14,24 +14,23 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
+#	Jean-Peer Lorenz <peer.loz@gmx.net>
 
-import gettext, sys
-from nssbackup.ui.SBSystrayGTK import main
+import sys
+import gettext
+
+#print "PYTHONPATH:"
+#print str(sys.path)
+
 from nssbackup.util import getResource
-#import gtk
-
-#----------------------------------------------------------------------
+from nssbackup.dbus_service import launch
 
 if __name__ == '__main__':
-	# i18n init
-	application = 'nssbackup'
-	locale_dir = getResource('locale')
+    # i18n init
+    application = 'nssbackup'
+    locale_dir = getResource('locale')
     
-	gettext.bindtextdomain(application, locale_dir)
-	gettext.textdomain(application)
-
-#	gtk.glade.bindtextdomain(application, locale_dir)
-#	gtk.glade.textdomain(application)
-
-	main(sys.argv)
+    gettext.bindtextdomain(application, locale_dir)
+    gettext.textdomain(application)
+    
+    launch(sys.argv)

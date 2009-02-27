@@ -70,9 +70,14 @@ def getUserTempDir():
 	:todo: Put the definition of used paths into `ConfigStaticData`!
 		   
 	"""
-	tempdir = os.path.join( "/tmp", "nssbackup/" ) 
+	if os.getuid() == 0 :
+		tempdir = os.path.join( "/tmp", "nssbackup/" ) 
+	else:
+		tempdir = os.path.join(getUserDatasDir(), "tmp/")
+
 	if not os.path.exists(tempdir) :
 		os.mkdir(tempdir)
+		
 	return tempdir
 
 def get_profilename(conffile):

@@ -1,34 +1,55 @@
 #!/usr/bin/env python
 
+#   NSsbackup - helper script for multiple volume backups
+#
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+
 import os, re, sys
 from gettext import gettext as _
 
-vol = os.getenv("TAR_VOLUME")
-archRE = re.compile("(.+?/)?files(-[0-9]+)*?\.tar")
-arch = os.getenv("TAR_ARCHIVE")
-name = "files"
-
-m = archRE.match(arch)
-if m and m.group(1):
-	path = m.group(1)
-	os.environ["TAR_ARCHIV_PATH"] = path
-else :
-	raise Exception(_("The name of the archive must meet '(+*?)/files.tar' : %s found") % arch)
-
-print "Preparing volume "+ vol + " of "+ name +"."
-
-origPath = os.getenv("TAR_ARCHIV_PATH","")
-
-if os.getenv("TAR_SUBCOMMAND") in ["-d","-x","-t"]:
-	if os.path.exists(origPath+os.sep+name+"-"+vol+".tar") :
-		fd = os.getenv("TAR_FD")
-		os.write(int(fd),origPath+os.sep+name+"-"+vol+".tar")
-		sys.exit()
-	else:
-		raise Exception (_("The file '%s' that was asked doesn't exist") % origPath+os.sep+name+"-"+vol+".tar" ) 
-elif os.getenv("TAR_SUBCOMMAND") == "-c" :
-	fd = os.getenv("TAR_FD")
-	os.write(int(fd),origPath+os.sep+name+"-"+vol+".tar")
-	sys.exit()
-else :
-	pass
+if __name__ == '__main__':
+    vol = os.getenv("TAR_VOLUME")
+    archRE = re.compile("(.+?/)?files(-[0-9]+)*?\.tar")
+    arch = os.getenv("TAR_ARCHIVE")
+    name = "files"
+    
+    m = archRE.match(arch)
+    if m and m.group(1):
+    	path = m.group(1)
+    	os.environ["TAR_ARCHIV_PATH"] = path
+    else :
+    	raise Exception(_("The name of the archive must meet '(+*?)/files.tar' : %s found") % arch)
+    
+    print "Preparing volume "+ vol + " of "+ name +"."
+    
+    origPath = os.getenv("TAR_ARCHIV_PATH","")
+    
+    if os.getenv("TAR_SUBCOMMAND") in ["-d","-x","-t"]:
+    	if os.path.exists(origPath+os.sep+name+"-"+vol+".tar") :
+    		fd = os.getenv("TAR_FD")
+    		os.write(int(fd),origPath+os.sep+name+"-"+vol+".tar")
+    		sys.exit()
+    	else:
+    		raise Exception (_("The file '%s' that was asked doesn't exist") % origPath+os.sep+name+"-"+vol+".tar" ) 
+    elif os.getenv("TAR_SUBCOMMAND") == "-c" :
+    	fd = os.getenv("TAR_FD")
+    	os.write(int(fd),origPath+os.sep+name+"-"+vol+".tar")
+    	sys.exit()
+    else :
+    	pass
+  

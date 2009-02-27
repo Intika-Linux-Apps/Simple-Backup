@@ -18,15 +18,28 @@
 
 import sys
 import gettext
+import subprocess
+import time
+
 from nssbackup.nssbackupd import main
 from nssbackup.util import getResource
-import os, time
+
 # i18n init
 application = 'nssbackup'
 locale_dir = getResource('locale')
 
 gettext.bindtextdomain(application, locale_dir)
 gettext.textdomain(application)
-pid = os.spawnl(os.P_NOWAIT, "nssbackup-tray-gui.py"); print "pid: %s" % pid
-#time.sleep(10)
+
+print "Now launching DBus service"
+dbus_launcher = getResource('nssbackup_service')
+pid = subprocess.Popen([dbus_launcher]).pid
+print "pid: %s" % pid
+
+print "Now launching tray gui"
+tray_gui = getResource('nssbackup_traygui')
+pid = subprocess.Popen([tray_gui]).pid
+print "pid: %s" % pid
+
+print "Now launching backup daemon (main func)"
 main(sys.argv)

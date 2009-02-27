@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-
-usage = """Usage:
-python example-service.py &
-python example-client.py
-python example-async-client.py
-python example-client.py --exit-service
-"""
 
 # Copyright (C) 2004-2006 Red Hat Inc. <http://www.redhat.com/>
 # Copyright (C) 2005-2007 Collabora Ltd. <http://www.collabora.co.uk/>
@@ -30,17 +22,19 @@ python example-client.py --exit-service
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+print "DBUS_SERVICE"
+
 import gobject
 
 import dbus
 import dbus.service
 import dbus.mainloop.glib
 
-from nssbackup.util import nssbackup_dbus_support
+from nssbackup.util import dbus_support
 
 
 class DemoException(dbus.DBusException):
-    _dbus_error_name = nssbackup_dbus_support.DBUS_EXCEPTION
+    _dbus_error_name = dbus_support.DBUS_EXCEPTION
 
 
 class NsSBackupdDBusObject(dbus.service.Object):
@@ -50,30 +44,30 @@ class NsSBackupdDBusObject(dbus.service.Object):
         self._session_bus   = session_bus
         self._mainloop      = mainloop
     
-    @dbus.service.method(nssbackup_dbus_support.DBUS_INTERFACE,
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='s', out_signature='as')
     def HelloWorld(self, hello_message):
         print (str(hello_message))
         return ["Hello", " from example-service.py", "with unique name",
                 self._session_bus.get_unique_name()]
 
-    @dbus.service.method(nssbackup_dbus_support.DBUS_INTERFACE,
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='', out_signature='')
     def RaiseException(self):
         raise DemoException('The RaiseException method does what you might '
                             'expect')
 
-    @dbus.service.method(nssbackup_dbus_support.DBUS_INTERFACE,
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='', out_signature='(ss)')
     def GetTuple(self):
         return ("Hello Tuple", " from example-service.py")
 
-    @dbus.service.method(nssbackup_dbus_support.DBUS_INTERFACE,
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='', out_signature='a{ss}')
     def GetDict(self):
         return {"first": "Hello Dict", "second": " from example-service.py"}
 
-    @dbus.service.method(nssbackup_dbus_support.DBUS_INTERFACE,
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='', out_signature='')
     def Exit(self):
         print "Exit was called."
@@ -81,21 +75,21 @@ class NsSBackupdDBusObject(dbus.service.Object):
             self._mainloop.quit()
 
 
-    @dbus.service.signal(nssbackup_dbus_support.DBUS_INTERFACE)
+    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
     def ProgressSignal(self, checkpoint):
         # The signal is emitted when this method exits
         # You can have code here if you wish
 #        pass
         print "The 'ProgressSignal' is emitted."
             
-    @dbus.service.signal(nssbackup_dbus_support.DBUS_INTERFACE)
+    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
     def HelloSignal(self, message):
         # The signal is emitted when this method exits
         # You can have code here if you wish
         print "The actual HelloSignal - passed message: %s" % message
 
 
-    @dbus.service.method(nssbackup_dbus_support.DBUS_INTERFACE,
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='s', out_signature='s')
     def emitSignal(self, msg):
         # you emit signals by calling the signal's skeleton method
@@ -103,7 +97,7 @@ class NsSBackupdDBusObject(dbus.service.Object):
         self.HelloSignal(msg)
         return 'Signal emitted'
 
-    @dbus.service.method(nssbackup_dbus_support.DBUS_INTERFACE,
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='s', out_signature='b')
     def emit_progress_signal(self, checkpoint):
         # you emit signals by calling the signal's skeleton method
@@ -123,16 +117,17 @@ class NsSBackupDBusService(object):
         self._mainloop = gobject.MainLoop()
                 
     def _initialize_dbus_service(self):
+        print "'_initialize_dbus_service'"
         if self._mainloop is None:
             raise AssertionError("ERR: Mainloop must be initialized before "\
                                  "starting the dbus service.")
         
         self._session_bus = dbus.SessionBus()
         self._dbus_service = dbus.service.BusName(\
-                                      nssbackup_dbus_support.DBUS_SERVICE,
+                                      dbus_support.DBUS_SERVICE,
                                       self._session_bus)
         self._remote_obj = NsSBackupdDBusObject(self._session_bus,
-                                      nssbackup_dbus_support.DBUS_OBJ_PATH,
+                                      dbus_support.DBUS_OBJ_PATH,
                                       self._mainloop)
         print "finished '_initialize_dbus_service'"
     
@@ -141,8 +136,29 @@ class NsSBackupDBusService(object):
         self._initialize_dbus_service()
         self._mainloop.run()
         
-                
-if __name__ == '__main__':
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+
+def is_running():
+    res = False
+    bus = dbus.SessionBus()
+    dbus_object = bus.get_object('org.freedesktop.DBus',
+                                 '/org/freedesktop/DBus')
+    dbus_iface = dbus.Interface(dbus_object, 'org.freedesktop.DBus')
+    services = dbus_iface.ListNames()
+    services.sort()
+    for service in services:
+        if service == dbus_support.DBUS_SERVICE:
+            res = True
+            break
+    return res
+          
+def __launch_service():
+    print "Launching NSsbackup DBus service"
     sbak_service = NsSBackupDBusService()
     sbak_service.main()
+
+def launch(args):
+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+    if not is_running():
+        __launch_service()
+    else:
+        print "NSsbackup DBus service is already running!"
