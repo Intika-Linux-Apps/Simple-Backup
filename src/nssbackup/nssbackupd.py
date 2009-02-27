@@ -129,15 +129,42 @@ class DBusConnection(object):
     def handle_error(self, e):
         print str(e)
     
-    def emit_signal(self, msg):
-        """Used for sending a signal over the signal dbus.
+    def emit_start_signal(self, profile):
+        """Used for sending a start signal over the signal dbus.
         
-        """ 
-        ret_val = self._remote_obj.emitSignal(msg,
-                            dbus_interface=dbus_support.DBUS_INTERFACE)
-                    #reply_handler = handle_reply, error_handler = handle_error)
+        :param profile: name of the current profile
+        
+        """
+        ret_val = self._remote_obj.emit_nssbackup_started_signal(profile,
+                        dbus_interface=dbus_support.DBUS_INTERFACE)
+            
         print "Returned value: %s" % ret_val
-        return False
+        return ret_val
+
+    def emit_finish_signal(self, profile):
+        """Used for sending a finish signal over the signal dbus.
+        
+        :param profile: name of the current profile
+        
+        """
+        ret_val = self._remote_obj.emit_nssbackup_finished_signal(profile,
+                        dbus_interface=dbus_support.DBUS_INTERFACE)
+
+        print "Returned value: %s" % ret_val
+        return ret_val
+
+    def emit_error_signal(self, profile, error):
+        """Used for sending an error signal over the signal dbus.
+        
+        :param profile: name of the current profile
+        :param error: error message to be passed
+        
+        """
+        ret_val = self._remote_obj.emit_nssbackup_error_signal(profile, error,
+                        dbus_interface=dbus_support.DBUS_INTERFACE)
+            
+        print "Returned value: %s" % ret_val
+        return ret_val
 
     def call_method(self, msg):
         """Used for calling a method on the GUI Dbus.
@@ -158,13 +185,25 @@ class DBusConnection(object):
         raise exceptions.NotSupportedError("Not yet implemented!")
     
     def exit(self):
-        print "Calling 'Exit' on remote objects! Exiting..."
+        print "Sending 'Exit'"
+
+#        if self._remote_obj:
+#            self._remote_obj.Exit(dbus_interface=\
+#                                  dbus_support.DBUS_INTERFACE)
+#        if self._remote_gui:
+#            self._remote_gui.Exit(dbus_interface=\
+#                                  dbus_support.DBUS_GUI_INTERFACE)
+#        return 
+    
         if self._remote_obj:
+            # first send an `Exit` signal out
+            self._remote_obj.emit_nssbackup_exit_signal(dbus_interface=\
+                                                    dbus_support.DBUS_INTERFACE)
+            time.sleep(2)
+            # and then exit the service itself
             self._remote_obj.Exit(dbus_interface=\
                                   dbus_support.DBUS_INTERFACE)
-        if self._remote_gui:
-            self._remote_gui.Exit(dbus_interface=\
-                                  dbus_support.DBUS_GUI_INTERFACE)
+            
         
     
 class NSsbackupd(object):
@@ -187,23 +226,25 @@ class NSsbackupd(object):
                to ensure that specific logger instances are created.
         
         """
+        self.__recent_error = None
         self.__errors            = []
+        
         self.__super_user        = False
         self.__check_for_superuser()
         
         # collection of all config managers
         self.__confm            = []
         # the name of the currently processed profile
-        self.__profileName        = None
+        self.__profilename        = None
         self.__retrieve_confm()
 
         # here the logger created for the default profile is used
-        self.logger            = log.LogFactory.getLogger(self.__profileName)
+        self.logger            = log.LogFactory.getLogger(self.__profilename)
 
         # the currently used instance of the BackupManager
         self.__bm                = None
 
-        self._dbus_connection = None
+        self._dbus = None
         
         
     def __check_for_superuser(self):
@@ -230,7 +271,7 @@ class NSsbackupd(object):
         
         _to = self.__bm.config.get("report","to")
         _title = _("[NSsbackup] [%(profile)s] Report of %(date)s")\
-                    % { 'profile':self.__profileName,
+                    % { 'profile':self.__profilename,
                         'date': datetime.datetime.now() }
         logf = self.__bm.config.get_logfile()
         if FAM.exists( logf ):
@@ -299,7 +340,7 @@ class NSsbackupd(object):
         # create config manager for the default profile and set as current
         if os.path.exists( conffile ):
             confm = ConfigManager( conffile )
-            self.__profileName = confm.getProfileName()
+            self.__profilename = confm.getProfileName()
             # store the created ConfigManager in a collection
             self.__confm.append( confm )
         else:
@@ -322,8 +363,8 @@ class NSsbackupd(object):
                         self.__confm.append( confm )
 
     def __setup_dbus(self):
-        self._dbus_connection = DBusConnection(self.logger)
-        self._dbus_connection.connect()
+        self._dbus = DBusConnection(self.logger)
+        self._dbus.connect()
 
     def run(self):
         """Actual main method to make backups using NSsbackup
@@ -336,16 +377,19 @@ class NSsbackupd(object):
         # if config == use_dbus...
         self.__setup_dbus()
 
+#        self._dbus.exit()
+#        sys.exit(1)
+        
         print "DAEMON - now everything is prepared for doing a backup"
 #        print "Emitting signal now..."
-#        self._dbus_connection.emit_signal("Hello")
+#        self._dbus.emit_signal("Hello")
 
 #        for i in range(0, 2):
 #            print '.'
 #            time.sleep(1)
 
 #        not suitable for user interaction!
-#        self._dbus_connection.call_method("This is a message call from 'sbackup_sender.py':\n"\
+#        self._dbus.call_method("This is a message call from 'sbackup_sender.py':\n"\
 #                         "We finished.")
 #        print "We finished!"
             
@@ -353,31 +397,32 @@ class NSsbackupd(object):
 #        
         for confm in self.__confm:
             try:
-                self.__profileName     = confm.getProfileName()
-                self.logger            = log.LogFactory.getLogger(self.__profileName)
+                self.__profilename     = confm.getProfileName()
+                self.logger            = log.LogFactory.getLogger(self.__profilename)
                 self.__bm              = BackupManager( confm )
                 self.__log_errlist()
                 self.__attempt_notify(event='start')
                 self.__bm.makeBackup()
                 self.__attempt_notify(event='finish')
-            except Exception, e:
-                self.__onError(e)
+            except Exception, exc:
+                self.__on_error(exc)
             finally:
                 self.__onFinish()
 
-        self._dbus_connection.exit()
+        self._dbus.exit()
 
-    def __onError(self, e):
+    def __on_error(self, error):
         """Handles errors that occurs during backup process.
+        
         """
-        self.logger.error(str(e))
+        self.__recent_error = error
+        self.logger.error(str(error))
         self.logger.error(traceback.format_exc())
 
         try:
-            n_body = "An error occured: '%s'" % (str(e))
-            self._notify_error(self.__profileName, n_body)
-        except Exception, e1:
-            self.logger.warning(str(e1))
+            self.__attempt_notify('error')
+        except Exception, err2:
+            self.logger.warning(str(err2))
         
         if self.__bm:
             self.__bm.endSBsession()
@@ -387,7 +432,8 @@ class NSsbackupd(object):
         """
         if self.__bm and self.__bm.config :
             # send the mail
-            if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
+            if self.__bm.config.has_section("report") and\
+               self.__bm.config.has_option("report","to") :
                 self.__sendEmail()
                 
     def __notify_errlist(self):
@@ -396,7 +442,9 @@ class NSsbackupd(object):
         """
         if len(self.__errors) > 0:
             for errmsg in self.__errors:
-                self._notify_error(self.__profileName, errmsg)
+                self.__recent_error = errmsg
+                self.__attempt_notify('error')
+#                self._notify_error(self.__profilename, errmsg)
 
     def __log_errlist(self):
         """Errors that occurred during the initialization process
@@ -410,20 +458,24 @@ class NSsbackupd(object):
                 self.logger.error(errmsg.replace("\n", " "))
                 
     def __attempt_notify(self, event):
-        if self._dbus_connection is not None:
-            
+        print "EVENT: %s" % event
+        ret_val = None
+        if self._dbus is not None:
             if event == 'start':
-                print "EVENT: %s" % event
-                _msg = _("Starting backup Session")
-#                self._notify_info(self.__profilename, _msg)
-                self.logger.info(_msg)
-                self._dbus_connection.emit_signal(_msg)
+                ret_val = self._dbus.emit_start_signal(self.__profilename)
                 
             elif event == 'finish':
-                self._dbus_connection.emit_signal(_("Ending Backup Session"))
+                ret_val = self._dbus.emit_finish_signal(self.__profilename)
 
+            elif event == 'error':
+                ret_val = self._dbus.emit_error_signal(self.__profilename,
+                                                       str(self.__recent_error))
+    
             else:
                 print "EVENT UNSUPPORTED (%s)" % event
+                
+        print "Returned value: %s" % ret_val
+        return ret_val
 
 
 def main(argv):

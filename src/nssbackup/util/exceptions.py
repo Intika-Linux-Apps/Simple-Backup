@@ -94,7 +94,6 @@ class NotSupportedError(Exception):
 	"""
 
 class NotifyException(SBException) :
-	"""
-	This Exception is thrown by notifiers and listeners.
-	"""
+	"""This Exception is thrown by notifiers and listeners.
 
+	"""

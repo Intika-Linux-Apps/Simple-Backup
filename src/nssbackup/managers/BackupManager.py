@@ -34,7 +34,7 @@ import os , grp, signal
 import datetime
 import re
 import socket
-import gobject
+import time
 
 from FuseFAM import FuseFAM
 from SnapshotManager import SnapshotManager
@@ -46,168 +46,6 @@ from nssbackup.util.log import LogFactory
 from nssbackup.util import exceptions
 
 
-class PyNotifyMixin(object):
-    """Mix-in class that provides the displaying of notifications using the
-    pynotify module. The notifications use the icon 'nssbackup32x32.png'.
-    
-    :todo: This is not the right place for the definition!
-    :todo: It would be more general if we give the icon to use as parameter!
-    
-    """
-    def __init__(self, logger):
-        """Default constructor.
-        
-        :param logger: Instance of logger to be used.
-        
-        :todo: The notification domain should be retrieved from a central place!
-        
-        """
-        self.__logger = logger
-
-        # internal flag whether the notification module is usable
-        self.__pynotif_avail = False
-        
-        # the pynotify module is stored in this variable
-        self.__pynotif_mod   = None
-        
-        # the current notification
-        self.__notif = None
-        
-        # trying to initialize the notification module
-        try:
-            import pynotify
-            self.__pynotif_mod = pynotify
-            if self.__pynotif_mod.init("NSsbackup"):
-                self.__pynotif_avail = True
-            else:
-                self.__pynotif_avail = False    # yes, this is insane!
-                self.__logger.warning(_("there was a problem initializing the "\
-                                        "pynotify module"))
-        except ImportError, exc:
-            self.__pynotif_avail = False
-            self.__logger.warning(str(exc))
-        
-
-    def _notify_info(self, profilename, message):
-        """Shows up a pop-up window to inform the user. The notification
-        supports mark-up.        
-
-         :param message: The message (body) that should be displayed.
-         :type message:  String
-         
-        """
-        if self.__pynotif_avail:
-            if self.__notif is None:
-                self.__notif = self.__get_notification(profilename, message)
-            else:
-                self.__update_notification(profilename, message)
-                
-            if isinstance(self.__notif, self.__pynotif_mod.Notification):
-                try:
-                    self.__notif.set_urgency(self.__pynotif_mod.URGENCY_LOW)
-                    self.__notif.show()
-                except gobject.GError, exc:
-                     # Connection to notification-daemon failed 
-                     self.logger.warning("Connection to notification-daemon "\
-                                        "failed: " + str(exc))
-
-    def _notify_warning(self, profilename, message):
-        """Shows up a pop-up window to inform the user. The notification
-        supports mark-up.        
-
-         :param message: The message (body) that should be displayed.
-         :type message:  String
-         
-        """
-        self.__notify_new(profilename, message, mode="warning")
-
-    def _notify_error(self, profilename, message):
-        """Shows up a pop-up window to inform the user that an error occured.
-        Such error notifications are emphasized and must be closed manual. The
-        notifications support mark-up.
-
-         :param message: The message (body) that should be displayed.
-         :type message:  String
-         
-        """
-        self.__notify_new(profilename, message, mode="critical")
-                     
-    def __notify_new(self, profilename, message, mode):
-        """Shows up a *new* pop-up window to inform the user that an error occured.
-        Such error notifications are emphasized and must be closed manual. The
-        notifications support mark-up.
-
-         :param message: The message (body) that should be displayed.
-         :type message:  String
-         
-        """
-        if self.__pynotif_avail:
-            notif = self.__get_notification(profilename, message)
-            if isinstance(notif, self.__pynotif_mod.Notification):
-                try:
-                    notif.set_timeout(self.__pynotif_mod.EXPIRES_NEVER)
-                    if mode == "critical":
-                        notif.set_urgency(self.__pynotif_mod.URGENCY_CRITICAL)
-                    else:
-                        notif.set_urgency(self.__pynotif_mod.URGENCY_NORMAL)
-                    notif.show()
-                except gobject.GError, exc:
-                     # Connection to notification-daemon failed 
-                     self.logger.warning("Connection to notification-daemon "\
-                                        "failed: " + str(exc))
-
-    def __get_notification(self, profilename, message):
-        """Returns a notification object but does not display it. The
-        notification supports mark-up. If notifications aren't supported
-        the method returns None.
-         
-        :param message: The message (body) that should be displayed.
-        :type message:  String
-         
-        :return: The created notification object or None
-        :rtype: Notification or None
-        
-        :todo: Replace single '<' characters by '&lt;' in a more reliable way!\
-               See function `gobject.markup_escape_text` for this.
-        :todo: The header and the icon should be given as parameter to make
-               this mix-in class more generic!
-               
-        """
-        notif = None
-        if self.__pynotif_avail:
-            message = message.replace("<", "&lt;")
-            ico = Util.getResource("nssbackup32x32.png")
-            try:
-                notif = self.__pynotif_mod.Notification(
-                                "NSsbackup [%s]" % profilename, message, ico)
-            except gobject.GError, exc:
-                 # Connection to notification-daemon failed 
-                 self.logger.warning("Connection to notification-daemon "\
-                                    "failed: " + str(exc))
-                 notif = None
-        return notif
-
-    def __update_notification(self, profilename, message):
-        """         
-        :param message: The message (body) that should be displayed.
-        :type message:  String
-         
-        :todo: Replace single '<' characters by '&lt;' in a more reliable way!
-        :todo: The header and the icon should be given as parameter to make
-               this mix-in class more generic!
-               
-        """
-        if self.__pynotif_avail:
-            message = message.replace("<", "&lt;")
-            ico = Util.getResource("nssbackup32x32.png")
-            try:
-                self.__notif.update(
-                                "NSsbackup [%s]" % profilename, message, ico)
-            except gobject.GError, exc:
-                 # Connection to notification-daemon failed 
-                 self.logger.warning("Connection to notification-daemon "\
-                                    "failed: " + str(exc))
-                 self.__notif = None
                 
                 
 class BackupManager(object):
@@ -251,9 +89,7 @@ class BackupManager(object):
         """Runs the whole backup process.
         
         """
-#        _msg = _("Starting backup Session")
-#        self._notify_info(self.__profilename, _msg)
-#        self.logger.info(_msg)
+        self.logger.info(_("Starting backup Session"))
         
         # set the lockfile
         self.__setlockfile()
@@ -595,7 +431,9 @@ class BackupManager(object):
             
         self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
         self.__fusefam.terminate()
-
+        
+        self.logger.info(_("Backup session terminated."))
+        time.sleep(10)
 #        self._notify_info(self.__profilename, _("Ending Backup Session"))
 
     def __checkTarget(self):

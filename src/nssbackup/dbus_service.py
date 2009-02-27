@@ -74,39 +74,67 @@ class NsSBackupdDBusObject(dbus.service.Object):
         if self._mainloop:
             self._mainloop.quit()
 
+    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
+    def nssbackup_exit_signal(self):
+        print "The 'ExitSignal' is emitted."
 
     @dbus.service.signal(dbus_support.DBUS_INTERFACE)
-    def ProgressSignal(self, checkpoint):
-        # The signal is emitted when this method exits
-        # You can have code here if you wish
-#        pass
+    def nssbackup_progress_signal(self, checkpoint):
         print "The 'ProgressSignal' is emitted."
             
     @dbus.service.signal(dbus_support.DBUS_INTERFACE)
-    def HelloSignal(self, message):
-        # The signal is emitted when this method exits
-        # You can have code here if you wish
-        print "The actual HelloSignal - passed message: %s" % message
+    def nssbackup_started_signal(self, profile):
+        print "nssbackup_started_signal - passed profile: %s" % profile
 
+    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
+    def nssbackup_finished_signal(self, profile):
+        print "nssbackup_finished_signal - passed profile: %s" % profile
+
+    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
+    def nssbackup_error_signal(self, profile, error):
+        print "nssbackup_error_signal - passed profile: %s - error: %s" % (profile, error)
 
     @dbus.service.method(dbus_support.DBUS_INTERFACE,
-                         in_signature='s', out_signature='s')
-    def emitSignal(self, msg):
-        # you emit signals by calling the signal's skeleton method
-        print "This is the 'emitSignal' method"
-        self.HelloSignal(msg)
-        return 'Signal emitted'
+                         in_signature='', out_signature='b')
+    def emit_nssbackup_exit_signal(self):
+        print "This is the 'emit_nssbackup_exit_signal' method"
+        self.nssbackup_exit_signal()
+        return True
+
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
+                         in_signature='s', out_signature='b')
+    def emit_nssbackup_started_signal(self, profile):
+        print "This is the 'emit_nssbackup_started_signal' method"
+        self.nssbackup_started_signal(profile)
+        return True
+
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
+                         in_signature='s', out_signature='b')
+    def emit_nssbackup_finished_signal(self, profile):
+        print "This is the 'emit_nssbackup_finished_signal' method"
+        self.nssbackup_finished_signal(profile)
+        return True
+
+    @dbus.service.method(dbus_support.DBUS_INTERFACE,
+                         in_signature='ss', out_signature='b')
+    def emit_nssbackup_error_signal(self, profile, error):
+        print "This is the 'emit_nssbackup_error_signal' method"
+        self.nssbackup_error_signal(profile, error)
+        return True
 
     @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='s', out_signature='b')
     def emit_progress_signal(self, checkpoint):
         # you emit signals by calling the signal's skeleton method
         print "This is the 'emit_progress_signal' method"
-        self.ProgressSignal(checkpoint)
+        self.nssbackup_progress_signal(checkpoint)
         return True
 
 
 class NsSBackupDBusService(object):
+    """This is the DBUS service that provide basic signals.
+    
+    """
     def __init__(self):
         self._session_bus   = None
         self._dbus_service  = None
