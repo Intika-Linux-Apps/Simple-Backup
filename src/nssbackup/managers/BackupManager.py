@@ -46,27 +46,27 @@ from nssbackup.util.log import LogFactory
 from nssbackup.util import exceptions
 
 
-                
-                
 class BackupManager(object):
-    """Class that handles the backup process.
-    
-    :todo: The BackupManager should not does any GUI related tasks!
+    """Class that handles/manages the backup process.
     
     """
     
-    def __init__(self, configmanager):
-        """The BackupManager Constructor.
+    def __init__(self, configmanager, backupstate):
+        """The `BackupManager` Constructor.
 
         :param configmanager : The current configuration manager
+        :param backupstate: object that stores the current state of the process
         
         :note: Make sure to call for the appropriate logger before\
                instantiating this class!
                
         """
         self.config            = configmanager
-        self.logger            = LogFactory.getLogger()        
+        self.__state           = backupstate
+        self.logger            = LogFactory.getLogger()
+         
         self.__profilename    = self.config.getProfileName()
+        self.__state.set_profilename(self.__profilename)
         
         self.__um            = UpgradeManager()
         self.__snpman        = None
@@ -90,6 +90,7 @@ class BackupManager(object):
         
         """
         self.logger.info(_("Starting backup Session"))
+        self.__state.set_state('start')
         
         # set the lockfile
         self.__setlockfile()
@@ -126,10 +127,9 @@ class BackupManager(object):
             self.logger.warning(str(exc))
 
         if needupgrade:
-            _msg = "There are snapshots with old snapshot format."\
-                   " Please upgrade them if you want to use them."
-#            self._notify_warning(self.__profilename, _msg)
-            self.logger.warning(_msg)
+            self.__state.set_state('needupgrade')
+            self.logger.warning(_("Snapshots with old format found. Upgrade "\
+                                  "them if you want to use them."))
         
         # purge
         purge = None
@@ -189,8 +189,7 @@ class BackupManager(object):
         
         self.__fillSnapshot(prev)
                     
-#        self._notify_info(self.__profilename, _("File list ready , Committing to disk"))
-                
+        self.__state.set_state('commit')
         self.__actualSnapshot.commit()
         
         # End session
@@ -423,8 +422,9 @@ class BackupManager(object):
         - copy the log file into the snapshot dir
         - remove the lockfile
         
-        If this method is called it is unsure whether the backup was
-        successful or not.
+        :attention: When calling this method is unsure whether the backup
+                    was successful or not.
+                    
         """
         self.__unsetlockfile()
         self.__copylogfile()
@@ -434,7 +434,8 @@ class BackupManager(object):
         
         self.logger.info(_("Backup session terminated."))
         time.sleep(10)
-#        self._notify_info(self.__profilename, _("Ending Backup Session"))
+        
+        self.__state.set_state('finish')
 
     def __checkTarget(self):
         """

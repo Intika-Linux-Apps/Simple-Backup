@@ -14,9 +14,14 @@
 
 # Authors :
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
+#    Jean-Peer Lorenz <peer.loz@gmx.net>
+
+
+from gettext import gettext as _
 
 from nssbackup.util.exceptions import SBException, NotifyException
 from nssbackup.util.log import LogFactory
+
 
 class Subject(object):
     def __init__(self):
@@ -27,10 +32,8 @@ class Subject(object):
             self._observers.append(observer)
 
     def detach(self, observer):
-        try:
+        if observer in self._observers:
             self._observers.remove(observer)
-        except ValueError:
-            pass
 
     def notify(self, modifier=None):
         for observer in self._observers:

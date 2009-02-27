@@ -315,18 +315,17 @@ class SBackupdSystrayGui(PyNotifyMixin):
         ico = Util.getResource("nssbackup32x32.png")
         self.notification   = pynotify.Notification(" ", " ", ico)
         
-#        print "DIR notif:"
-#        print dir(self.notification)
-        
         self.trayicon     = gtk.StatusIcon()
         self.window         = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.menu           = gtk.Menu()
+
 #        self._mainloop = None
         self._blocking_factor = 20
         self._blocksize = 512
         self._total_size = "??"
         
         self.__error_present = False
+        self.__warning_present = False
         
         super(SBackupdSystrayGui, self).__init__(self.logger, self.trayicon)
         
@@ -335,8 +334,11 @@ class SBackupdSystrayGui(PyNotifyMixin):
         
         """
         signal_handlers = {
-                'nssbackup_started_signal'  : self._started_signal_handler,
-                'nssbackup_finished_signal' : self._finished_signal_handler,
+                'nssbackup_info_signal'  : self._info_signal_handler,
+#                'nssbackup_started_signal'  : self._started_signal_handler,
+#                'nssbackup_commit_signal'  : self._commit_signal_handler,
+#                'nssbackup_finished_signal' : self._finished_signal_handler,
+                'nssbackup_warning_signal'    : self._warning_signal_handler,
                 'nssbackup_error_signal'    : self._error_signal_handler,
                 'nssbackup_exit_signal'     : self._exit_signal_handler,
                 'nssbackup_progress_signal' : self._progress_signal_handler
@@ -347,16 +349,46 @@ class SBackupdSystrayGui(PyNotifyMixin):
             print "K: %s; V: %s" % (_key, _val)
             self._sbackupd_dbus_obj.connect_to_signal(_key, _val,
                             dbus_interface=dbus_support.DBUS_INTERFACE)
-        
-    def _started_signal_handler(self, profile):
-        msg = _("Starting backup Session")
-        print (msg)
-        self._notify_info(profile, msg)
 
-    def _finished_signal_handler(self, profile):
-        msg = _("Ending Backup Session")
+    def _info_signal_handler(self, event, profile):
+        if event == 'start':
+            msg = _("Starting backup Session")
+            
+        elif event == 'commit':
+            msg = _("File list ready , Committing to disk")
+            
+        elif event == 'finish':
+            msg = _("Ending Backup Session")
+            
+        else:
+            msg = _("Unknown event received")
+            
         print (msg)
         self._notify_info(profile, msg)
+        
+#    def _started_signal_handler(self, profile):
+#        msg = _("Starting backup Session")
+#        print (msg)
+#        self._notify_info(profile, msg)
+#
+#    def _commit_signal_handler(self, profile):
+#        msg = _("File list ready , Committing to disk")
+#        print (msg)
+#        self._notify_info(profile, msg)
+#
+#    def _finished_signal_handler(self, profile):
+#        msg = _("Ending Backup Session")
+#        print (msg)
+#        self._notify_info(profile, msg)
+
+    def _warning_signal_handler(self, event, profile):
+        self.__warning_present = True
+        if event == 'needupgrade':
+            msg = "There are snapshots with old snapshot format."\
+                  " Please upgrade these if you want to use them."
+                  
+        print (msg)
+        self._notify_warning(profile, msg)
 
     def _error_signal_handler(self, profile, error):
         self.__error_present = True
@@ -366,7 +398,7 @@ class SBackupdSystrayGui(PyNotifyMixin):
 
     def _exit_signal_handler(self):
         print "GUI: Received EXITSIGNAL"
-        if not self.__error_present:
+        if (not self.__error_present) and (not self.__warning_present):
             self.quit()
         
     def _progress_signal_handler(self, checkpoint):
