@@ -83,26 +83,9 @@ class NsSBackupdDBusObject(dbus.service.Object):
         print "The 'ProgressSignal' is emitted."
 
     @dbus.service.signal(dbus_support.DBUS_INTERFACE)
-    def nssbackup_info_signal(self, event, profile):
-        print "nssbackup_info_signal - passed event: `%s` - profile: %s"\
-                                                        % (event, profile)
-
-    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
-    def nssbackup_warning_signal(self, event, profile):
-        print "nssbackup_warning_signal - passed event: `%s` - profile: %s"\
-                                                        % (event, profile)
-            
-#    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
-#    def nssbackup_started_signal(self, profile):
-#        print "nssbackup_started_signal - passed profile: %s" % profile
-#
-#    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
-#    def nssbackup_commit_signal(self, profile):
-#        print "nssbackup_committed_signal - passed profile: %s" % profile
-#
-#    @dbus.service.signal(dbus_support.DBUS_INTERFACE)
-#    def nssbackup_finished_signal(self, profile):
-#        print "nssbackup_finished_signal - passed profile: %s" % profile
+    def nssbackup_event_signal(self, event, urgency, profile):
+        print "nssbackup_event_signal - passed event: `%s` - urgency: `%s` - "\
+              "profile: `%s`" % (event, urgency, profile)
 
     @dbus.service.signal(dbus_support.DBUS_INTERFACE)
     def nssbackup_error_signal(self, profile, error):
@@ -116,39 +99,11 @@ class NsSBackupdDBusObject(dbus.service.Object):
         return True
 
     @dbus.service.method(dbus_support.DBUS_INTERFACE,
-                         in_signature='ss', out_signature='b')
-    def emit_nssbackup_info_signal(self, event, profile):
-        print "This is the 'emit_nssbackup_info_signal' method"
-        self.nssbackup_info_signal(event, profile)
+                         in_signature='sss', out_signature='b')
+    def emit_nssbackup_event_signal(self, event, urgency, profile):
+        print "This is the 'emit_nssbackup_event_signal' method"
+        self.nssbackup_event_signal(event, urgency, profile)
         return True
-
-    @dbus.service.method(dbus_support.DBUS_INTERFACE,
-                         in_signature='ss', out_signature='b')
-    def emit_nssbackup_warning_signal(self, event, profile):
-        print "This is the 'emit_nssbackup_warning_signal' method"
-        self.nssbackup_warning_signal(event, profile)
-        return True
-
-#    @dbus.service.method(dbus_support.DBUS_INTERFACE,
-#                         in_signature='s', out_signature='b')
-#    def emit_nssbackup_started_signal(self, profile):
-#        print "This is the 'emit_nssbackup_started_signal' method"
-#        self.nssbackup_started_signal(profile)
-#        return True
-#
-#    @dbus.service.method(dbus_support.DBUS_INTERFACE,
-#                         in_signature='s', out_signature='b')
-#    def emit_nssbackup_commit_signal(self, profile):
-#        print "This is the 'emit_nssbackup_commit_signal' method"
-#        self.nssbackup_started_signal(profile)
-#        return True
-#
-#    @dbus.service.method(dbus_support.DBUS_INTERFACE,
-#                         in_signature='s', out_signature='b')
-#    def emit_nssbackup_finished_signal(self, profile):
-#        print "This is the 'emit_nssbackup_finished_signal' method"
-#        self.nssbackup_finished_signal(profile)
-#        return True
 
     @dbus.service.method(dbus_support.DBUS_INTERFACE,
                          in_signature='ss', out_signature='b')

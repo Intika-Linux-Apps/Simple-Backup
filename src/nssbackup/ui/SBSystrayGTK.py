@@ -334,11 +334,7 @@ class SBackupdSystrayGui(PyNotifyMixin):
         
         """
         signal_handlers = {
-                'nssbackup_info_signal'  : self._info_signal_handler,
-#                'nssbackup_started_signal'  : self._started_signal_handler,
-#                'nssbackup_commit_signal'  : self._commit_signal_handler,
-#                'nssbackup_finished_signal' : self._finished_signal_handler,
-                'nssbackup_warning_signal'    : self._warning_signal_handler,
+                'nssbackup_event_signal'  : self._event_signal_handler,
                 'nssbackup_error_signal'    : self._error_signal_handler,
                 'nssbackup_exit_signal'     : self._exit_signal_handler,
                 'nssbackup_progress_signal' : self._progress_signal_handler
@@ -350,7 +346,10 @@ class SBackupdSystrayGui(PyNotifyMixin):
             self._sbackupd_dbus_obj.connect_to_signal(_key, _val,
                             dbus_interface=dbus_support.DBUS_INTERFACE)
 
-    def _info_signal_handler(self, event, profile):
+    def _event_signal_handler(self, event, urgency, profile):
+        """
+        
+        """
         if event == 'start':
             msg = _("Starting backup Session")
             
@@ -359,36 +358,26 @@ class SBackupdSystrayGui(PyNotifyMixin):
             
         elif event == 'finish':
             msg = _("Ending Backup Session")
-            
-        else:
-            msg = _("Unknown event received")
-            
-        print (msg)
-        self._notify_info(profile, msg)
-        
-#    def _started_signal_handler(self, profile):
-#        msg = _("Starting backup Session")
-#        print (msg)
-#        self._notify_info(profile, msg)
-#
-#    def _commit_signal_handler(self, profile):
-#        msg = _("File list ready , Committing to disk")
-#        print (msg)
-#        self._notify_info(profile, msg)
-#
-#    def _finished_signal_handler(self, profile):
-#        msg = _("Ending Backup Session")
-#        print (msg)
-#        self._notify_info(profile, msg)
 
-    def _warning_signal_handler(self, event, profile):
-        self.__warning_present = True
-        if event == 'needupgrade':
-            msg = "There are snapshots with old snapshot format."\
-                  " Please upgrade these if you want to use them."
-                  
+        elif event == 'needupgrade':
+            msg = _("There are snapshots with old snapshot format."\
+                    " Please upgrade these if you want to use them.") 
+        else:
+            msg = _("Unknown event received")    
         print (msg)
-        self._notify_warning(profile, msg)
+        self._notify(urgency, profile, msg)        
+        
+    def _notify(self, urgency, profile, message):
+        """
+        """
+        if urgency == 'info':
+            self._notify_info(profile, message)
+
+        elif urgency == 'warning':
+            self.__warning_present = True
+            self._notify_warning(profile, message)
+        else:
+            raise ValueError("Unknown urgency!")
 
     def _error_signal_handler(self, profile, error):
         self.__error_present = True

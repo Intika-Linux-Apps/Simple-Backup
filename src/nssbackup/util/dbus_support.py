@@ -1,6 +1,31 @@
+#    NSsbackup - support of DBus functionality
+#
+#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
 """
+:mod:`dbus_support` --- support of DBus functionality
+====================================================================
 
-if you want to launch it automatically, add in
+.. module:: dbus_support
+   :synopsis: Provides support of DBus functionality
+.. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+
+
+If you want to launch it automatically, add a service file in
 'peer@ayida:/usr/share/dbus-1/services$':
 
 [D-BUS Service]
@@ -102,52 +127,17 @@ class DBusConnection(object):
         print "Dbus service available: %s" % self._dbus_present
         print "GUI service available: %s" % self._gui_present
             
-    def emit_info_signal(self, event, profile):
-        """Used for sending a generic information event over the signal dbus.
+    def emit_event_signal(self, event, urgency, profile):
+        """Used for sending a generic event over the signal dbus.
+        This includes informations and warnings.
         
         :param event: the actually processed event
+        :param urgency: how urgent the message is
         :param profile: name of the current profile
 
         """
-        ret_val = self._remote_obj.emit_nssbackup_info_signal(event, profile,
-                        dbus_interface=DBUS_INTERFACE)
-        print "Returned value: %s" % ret_val
-        return ret_val
-
-#    def emit_commit_signal(self, profile):
-#        """Used for sending a commit signal over the signal dbus.
-#        
-#        :param profile: name of the current profile
-#        
-#        """
-#        ret_val = self._remote_obj.emit_nssbackup_commit_signal(profile,
-#                        dbus_interface=DBUS_INTERFACE)
-#            
-#        print "Returned value: %s" % ret_val
-#        return ret_val
-#
-#    def emit_finish_signal(self, profile):
-#        """Used for sending a finish signal over the signal dbus.
-#        
-#        :param profile: name of the current profile
-#        
-#        """
-#        ret_val = self._remote_obj.emit_nssbackup_finished_signal(profile,
-#                        dbus_interface=DBUS_INTERFACE)
-#
-#        print "Returned value: %s" % ret_val
-#        return ret_val
-
-    def emit_warning_signal(self, event, profile):
-        """Used for sending an warning signal over the signal dbus.
-        
-        :param profile: name of the current profile
-        :param error: error message to be passed
-        
-        """
-        ret_val = self._remote_obj.emit_nssbackup_warning_signal(event, profile,
-                        dbus_interface=DBUS_INTERFACE)
-            
+        ret_val = self._remote_obj.emit_nssbackup_event_signal(event, urgency,
+                                        profile, dbus_interface=DBUS_INTERFACE)
         print "Returned value: %s" % ret_val
         return ret_val
 
@@ -198,6 +188,7 @@ class DBusNotifier(notifier.Observer):
         super(DBusNotifier, self).__init__()
 
         self.__state = None
+        self.__urgency = None
         self.__profilename = None
         self.__recent_error = None
 
@@ -215,43 +206,46 @@ class DBusNotifier(notifier.Observer):
         self.__dbus.connect()
         
     def update(self, subject):
+        """Interface method for observer objects that is called by the
+        observed subject. In the case of the `DBusNotifier` were
+        notifications send over the bus.
+         
+        """
         print "OBSERVER UPDATE"
         self.__state = subject.get_state()
+        self.__urgency = subject.get_urgency()
         self.__profilename = subject.get_profilename()
         self.__recent_error = subject.get_recent_error()
         
-        print "STATE: `%s`" % self.__state
         self.__attempt_notify()
 
     def __attempt_notify(self):
+        """Private helper method that actually tries to notify over
+        the DBus about several events. This method decides what
+        signals are send over the bus.
+        
+        :return: the value returned by the signal (usually True)
+        
+        """
         state = self.__state
-        print "NOTIFY STATE: %s" % state
+        urgency = self.__urgency
+        print "ATTEMPT NOTIFY - STATE: `%s` - Urgency: `%s`" % (state, urgency)
         
         ret_val = None
         if self.__dbus is not None:
-            if state in ('start', 'commit', 'finish'):
-                ret_val = self.__dbus.emit_info_signal(state,
-                                                       self.__profilename)
-
-            elif state == 'needupgrade':
-                ret_val = self.__dbus.emit_warning_signal(state,
-                                                          self.__profilename)
-                
-#            if state == 'start':
-#                ret_val = self.__dbus.emit_start_signal(self.__profilename)
-#                
-#            if state == 'commit':
-#                ret_val = self.__dbus.emit_commit_signal(self.__profilename)
-#                
-#            elif state == 'finish':
-#                ret_val = self.__dbus.emit_finish_signal(self.__profilename)
+            if state in ('start',
+                         'commit',
+                         'finish',
+                         'needupgrade'):
+                ret_val = self.__dbus.emit_event_signal(state, urgency,
+                                                        self.__profilename)
 
             elif state == 'error':
                 ret_val = self.__dbus.emit_error_signal(self.__profilename,
-                                                       str(self.__recent_error))
+                                                        str(self.__recent_error))
     
             else:
-                print "STATE UNSUPPORTED (%s)" % state
+                raise ValueError("STATE UNSUPPORTED (%s)" % state)
                 
         print "Returned value: %s" % ret_val
         return ret_val

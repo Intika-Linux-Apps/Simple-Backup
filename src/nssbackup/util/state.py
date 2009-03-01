@@ -36,17 +36,18 @@ class NSsbackupState(notifier.Subject):
     one can change the state and it is published to registered
     observers.
     
-    :todo: We could add an urgency etc.!
+    :todo: Add type checking in setter methods!
     
     """
     def __init__(self):
         super(NSsbackupState, self).__init__()
         self.__state = 'unknown'
-        self.__profilename = None
-        self.__recent_error = None
+        self.__urgency = 'info'
+        self.__profilename = 'None'
+        self.__recent_error = 'None'
 
     def set_state(self, state):
-        """Observers are only notified, if the state was changed.
+        """Observers are only notified, if the state has changed.
         
         """
         self.__state = state
@@ -54,6 +55,21 @@ class NSsbackupState(notifier.Subject):
         
     def get_state(self):
         return self.__state
+    
+    def set_urgency(self, urgency):
+        """The urgency is used to distinguish several types of events.
+        There are following urgencies:
+        
+        -critical
+        -error
+        -warning
+        -info.
+        
+        """
+        self.__urgency = urgency
+        
+    def get_urgency(self):
+        return self.__urgency
     
     def set_profilename(self, profilename):
         self.__profilename = profilename
