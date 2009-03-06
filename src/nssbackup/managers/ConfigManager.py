@@ -224,7 +224,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 	
 	cronheader = "SHELL=/bin/bash \nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\n"
 	
-	servicefile 		 = Util.getResource("nssbackup")
+	servicefile 		 = Util.getResource("nssbackup", True)
 	
 	def __init__(self, configfile = None):
 		"""Default constructor.
