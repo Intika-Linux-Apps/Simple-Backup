@@ -18,7 +18,7 @@
 
 import gettext, sys, os, traceback
 from gettext import gettext as _
-from nssbackup.util.log import getLogger
+from nssbackup.util.log import LogFactory
 from nssbackup.managers.UpgradeManager import UpgradeManager
 import traceback
 from nssbackup.util import getResource
@@ -48,6 +48,6 @@ Use simple-restore-gnome for more ease of use.
 		path = os.path.abspath(sys.argv[1])
 		u.upgradeAll(path)
 	except Exception, e :
-			getLogger().error(str(e))
-			getLogger().error(traceback.format_exc())
+			LogFactory.getLogger().error(str(e))
+			LogFactory.getLogger().error(traceback.format_exc())
 			
