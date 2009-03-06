@@ -2,7 +2,7 @@
 
 PYTHON=`which python`
 VERSION=0.2
-SETUP.PY_OPTS=
+SETUP.PY_OPTS="--root=/"
 
 # available languages
 PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR sv tr uk zh_CN zh_TW
@@ -15,8 +15,6 @@ BIN=$(DESTDIR)/bin
 SBIN=$(DESTDIR)/sbin
 
 # definition of classes directory
-PYDIR=$(DESTDIR)/share/python-support
-CLSDIR=$(PYDIR)/nssbackup
 
 all: po-data fill-templates
 
@@ -64,7 +62,7 @@ uninstall-sbin:
 	rm -f $(SBIN)/nssbackupconfig
 
 uninstall-package:
-	rm -rf $(CLSDIR)
+	rm -rf $(DESTDIR)/lib/python*/dist-packages/nssbackup*
 
 uninstall-data:
 	rm -f $(DESTDIR)/share/pixmaps/nssbackup-restore.png
