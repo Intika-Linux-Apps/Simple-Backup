@@ -158,7 +158,10 @@ class ConfigManager(ConfigParser.ConfigParser):
 	# gzip : use a tar.gz - All files are stored in the files.tar.gz
 	# bzip2 :use a tar.bz2 - All files are stored in the files.tar.bz2
 	format = gzip
+	# backup the links 
 	backuplinks=1
+	# follow symlinks
+	followlinks=1
 	
 	# For the split functionality :
 	# this should be an integer . It represent the size in KB of each archive (0 => unlimited)
@@ -964,7 +967,7 @@ class ConfigStaticData(object):
 				   		'splitsize' 	: int,
 				   		'purge' 		: str,
 				   		'run4others' 	: int,
-				   		'backuplinks' 	: int },
+				   		'followlinks' 	: int },
 	 'log' 			: {'level' : int , 'file' : str },
 	 'report' 		: {'from' :str, 'to' : str,'smtpserver' : str,
 				 	   'smtpport' : int, 'smtpuser' : str,

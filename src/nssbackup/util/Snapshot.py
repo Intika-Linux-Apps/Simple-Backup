@@ -75,6 +75,8 @@ class Snapshot(object):
 		self.__base = None
 		self.__format = "gzip" # default value
 		
+		self.__followlinks = False
+		
 		self.__snarfile = None
 		self.__includeFlist = SBdict()
 		self.__includeFlistFile = None # Str
@@ -328,6 +330,9 @@ class Snapshot(object):
 		"""
 		_name = str(self.getName())
 		return _name.endswith(".ful")
+	
+	def isFollowLinks(self):
+		return self.__followlinks
 
 	def commit (self) :
 		"Commit the snapshot infos ( write to the disk )"
@@ -420,6 +425,13 @@ class Snapshot(object):
 			raise TypeError("The size parameter must be an integer")
 		self.__splitedSize = size
 	
+	def setFollowLinks(self, activate):
+		"""
+		@param activate: boolean to activate symlinks follow up 
+		"""
+		if type(activate) != bool :
+			raise TypeError("the activate parameter must be a boolean")
+		self.__followlinks = activate
 	
 	# Private
 	def __validateSnapshot(self,path, name):

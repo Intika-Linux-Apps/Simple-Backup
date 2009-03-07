@@ -288,6 +288,12 @@ class UpgradeLogOption(object):
 						print "   to   `%s`" % (new_log)						
 						config.set("log", "file", str(new_log))
 						config.commit_to_disk()
+			if config.has_section("general"):
+				# remove old backuplinks options - it's now always done.
+				if config.has_option("general","backuplinks"):
+					print "   Removing backuplinks option (not needed anymore)"
+					config.remove_option("general","backuplinks")
+					config.commit_to_disk()
 	
 	def do_upgrade(self):
 		"""Public method that actually processes the upgrade

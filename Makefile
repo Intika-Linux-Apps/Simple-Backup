@@ -1,7 +1,7 @@
 # makefile for NSsbackup
 
 PYTHON=`which python`
-VERSION=0.2
+VERSION=0.2-0~rc7
 SETUP.PY_OPTS="--root=/"
 
 # available languages

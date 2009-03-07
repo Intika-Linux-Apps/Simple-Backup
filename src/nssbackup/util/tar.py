@@ -236,6 +236,9 @@ def __prepareTarCommonOpts(snapshot):
 				    "--files-from="+snapshot.getIncludeFListFile()+".tmp"])
 	options.append ("--exclude-from="+snapshot.getExcludeFListFile()+".tmp")
 	
+	if snapshot.isFollowLinks() :
+		options.append("--dereference")
+	
 	archivename = "files.tar"
 	if snapshot.getFormat() == "gzip":
 		options.insert(1,"--gzip")
