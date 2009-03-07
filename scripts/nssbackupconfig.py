@@ -122,6 +122,13 @@ class UpgradeLogOption(object):
 				self.readfp(fobj, self._configfile)
 				fobj.close()
 			
+		def optionxform(self, option):
+			"""
+			Default behaviour of ConfigParser is to set the option keys to lowercase. 
+			by overiding this method, we make it case sensitive. that's really important for dirconfig pathes 
+			"""
+			return str( option )
+			
 		def commit_to_disk(self):
 			"""Writes the current configuration set to the disk. The
 			configuration file given to the constructor is used.
