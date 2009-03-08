@@ -2,7 +2,6 @@
 
 PYTHON=`which python`
 VERSION=0.2-0~rc7
-SETUP.PY_OPTS="--root=/"
 
 # available languages
 PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR sv tr uk zh_CN zh_TW
@@ -10,6 +9,8 @@ PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR sv tr uk zh
 # installation into /usr/local to be compliant to GNU standards
 PREFIX=/usr/local
 DESTDIR=/usr/local
+
+SETUP.PY_OPTS=--root=/
 
 BIN=$(DESTDIR)/bin
 SBIN=$(DESTDIR)/sbin
@@ -44,7 +45,7 @@ install-sbin:
 	cp -a scripts/nssbackupconfig.py $(SBIN)/nssbackupconfig
 	
 install-package:
-	$(PYTHON) setup.py install ${SETUP.PY_OPTS}  
+	$(PYTHON) setup.py install ${SETUP.PY_OPTS} --prefix=$(PREFIX)
 
 install-po:
 	set -e; for lang in $(PO); do install -d $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
@@ -62,7 +63,7 @@ uninstall-sbin:
 	rm -f $(SBIN)/nssbackupconfig
 
 uninstall-package:
-	rm -rf $(DESTDIR)/lib/python*/dist-packages/nssbackup*
+	rm -rf $(DESTDIR)/lib/python*/*/nssbackup*
 
 uninstall-data:
 	rm -f $(DESTDIR)/share/pixmaps/nssbackup-restore.png
