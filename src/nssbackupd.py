@@ -15,11 +15,11 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
+#   Jean-Peer Lorenz <peer.loz@gmx.net>
+
 
 import sys
 import gettext
-import subprocess
-import time
 
 from nssbackup.nssbackupd import main
 from nssbackup.util import getResource
@@ -27,19 +27,9 @@ from nssbackup.util import getResource
 # i18n init
 application = 'nssbackup'
 locale_dir = getResource('locale')
-
 gettext.bindtextdomain(application, locale_dir)
 gettext.textdomain(application)
 
-print "Now launching DBus service"
-dbus_launcher = getResource('nssbackup_service')
-pid = subprocess.Popen([dbus_launcher]).pid
-print "pid: %s" % pid
-
-print "Now launching tray gui"
-tray_gui = getResource('nssbackup_traygui')
-pid = subprocess.Popen([tray_gui]).pid
-print "pid: %s" % pid
-
-print "Now launching backup daemon (main func)"
-main(sys.argv)
+retc = main(sys.argv)
+print "Exit code: `%s`" % retc
+sys.exit(retc)

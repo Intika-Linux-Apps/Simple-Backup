@@ -217,6 +217,9 @@ class UpgradeLogOption(object):
 		:note: It is assumed that user configurations are stored in a\
 			   directory like `~/.config/nssbackup`.
 		
+		:todo: Implement a better way for retrieval of user's confdirs e.g.\
+		       by reading the users environ!
+		       
 		"""
 		self.__configdirs = []
 		# for the superuser
