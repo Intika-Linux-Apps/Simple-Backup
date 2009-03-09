@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% set title = 'Overview' %}
+{% block body %}
+
+
+<blockquote>
+<em> This documentation is currently being created for release 0.2 of
+  NSsbackup. Due to this fact it is not very mature and may contain bugs.
+  Please report if you find one.
+</em>
+</blockquote>
+
+
+
+<h2>Simple Backup solution</a></h2>
+
+<img align="right" src="{{ pathto("_static/nssbackup-config-gui.png", 1) }}"
+alt="Screenshot NSsbackup configuration" />
+
+<blockquote>
+<p>NSsbackup is a Simple Backup solution for Linux. It is generally developed
+with a Gnome desktop in mind, but will also work in other desktop environments
+and also on the console.
+</p>
+</blockquote>
+ 
+
+<h2>Features:</h2>
+<blockquote>
+<ul class="simple">
+<li>Using the TAR backup feature: TAR examines the changes occurred on a file</li>
+<li>Support compression options: 3 types of compression are supported: Gzip, Bzip2, and uncompressed</li>
+<li>Profiles Management: A user can have multiple configuration files in order to perform different backups e.g. for Photos, Settings, Documents</li>
+<li>Split of the archive into several files of configurable size (only available for uncompressed archives)</li>
+
+<li>Snapshots Management: This is a more general management of backups</li>
+<li>Logarithmic Purge that works (yeah)</li>
+<li>Open source (encourages community input)</li>
+<li>Unit-tested</li>
+</ul>
+</blockquote>
+
+<h2>Documentation</h2>
+
+<table class="contentstable" align="center" style="margin-left: 30px"><tr>
+  <td width="50%">
+
+    <p class="biglink"><a class="biglink" href="{{ pathto("screenshots") }}">Screenshots</a><br/>
+       <span class="linkdescr">it looks like this</span></p>
+    <p class="biglink"><a class="biglink" href="{{ pathto("tutorial/index") }}">Tutorial</a><br/>
+       <span class="linkdescr">start here</span></p>
+    <p class="biglink"><a class="biglink" href="{{ pathto("users_guide/index") }}">User's Handbook</a><br/>
+       <span class="linkdescr">guide to using NSsbackup</span></p>
+    <p class="biglink"><a class="biglink" href="{{ pathto("contents") }}">Contents</a><br/>
+       <span class="linkdescr">a complete overview</span></p>
+  </td>
+  <td width="50%">
+    <p class="biglink"><a class="biglink" href="{{ pathto("devel_section/index") }}">Developer's Section</a><br/>
+       <span class="linkdescr">documentation of internals</span></p>
+    <p class="biglink"><a class="biglink" href="{{ pathto("search") }}">Search Page</a><br/>
+       <span class="linkdescr">search the documentation</span></p>
+    <p class="biglink"><a class="biglink" href="{{ pathto("genindex") }}">General Index</a><br/>
+       <span class="linkdescr">all functions, classes, terms</span></p>
+    <p class="biglink"><a class="biglink" href="{{ pathto("modindex") }}">Module Index</a><br/>
+       <span class="linkdescr">quick access to all documented modules</span></p>
+  </td></tr>
+</table>
+
+
+
+<h2>Get NSsbackup</h2>
+<blockquote>
+  <p>
+	NSsbackup is available as Ubuntu package from the
+	<a href="https://edge.launchpad.net/~nssbackup-team/+archive/ppa">Personal Package
+    Archive</a>.
+  </p>
+  <p>The source code can be found on the Launchpad code hosting site at
+    <tt><a href="https://code.launchpad.net/nssbackup">https://code.launchpad.net/nssbackup</a></tt>.</p>
+</blockquote>
+
+{% endblock %}

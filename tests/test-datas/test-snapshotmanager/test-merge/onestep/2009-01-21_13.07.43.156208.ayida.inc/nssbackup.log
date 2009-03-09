@@ -1,0 +1,67 @@
+NSSBackup 'Default Profile' Logger
+==============
+2009-01-21 13:07:42,986 - DEBUG - ConfigManager.py:__create_logger(484) - Log output for [Default Profile] is directed to file '/home/peer/backups/logs/nssbackup.log'
+2009-01-21 13:07:42,986 - DEBUG - ConfigManager.py:validateConfigFileOpts(525) - Validating config file
+2009-01-21 13:07:42,986 - INFO - ConfigManager.py:__init__(264) - ConfigManager created from config file '/home/peer/.config/nssbackup/nssbackup.conf'.
+2009-01-21 13:07:43,135 - INFO - BackupManager.py:__init__(168) - BackupManager created 
+2009-01-21 13:07:43,144 - INFO - BackupManager.py:makeBackup(174) - Starting backup [Default Profile]
+2009-01-21 13:07:43,147 - DEBUG - BackupManager.py:__setlockfile(466) - Created lockfile at '/home/peer/.local/share/nssbackup/nssbackup.lock' with info '10234'
+2009-01-21 13:07:43,148 - INFO - FuseFAM.py:initialize(172) - Initializing FUSE FILE ACCESS MANAGER !
+2009-01-21 13:07:43,148 - DEBUG - FuseFAM.py:initialize(238) - [log]
+file = '/home/peer/backups/logs/nssbackup.log'
+level = '10'
+[places]
+prefix = '/usr'
+[schedule]
+cron = "SHELL=/bin/bash\nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\nSHELL=/bin/bash\nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n0 4 * * *\troot\tif [ -x '/home/peer/programming/python/nssb/modified/progressbar/0.2/datas/nssbackup' ]; then /home/peer/programming/python/nssb/modified/progressbar/0.2/datas/nssbackup; fi;\troot\tif [ -x '/home/peer/programming/python/nssb/modified/progressbar/0.2/datas/nssbackup' ]; then /home/peer/programming/python/nssb/modified/progressbar/0.2/datas/nssbackup; fi;"
+[dirconfig]
+/home/peer/backups/testdocs/docs/ = '1'
+/home/peer/backups/testdocs/docs/PyThreads.pdf~ = '0'
+[general]
+splitsize = '0'
+target = '/media/TRANSFER/home/pub/testbak/bak'
+format = 'bzip2'
+mountdir = '/home/peer/.local/share/nssbackup/mountdir'
+purge = '4'
+maxincrement = '7'
+lockfile = '/home/peer/.local/share/nssbackup/nssbackup.lock'
+backuplinks = '1'
+[report]
+from = 'NSsbackup Daemon <peer@ayida.ext>'
+[exclude]
+regex = '\\.avi,\\.bak'
+2009-01-21 13:07:43,151 - INFO - UpgradeManager.py:upgradeAll(119) - Upgrading All valid snapshot in '/media/TRANSFER/home/pub/testbak/bak'
+2009-01-21 13:07:43,151 - DEBUG - SnapshotManager.py:getSnapshots(140) - [Snapshots Listing]
+2009-01-21 13:07:43,152 - DEBUG - SnapshotManager.py:getSnapshots(142) - 2009-01-21_13.05.19.000782.ayida.inc
+2009-01-21 13:07:43,152 - DEBUG - SnapshotManager.py:getSnapshots(142) - 2009-01-21_12.59.16.564046.ayida.ful
+2009-01-21 13:07:43,152 - DEBUG - SnapshotManager.py:getSnapshots(140) - [Snapshots Listing]
+2009-01-21 13:07:43,153 - DEBUG - SnapshotManager.py:getSnapshots(142) - 2009-01-21_13.05.19.000782.ayida.inc
+2009-01-21 13:07:43,153 - DEBUG - SnapshotManager.py:getSnapshots(142) - 2009-01-21_12.59.16.564046.ayida.ful
+2009-01-21 13:07:43,153 - INFO - SnapshotManager.py:_do_cutoff_purge(816) - Simple purge - remove all backups older then 4 days
+2009-01-21 13:07:43,153 - DEBUG - SnapshotManager.py:_do_cutoff_purge(819) - Checking snapshot '2009-01-21_13.05.19.000782.ayida.inc' for simple purge!
+2009-01-21 13:07:43,154 - DEBUG - SnapshotManager.py:_do_cutoff_purge(819) - Checking snapshot '2009-01-21_12.59.16.564046.ayida.ful' for simple purge!
+2009-01-21 13:07:43,154 - DEBUG - SnapshotManager.py:getSnapshots(140) - [Snapshots Listing]
+2009-01-21 13:07:43,155 - DEBUG - SnapshotManager.py:getSnapshots(142) - 2009-01-21_13.05.19.000782.ayida.inc
+2009-01-21 13:07:43,155 - DEBUG - SnapshotManager.py:getSnapshots(142) - 2009-01-21_12.59.16.564046.ayida.ful
+2009-01-21 13:07:43,155 - DEBUG - BackupManager.py:__isIncOrFull(554) -  Last backup (2009-01-21_13.05.19.000782.ayida.inc) was an increment - lets search for the last full one
+2009-01-21 13:07:43,155 - INFO - BackupManager.py:__isIncOrFull(561) - Last full backup is fresh (0 days old )-> make an increment
+2009-01-21 13:07:43,157 - INFO - BackupManager.py:makeBackup(219) - Starting snapshot 2009-01-21_13.07.43.156208.ayida.inc 
+2009-01-21 13:07:43,157 - INFO - BackupManager.py:makeBackup(226) - Setting Base to '2009-01-21_13.05.19.000782.ayida.inc' 
+2009-01-21 13:07:43,158 - INFO - BackupManager.py:makeBackup(232) - Setting packages File 
+2009-01-21 13:07:43,343 - INFO - BackupManager.py:makeBackup(243) - Setting Excludes File 
+2009-01-21 13:07:43,344 - INFO - BackupManager.py:makeBackup(251) - Setting compression format 
+2009-01-21 13:07:43,344 - DEBUG - Snapshot.py:setFormat(349) - Set the compression format to bzip2
+2009-01-21 13:07:43,345 - INFO - BackupManager.py:makeBackup(256) - Setting split size
+2009-01-21 13:07:43,345 - DEBUG - BackupManager.py:__fillSnapshot(397) - getting exclude list for actual snapshot
+2009-01-21 13:07:43,346 - DEBUG - BackupManager.py:__fillSnapshot(413) - set the list to backup and to exclude
+2009-01-21 13:07:43,346 - DEBUG - BackupManager.py:__fillSnapshot(430) - We have now every thing we need, starting the creation of the complete exclude list 
+2009-01-21 13:07:43,352 - DEBUG - BackupManager.py:__fillSnapshot(441) - Maximum free size required is '0 Mb 7 Kb 594' 
+2009-01-21 13:07:43,380 - INFO - tar.py:makeTarIncBackup(266) - Launching TAR to make Inc backup 
+2009-01-21 13:07:43,381 - DEBUG - tar.py:__prepareTarCommonOpts(237) - ['-cS', '--bzip2', '--directory=/', '--ignore-failed-read', '--files-from=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/includes.list.tmp', '--exclude-from=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/excludes.list.tmp', '--file=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/files.tar.bz2']
+2009-01-21 13:07:43,381 - DEBUG - tar.py:__prepareTarCommonOpts(239) - Common TAR options : ['-cS', '--bzip2', '--directory=/', '--ignore-failed-read', '--files-from=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/includes.list.tmp', '--exclude-from=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/excludes.list.tmp', '--file=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/files.tar.bz2']
+2009-01-21 13:07:43,381 - DEBUG - tar.py:makeTarIncBackup(279) - Snapshot's base snarfile: /media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.05.19.000782.ayida.inc/files.snar
+2009-01-21 13:07:43,382 - DEBUG - tar.py:makeTarIncBackup(280) - Snapshot's snarfile: /media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/files.snar
+2009-01-21 13:07:43,382 - DEBUG - tar.py:makeTarIncBackup(281) - Temporary snarfile: /tmp/nssbackup/files.snar
+2009-01-21 13:07:43,383 - DEBUG - __init__.py:launch(194) - Lauching : ['tar', '-cS', '--bzip2', '--directory=/', '--ignore-failed-read', '--files-from=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/includes.list.tmp', '--exclude-from=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/excludes.list.tmp', '--file=/media/TRANSFER/home/pub/testbak/bak/2009-01-21_13.07.43.156208.ayida.inc/files.tar.bz2', '--listed-incremental=/tmp/nssbackup/files.snar']
+2009-01-21 13:07:43,397 - DEBUG - tar.py:makeTarIncBackup(301) - TAR Output : 
+2009-01-21 13:07:43,399 - INFO - BackupManager.py:__unsetlockfile(473) - Session of backup is finished (/home/peer/.local/share/nssbackup/nssbackup.lock is removed) 
