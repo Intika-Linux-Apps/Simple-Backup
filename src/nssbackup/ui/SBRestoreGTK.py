@@ -745,7 +745,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 			if iter :
 				snp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter,0)))
 				try:
-					message = _("Do you really want to rebase '%s' on '%s' ?") % (self.currentSnp, snp)
+					message = _("Do you really want to rebase '%(current)s' on '%(base)s' ?") % {"current" : self.currentSnp, "base" : snp}
 					dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=message)
 					response = dialog.run()
 					dialog.destroy()
@@ -800,9 +800,9 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 						 
 		"restore_as" : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Restoring of selected files</b>"),
-						 "msg_progress"    : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> is in progress."),
-						 "msg_sucess"      : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> was sucessful."),
-						 "msg_failure"     : _("Restoring of <tt>'%s'</tt>\nto <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_progress"    : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
+						 "msg_sucess"      : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was sucessful."),
+						 "msg_failure"     : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not sucessful.\n\nThe following error occured:\n") },
 						 
 		"revert"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Reverting selected files</b>"),
@@ -812,9 +812,9 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 
 		"revert_as"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Reverting selected files</b>"),
-						 "msg_progress"    : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> is in progress."),
-						 "msg_sucess"      : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> was sucessful."),
-						 "msg_failure"     : _("Reverting of <tt>'%s'</tt>\nto <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_progress"    : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
+						 "msg_sucess"      : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was sucessful."),
+						 "msg_failure"     : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not sucessful.\n\nThe following error occured:\n") },
 	  }
 
 	def __init__(self, parent):
@@ -890,7 +890,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 		if dirname is None:
 			begin_msg = msgs["msg_progress"] % (source)
 		else:
-			begin_msg = msgs["msg_progress"] % (source, dirname)
+			begin_msg = msgs["msg_progress"] % {"source" : source, "dirname" : dirname}
 
 		self.widgets['button_close'].set_sensitive(False)
 		self.widgets['txt_title'].set_markup(msgs["msg_headline"])
@@ -909,7 +909,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 		if dirname is None:
 			msg_sucess = msgs["msg_sucess"] % (source)
 		else:
-			msg_sucess = msgs["msg_sucess"] % (source, dirname)
+			msg_sucess = msgs["msg_sucess"] % {"source" : source, "dirname" : dirname}
 
 		self._stop_pulse()
 		self.widgets['restore_progressbar'].hide()
@@ -931,7 +931,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 		if dirname is None:
 			msg_failure = msgs["msg_failure"] % (source)
 		else:
-			msg_failure = msgs["msg_failure"] % (source, dirname)
+			msg_failure = msgs["msg_failure"] % {"source" : source, "dirname" : dirname}
 
 		msg_failure += str(failure)
 		
