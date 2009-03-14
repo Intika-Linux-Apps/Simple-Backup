@@ -96,7 +96,10 @@ class ConfigManager(ConfigParser.RawConfigParser):
     # gzip : use a tar.gz - All files are stored in the files.tar.gz
     # bzip2 :use a tar.bz2 - All files are stored in the files.tar.bz2
     format = gzip
+	# backup the links 
     backuplinks=1
+	# follow symlinks
+	followlinks=1
     
     # For the split functionality :
     # this should be an integer . It represent the size in KB of each archive (0 => unlimited)
@@ -162,7 +165,7 @@ class ConfigManager(ConfigParser.RawConfigParser):
     
     cronheader = "SHELL=/bin/bash \nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\n"
     
-    servicefile          = Util.getResource("nssbackup")
+	servicefile 		 = Util.getResource("nssbackup", True)
     
     def __init__(self, configfile = None):
         """Default constructor.
@@ -996,7 +999,7 @@ class ConfigStaticData(object):
                            'splitsize'     : int,
                            'purge'         : str,
                            'run4others'     : int,
-                           'backuplinks'     : int },
+                           'followlinks' 	: int },
      'log'             : {'level' : int , 'file' : str },
      'report'         : {'from' :str, 'to' : str,'smtpserver' : str,
                         'smtpport' : int, 'smtpuser' : str,

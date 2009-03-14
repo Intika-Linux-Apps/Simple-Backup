@@ -1,5 +1,8 @@
 # makefile for NSsbackup
 
+PYTHON=`which python`
+VERSION=0.2-0~rc7
+
 # available languages
 PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR sv tr uk zh_CN zh_TW
 
@@ -7,18 +10,18 @@ PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR sv tr uk zh
 PREFIX=/usr/local
 DESTDIR=/usr/local
 
+SETUP.PY_OPTS=--root=/
+
 BIN=$(DESTDIR)/bin
 SBIN=$(DESTDIR)/sbin
 
 # definition of classes directory
-PYDIR=$(DESTDIR)/lib/python2.5/site-packages
-CLSDIR=$(PYDIR)/nssbackup
 
 all: po-data fill-templates
 
 default:
 
-install: install-po install-bin install-sbin install-package install-data
+install: install-po install-bin install-sbin install-package
 	chmod +x $(BIN)/nssbackup*
 	chmod +x $(SBIN)/nssbackup*
 	chmod +x $(DESTDIR)/share/nssbackup/multipleTarScript
@@ -26,40 +29,27 @@ install: install-po install-bin install-sbin install-package install-data
 
 fill-templates:
 	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/ressources.in > src/nssbackup/ressources
+	sed s+@version@+2.0+ setup.py.in > setup.py
 
 # application's binaries
 install-bin:
 	mkdir -p $(BIN)
-	cp -a src/nssbackupd.py $(BIN)/nssbackupd
-	cp -a src/nssbackup-config-gui.py $(BIN)/nssbackup-config-gui
-	cp -a src/nssbackup-restore-gui.py $(BIN)/nssbackup-restore-gui
-	cp -a src/nssbackup-upgrade-backups.py $(BIN)/nssbackup-upgrade-backups
+	cp -a scripts/nssbackupd.py $(BIN)/nssbackupd
+	cp -a scripts/nssbackup-config-gui.py $(BIN)/nssbackup-config-gui
+	cp -a scripts/nssbackup-restore-gui.py $(BIN)/nssbackup-restore-gui
+	cp -a scripts/nssbackup-upgrade-backups.py $(BIN)/nssbackup-upgrade-backups
 
 # Configuration and setup tools
 install-sbin:
 	mkdir -p $(SBIN)
-	cp -a src/nssbackupconfig.py $(SBIN)/nssbackupconfig
+	cp -a scripts/nssbackupconfig.py $(SBIN)/nssbackupconfig
 	
 install-package:
-	mkdir -p $(CLSDIR)
-	cp -a src/nssbackup/* $(CLSDIR)
-	rm -f $(CLSDIR)/ressources.in  
+	$(PYTHON) setup.py install ${SETUP.PY_OPTS} --prefix=$(PREFIX)
 
 install-po:
 	set -e; for lang in $(PO); do install -d $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
 	set -e; for lang in $(PO); do install -m 644 po/$$lang/LC_MESSAGES/* $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
-
-install-data:
-	mkdir -p $(DESTDIR)/share/nssbackup
-	cp -a datas/multipleTarScript $(DESTDIR)/share/nssbackup/
-	cp -a datas/nssbackup $(DESTDIR)/share/nssbackup/
-	cp -a datas/*.glade $(DESTDIR)/share/nssbackup/
-
-	mkdir -p $(DESTDIR)/share/pixmaps
-	cp -a datas/*.png $(DESTDIR)/share/pixmaps/
-
-	mkdir -p $(DESTDIR)/share/applications
-	cp -a datas/*.desktop $(DESTDIR)/share/applications/
 
 uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data
 
@@ -73,7 +63,7 @@ uninstall-sbin:
 	rm -f $(SBIN)/nssbackupconfig
 
 uninstall-package:
-	rm -rf $(CLSDIR)
+	rm -rf $(DESTDIR)/lib/python*/*/nssbackup*
 
 uninstall-data:
 	rm -f $(DESTDIR)/share/pixmaps/nssbackup-restore.png
@@ -93,8 +83,9 @@ clean:
 	set -e; find . -name '*.pyc' -exec rm -f '{}' \;
 	set -e; find . -name '*~' -exec rm -f '{}' \;
 	set -e; find . -name '*.bak' -exec rm -f '{}' \;
-	rm -rf build
+	rm -rf build dist setup.py
 	rm -f src/nssbackup/ressources
+	rm -rf src/nssbackup.egg-info
 	set -e; for lang in $(PO); do rm -rf po/$$lang ; done
 	
 po-dir:

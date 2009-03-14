@@ -54,6 +54,7 @@ import nssbackup.util.tar as TAR
 from nssbackup import Infos
 from nssbackup.util import exceptions
 from nssbackup.util import tasks
+from nssbackup.util.tar import Dumpdir
 
 # initialize threading before running a main loop
 gtk.gdk.threads_init()
@@ -404,6 +405,17 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 	
 	def on_filelisttreeview_cursor_changed(self, *args):
 		self.widgets['buttonspool'].set_sensitive(True)
+		# deactivate restore buttons if the selection is not included in 
+		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
+		if iter :
+			state = tstore.get_value(iter, 1)
+			if state == Dumpdir.getHRCtrls()['N'] :
+				self.widgets['restore'].set_sensitive(False)
+				self.widgets['restoreas'].set_sensitive(False)
+			else:
+				self.widgets['restore'].set_sensitive(True)
+				self.widgets['restoreas'].set_sensitive(True)
+
 
 	def on_filelisttreeview_unselect_all(self, *args):
 		self.widgets['buttonspool'].set_sensitive(False)

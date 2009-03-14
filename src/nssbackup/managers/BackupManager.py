@@ -183,7 +183,14 @@ class BackupManager(object):
         self.logger.info(_("Setting split size"))
         if self.config.has_option( "general", "splitsize" ):
             self.__actualSnapshot.setSplitedSize(int(self.config.get("general","splitsize")))
-            
+			
+		# set followlinks
+		self.__followlinks = False
+		if self.config.has_option( "general", "followlinks" ) and self.config.get("general","followlinks") == "1":
+			self.logger.info(_("Setting follow symbolic links"))
+			self.__followlinks = True
+			self.__actualSnapshot.setFollowLinks(self.__followlinks)
+			
         # Reduce the priority, so not to interfere with other processes
         os.nice(20)
         
@@ -279,8 +286,15 @@ class BackupManager(object):
                 if not self.__actualSnapshot.getIncludeFlist().hasFile(path):
                     self.__actualSnapshot.addToExcludeFlist(path)
             else :
-                # add _file and then check if it's a dir to add the contents , We won't follow links
-                if not os.path.islink(path.rstrip(os.sep)) :
+				# add _file and then check if it's a dir to add the contents , We won't follow links by default
+				stop = False
+				if os.path.islink(path.rstrip(os.sep)) :
+					# we got a link, always backup links, then tar will follow it if 
+					# followlinks is set
+					self.logger.debug("backing up the link '%s' ! " % path)
+					if not self.__followlinks:
+						stop = True
+				if not stop :
                     # if it's a directory
                     if os.path.isdir(path):
                         #enter inside
@@ -301,20 +315,8 @@ class BackupManager(object):
                             self.__actualSnapshot.addToExcludeFlist(path)
                     else:
                         self.fullsize += os.lstat(path).st_size
-                else :
-                    # we got a link
-                    if backuplinks :
-                        self.logger.debug("backing up the link '%s' ! " % path)
-                    else :
-                        self.logger.debug("Excluding link '%s' ! " % path)
-                        self.__actualSnapshot.addToExcludeFlist(path)
-                        self.fullsize += os.lstat(path).st_size
-        # End of Subroutines
-        
-        backuplinks=None
-        if self.config.has_option("general","backuplinks") and str(self.config.get("general","backuplinks")) == "1" :
-            backuplinks=True
-        
+					
+		# End of Subroutines
         
         # Use this for getting the size limit 
         self.fullsize = 0L

@@ -122,6 +122,13 @@ class UpgradeLogOption(object):
 				self.readfp(fobj, self._configfile)
 				fobj.close()
 			
+		def optionxform(self, option):
+			"""
+			Default behaviour of ConfigParser is to set the option keys to lowercase. 
+			by overiding this method, we make it case sensitive. that's really important for dirconfig pathes 
+			"""
+			return str( option )
+			
 		def commit_to_disk(self):
 			"""Writes the current configuration set to the disk. The
 			configuration file given to the constructor is used.
@@ -291,6 +298,12 @@ class UpgradeLogOption(object):
 						print "   to   `%s`" % (new_log)						
 						config.set("log", "file", str(new_log))
 						config.commit_to_disk()
+			if config.has_section("general"):
+				# remove old backuplinks options - it's now always done.
+				if config.has_option("general","backuplinks"):
+					print "   Removing backuplinks option (not needed anymore)"
+					config.remove_option("general","backuplinks")
+					config.commit_to_disk()
 	
 	def do_upgrade(self):
 		"""Public method that actually processes the upgrade

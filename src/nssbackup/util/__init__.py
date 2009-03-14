@@ -165,7 +165,7 @@ def _prepare_nssb_copy(src, dst):
 	return retval
 	
 
-def getResource(resourceName):
+def getResource(resourceName, isFile=False):
 	"""This will look for a ressource installed by nssbackup. The installation
 	script write in the ressources file were it stores the file then
 	getRessource will look for them.
@@ -178,7 +178,7 @@ def getResource(resourceName):
 		_dir = _dir.strip()
 		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
 		if os.path.exists(_dir) and os.path.isdir(_dir):
-			if _dir.endswith(resourceName):
+			if _dir.endswith(resourceName) and not isFile:
 				return _dir 
 			list = os.listdir(_dir)
 			#LogFactory.getLogger().debug("File list is :" + str(list))

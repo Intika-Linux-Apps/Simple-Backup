@@ -357,7 +357,7 @@ class SBconfigGTK(GladeGnomeApp):
 			'askNewPrfNameDialog',
 			'enableNewPrfCB',
 			'newPrfNameEntry',
-			'backuplinks',
+			'followlinks',
 			]
 
 		handlers = [
@@ -432,7 +432,7 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_ex_pathstv_key_press_event',
 			'on_ex_ftypetv_key_press_event',
 			'on_ex_regextv_key_press_event',
-			'on_backuplinks_toggled',
+			'on_followlinks_toggled',
 			]
 
 		top_window = 'nssbackupConfApp'
@@ -599,10 +599,10 @@ class SBconfigGTK(GladeGnomeApp):
 				self.widgets["ex_max"].set_active( True )
 		
 		# backup links
-		if self.configman.has_option("general", "backuplinks") :
-			self.widgets["backuplinks"].set_active(True)
+		if self.configman.has_option("general", "followlinks") :
+			self.widgets["followlinks"].set_active(True)
 		else :
-			self.widgets["backuplinks"].set_active(False)
+			self.widgets["followlinks"].set_active(False)
 		
 		# Maximum of inc
 		if self.configman.has_option("general", "maxincrement") :
@@ -1627,12 +1627,11 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.remove_option("exclude", "maxsize")
 			self.isConfigChanged()
 
-	def on_backuplinks_toggled(self, *args):
-#		raise TypeError("This is a test exception!")
-		if self.widgets['backuplinks'].get_active():
-			self.configman.set("general", "backuplinks", 1)
+	def on_followlinks_toggled(self, *args):
+		if self.widgets['followlinks'].get_active():
+			self.configman.set("general", "followlinks", 1)
 		else :
-			self.configman.remove_option("general", "backuplinks")
+			self.configman.remove_option("general", "followlinks")
 		self.isConfigChanged()
 
 	def on_ex_maxsize_changed(self, *args):

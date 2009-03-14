@@ -5,11 +5,13 @@ Name=NSsbackup Restoration
 Name[de]=NSsbackup Wiederherstellung
 Name[pt_BR]=Restauração de Backup
 Name[es]=Restauración de copia de seguridad
+Name[ja]=バックアップの復元
 #
 Comment=NSsbackup restoration tool for non-admins.
 Comment[de]=NSsbackup Wiederherstellung für Nicht-Admins.
 Comment[pt_BR]=Restaure seu backup feito anteriormente (non-admins).
 Comment[es]=Restauración de copia de seguridad para no administradores.
+Comment[ja]=バックアップの復元ツールを起動します
 #
 GenericName=Restoration tool
 GenericName[fr_FR]=Utilitaire de restauration

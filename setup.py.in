@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+
+from setuptools import setup, find_packages
+
+setup(name='nssbackup', version='@version@',
+    description='NSsbackup, shortform of Not So Simple Backup suite, is a backup solution for common desktop use.',
+    author='http://launchpad.net/~nssbackup-team',
+    author_email='nssbackup-team@lists.launchpad.net',
+    url='http://launchpad.net/nssbackup',
+    packages = find_packages("src"),
+    package_dir = {'':'src'},
+    package_data = {'': ['ressources'],},
+    data_files=[('share/nssbackup', ['datas/nssbackup-restore.glade', 
+                                     'datas/nssbackup-config.glade', 
+                                     'datas/multipleTarScript', 
+                                     'datas/nssbackup' ]),
+                  ('share/pixmaps/', ['datas/nssbackup-conf.png', 
+                                      'datas/nssbackup32x32.png', 
+                                      'datas/nssbackup.png', 
+                                      'datas/nssbackup-restore.png']),
+                  ('share/applications', ['datas/nssbackup-config.desktop', 
+                                          'datas/nssbackup-config-su.desktop', 
+                                          'datas/nssbackup-restore.desktop', 
+                                          'datas/nssbackup-restore-su.desktop'])],
+
+
+    )
