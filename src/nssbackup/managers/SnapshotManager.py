@@ -274,7 +274,7 @@ class SnapshotManager(object):
 		currentTorebase = torebase
 		
 		while currentTorebase.getBase():
-			self.statusMessage = _("Rebasing '%s' on '%s'") % (currentTorebase,currentTorebase.getBase())
+			self.statusMessage = _("Rebasing '%(current)s' on '%(base)s'") % {"current": currentTorebase, "base" : currentTorebase.getBase()}
 			self.logger.info(self.statusMessage)
 			currentTorebase = self._rebaseOnLastSnp(currentTorebase)
 			# re-basing finished?

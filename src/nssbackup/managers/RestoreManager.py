@@ -70,7 +70,7 @@ class RestoreManager(object):
 			if failOnNotFound :
 				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
 			else : 
-				self.logger.warning(_("File '%s' not found in the backup snapshot [%s] files list, We'll not fail though !") % (_file,snapshot.getName()) )
+				self.logger.warning(_("File '%(filename)s' not found in the backup snapshot [%(snapshotname)s] files list, We'll not fail though !") % {"filename": _file, "snapshotname" : snapshot.getName()} )
 				return
 		
 		suffix = None
@@ -147,7 +147,7 @@ class RestoreManager(object):
 		history.reverse()
 		
 		for snp in history :
-			self.logger.debug("Restoring '%s' from snapshot '%s' " % (dir, snp.getName()) )
+			self.logger.debug("Restoring '%(dirname)s' from snapshot '%(snapshotname)s' " % {"dirname" : dir, "snapshotname" : snp.getName()} )
 			self.restoreAs(snp, dir, targetdir, False,False)
 
 

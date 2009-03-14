@@ -19,6 +19,7 @@
 
 import logging
 import os.path
+import os
 import nssbackup.managers.FileAccessManager as FAM
 
 
@@ -86,6 +87,10 @@ class LogFactory(object):
 			if logfile:
 				# create the logfile
 				if not os.path.exists(logfile) :
+					#make sure that the parent directory exist
+					parentdir = os.path.dirname(os.path.abspath(logfile))
+					if not os.path.exists(parentdir):
+						os.makedirs(parentdir)
 					FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
 				else :
 					# clean the logfile

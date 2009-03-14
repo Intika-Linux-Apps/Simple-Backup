@@ -12,6 +12,12 @@ DESTDIR=/usr/local
 
 SETUP.PY_OPTS=--root=/
 
+UbuntuVersion=$(shell expr "$(shell lsb_release -r)" : ".*: *\(.*\)")
+# if we use jaunty
+ifneq (,$(findstring 9.04,$(UbuntuVersion)))
+    LAYOUT="--install-layout=deb"
+endif
+
 BIN=$(DESTDIR)/bin
 SBIN=$(DESTDIR)/sbin
 
@@ -45,7 +51,7 @@ install-sbin:
 	cp -a scripts/nssbackupconfig.py $(SBIN)/nssbackupconfig
 	
 install-package:
-	$(PYTHON) setup.py install ${SETUP.PY_OPTS} --prefix=$(PREFIX)
+	$(PYTHON) setup.py install ${SETUP.PY_OPTS} --prefix=$(PREFIX) $(LAYOUT)
 
 install-po:
 	set -e; for lang in $(PO); do install -d $(DESTDIR)/share/locale/$$lang/LC_MESSAGES/ ; done
@@ -95,5 +101,5 @@ po-data: po-dir
 	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 	
 po-gen:
-	set -e; xgettext -o po/messages.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop src/nssbackup-upgrade-backups.py src/nssbackupconfig.py
+	set -e; xgettext -o po/messages.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop scripts/*.py
 	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/messages.pot; done
