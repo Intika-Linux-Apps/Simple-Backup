@@ -47,7 +47,6 @@ from nssbackup.util import getResource
 from nssbackup.util import dbus_support
 from nssbackup.util import state
 import nssbackup.managers.FileAccessManager as FAM
-from nssbackup.managers.ConfigManager import getUserConfDir
 from nssbackup.managers.ConfigManager import ConfigManager
 from nssbackup.managers.ConfigManager import ConfigurationFileHandler
 from nssbackup.managers.ConfigManager import ConfigStaticData

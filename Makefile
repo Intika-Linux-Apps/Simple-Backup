@@ -81,6 +81,7 @@ uninstall-data:
 	rm -f $(DESTDIR)/share/applications/nssbackup-config-su.desktop
 	rm -f $(DESTDIR)/share/applications/nssbackup-restore-su.desktop
 	rm -rf $(DESTDIR)/share/nssbackup
+	rm -rf $(DESTDIR)/share/doc/nssbackup
 	set -e; find $(DESTDIR)/share/locale -name nssbackup.mo -exec rm -f '{}' \;
 	
 reinstall: uninstall install

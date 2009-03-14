@@ -69,7 +69,7 @@ def get_profiles(prfdir):
 
 
 # TODO: And maybe the parser should be a member of NSsbackup config!
-class ConfigManager(ConfigParser.RawConfigParser):
+class ConfigManager(ConfigParser.ConfigParser):
     """nssbackup config manager
     
     The configuration manager is responsible for the following:
@@ -165,7 +165,7 @@ class ConfigManager(ConfigParser.RawConfigParser):
     
     cronheader = "SHELL=/bin/bash \nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\n"
     
-	servicefile 		 = Util.getResource("nssbackup", True)
+    servicefile = Util.getResource("nssbackup", True)
     
     def __init__(self, configfile = None):
         """Default constructor.

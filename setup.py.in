@@ -13,15 +13,19 @@ setup(name='nssbackup', version='@version@',
     data_files=[('share/nssbackup', ['datas/nssbackup-restore.glade', 
                                      'datas/nssbackup-config.glade', 
                                      'datas/multipleTarScript', 
-                                     'datas/nssbackup' ]),
+                                     'datas/nssbackup',
+                                      'datas/nssbackup_service',
+                                      'datas/nssbackup_traygui',]),
                   ('share/pixmaps/', ['datas/nssbackup-conf.png', 
                                       'datas/nssbackup32x32.png', 
                                       'datas/nssbackup.png', 
-                                      'datas/nssbackup-restore.png']),
+                                      'datas/nssbackup-restore.png'
+                                      ,'datas/nssbackup-tray.png']),
                   ('share/applications', ['datas/nssbackup-config.desktop', 
                                           'datas/nssbackup-config-su.desktop', 
                                           'datas/nssbackup-restore.desktop', 
-                                          'datas/nssbackup-restore-su.desktop'])],
+                                          'datas/nssbackup-restore-su.desktop']),
+                  ('share/doc/nssbackup', ['datas/nssbackup.conf.example',]) ],
 
 
     )

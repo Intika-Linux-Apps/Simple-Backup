@@ -39,6 +39,7 @@ from nssbackup.util import exceptions
 from datetime import datetime
 import time
 from nssbackup.managers import ConfigManager
+from nssbackup.managers.ConfigManager import ConfigurationFileHandler
 
 
 def getArchiveType(archive):
@@ -294,7 +295,7 @@ def makeTarIncBackup(snapshot):
 
 	base_snarfile = snapshot.getBaseSnapshot().getSnarFile()
 	snarfile = snapshot.getSnarFile()
-	tmp_snarfile = os.path.join( ConfigManager.getUserTempDir(),
+	tmp_snarfile = os.path.join( ConfigurationFileHandler().get_user_tempdir(),
 								 os.path.basename(snarfile) )
 	
 	LogFactory.getLogger().debug("Snapshot's base snarfile: %s" % base_snarfile)	
@@ -350,7 +351,7 @@ def makeTarFullBackup(snapshot):
 		options = __addSplitOpts(snapshot, options, splitSize)
 	
 	snarfile = snapshot.getSnarFile()
-	tmp_snarfile = os.path.join( ConfigManager.getUserTempDir(),
+	tmp_snarfile = os.path.join( ConfigurationFileHandler().get_user_tempdir(),
 								 os.path.basename(snarfile) )
 	
 	LogFactory.getLogger().debug("Snapshot's snarfile: %s" % snarfile)

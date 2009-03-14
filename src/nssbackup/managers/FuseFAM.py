@@ -24,7 +24,7 @@ from nssbackup.util.log import LogFactory
 from nssbackup.plugins import PluginManager
 from nssbackup.util.exceptions import SBException
 from nssbackup.util import exceptions
-from nssbackup.managers.ConfigManager import getUserDatasDir
+from nssbackup.managers.ConfigManager import ConfigurationFileHandler
 import FileAccessManager as FAM
 
 
@@ -52,6 +52,8 @@ class FuseFAM(object):
 		self.__mountedDirs = {}
 		
 		self.__config = configManager
+		
+		self.__configFileHandler = ConfigurationFileHandler()
 		#sets the default mount dir 
 		if self.__config and self.__config.has_option("general","mountdir") :
 			self.__mountdir = self.__config.get("general","mountdir")
@@ -60,7 +62,7 @@ class FuseFAM(object):
 			if os.getuid() == 0 :
 				self.__mountdir = "/mnt/nssbackup/"
 			else : 
-				self.__mountdir = getUserDatasDir()+"mountdir"
+				self.__mountdir = self.__configFileHandler.get_user_datadir()+"mountdir"
 
 	
 	def getMountedDirs(self):
@@ -182,7 +184,7 @@ class FuseFAM(object):
 			if os.getuid() == 0 :
 				self.__mountdir = "/mnt/nssbackup/"
 			else : 
-				self.__mountdir = getUserDatasDir() + "mountdir"
+				self.__mountdir = self.__configFileHandler.get_user_datadir() + "mountdir"
 		
 		# check if the mount dir is valid
 		if not os.path.exists(self.__mountdir) : 
@@ -277,7 +279,7 @@ class FuseFAM(object):
 		if os.getuid() == 0 :
 			mountdir = "/mnt/nssbackup/"
 		else : 
-			mountdir = getUserDatasDir()+ "mountdir"
+			mountdir = self.__configFileHandler.get_user_datadir() + "mountdir"
 		
 		# check if the mount dir is valid
 		if not os.path.exists(mountdir) : 

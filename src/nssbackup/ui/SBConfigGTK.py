@@ -25,7 +25,7 @@ from nssbackup.plugins import PluginManager
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
-from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
+from nssbackup.managers.ConfigManager import ConfigManager, ConfigurationFileHandler
 from nssbackup.ui.GladeGnomeApp import GladeGnomeApp
 from gettext import gettext as _
 import nssbackup.util as Util
@@ -46,6 +46,8 @@ class SBconfigGTK(GladeGnomeApp):
 		# the 'default file' configuring the default profile
 		self.default_conffile = None 
 		
+		self.__configFileHandler = ConfigurationFileHandler()
+		
 		if os.geteuid() == 0 :
 			if os.path.exists("/etc/nssbackup.conf") :
 				self.default_conffile = "/etc/nssbackup.conf"
@@ -53,9 +55,9 @@ class SBconfigGTK(GladeGnomeApp):
 			else :
 				self.configman = ConfigManager()
 		else :
-			if os.path.exists(getUserConfDir()+"nssbackup.conf") :
-				self.default_conffile = getUserConfDir()+"nssbackup.conf"
-				self.conffile = getUserConfDir()+"nssbackup.conf"
+			if os.path.exists(self.__configFileHandler.get_user_confdir()+"nssbackup.conf") :
+				self.default_conffile = self.__configFileHandler.get_user_confdir()+"nssbackup.conf"
+				self.conffile = self.__configFileHandler.get_user_confdir()+"nssbackup.conf"
 				self.configman = ConfigManager(self.default_conffile)
 			else :
 				self.configman = ConfigManager()
@@ -111,7 +113,7 @@ class SBconfigGTK(GladeGnomeApp):
 		if os.getuid() == 0 :
 			self.widgets['dest1'].set_label(_("Use default backup directory (/var/backup)"))
 		else :
-			self.widgets['dest1'].set_label(_("Use default backup directory (%s)") % (getUserDatasDir()+"backups") )
+			self.widgets['dest1'].set_label(_("Use default backup directory (%s)") % (self.__configFileHandler.get_user_datadir()+"backups") )
 		
 		self.ex_regex = gtk.ListStore( str )
 		self.ex_regextv = self.widgets["ex_regextv"]
@@ -1174,7 +1176,7 @@ class SBconfigGTK(GladeGnomeApp):
 		"""
 		_reslt = False
 		if (os.getuid() == 0 and atarget == "/var/backup") or\
-		   (os.getuid() != 0 and atarget == getUserDatasDir()+"backups"):
+		   (os.getuid() != 0 and atarget == self.__configFileHandler.get_user_datadir()+"backups"):
 			_reslt = True
 		return _reslt
 
@@ -1190,7 +1192,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.set( "general", "target", "/var/backup")
 			self.isConfigChanged()
 		else :
-			self.configman.set( "general", "target", getUserDatasDir()+"backups")
+			self.configman.set( "general", "target", self.__configFileHandler.get_user_datadir()+"backups")
 			self.isConfigChanged()
 
 
@@ -1780,7 +1782,7 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_addProfileButton_clicked(self, *args):
 		
-		prfDir = getUserConfDir()+"nssbackup.d/"
+		prfDir = self.__configFileHandler.get_user_confdir()+"nssbackup.d/"
 		if not os.path.exists(prfDir):
 			os.makedirs(prfDir)
 		
@@ -1792,7 +1794,7 @@ class SBconfigGTK(GladeGnomeApp):
 
 			enable = self.widgets['enableNewPrfCB'].get_active()
 			prfName = self.widgets['newPrfNameEntry'].get_text()
-			prfConf = getUserConfDir()+"nssbackup.d/nssbackup-"+prfName.strip()+".conf"
+			prfConf = self.__configFileHandler.get_user_confdir()+"nssbackup.d/nssbackup-"+prfName.strip()+".conf"
 			
 			if not prfName or prfName is '' :
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,

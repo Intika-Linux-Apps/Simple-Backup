@@ -45,7 +45,7 @@ from GladeWindow import ProgressbarMixin
 
 import nssbackup.util as Util
 from nssbackup.managers.FuseFAM import FuseFAM
-from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir
+from nssbackup.managers.ConfigManager import ConfigManager, ConfigurationFileHandler
 from nssbackup.managers.SnapshotManager import SnapshotManager
 from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.managers.UpgradeManager import UpgradeManager
@@ -77,6 +77,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		''' '''
 		self.init(parent = parent)
 		
+		self.__configFileHandler = ConfigurationFileHandler()
+		
 		# get the config file
 		if os.getuid() == 0 : # we are root
 			if os.path.exists("/etc/nssbackup.conf") :
@@ -85,8 +87,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 				self.config = ConfigManager()
 					
 		else :  # we are others
-			if os.path.exists(getUserConfDir()+ "nssbackup.conf") :
-				self.config = ConfigManager(getUserConfDir()+ "nssbackup.conf")
+			if os.path.exists(self.__configFileHandler.get_user_confdir()+ "nssbackup.conf") :
+				self.config = ConfigManager(self.__configFileHandler.get_user_confdir()+ "nssbackup.conf")
 			else :
 				self.config = ConfigManager()
 		

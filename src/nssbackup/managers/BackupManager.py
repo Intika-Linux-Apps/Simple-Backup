@@ -184,12 +184,12 @@ class BackupManager(object):
         if self.config.has_option( "general", "splitsize" ):
             self.__actualSnapshot.setSplitedSize(int(self.config.get("general","splitsize")))
 			
-		# set followlinks
-		self.__followlinks = False
-		if self.config.has_option( "general", "followlinks" ) and self.config.get("general","followlinks") == "1":
-			self.logger.info(_("Setting follow symbolic links"))
-			self.__followlinks = True
-			self.__actualSnapshot.setFollowLinks(self.__followlinks)
+        # set followlinks
+        self.__followlinks = False
+        if self.config.has_option( "general", "followlinks" ) and self.config.get("general","followlinks") == "1":
+            self.logger.info(_("Setting follow symbolic links"))
+            self.__followlinks = True
+            self.__actualSnapshot.setFollowLinks(self.__followlinks)
 			
         # Reduce the priority, so not to interfere with other processes
         os.nice(20)
@@ -296,25 +296,25 @@ class BackupManager(object):
 						stop = True
 				if not stop :
                     # if it's a directory
-                    if os.path.isdir(path):
+					if os.path.isdir(path):
                         #enter inside
                         # we remove the dir as an effective file of the exclude list
                         # This will prevent full exclusion of that directory
-                        if self.__actualSnapshot.getExcludeFlist().hasFile(path):
-                            self.__actualSnapshot.getExcludeFlist()[path][0] = None
-                        try :
-                            for contents in FAM.listdir(path) :
-                                # contents is a path of a file or dir to include 
-                                contents = os.path.normpath( os.sep.join([path,contents]) )
-                                # if the file is included precisely, don't force exclusion
-                                checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
+						if self.__actualSnapshot.getExcludeFlist().hasFile(path):
+							self.__actualSnapshot.getExcludeFlist()[path][0] = None
+						try :
+							for contents in FAM.listdir(path) :
+								# contents is a path of a file or dir to include 
+								contents = os.path.normpath( os.sep.join([path,contents]) )
+								# if the file is included precisely, don't force exclusion
+								checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
                             
-                        except OSError, e :
-                            self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
-                            # Add to exclude file list
-                            self.__actualSnapshot.addToExcludeFlist(path)
-                    else:
-                        self.fullsize += os.lstat(path).st_size
+						except OSError, e :
+							self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
+							# Add to exclude file list
+							self.__actualSnapshot.addToExcludeFlist(path)
+					else:
+						self.fullsize += os.lstat(path).st_size
 					
 		# End of Subroutines
         
