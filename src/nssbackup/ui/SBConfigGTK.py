@@ -474,30 +474,25 @@ class SBconfigGTK(GladeGnomeApp):
 						self.__set_destination_widgets_to_default()
 					else :
 						if not os.path.exists(ctarget ):
-							try:
-								os.mkdir(ctarget) # makedirs is not good
-							except OSError, _exc:
-								self.__set_target_to_default()
-								self.__set_destination_widgets_to_default()
-								
-								_sec_msg = _("Please make "\
-						 "sure the missing directory exists (e.g. by mounting "\
-						 "an external disk) or change the specified target "\
-						 "to an existing one.")
-								_message_str = "While attempting to create "\
-						 "the backup target the the following error occured:\n"\
-						 "%s\n\n"\
-						 "Attention: The target will be set to the default "\
-						 "value. Check this on the destination settings page "\
-						 "before saving the configuration." % str(_exc)
-								_boxtitle = _("NSsbackup configuration error")
-								_headline_str =\
-								_("Unable to create backup target")
+							self.__set_target_to_default()
+							self.__set_destination_widgets_to_default()
+							
+							_sec_msg = _("Please make "\
+					 "sure the missing directory exists (e.g. by mounting "\
+					 "an external disk) or change the specified target "\
+					 "to an existing one.")
+							_message_str = "Backup target does not exist.\n\n"\
+					 "Attention: The target will be set to the default "\
+					 "value. Check this on the destination settings page "\
+					 "before saving the configuration."
+							_boxtitle = _("NSsbackup configuration error")
+							_headline_str =\
+							_("Unable to open backup target")
 
-								gobject.idle_add( self._show_errdialog,
-												  _message_str, _boxtitle,
-												  _headline_str, _sec_msg )
-								return
+							gobject.idle_add( self._show_errdialog,
+											  _message_str, _boxtitle,
+											  _headline_str, _sec_msg )
+							return
 							
 						self.__set_destination_widgets_to_local(ctarget)
 				else :

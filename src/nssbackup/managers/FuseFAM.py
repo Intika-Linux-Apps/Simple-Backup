@@ -193,14 +193,14 @@ class FuseFAM(object):
 		
 		#start the mount process
 		#  mount target
-		if self.__config.has_option("general","target") and not self.__config.get("general","target").startswith(os.sep):
-			self.__mount(self.__config.get("general","target"))
-		elif self.__config.get("general","target").startswith(os.sep) :   # this assumes absolute paths
-			if not os.path.exists(self.__config.get("general","target")) :
-				try:
-					os.mkdir(self.__config.get("general","target"))
-				except OSError, exc:
-					raise exceptions.FuseFAMException(_("Unable to open target directory.\n")+str(exc))
+		if self.__config.has_option("general","target"):
+			if self.__config.get("general","target").startswith(os.sep) :   # this assumes absolute paths
+				if not os.path.exists(self.__config.get("general","target")) :
+					raise exceptions.FuseFAMException(_("Target directory "\
+								"'%(target)s' does not exist.")% {"target" : self.__config.get("general","target")} )
+			else: # this means remote target
+				self.__mount(self.__config.get("general","target"))
+
 		#mount dirs from dirconfig if needed
 		if self.__config.has_section("dirconfig") and self.__config.has_option("dirconfig", "remote") :
 			remotes = self.__config.get("dirconfig", "remote")
