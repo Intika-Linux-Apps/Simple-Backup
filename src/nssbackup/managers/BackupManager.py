@@ -318,16 +318,19 @@ class BackupManager(PyNotifyMixin):
 				self.__actualSnapshot.setBase(base.getName())
 		del base
 
-		# Backup list of installed packages (Debian only part)
-		try:
-			self.logger.info(_("Setting packages File "))
-			command = "dpkg --get-selections"
-			s = os.popen( command )
-			pkg = s.read()
-			s.close()
-			self.__actualSnapshot.setPackages(pkg)
-		except Exception, e:
-			self.logger.warning(_("Problem when setting the packages : ") + str(e))
+		# Backup list of installed packages
+		self.__packagecmd = "dpkg --get-selections"
+		if self.config.has_option( "general", "packagecmd" ):
+			self.__packagecmd = self.config.get("general", "packagecmd" )
+		if self.__packagecmd:
+			try:
+				self.logger.info(_("Setting packages File "))
+				s = os.popen( self.__packagecmd )
+				pkg = s.read()
+				s.close()
+				self.__actualSnapshot.setPackages(pkg)
+			except Exception, e:
+				self.logger.warning(_("Problem when setting the packages : ") + str(e))
 		
 		# set Excludes
 		self.logger.info(_("Setting Excludes File "))
