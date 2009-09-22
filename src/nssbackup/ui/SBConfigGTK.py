@@ -25,7 +25,8 @@ from nssbackup.plugins import PluginManager
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
-from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir
+from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir,\
+	ConfigStaticData
 from nssbackup.ui.GladeGnomeApp import GladeGnomeApp
 from gettext import gettext as _
 import nssbackup.util as Util
@@ -158,10 +159,13 @@ class SBconfigGTK(GladeGnomeApp):
 		# Profile Manager
 		# [ enable , profilename, cfPath ]
 		self.profiles = gtk.ListStore( bool, str, str )
+		# add the default profile and disable any modification to it
+		self.profiles.append([True, ConfigStaticData.get_default_profilename(), getUserConfDir() + ConfigStaticData.get_default_conffile()]) 
 		for i,v in self.configman.getProfiles().iteritems() :
 			self.profiles.append( [v[1], i, v[0]] )
 		self.profilestv = self.widgets['profilesListTreeView']
 		self.profilestv.set_model(self.profiles )
+		
 		
 		cell8,cell9 = gtk.CellRendererToggle(), gtk.CellRendererText()
 		cell8.set_active(True)
@@ -1826,26 +1830,33 @@ class SBconfigGTK(GladeGnomeApp):
 			return 
 		
 		prfName, prfConf = tm.get_value(iter,1), tm.get_value(iter,2)
-		
-		warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n <b>Are you sure to want to delete the '%(name)s' profile ?</b> " % {'name': prfName})
-		
-		dialog = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_YES_NO)
-		dialog.set_markup(warning)
-		response = dialog.run()
-		dialog.destroy()
-		
-		if response == gtk.RESPONSE_YES :
-			self.logger.debug("Remove Profile '%s' configuration" % prfName)
-			if os.path.exists(prfConf) :
-				os.remove(prfConf)
-			self.profiles.remove(iter)
+		if prfName == ConfigStaticData.get_default_profilename():
+			self._forbid_default_profile_removal(_("remove"))
+		else :
+			warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n <b>Are you sure to want to delete the '%(name)s' profile ?</b> " % {'name': prfName})
 			
-		elif response == gtk.RESPONSE_NO :
-			pass
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_YES_NO)
+			dialog.set_markup(warning)
+			response = dialog.run()
+			dialog.destroy()
+			
+			if response == gtk.RESPONSE_YES :
+				self.logger.debug("Remove Profile '%s' configuration" % prfName)
+				if os.path.exists(prfConf) :
+					os.remove(prfConf)
+				self.profiles.remove(iter)
+				
+			elif response == gtk.RESPONSE_NO :
+				pass
 
 	def on_editProfileButton_clicked(self, *args):
 		
 		tm, iter = self.profilestv.get_selection().get_selected()
+		if not iter :
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Please select a Profile !"))
+			dialog.run()
+			dialog.destroy()
+			return 
 		prfName, prfConf = tm.get_value(iter,1), tm.get_value(iter,2)
 		self.logger.debug("Load Profile '%s' configuration" % prfName)
 		
@@ -1861,27 +1872,35 @@ class SBconfigGTK(GladeGnomeApp):
 		self.conffile = self.default_conffile
 		self.on_reload_clicked()
 		
-	def on_prfEnableCB_toggled(self,*args):
+	def on_prfEnableCB_toggled(self, *args):
 		
 		tm, iter = self.profilestv.get_selection().get_selected()
+		if not iter :
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Please select a Profile !"))
+			dialog.run()
+			dialog.destroy()
+			return 
 		enable, prfName, prfConf =tm.get_value(iter,0), tm.get_value(iter,1), tm.get_value(iter,2)
 		
-		dir, file = prfConf.rsplit(os.sep,1)
-		
-		# rename the file 
-		if enable :
-			# then disable
-			self.logger.debug("Disabling %s " % prfName )
-			os.rename(prfConf, prfConf+"-disable")
-			self.profiles.set_value(iter, 0, False)
-			self.profiles.set_value(iter, 2, prfConf+"-disable")
-			
+		if prfName == ConfigStaticData.get_default_profilename():
+			self._forbid_default_profile_removal(_("disable"))
 		else :
-			# enable it
-			self.logger.debug("Enabling %s " % prfName )
-			os.rename(prfConf, prfConf.rstrip("-disable"))
-			self.profiles.set_value(iter, 0, True)
-			self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
+			dir, file = prfConf.rsplit(os.sep,1)
+			
+			# rename the file 
+			if enable :
+				# then disable
+				self.logger.debug("Disabling %s " % prfName )
+				os.rename(prfConf, prfConf+"-disable")
+				self.profiles.set_value(iter, 0, False)
+				self.profiles.set_value(iter, 2, prfConf+"-disable")
+				
+			else :
+				# enable it
+				self.logger.debug("Enabling %s " % prfName )
+				os.rename(prfConf, prfConf.rstrip("-disable"))
+				self.profiles.set_value(iter, 0, True)
+				self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
 
 	def _show_errdialog(self, message_str, boxtitle = "",
 							   headline_str = "", secmsg_str = ""):
@@ -1916,6 +1935,17 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.run()
 		dialog.destroy()
 
+	def _forbid_default_profile_removal(self, action):
+		"""
+		Shows an info box stating that we are not able to do the given action on the default profile.
+		"""
+		info = _("You can't %s the Default Profile. Please use it if you need only one profile." % action)
+		
+		dialog = gtk.MessageDialog(type=gtk.MESSAGE_INFO, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE)
+		dialog.set_markup(info)
+		dialog.run()
+		dialog.destroy()
+				
 
 def main(argv):
 	w = SBconfigGTK()
