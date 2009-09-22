@@ -167,6 +167,9 @@ class ConfigManager(ConfigParser.ConfigParser):
 	# this should be an integer . It represent the size in KB of each archive (0 => unlimited)
 	splitsize = 0
 	
+	# Set the package manager command to backup the package list
+	packagecmd = <whatever command that will be launched>
+	
 	[log]
 	level = 20
 	file = nssbackup.log
@@ -967,7 +970,8 @@ class ConfigStaticData(object):
 				   		'splitsize' 	: int,
 				   		'purge' 		: str,
 				   		'run4others' 	: int,
-				   		'followlinks' 	: int },
+				   		'followlinks' 	: int,
+						'packagecmd'	: str},
 	 'log' 			: {'level' : int , 'file' : str },
 	 'report' 		: {'from' :str, 'to' : str,'smtpserver' : str,
 				 	   'smtpport' : int, 'smtpuser' : str,

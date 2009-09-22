@@ -25,6 +25,9 @@ run4others = 1
 # Backup links : use 1 to activate and 0 to deactivate (default = 0 )
 backuplinks=1
 
+# Set the package manager command to backup the package list
+packagecmd = <whatever command that will be launched>
+
 [log]
 # level : 10 = DEBUG, 20 = INFO, 50 = ERROR
 level = 20
@@ -53,12 +56,12 @@ level = 20
 
 # In this section you describe, what directories to backup and what to skip 
 # More precise commands override wider ones, for example:
-# /var=1  # This means that the whole /var directory is to be backuped
-# /var/cache=0 # This means the /var/cache and its subdirectories are not
-#              # to  be backuped
-# In this case all /var, except /var/cache will be backuped
+# /var=1  # This means that the whole /var directory is to be backed up
+# /var/cache=0 # This means the /var/cache and its sub-directories are not
+#              # to  be backed up
+# In this case all /var, except /var/cache will be backed up
 # It works the othe way around too
-# by default nothing is backuped
+# by default nothing is backed up
 
 /etc/=1
 /home/=1
