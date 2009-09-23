@@ -107,8 +107,8 @@ class PyNotifyMixin(object):
 					self.__notif.set_urgency(self.__pynotif_mod.URGENCY_LOW)
 					self.__notif.show()
 				except gobject.GError, exc:
-				 	# Connection to notification-daemon failed 
-				 	self.logger.warning("Connection to notification-daemon "\
+					# Connection to notification-daemon failed 
+					self.logger.warning("Connection to notification-daemon "\
 										"failed: " + str(exc))
 
 	def _notify_warning(self, profilename, message):
@@ -131,7 +131,7 @@ class PyNotifyMixin(object):
  		
 		"""
 		self.__notify_new(profilename, message, mode="critical")
-				 	
+				
 	def __notify_new(self, profilename, message, mode):
 		"""Shows up a *new* pop-up window to inform the user that an error occured.
 		Such error notifications are emphasized and must be closed manual. The
@@ -152,12 +152,12 @@ class PyNotifyMixin(object):
 						notif.set_urgency(self.__pynotif_mod.URGENCY_NORMAL)
 					notif.show()
 				except gobject.GError, exc:
-				 	# Connection to notification-daemon failed 
-				 	self.logger.warning("Connection to notification-daemon "\
+					# Connection to notification-daemon failed 
+					self.logger.warning("Connection to notification-daemon "\
 										"failed: " + str(exc))
 
 	def __get_notification(self, profilename, message):
- 		"""Returns a notification object but does not display it. The
+		"""Returns a notification object but does not display it. The
  		notification supports mark-up. If notifications aren't supported
  		the method returns None.
  		
@@ -180,14 +180,14 @@ class PyNotifyMixin(object):
 				notif = self.__pynotif_mod.Notification(
 								"NSsbackup [%s]" % profilename, message, ico)
 			except gobject.GError, exc:
-			 	# Connection to notification-daemon failed 
-			 	self.logger.warning("Connection to notification-daemon "\
+				# Connection to notification-daemon failed 
+				self.logger.warning("Connection to notification-daemon "\
 									"failed: " + str(exc))
-			 	notif = None
+				notif = None
 		return notif
 
 	def __update_notification(self, profilename, message):
- 		""" 		
+		""" 		
  		:param message: The message (body) that should be displayed.
  		:type message:  String
  		
@@ -203,10 +203,10 @@ class PyNotifyMixin(object):
 				self.__notif.update(
 								"NSsbackup [%s]" % profilename, message, ico)
 			except gobject.GError, exc:
-			 	# Connection to notification-daemon failed 
-			 	self.logger.warning("Connection to notification-daemon "\
+				# Connection to notification-daemon failed 
+				self.logger.warning("Connection to notification-daemon "\
 									"failed: " + str(exc))
-			 	self.__notif = None
+				self.__notif = None
 				
 				
 class BackupManager(PyNotifyMixin):

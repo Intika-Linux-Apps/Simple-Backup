@@ -328,8 +328,10 @@ def makeTarIncBackup(snapshot):
 			LogFactory.getLogger().warning(_("Unable to change permissions for "\
 									  "file '%s'.") % snarfile )
 		os.remove( tmp_snarfile )
-
-		if retVal != 0 :
+		if retVal == 1 :
+			# list-incremental is not compatible with ignore failed read
+			LogFactory.getLogger().warning(_("TAR sent a warning when making the backup : ") + errStr )
+		elif retVal != 0 :
 			# list-incremental is not compatible with ignore failed read
 			LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
 			raise SBException(_("Couldn't make a proper backup : ") + errStr )
@@ -375,7 +377,10 @@ def makeTarFullBackup(snapshot):
 									  "file '%s'.") % snarfile )
 	os.remove( tmp_snarfile )
 
-	if retVal != 0 :
+	if retVal == 1 :
+		# list-incremental is not compatible with ignore failed read
+		LogFactory.getLogger().warning(_("TAR sent a warning when making the backup : ") + errStr )
+	elif retVal != 0 :
 		# list-incremental is not compatible with ignore failed read
 		LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
 		raise SBException(_("Couldn't make a proper backup : ") + errStr )

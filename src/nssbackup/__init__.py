@@ -46,7 +46,8 @@ class Infos(object):
 
     VERSION = "0.2-0 RC7"
     
-    DESCRIPTION = _("This is a user friendly backup solution for common desktop needs.")
+    DESCRIPTION = _("This is a user friendly backup solution for common desktop needs.\n \
+If you want to help, by submitting Bugs, by translating or anything else, please visit our website.")
     WEBSITE = "https://launchpad.net/nssbackup/"
     
     hostname = socket.gethostname()
