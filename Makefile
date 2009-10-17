@@ -13,10 +13,14 @@ DESTDIR=/usr/local
 SETUP.PY_OPTS=--root=/
 
 UbuntuVersion=$(shell expr "$(shell lsb_release -r)" : ".*: *\(.*\)")
-# if we use jaunty
+# if we use jaunty or karmic
 ifneq (,$(findstring 9.04,$(UbuntuVersion)))
     LAYOUT="--install-layout=deb"
 endif
+ifneq (,$(findstring 9.10,$(UbuntuVersion)))
+    LAYOUT="--install-layout=deb"
+endif
+
 
 BIN=$(DESTDIR)/bin
 SBIN=$(DESTDIR)/sbin

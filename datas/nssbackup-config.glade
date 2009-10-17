@@ -1,16 +1,15 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
+<!--Generated with glade3 3.4.5 on Mon Apr 20 19:28:34 2009 -->
 <glade-interface>
   <!-- interface-requires gtk+ 2.16 -->
   <requires lib="bonobo"/>
-  <!-- interface-requires bonobo 2115.63280 -->
   <requires lib="gnome"/>
-  <!-- interface-requires gnome 2115.63280 -->
-  <!-- interface-naming-policy toplevel-contextual -->
   <widget class="GtkDialog" id="ftypedialog">
     <property name="title" translatable="yes">Exclude file type</property>
     <property name="modal">True</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="type_hint">dialog</property>
+    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="skip_taskbar_hint">True</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox4">
@@ -20,18 +19,17 @@
             <property name="visible">True</property>
             <child>
               <widget class="GtkRadioButton" id="ftype_st">
-                <property name="label" translatable="yes">Standard file types:</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="receives_default">False</property>
+                <property name="label" translatable="yes">Standard file types:</property>
                 <property name="use_underline">True</property>
+                <property name="response_id">0</property>
                 <property name="draw_indicator">True</property>
                 <signal name="toggled" handler="on_ftype_toggled"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -54,11 +52,11 @@ ogg
                 <property name="visible">True</property>
                 <child>
                   <widget class="GtkRadioButton" id="ftype_custom">
-                    <property name="label" translatable="yes">Custom defined file type with </property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
+                    <property name="label" translatable="yes">Custom defined file type with </property>
                     <property name="use_underline">True</property>
+                    <property name="response_id">0</property>
                     <property name="draw_indicator">True</property>
                     <property name="group">ftype_st</property>
                     <signal name="toggled" handler="on_ftype_toggled"/>
@@ -66,7 +64,6 @@ ogg
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -104,33 +101,30 @@ ogg
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area4">
             <property name="visible">True</property>
-            <property name="layout_style">end</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
               <widget class="GtkButton" id="cancelbutton">
-                <property name="label">gtk-cancel</property>
-                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
-                <property name="receives_default">False</property>
+                <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-6</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
               <widget class="GtkButton" id="okbutton">
-                <property name="label">gtk-ok</property>
-                <property name="response_id">-5</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
-                <property name="receives_default">False</property>
+                <property name="label">gtk-ok</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-5</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -141,8 +135,7 @@ ogg
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>
@@ -150,7 +143,7 @@ ogg
   </widget>
   <widget class="GtkDialog" id="regexdialog">
     <property name="title" translatable="yes">Exclude by regex</property>
-    <property name="type_hint">dialog</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="skip_taskbar_hint">True</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox5">
@@ -165,12 +158,9 @@ ogg
                 <property name="ypad">5</property>
                 <property name="label" translatable="yes">Enter a regular expression.
 Files and directories matching this expression will be excluded from backup.</property>
-                <property name="justify">center</property>
+                <property name="justify">GTK_JUSTIFY_CENTER</property>
                 <property name="wrap">True</property>
               </widget>
-              <packing>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkEntry" id="regex_box">
@@ -190,33 +180,30 @@ Files and directories matching this expression will be excluded from backup.</pr
         <child internal-child="action_area">
           <widget class="GtkHButtonBox" id="dialog-action_area5">
             <property name="visible">True</property>
-            <property name="layout_style">end</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
               <widget class="GtkButton" id="cancelbutton2">
-                <property name="label">gtk-cancel</property>
-                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
-                <property name="receives_default">False</property>
+                <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-6</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
               <widget class="GtkButton" id="okbutton2">
-                <property name="label">gtk-ok</property>
-                <property name="response_id">-5</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
-                <property name="receives_default">False</property>
+                <property name="label">gtk-ok</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-5</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -227,8 +214,7 @@ Files and directories matching this expression will be excluded from backup.</pr
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>
@@ -240,8 +226,8 @@ Files and directories matching this expression will be excluded from backup.</pr
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Enter the remote target to include</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="type_hint">dialog</property>
+    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
@@ -259,9 +245,6 @@ Files and directories matching this expression will be excluded from backup.</pr
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="label" translatable="yes">Choose a plugin to get the format</property>
               </widget>
-              <packing>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkHBox" id="hbox27">
@@ -273,9 +256,6 @@ Files and directories matching this expression will be excluded from backup.</pr
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <property name="label" translatable="yes">Choose your plugin :</property>
                   </widget>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkComboBox" id="pluginscombobox">
@@ -306,9 +286,6 @@ Files and directories matching this expression will be excluded from backup.</pr
                 <property name="can_focus">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
               </widget>
-              <packing>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkButton" id="fusecheckbutton">
@@ -316,6 +293,7 @@ Files and directories matching this expression will be excluded from backup.</pr
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_fusecheckbutton_clicked"/>
                 <child>
                   <widget class="GtkHBox" id="hbox26">
@@ -327,9 +305,6 @@ Files and directories matching this expression will be excluded from backup.</pr
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="stock">gtk-apply</property>
                       </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
                       <widget class="GtkLabel" id="label52">
@@ -357,33 +332,30 @@ Files and directories matching this expression will be excluded from backup.</pr
           <widget class="GtkHButtonBox" id="dialog-action_area3">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="layout_style">end</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
               <widget class="GtkButton" id="remote_inc_okbutton">
-                <property name="label">gtk-ok</property>
-                <property name="response_id">-5</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
-                <property name="receives_default">False</property>
+                <property name="label">gtk-ok</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-5</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
               <widget class="GtkButton" id="button2">
-                <property name="label">gtk-cancel</property>
-                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
-                <property name="receives_default">False</property>
+                <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-6</property>
                 <signal name="clicked" handler="gtk_widget_hide"/>
               </widget>
               <packing>
@@ -395,8 +367,7 @@ Files and directories matching this expression will be excluded from backup.</pr
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>
@@ -406,9 +377,9 @@ Files and directories matching this expression will be excluded from backup.</pr
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Save the configuration ...</property>
-    <property name="window_position">center-on-parent</property>
+    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
@@ -433,32 +404,31 @@ Do you want to save ?</property>
           <widget class="GtkHButtonBox" id="dialog-action_area6">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="layout_style">end</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
               <widget class="GtkButton" id="saveconfig_yes_button">
-                <property name="label" translatable="yes">gtk-yes</property>
-                <property name="response_id">-8</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">gtk-yes</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-8</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
               <widget class="GtkButton" id="saveconfig_no_button">
-                <property name="label" translatable="yes">gtk-no</property>
-                <property name="response_id">-9</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">gtk-no</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-9</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -469,8 +439,7 @@ Do you want to save ?</property>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>
@@ -480,8 +449,8 @@ Do you want to save ?</property>
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Profile Manager</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="type_hint">dialog</property>
+    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="skip_taskbar_hint">True</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox7">
@@ -509,7 +478,6 @@ Thanks to this you can configure backup of different kinds to different places.
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -521,7 +489,7 @@ Thanks to this you can configure backup of different kinds to different places.
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <property name="label_xalign">0</property>
-                    <property name="shadow_type">none</property>
+                    <property name="shadow_type">GTK_SHADOW_NONE</property>
                     <child>
                       <widget class="GtkAlignment" id="alignment10">
                         <property name="visible">True</property>
@@ -532,15 +500,15 @@ Thanks to this you can configure backup of different kinds to different places.
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="hscrollbar_policy">automatic</property>
-                            <property name="vscrollbar_policy">automatic</property>
+                            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                             <child>
                               <widget class="GtkTreeView" id="profilesListTreeView">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                 <property name="enable_search">False</property>
-                                <property name="enable_grid_lines">horizontal</property>
+                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                               </widget>
                             </child>
                           </widget>
@@ -559,40 +527,38 @@ Thanks to this you can configure backup of different kinds to different places.
                       </packing>
                     </child>
                   </widget>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkVButtonBox" id="vbuttonbox1">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <property name="spacing">3</property>
-                    <property name="layout_style">start</property>
+                    <property name="layout_style">GTK_BUTTONBOX_START</property>
                     <child>
                       <widget class="GtkButton" id="addProfileButton">
-                        <property name="label" translatable="yes">gtk-add</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">gtk-add</property>
                         <property name="use_stock">True</property>
+                        <property name="response_id">0</property>
                         <signal name="clicked" handler="on_addProfileButton_clicked"/>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkButton" id="removeProfileButton">
-                        <property name="label" translatable="yes">gtk-remove</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">gtk-remove</property>
                         <property name="use_stock">True</property>
+                        <property name="response_id">0</property>
                         <signal name="clicked" handler="on_removeProfileButton_clicked"/>
                       </widget>
                       <packing>
@@ -603,12 +569,13 @@ Thanks to this you can configure backup of different kinds to different places.
                     </child>
                     <child>
                       <widget class="GtkButton" id="editProfileButton">
-                        <property name="label" translatable="yes">gtk-edit</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">gtk-edit</property>
                         <property name="use_stock">True</property>
+                        <property name="response_id">0</property>
                         <signal name="clicked" handler="on_editProfileButton_clicked"/>
                       </widget>
                       <packing>
@@ -640,28 +607,27 @@ Thanks to this you can configure backup of different kinds to different places.
           <widget class="GtkHButtonBox" id="dialog-action_area7">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="layout_style">end</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
               <widget class="GtkButton" id="closeProfileManagerButton">
-                <property name="label" translatable="yes">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">gtk-close</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_closeProfileManagerButton_clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>
@@ -670,8 +636,8 @@ Thanks to this you can configure backup of different kinds to different places.
   <widget class="GtkDialog" id="askNewPrfNameDialog">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="type_hint">dialog</property>
+    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="transient_for">ProfileManagerDialog</property>
     <child internal-child="vbox">
@@ -693,7 +659,6 @@ Thanks to this you can configure backup of different kinds to different places.
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -703,19 +668,18 @@ Thanks to this you can configure backup of different kinds to different places.
                 <property name="spacing">4</property>
                 <child>
                   <widget class="GtkCheckButton" id="enableNewPrfCB">
-                    <property name="label" translatable="yes">Enable</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="relief">half</property>
+                    <property name="label" translatable="yes">Enable</property>
+                    <property name="relief">GTK_RELIEF_HALF</property>
+                    <property name="response_id">0</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
                     <property name="padding">5</property>
-                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -742,7 +706,6 @@ Thanks to this you can configure backup of different kinds to different places.
                       </widget>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -777,32 +740,31 @@ Thanks to this you can configure backup of different kinds to different places.
           <widget class="GtkHButtonBox" id="dialog-action_area8">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="layout_style">end</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
               <widget class="GtkButton" id="button3">
-                <property name="label" translatable="yes">gtk-cancel</property>
-                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-6</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
               <widget class="GtkButton" id="button1">
-                <property name="label" translatable="yes">gtk-ok</property>
-                <property name="response_id">-5</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">gtk-ok</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">-5</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -813,8 +775,7 @@ Thanks to this you can configure backup of different kinds to different places.
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>
@@ -845,9 +806,9 @@ Thanks to this you can configure backup of different kinds to different places.
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <child>
                           <widget class="GtkImageMenuItem" id="save">
-                            <property name="label">gtk-save</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="label">gtk-save</property>
                             <property name="use_underline">True</property>
                             <property name="use_stock">True</property>
                             <signal name="activate" handler="on_save_activate"/>
@@ -855,9 +816,9 @@ Thanks to this you can configure backup of different kinds to different places.
                         </child>
                         <child>
                           <widget class="GtkImageMenuItem" id="save_as">
-                            <property name="label">gtk-save-as</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="label">gtk-save-as</property>
                             <property name="use_underline">True</property>
                             <property name="use_stock">True</property>
                             <signal name="activate" handler="on_save_as_activate"/>
@@ -871,9 +832,9 @@ Thanks to this you can configure backup of different kinds to different places.
                         </child>
                         <child>
                           <widget class="GtkImageMenuItem" id="exit">
-                            <property name="label">gtk-quit</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="label">gtk-quit</property>
                             <property name="use_underline">True</property>
                             <property name="use_stock">True</property>
                             <signal name="activate" handler="gtk_main_quit"/>
@@ -895,9 +856,9 @@ Thanks to this you can configure backup of different kinds to different places.
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <child>
                           <widget class="GtkImageMenuItem" id="prfManager">
-                            <property name="label">Profile Manager</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="label">Profile Manager</property>
                             <property name="use_underline">True</property>
                             <property name="use_stock">True</property>
                             <signal name="activate" handler="on_prfManager_activate"/>
@@ -919,9 +880,9 @@ Thanks to this you can configure backup of different kinds to different places.
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <child>
                           <widget class="GtkImageMenuItem" id="about">
-                            <property name="label">gtk-about</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="label">gtk-about</property>
                             <property name="use_underline">True</property>
                             <property name="use_stock">True</property>
                             <signal name="activate" handler="on_about_activate"/>
@@ -946,7 +907,7 @@ Thanks to this you can configure backup of different kinds to different places.
               <widget class="GtkToolbar" id="toolbar">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="toolbar_style">both</property>
+                <property name="toolbar_style">GTK_TOOLBAR_BOTH</property>
                 <child>
                   <widget class="GtkToolButton" id="reload">
                     <property name="visible">True</property>
@@ -956,7 +917,6 @@ Thanks to this you can configure backup of different kinds to different places.
                     <signal name="clicked" handler="on_reload_clicked"/>
                   </widget>
                   <packing>
-                    <property name="expand">False</property>
                     <property name="homogeneous">True</property>
                   </packing>
                 </child>
@@ -969,7 +929,6 @@ Thanks to this you can configure backup of different kinds to different places.
                     <signal name="clicked" handler="on_save_clicked"/>
                   </widget>
                   <packing>
-                    <property name="expand">False</property>
                     <property name="homogeneous">True</property>
                   </packing>
                 </child>
@@ -978,9 +937,6 @@ Thanks to this you can configure backup of different kinds to different places.
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                   </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkToolButton" id="backup">
@@ -991,7 +947,6 @@ Thanks to this you can configure backup of different kinds to different places.
                     <signal name="clicked" handler="on_backup_clicked"/>
                   </widget>
                   <packing>
-                    <property name="expand">False</property>
                     <property name="homogeneous">True</property>
                   </packing>
                 </child>
@@ -1000,9 +955,6 @@ Thanks to this you can configure backup of different kinds to different places.
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                   </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkToolButton" id="prfManToolButton">
@@ -1013,14 +965,12 @@ Thanks to this you can configure backup of different kinds to different places.
                     <signal name="clicked" handler="on_prfManager_activate"/>
                   </widget>
                   <packing>
-                    <property name="expand">False</property>
                     <property name="homogeneous">True</property>
                   </packing>
                 </child>
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -1034,19 +984,18 @@ Thanks to this you can configure backup of different kinds to different places.
                     <property name="border_width">5</property>
                     <child>
                       <widget class="GtkRadioButton" id="main_radio">
-                        <property name="label" translatable="yes">Use recommended backup settings</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
                         <property name="border_width">2</property>
+                        <property name="label" translatable="yes">Use recommended backup settings</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_main_radio_toggled"/>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -1060,7 +1009,6 @@ Thanks to this you can configure backup of different kinds to different places.
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -1069,8 +1017,7 @@ Thanks to this you can configure backup of different kinds to different places.
                             <property name="xalign">0</property>
                             <property name="yalign">0</property>
                             <property name="xpad">4</property>
-                            <property name="label" translatable="yes">&lt;small&gt;Do standard backups.
-Defaults: daily incremental and weekly full backup to /var/backup of all user files, /etc, /usr/local and /var. 
+                            <property name="label" translatable="yes">&lt;small&gt;Do standard backups.Defaults: daily incremental and weekly full backup to /var/backup of all user files, /etc, /usr/local and /var. 
 Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;/small&gt;</property>
                             <property name="use_markup">True</property>
                             <property name="wrap">True</property>
@@ -1081,16 +1028,18 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         </child>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkRadioButton" id="main_radio2">
-                        <property name="label" translatable="yes">Use custom backup settings</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
+                        <property name="label" translatable="yes">Use custom backup settings</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">main_radio</property>
                         <signal name="toggled" handler="on_main_radio_toggled"/>
@@ -1112,7 +1061,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -1123,7 +1071,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="xpad">4</property>
                             <property name="label" translatable="yes">&lt;small&gt;Do backups according to the settings defined on the next pages of this dialog.&lt;/small&gt;</property>
                             <property name="use_markup">True</property>
-                            <property name="justify">fill</property>
+                            <property name="justify">GTK_JUSTIFY_FILL</property>
                             <property name="wrap">True</property>
                           </widget>
                           <packing>
@@ -1132,16 +1080,17 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         </child>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkRadioButton" id="main_radio3">
-                        <property name="label" translatable="yes">Manual backups only</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
+                        <property name="label" translatable="yes">Manual backups only</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">main_radio</property>
                         <signal name="toggled" handler="on_main_radio_toggled"/>
@@ -1163,7 +1112,6 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -1174,7 +1122,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                             <property name="xpad">4</property>
                             <property name="label" translatable="yes">&lt;small&gt;Do not backup your data automatically. Note: this does not prevent doing manual backups.&lt;/small&gt;</property>
                             <property name="use_markup">True</property>
-                            <property name="justify">fill</property>
+                            <property name="justify">GTK_JUSTIFY_FILL</property>
                             <property name="wrap">True</property>
                           </widget>
                           <packing>
@@ -1183,6 +1131,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         </child>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="position">5</property>
                       </packing>
                     </child>
@@ -1192,7 +1141,7 @@ Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="border_width">1</property>
                         <property name="label_xalign">0</property>
-                        <property name="shadow_type">etched-out</property>
+                        <property name="shadow_type">GTK_SHADOW_ETCHED_OUT</property>
                         <child>
                           <widget class="GtkTable" id="table1">
                             <property name="visible">True</property>
@@ -1223,7 +1172,7 @@ bzip2</property>
                                 <property name="label" translatable="yes">Choose the compression format that you want to apply.
 Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="use_markup">True</property>
-                                <property name="justify">fill</property>
+                                <property name="justify">GTK_JUSTIFY_FILL</property>
                               </widget>
                             </child>
                             <child>
@@ -1257,7 +1206,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                   </widget>
                                   <packing>
                                     <property name="fill">False</property>
-                                    <property name="position">0</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -1297,6 +1245,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="fill">False</property>
                         <property name="position">6</property>
                       </packing>
                     </child>
@@ -1308,8 +1257,8 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <property name="label" translatable="yes">General</property>
                   </widget>
                   <packing>
-                    <property name="tab_fill">False</property>
                     <property name="type">tab</property>
+                    <property name="tab_fill">False</property>
                   </packing>
                 </child>
                 <child>
@@ -1319,9 +1268,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                       <widget class="GtkScrolledWindow" id="scrolledwindow1">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="hscrollbar_policy">automatic</property>
-                        <property name="vscrollbar_policy">automatic</property>
-                        <property name="shadow_type">in</property>
+                        <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                        <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                        <property name="shadow_type">GTK_SHADOW_IN</property>
                         <child>
                           <widget class="GtkTreeView" id="includetv">
                             <property name="visible">True</property>
@@ -1329,26 +1278,23 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="border_width">2</property>
                             <property name="headers_visible">False</property>
                             <property name="search_column">1</property>
-                            <property name="enable_grid_lines">horizontal</property>
+                            <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                             <signal name="key_press_event" handler="on_includetv_key_press_event"/>
                           </widget>
                         </child>
                       </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
                       <widget class="GtkHButtonBox" id="hbuttonbox">
                         <property name="visible">True</property>
                         <property name="spacing">3</property>
-                        <property name="layout_style">spread</property>
+                        <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
                         <child>
                           <widget class="GtkButton" id="inc_addfile">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="can_default">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_inc_addfile_clicked"/>
                             <child>
                               <widget class="GtkAlignment" id="alignment1">
@@ -1367,7 +1313,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">False</property>
-                                        <property name="position">0</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -1390,7 +1335,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -1398,7 +1342,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="can_default">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_inc_adddir_clicked"/>
                             <child>
                               <widget class="GtkAlignment" id="alignment2">
@@ -1417,7 +1361,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">False</property>
-                                        <property name="position">0</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -1445,12 +1388,12 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         </child>
                         <child>
                           <widget class="GtkButton" id="inc_del">
-                            <property name="label">gtk-remove</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="can_default">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="label">gtk-remove</property>
                             <property name="use_stock">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_inc_del_clicked"/>
                           </widget>
                           <packing>
@@ -1471,7 +1414,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">Add a remote source</property>
-                        <property name="ellipsize">start</property>
+                        <property name="ellipsize">PANGO_ELLIPSIZE_START</property>
                       </widget>
                       <packing>
                         <property name="position">2</property>
@@ -1481,16 +1424,16 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                       <widget class="GtkScrolledWindow" id="scrolledwindow7">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="hscrollbar_policy">automatic</property>
-                        <property name="vscrollbar_policy">automatic</property>
-                        <property name="shadow_type">in</property>
+                        <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                        <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                        <property name="shadow_type">GTK_SHADOW_IN</property>
                         <child>
                           <widget class="GtkTreeView" id="remote_includetv">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="headers_visible">False</property>
                             <property name="search_column">1</property>
-                            <property name="enable_grid_lines">horizontal</property>
+                            <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                             <signal name="key_press_event" handler="on_remote_includetv_key_press_event"/>
                           </widget>
                         </child>
@@ -1503,31 +1446,32 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                       <widget class="GtkHButtonBox" id="hbuttonbox1">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="layout_style">spread</property>
+                        <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
                         <child>
                           <widget class="GtkButton" id="remote_inc_add">
-                            <property name="label">gtk-add</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="label">gtk-add</property>
                             <property name="use_stock">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_remote_inc_add_clicked"/>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
                           <widget class="GtkButton" id="remote_inc_del">
-                            <property name="label">gtk-remove</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="label">gtk-remove</property>
                             <property name="use_stock">True</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_remote_inc_del_clicked"/>
                           </widget>
                           <packing>
@@ -1542,6 +1486,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_test_remote_clicked"/>
                             <child>
                               <widget class="GtkAlignment" id="alignment8">
@@ -1557,9 +1502,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                         <property name="stock">gtk-ok</property>
                                       </widget>
-                                      <packing>
-                                        <property name="position">0</property>
-                                      </packing>
                                     </child>
                                     <child>
                                       <widget class="GtkLabel" id="label51">
@@ -1598,16 +1540,16 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <property name="label" translatable="yes">Include</property>
                   </widget>
                   <packing>
+                    <property name="type">tab</property>
                     <property name="position">1</property>
                     <property name="tab_fill">False</property>
-                    <property name="type">tab</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkNotebook" id="notebook2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="tab_pos">left</property>
+                    <property name="tab_pos">GTK_POS_LEFT</property>
                     <child>
                       <widget class="GtkVBox" id="vbox4">
                         <property name="visible">True</property>
@@ -1615,9 +1557,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                           <widget class="GtkScrolledWindow" id="scrolledwindow2">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">automatic</property>
-                            <property name="vscrollbar_policy">automatic</property>
-                            <property name="shadow_type">in</property>
+                            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="shadow_type">GTK_SHADOW_IN</property>
                             <child>
                               <widget class="GtkTreeView" id="ex_pathstv">
                                 <property name="height_request">200</property>
@@ -1626,26 +1568,23 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="border_width">2</property>
                                 <property name="headers_visible">False</property>
                                 <property name="search_column">1</property>
-                                <property name="enable_grid_lines">horizontal</property>
+                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                                 <signal name="key_press_event" handler="on_ex_pathstv_key_press_event"/>
                               </widget>
                             </child>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkHButtonBox" id="hbuttonbox2">
                             <property name="visible">True</property>
                             <property name="spacing">3</property>
-                            <property name="layout_style">end</property>
+                            <property name="layout_style">GTK_BUTTONBOX_END</property>
                             <child>
                               <widget class="GtkButton" id="ex_addfile">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
-                                <property name="receives_default">False</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_addfile_clicked"/>
                                 <child>
                                   <widget class="GtkAlignment" id="alignment3">
@@ -1664,7 +1603,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                           <packing>
                                             <property name="expand">False</property>
                                             <property name="fill">False</property>
-                                            <property name="position">0</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -1687,7 +1625,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">False</property>
-                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
@@ -1695,7 +1632,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
-                                <property name="receives_default">False</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_adddir_clicked"/>
                                 <child>
                                   <widget class="GtkAlignment" id="alignment4">
@@ -1714,7 +1651,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                           <packing>
                                             <property name="expand">False</property>
                                             <property name="fill">False</property>
-                                            <property name="position">0</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -1742,12 +1678,12 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             </child>
                             <child>
                               <widget class="GtkButton" id="ex_delpath">
-                                <property name="label">gtk-remove</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
-                                <property name="receives_default">False</property>
+                                <property name="label">gtk-remove</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_delpath_clicked"/>
                               </widget>
                               <packing>
@@ -1760,7 +1696,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                           <packing>
                             <property name="expand">False</property>
                             <property name="padding">5</property>
-                            <property name="pack_type">end</property>
+                            <property name="pack_type">GTK_PACK_END</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
@@ -1772,8 +1708,8 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         <property name="label" translatable="yes">Paths</property>
                       </widget>
                       <packing>
-                        <property name="tab_fill">False</property>
                         <property name="type">tab</property>
+                        <property name="tab_fill">False</property>
                       </packing>
                     </child>
                     <child>
@@ -1783,9 +1719,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                           <widget class="GtkScrolledWindow" id="scrolledwindow3">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">automatic</property>
-                            <property name="vscrollbar_policy">automatic</property>
-                            <property name="shadow_type">in</property>
+                            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="shadow_type">GTK_SHADOW_IN</property>
                             <child>
                               <widget class="GtkTreeView" id="ex_ftypetv">
                                 <property name="height_request">200</property>
@@ -1793,43 +1729,39 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="can_focus">True</property>
                                 <property name="headers_visible">False</property>
                                 <property name="search_column">1</property>
-                                <property name="enable_grid_lines">horizontal</property>
+                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                                 <signal name="key_press_event" handler="on_ex_ftypetv_key_press_event"/>
                               </widget>
                             </child>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkHButtonBox" id="hbuttonbox3">
                             <property name="visible">True</property>
-                            <property name="layout_style">spread</property>
+                            <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
                             <child>
                               <widget class="GtkButton" id="ex_addftype">
-                                <property name="label">gtk-add</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
-                                <property name="receives_default">False</property>
+                                <property name="label">gtk-add</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_addftype_clicked"/>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">False</property>
-                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
                               <widget class="GtkButton" id="ex_delftype">
-                                <property name="label">gtk-remove</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
-                                <property name="receives_default">False</property>
+                                <property name="label">gtk-remove</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_delftype_clicked"/>
                               </widget>
                               <packing>
@@ -1856,9 +1788,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         <property name="label" translatable="yes">File types</property>
                       </widget>
                       <packing>
+                        <property name="type">tab</property>
                         <property name="position">1</property>
                         <property name="tab_fill">False</property>
-                        <property name="type">tab</property>
                       </packing>
                     </child>
                     <child>
@@ -1868,9 +1800,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                           <widget class="GtkScrolledWindow" id="scrolledwindow4">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">automatic</property>
-                            <property name="vscrollbar_policy">automatic</property>
-                            <property name="shadow_type">in</property>
+                            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="shadow_type">GTK_SHADOW_IN</property>
                             <child>
                               <widget class="GtkTreeView" id="ex_regextv">
                                 <property name="height_request">200</property>
@@ -1878,43 +1810,39 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="can_focus">True</property>
                                 <property name="headers_visible">False</property>
                                 <property name="search_column">1</property>
-                                <property name="enable_grid_lines">horizontal</property>
+                                <property name="enable_grid_lines">GTK_TREE_VIEW_GRID_LINES_HORIZONTAL</property>
                                 <signal name="key_press_event" handler="on_ex_regextv_key_press_event"/>
                               </widget>
                             </child>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkHButtonBox" id="hbuttonbox4">
                             <property name="visible">True</property>
-                            <property name="layout_style">spread</property>
+                            <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
                             <child>
                               <widget class="GtkButton" id="ex_addregex">
-                                <property name="label">gtk-add</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
-                                <property name="receives_default">False</property>
+                                <property name="label">gtk-add</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_addregex_clicked"/>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">False</property>
-                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
                               <widget class="GtkButton" id="ex_delregex">
-                                <property name="label">gtk-remove</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="can_default">True</property>
-                                <property name="receives_default">False</property>
+                                <property name="label">gtk-remove</property>
                                 <property name="use_stock">True</property>
+                                <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_ex_delregex_clicked"/>
                               </widget>
                               <packing>
@@ -1941,9 +1869,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         <property name="label" translatable="yes">Regex</property>
                       </widget>
                       <packing>
+                        <property name="type">tab</property>
                         <property name="position">2</property>
                         <property name="tab_fill">False</property>
-                        <property name="type">tab</property>
                       </packing>
                     </child>
                     <child>
@@ -1958,19 +1886,18 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="spacing">3</property>
                             <child>
                               <widget class="GtkCheckButton" id="ex_max">
-                                <property name="label" translatable="yes">Do not backup files bigger than </property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="receives_default">False</property>
+                                <property name="label" translatable="yes">Do not backup files bigger than </property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
+                                <property name="response_id">0</property>
                                 <property name="draw_indicator">True</property>
                                 <signal name="toggled" handler="on_ex_max_toggled"/>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">False</property>
-                                <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
@@ -2006,11 +1933,11 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         </child>
                         <child>
                           <widget class="GtkCheckButton" id="followlinks">
-                            <property name="label" translatable="yes">Follow symbolic links </property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="label" translatable="yes">Follow symbolic links </property>
                             <property name="focus_on_click">False</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="on_followlinks_toggled"/>
                           </widget>
@@ -2047,9 +1974,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         <property name="label" translatable="yes">Others</property>
                       </widget>
                       <packing>
+                        <property name="type">tab</property>
                         <property name="position">3</property>
                         <property name="tab_fill">False</property>
-                        <property name="type">tab</property>
                       </packing>
                     </child>
                   </widget>
@@ -2063,9 +1990,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <property name="label" translatable="yes">Exclude</property>
                   </widget>
                   <packing>
+                    <property name="type">tab</property>
                     <property name="position">2</property>
                     <property name="tab_fill">False</property>
-                    <property name="type">tab</property>
                   </packing>
                 </child>
                 <child>
@@ -2073,27 +2000,26 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <property name="visible">True</property>
                     <child>
                       <widget class="GtkRadioButton" id="dest1">
-                        <property name="label" translatable="yes">Use default backup directory (/var/backup)</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
+                        <property name="label" translatable="yes">Use default backup directory (/var/backup)</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_dest1_toggled"/>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkRadioButton" id="dest2">
-                        <property name="label" translatable="yes">Use custom local backup directory</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
+                        <property name="label" translatable="yes">Use custom local backup directory</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">dest1</property>
                         <signal name="toggled" handler="on_dest1_toggled"/>
@@ -2115,7 +2041,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
                             <property name="padding">6</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -2123,8 +2048,8 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="border_width">10</property>
-                            <property name="action">select-folder</property>
                             <property name="show_hidden">True</property>
+                            <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                             <property name="title" translatable="yes">Select the destination folder</property>
                             <signal name="selection_changed" handler="on_dest_localpath_selection_changed"/>
                           </widget>
@@ -2140,11 +2065,11 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     </child>
                     <child>
                       <widget class="GtkRadioButton" id="dest3">
-                        <property name="label" translatable="yes">Use a remote directory (SSH or FTP)</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
+                        <property name="label" translatable="yes">Use a remote directory (SSH or FTP)</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">dest1</property>
                         <signal name="toggled" handler="on_dest1_toggled"/>
@@ -2173,7 +2098,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
                             <property name="padding">6</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -2192,8 +2116,8 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                           <widget class="GtkButton" id="dest_remotetest">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
                             <property name="border_width">10</property>
+                            <property name="response_id">0</property>
                             <signal name="clicked" handler="on_dest_remotetest_clicked"/>
                             <child>
                               <widget class="GtkAlignment" id="alignment5">
@@ -2212,7 +2136,6 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">False</property>
-                                        <property name="position">0</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -2264,7 +2187,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="label" translatable="yes">&lt;i&gt;The selected destination is not writtable with current permissions.
 The backups can not be written there.&lt;/i&gt;</property>
                             <property name="use_markup">True</property>
-                            <property name="justify">center</property>
+                            <property name="justify">GTK_JUSTIFY_CENTER</property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -2279,7 +2202,7 @@ The backups can not be written there.&lt;/i&gt;</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="padding">20</property>
-                        <property name="pack_type">end</property>
+                        <property name="pack_type">GTK_PACK_END</property>
                         <property name="position">5</property>
                       </packing>
                     </child>
@@ -2294,9 +2217,9 @@ The backups can not be written there.&lt;/i&gt;</property>
                     <property name="label" translatable="yes">Destination</property>
                   </widget>
                   <packing>
+                    <property name="type">tab</property>
                     <property name="position">3</property>
                     <property name="tab_fill">False</property>
-                    <property name="type">tab</property>
                   </packing>
                 </child>
                 <child>
@@ -2313,11 +2236,8 @@ The backups can not be written there.&lt;/i&gt;</property>
                             <property name="visible">True</property>
                             <property name="xalign">1</property>
                             <property name="label" translatable="yes">Do backups </property>
-                            <property name="justify">right</property>
+                            <property name="justify">GTK_JUSTIFY_RIGHT</property>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkComboBox" id="time_freq">
@@ -2338,13 +2258,13 @@ custom</property>
                         </child>
                         <child>
                           <widget class="GtkRadioButton" id="anacronRadio">
-                            <property name="label" translatable="yes">simply</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
                             <property name="tooltip" translatable="yes">This option will make nssbackup make a backup not at a precise time but when the computer is up. </property>
                             <property name="border_width">4</property>
+                            <property name="label" translatable="yes">simply</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="on_anacronRadio_toggled"/>
                           </widget>
@@ -2356,12 +2276,12 @@ custom</property>
                         </child>
                         <child>
                           <widget class="GtkRadioButton" id="preciselyRadio">
-                            <property name="label" translatable="yes">precisely</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
                             <property name="border_width">2</property>
+                            <property name="label" translatable="yes">precisely</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">anacronRadio</property>
                             <signal name="toggled" handler="on_anacronRadio_toggled"/>
@@ -2484,9 +2404,9 @@ custom</property>
                           <widget class="GtkScrolledWindow" id="scrolledwindow6">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">automatic</property>
-                            <property name="vscrollbar_policy">automatic</property>
-                            <property name="shadow_type">in</property>
+                            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="shadow_type">GTK_SHADOW_IN</property>
                             <child>
                               <widget class="GtkTreeView" id="time_dowtv">
                                 <property name="visible">True</property>
@@ -2508,9 +2428,9 @@ custom</property>
                           <widget class="GtkScrolledWindow" id="scrolledwindow5">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">automatic</property>
-                            <property name="vscrollbar_policy">automatic</property>
-                            <property name="shadow_type">in</property>
+                            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                            <property name="shadow_type">GTK_SHADOW_IN</property>
                             <child>
                               <widget class="GtkTreeView" id="time_domtv">
                                 <property name="visible">True</property>
@@ -2576,12 +2496,9 @@ custom</property>
                             <property name="visible">True</property>
                             <property name="xalign">0.89999997615814209</property>
                             <property name="label" translatable="yes">Do a full backup at least once every</property>
-                            <property name="justify">right</property>
+                            <property name="justify">GTK_JUSTIFY_RIGHT</property>
                             <property name="single_line_mode">True</property>
                           </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <widget class="GtkSpinButton" id="time_maxinc">
@@ -2622,7 +2539,6 @@ custom</property>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -2634,7 +2550,7 @@ custom</property>
 Unless a set number of days has passed since the last full backup, incremental backups will be done.
 See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                             <property name="use_markup">True</property>
-                            <property name="justify">center</property>
+                            <property name="justify">GTK_JUSTIFY_CENTER</property>
                             <property name="wrap">True</property>
                           </widget>
                           <packing>
@@ -2643,6 +2559,7 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                         </child>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="position">5</property>
                       </packing>
                     </child>
@@ -2657,9 +2574,9 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                     <property name="label" translatable="yes">Time (for admins only)</property>
                   </widget>
                   <packing>
+                    <property name="type">tab</property>
                     <property name="position">4</property>
                     <property name="tab_fill">False</property>
-                    <property name="type">tab</property>
                   </packing>
                 </child>
                 <child>
@@ -2667,18 +2584,17 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                     <property name="visible">True</property>
                     <child>
                       <widget class="GtkCheckButton" id="purgecheckbox">
-                        <property name="label" translatable="yes">Enable purging of old and incomplete backups</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
+                        <property name="label" translatable="yes">Enable purging of old and incomplete backups</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_purgecheckbox_toggled"/>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -2692,16 +2608,15 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
                           <widget class="GtkRadioButton" id="purgeradiobutton">
-                            <property name="label" translatable="yes">Simple cutoff: Erase all backups older than </property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="label" translatable="yes">Simple cutoff: Erase all backups older than </property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
                             <signal name="toggled" handler="on_purgeradiobutton_toggled"/>
                           </widget>
@@ -2737,6 +2652,7 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                         </child>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
@@ -2751,16 +2667,15 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
                           <widget class="GtkRadioButton" id="logpurgeradiobutton">
-                            <property name="label" translatable="yes">Logarithmic</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="label" translatable="yes">Logarithmic</property>
                             <property name="use_underline">True</property>
+                            <property name="response_id">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">purgeradiobutton</property>
@@ -2807,7 +2722,6 @@ Erase all other backups.&lt;/small&gt;
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -2817,7 +2731,7 @@ Erase all other backups.&lt;/small&gt;
                             <property name="ypad">5</property>
                             <property name="label" translatable="yes">&lt;small&gt;Note: Additionally all incomplete and irrecoverable backups will be erased as long as there is a complete backup snapshot made later on.&lt;/small&gt;</property>
                             <property name="use_markup">True</property>
-                            <property name="justify">center</property>
+                            <property name="justify">GTK_JUSTIFY_CENTER</property>
                             <property name="wrap">True</property>
                           </widget>
                           <packing>
@@ -2841,13 +2755,13 @@ Erase all other backups.&lt;/small&gt;
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Purging</property>
                     <accessibility>
-                      <atkproperty name="AtkObject::accessible-description" translatable="yes">Cleaning old backups</atkproperty>
+                      <atkproperty name="AtkObject::accessible_description" translatable="yes">Cleaning old backups</atkproperty>
                     </accessibility>
                   </widget>
                   <packing>
+                    <property name="type">tab</property>
                     <property name="position">5</property>
                     <property name="tab_fill">False</property>
-                    <property name="type">tab</property>
                   </packing>
                 </child>
                 <child>
@@ -2866,7 +2780,6 @@ Erase all other backups.&lt;/small&gt;
                           </widget>
                           <packing>
                             <property name="expand">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -2881,7 +2794,6 @@ Erase all other backups.&lt;/small&gt;
                       </widget>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -2896,7 +2808,7 @@ Erase all other backups.&lt;/small&gt;
                           <widget class="GtkLabel" id="label37">
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
-                            <property name="extension_events">cursor</property>
+                            <property name="extension_events">GDK_EXTENSION_EVENTS_CURSOR</property>
                             <property name="tooltip" translatable="yes">Debug is just for debbuging purpose.Info is the recommended setting</property>
                             <property name="label" translatable="yes">Log level :</property>
                           </widget>
@@ -2933,8 +2845,8 @@ Error</property>
                           <widget class="GtkFileChooserButton" id="logfilechooser">
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="action">select-folder</property>
                             <property name="show_hidden">True</property>
+                            <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                             <signal name="selection_changed" handler="on_logfilechooser_selection_changed"/>
                           </widget>
                           <packing>
@@ -2963,7 +2875,6 @@ Error</property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -2990,7 +2901,7 @@ Error</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="label_xalign">0</property>
-                            <property name="shadow_type">etched-out</property>
+                            <property name="shadow_type">GTK_SHADOW_ETCHED_OUT</property>
                             <child>
                               <widget class="GtkAlignment" id="alignment6">
                                 <property name="visible">True</property>
@@ -3005,22 +2916,91 @@ Error</property>
                                       <widget class="GtkTable" id="table3">
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                        <property name="n_rows">4</property>
-                                        <property name="n_columns">2</property>
+                                        <property name="n_rows">2</property>
+                                        <property name="n_columns">5</property>
                                         <child>
-                                          <widget class="GtkEntry" id="smtpport">
+                                          <placeholder/>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkLabel" id="label63">
                                             <property name="visible">True</property>
-                                            <property name="can_focus">True</property>
-                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                            <property name="width_chars">4</property>
-                                            <signal name="changed" handler="on_smtpport_changed"/>
+                                            <property name="label" translatable="yes"> From :</property>
                                           </widget>
                                           <packing>
                                             <property name="left_attach">1</property>
                                             <property name="right_attach">2</property>
-                                            <property name="top_attach">3</property>
-                                            <property name="bottom_attach">4</property>
-                                            <property name="x_options"></property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkLabel" id="label62">
+                                            <property name="visible">True</property>
+                                            <property name="label" translatable="yes">server :</property>
+                                          </widget>
+                                          <packing>
+                                            <property name="left_attach">1</property>
+                                            <property name="right_attach">2</property>
+                                            <property name="top_attach">1</property>
+                                            <property name="bottom_attach">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkLabel" id="label42">
+                                            <property name="visible">True</property>
+                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <property name="label" translatable="yes">port :</property>
+                                          </widget>
+                                          <packing>
+                                            <property name="left_attach">3</property>
+                                            <property name="right_attach">4</property>
+                                            <property name="top_attach">1</property>
+                                            <property name="bottom_attach">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkLabel" id="label41">
+                                            <property name="visible">True</property>
+                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <property name="label" translatable="yes">SMTP :</property>
+                                          </widget>
+                                          <packing>
+                                            <property name="top_attach">1</property>
+                                            <property name="bottom_attach">2</property>
+                                            <property name="x_options">GTK_FILL</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkLabel" id="label43">
+                                            <property name="visible">True</property>
+                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <property name="label" translatable="yes">To :</property>
+                                          </widget>
+                                          <packing>
+                                            <property name="left_attach">3</property>
+                                            <property name="right_attach">4</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkEntry" id="smtpfrom">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <signal name="changed" handler="on_smtpfrom_changed"/>
+                                          </widget>
+                                          <packing>
+                                            <property name="left_attach">2</property>
+                                            <property name="right_attach">3</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkEntry" id="smtpto">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <signal name="changed" handler="on_smtpto_changed"/>
+                                          </widget>
+                                          <packing>
+                                            <property name="left_attach">4</property>
+                                            <property name="right_attach">5</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -3032,82 +3012,31 @@ Error</property>
                                             <signal name="changed" handler="on_smtpserver_changed"/>
                                           </widget>
                                           <packing>
-                                            <property name="left_attach">1</property>
-                                            <property name="right_attach">2</property>
-                                            <property name="top_attach">2</property>
-                                            <property name="bottom_attach">3</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <widget class="GtkEntry" id="smtpto">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">True</property>
-                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                            <signal name="changed" handler="on_smtpto_changed"/>
-                                          </widget>
-                                          <packing>
-                                            <property name="left_attach">1</property>
-                                            <property name="right_attach">2</property>
+                                            <property name="left_attach">2</property>
+                                            <property name="right_attach">3</property>
                                             <property name="top_attach">1</property>
                                             <property name="bottom_attach">2</property>
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkEntry" id="smtpfrom">
+                                          <widget class="GtkEntry" id="smtpport">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                            <signal name="changed" handler="on_smtpfrom_changed"/>
+                                            <property name="width_chars">4</property>
+                                            <signal name="changed" handler="on_smtpport_changed"/>
                                           </widget>
                                           <packing>
-                                            <property name="left_attach">1</property>
-                                            <property name="right_attach">2</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <widget class="GtkLabel" id="label42">
-                                            <property name="visible">True</property>
-                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                            <property name="label" translatable="yes">SMTP port :</property>
-                                          </widget>
-                                          <packing>
-                                            <property name="top_attach">3</property>
-                                            <property name="bottom_attach">4</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <widget class="GtkLabel" id="label41">
-                                            <property name="visible">True</property>
-                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                            <property name="label" translatable="yes">SMTP server :</property>
-                                          </widget>
-                                          <packing>
-                                            <property name="top_attach">2</property>
-                                            <property name="bottom_attach">3</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <widget class="GtkLabel" id="label40">
-                                            <property name="visible">True</property>
-                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                            <property name="label" translatable="yes">From :</property>
-                                          </widget>
-                                        </child>
-                                        <child>
-                                          <widget class="GtkLabel" id="label43">
-                                            <property name="visible">True</property>
-                                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                            <property name="label" translatable="yes">To :</property>
-                                          </widget>
-                                          <packing>
+                                            <property name="left_attach">4</property>
+                                            <property name="right_attach">5</property>
                                             <property name="top_attach">1</property>
                                             <property name="bottom_attach">2</property>
+                                            <property name="x_options"></property>
                                           </packing>
                                         </child>
                                       </widget>
                                       <packing>
                                         <property name="expand">False</property>
-                                        <property name="position">0</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -3116,25 +3045,25 @@ Error</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                         <child>
                                           <widget class="GtkButton" id="testMailButton">
-                                            <property name="label" translatable="yes">Test mail settings</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <property name="label" translatable="yes">Test mail settings</property>
+                                            <property name="response_id">0</property>
                                             <signal name="clicked" handler="on_testMailButton_clicked"/>
                                           </widget>
                                           <packing>
                                             <property name="expand">False</property>
                                             <property name="fill">False</property>
-                                            <property name="pack_type">end</property>
-                                            <property name="position">0</property>
+                                            <property name="pack_type">GTK_PACK_END</property>
                                           </packing>
                                         </child>
                                       </widget>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">False</property>
-                                        <property name="pack_type">end</property>
+                                        <property name="pack_type">GTK_PACK_END</property>
                                         <property name="position">1</property>
                                       </packing>
                                     </child>
@@ -3156,7 +3085,6 @@ Error</property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
-                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -3164,7 +3092,7 @@ Error</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="label_xalign">0</property>
-                            <property name="shadow_type">etched-out</property>
+                            <property name="shadow_type">GTK_SHADOW_ETCHED_OUT</property>
                             <child>
                               <widget class="GtkAlignment" id="alignment7">
                                 <property name="visible">True</property>
@@ -3181,25 +3109,21 @@ Error</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                         <child>
                                           <widget class="GtkCheckButton" id="smtplogincheckbox">
-                                            <property name="label" translatable="yes">Use a username and password</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
-                                            <property name="receives_default">False</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <property name="label" translatable="yes">Use a username and password</property>
+                                            <property name="response_id">0</property>
                                             <property name="draw_indicator">True</property>
                                             <signal name="toggled" handler="on_smtplogincheckbox_toggled"/>
                                           </widget>
-                                          <packing>
-                                            <property name="position">0</property>
-                                          </packing>
                                         </child>
                                         <child>
                                           <widget class="GtkTable" id="smtplogininfo">
                                             <property name="visible">True</property>
                                             <property name="sensitive">False</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                            <property name="n_rows">2</property>
-                                            <property name="n_columns">2</property>
+                                            <property name="n_columns">4</property>
                                             <child>
                                               <widget class="GtkLabel" id="label45">
                                                 <property name="visible">True</property>
@@ -3207,8 +3131,8 @@ Error</property>
                                                 <property name="label" translatable="yes">Password</property>
                                               </widget>
                                               <packing>
-                                                <property name="top_attach">1</property>
-                                                <property name="bottom_attach">2</property>
+                                                <property name="left_attach">2</property>
+                                                <property name="right_attach">3</property>
                                               </packing>
                                             </child>
                                             <child>
@@ -3227,10 +3151,8 @@ Error</property>
                                                 <signal name="changed" handler="on_smtppassword_changed"/>
                                               </widget>
                                               <packing>
-                                                <property name="left_attach">1</property>
-                                                <property name="right_attach">2</property>
-                                                <property name="top_attach">1</property>
-                                                <property name="bottom_attach">2</property>
+                                                <property name="left_attach">3</property>
+                                                <property name="right_attach">4</property>
                                               </packing>
                                             </child>
                                             <child>
@@ -3253,7 +3175,6 @@ Error</property>
                                       </widget>
                                       <packing>
                                         <property name="expand">False</property>
-                                        <property name="position">0</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -3262,17 +3183,14 @@ Error</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                         <child>
                                           <widget class="GtkCheckButton" id="TLScheckbutton">
-                                            <property name="label" translatable="yes">Use secured connexion</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
-                                            <property name="receives_default">False</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <property name="label" translatable="yes">Use secured connexion</property>
+                                            <property name="response_id">0</property>
                                             <property name="draw_indicator">True</property>
                                             <signal name="toggled" handler="on_TLScheckbutton_toggled"/>
                                           </widget>
-                                          <packing>
-                                            <property name="position">0</property>
-                                          </packing>
                                         </child>
                                         <child>
                                           <widget class="GtkVBox" id="TLSinfos">
@@ -3285,26 +3203,23 @@ Error</property>
                                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                                 <child>
                                                   <widget class="GtkRadioButton" id="TLSradiobutton">
-                                                    <property name="label">TLS</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
-                                                    <property name="receives_default">False</property>
                                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                                    <property name="label">TLS</property>
+                                                    <property name="response_id">0</property>
                                                     <property name="active">True</property>
                                                     <property name="draw_indicator">True</property>
                                                     <signal name="toggled" handler="on_TLSradiobutton_toggled"/>
                                                   </widget>
-                                                  <packing>
-                                                    <property name="position">0</property>
-                                                  </packing>
                                                 </child>
                                                 <child>
                                                   <widget class="GtkRadioButton" id="SSLradiobutton">
-                                                    <property name="label">SSL</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
-                                                    <property name="receives_default">False</property>
                                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                                    <property name="label">SSL</property>
+                                                    <property name="response_id">0</property>
                                                     <property name="active">True</property>
                                                     <property name="draw_indicator">True</property>
                                                     <property name="group">TLSradiobutton</property>
@@ -3314,16 +3229,12 @@ Error</property>
                                                   </packing>
                                                 </child>
                                               </widget>
-                                              <packing>
-                                                <property name="position">0</property>
-                                              </packing>
                                             </child>
                                             <child>
                                               <widget class="GtkTable" id="SSLinfos">
                                                 <property name="visible">True</property>
                                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                                                <property name="n_rows">2</property>
-                                                <property name="n_columns">2</property>
+                                                <property name="n_columns">4</property>
                                                 <child>
                                                   <widget class="GtkFileChooserButton" id="crtfilechooser">
                                                     <property name="visible">True</property>
@@ -3342,8 +3253,8 @@ Error</property>
                                                     <property name="label" translatable="yes">Key</property>
                                                   </widget>
                                                   <packing>
-                                                    <property name="top_attach">1</property>
-                                                    <property name="bottom_attach">2</property>
+                                                    <property name="left_attach">2</property>
+                                                    <property name="right_attach">3</property>
                                                   </packing>
                                                 </child>
                                                 <child>
@@ -3360,10 +3271,8 @@ Error</property>
                                                     <signal name="selection_changed" handler="on_keyfilechooser_selection_changed"/>
                                                   </widget>
                                                   <packing>
-                                                    <property name="left_attach">1</property>
-                                                    <property name="right_attach">2</property>
-                                                    <property name="top_attach">1</property>
-                                                    <property name="bottom_attach">2</property>
+                                                    <property name="left_attach">3</property>
+                                                    <property name="right_attach">4</property>
                                                   </packing>
                                                 </child>
                                               </widget>
@@ -3421,9 +3330,9 @@ Error</property>
                     <property name="label" translatable="yes">Report</property>
                   </widget>
                   <packing>
+                    <property name="type">tab</property>
                     <property name="position">6</property>
                     <property name="tab_fill">False</property>
-                    <property name="type">tab</property>
                   </packing>
                 </child>
               </widget>
