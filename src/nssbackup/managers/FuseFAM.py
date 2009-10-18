@@ -126,6 +126,7 @@ class FuseFAM(object):
 					self.logger.debug("Removing '%s' from configManager" % remotedir)
 					self.__config.remove_option("dirconfig",remotedir)
 				elif self.__config.has_option("general","target") and self.__config.get("general","target") == remotedir :
+					self.logger.error("ERROR when trying to use plugin '%s' to mount target destination '%s' ! Cause : %s"% (p_name,remotedir,str(e)))
 					raise SBException("We are unable to mount the target dir !")
 				return False
 		self.logger.warning("No plugin could deal with that schema '%s', disabling it" % remotedir)
