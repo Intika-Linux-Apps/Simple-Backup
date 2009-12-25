@@ -2297,7 +2297,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         <child>
                           <widget class="GtkLabel" id="dest_unusable_2">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">&lt;i&gt;The selected destination is not writtable with current permissions.
+                            <property name="label" translatable="yes">&lt;i&gt;The selected destination is not writeable with current permissions.
 The backups can not be written there.&lt;/i&gt;</property>
                             <property name="use_markup">True</property>
                             <property name="justify">center</property>
