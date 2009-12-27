@@ -452,7 +452,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		"""
 		if section == "dirconfig" and option == "remote" :
 			if type(value) != dict :
-				raise SBException(_("You must provide a dictionary"))
+				raise SBException(_("You must provide a dictionary."))
 			if not self.has_option(section, option) :
 				ConfigParser.ConfigParser.set(self, section, option, value)
 			else :
@@ -541,7 +541,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		retValue = ConfigParser.ConfigParser.read(self, self.conffile)
 		
 		if len(retValue) == 0 :
-			raise SBException(_("The config file '%s' couldn't be read !")\
+			raise SBException(_("The config file '%s' couldn't be read!")\
 								% self.conffile )
 		return retValue
 
@@ -558,7 +558,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 			self.conffile = options.config
 
 	def validateConfigFileOpts(self):
-		self.logger.debug("Validating config file")
+		self.logger.debug("Validating config file.")
 		if (self.valid_options is None):
 			return
 		for section in self.sections():

@@ -362,7 +362,7 @@ class BackupManager(PyNotifyMixin):
 		
 		self.__fillSnapshot(prev)
 					
-		self._notify_info(self.__profilename, _("File list ready , Committing to disk"))
+		self._notify_info(self.__profilename, _("File list ready, committing to disk"))
 				
 		self.__actualSnapshot.commit()
 		
@@ -536,7 +536,7 @@ class BackupManager(PyNotifyMixin):
 		self.logger.debug("Maximum free size required is '%s' " % neededspace)
 		vstat = os.statvfs( self.__actualSnapshot.getPath() )
 		if (vstat.f_bavail * vstat.f_bsize) <= self.fullsize:
-			raise exceptions.SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
+			raise exceptions.SBException(_("Not enough free space in the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
 	
 	def __setlockfile(self):
 		"""Set the lockfile.
@@ -581,7 +581,7 @@ class BackupManager(PyNotifyMixin):
 					self.logger.warning(_("Unable to change permissions for "\
 										  "file '%s'.") % logf_target )
 			else :
-				self.logger.warning(_("Unable to find logfile to copy into snapshot"))
+				self.logger.warning(_("Unable to find logfile to copy into snapshot."))
 		else:
 			self.logger.warning(_("No snapshot to copy logfile."))
 		
@@ -597,10 +597,10 @@ class BackupManager(PyNotifyMixin):
 		self.__unsetlockfile()
 		self.__copylogfile()
 			
-		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
+		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER!"))
 		self.__fusefam.terminate()
 
-		self._notify_info(self.__profilename, _("Ending Backup Session"))
+		self._notify_info(self.__profilename, _("Ending Backup Session."))
 
 	def __checkTarget(self):
 		"""
@@ -621,7 +621,7 @@ class BackupManager(PyNotifyMixin):
 			FAM.writetofile(_testfile, "testWritable")
 			FAM.delete(_testfile)
 		except Exception, e :
-			self.logger.error(_("Target not writable : ") + str(e))
+			self.logger.error(_("Target not writeable: ") + str(e))
 			raise e
 	
 	def __retrieve_basic_infos(self):
