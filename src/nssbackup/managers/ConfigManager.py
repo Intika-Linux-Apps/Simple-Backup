@@ -938,11 +938,11 @@ class ConfigStaticData(object):
 	__cformat = {'none':0, 'gzip':1, 'bzip2':2}
 	
 	__splitSize = {'Unlimited'    : 0,
-				   '100 MB'       : 100,
-				   '250 MB'       : 250,
-				   '650 MB'       : 650,
-				   '2 GB (FAT16)' : 2000,
-				   '4 GB (FAT32)' : 4000,
+				   '100 MiB'       : 100,
+				   '250 MiB'       : 250,
+				   '650 MiB'       : 650,
+				   '2 GiB (FAT16)' : 2000,
+				   '4 GiB (FAT32)' : 4000,
 				   'Custom'       : -1}
 
 	__default_profilename = _("Default Profile")

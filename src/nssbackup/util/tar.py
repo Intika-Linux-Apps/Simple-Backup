@@ -269,7 +269,7 @@ def __addSplitOpts(snapshot, options, size):
 	@type snapshot: Snapshot
 	@param options: the option in which to append
 	@type options: list
-	@param size: the size of each part (in KB)
+	@param size: the size of each part (in KiB)
 	@type size: int
 	@raise SBException: if the snapshot format is other than none
 	"""

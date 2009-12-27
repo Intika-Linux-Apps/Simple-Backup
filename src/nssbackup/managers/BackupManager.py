@@ -532,7 +532,7 @@ class BackupManager(PyNotifyMixin):
 		mb = self.fullsize / (1024*1024)
 		kb = ( self.fullsize % (1024*1024) ) / 1024
 		b = ( self.fullsize % (1024*1024) ) % 1024
-		neededspace = "%d Mb %d Kb %d" % (mb,kb,b)
+		neededspace = "%d MiB %d KiB %d" % (mb,kb,b)
 		self.logger.debug("Maximum free size required is '%s' " % neededspace)
 		vstat = os.statvfs( self.__actualSnapshot.getPath() )
 		if (vstat.f_bavail * vstat.f_bsize) <= self.fullsize:

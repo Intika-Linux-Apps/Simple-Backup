@@ -1018,7 +1018,7 @@ Thanks to this you can configure backup of different kinds to different places.
                             <property name="yalign">0</property>
                             <property name="xpad">4</property>
                             <property name="label" translatable="yes">&lt;small&gt;Do standard backups.Defaults: daily incremental and weekly full backup to /var/backup of all user files, /etc, /usr/local and /var. 
-Multimedia files, temporary files and files larger than 100 Mb are excluded.&lt;/small&gt;</property>
+Multimedia files, temporary files and files larger than 100 MiB are excluded.&lt;/small&gt;</property>
                             <property name="use_markup">True</property>
                             <property name="wrap">True</property>
                           </widget>
@@ -1181,7 +1181,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                 <property name="xalign">0.11999999731779099</property>
                                 <property name="yalign">1</property>
-                                <property name="label" translatable="yes">Split the backup archive into small pieces (value in MB)
+                                <property name="label" translatable="yes">Split the backup archive into small pieces (value in MiB)
 &lt;small&gt;You can split the snapshot to make backup on some filesystem that doesn't support large files.&lt;/small&gt;
 &lt;b&gt;Note: This functionality is not compatible with compress !&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
@@ -1916,7 +1916,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <child>
                               <widget class="GtkLabel" id="label17">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">Mb</property>
+                                <property name="label" translatable="yes">MiB</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -2184,7 +2184,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                         <child>
                           <widget class="GtkLabel" id="dest_unusable_2">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">&lt;i&gt;The selected destination is not writtable with current permissions.
+                            <property name="label" translatable="yes">&lt;i&gt;The selected destination is not writeable with current permissions.
 The backups can not be written there.&lt;/i&gt;</property>
                             <property name="use_markup">True</property>
                             <property name="justify">GTK_JUSTIFY_CENTER</property>

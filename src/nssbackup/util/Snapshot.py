@@ -417,9 +417,8 @@ class Snapshot(object):
 	
 	def setSplitedSize(self, size):
 		"""
-		@param size: The size in KB to set
+		@param size: The size in KiB to set
 		
-		@todo: Wrong parameter type should raise a TypeError!
 		"""
 		if type(size) != int :
 			raise TypeError("The size parameter must be an integer")
