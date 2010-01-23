@@ -17,23 +17,44 @@
 
 
 import unittest
-import os
-from nssbackup.managers.FuseFAM import FuseFAM
-from nssbackup.managers.ConfigManager import ConfigManager
+
+from nssbackup.plugins.sshFuseFAM import sshFuseFAM
+from nssbackup.util.exceptions import SBException
 
 class TestFuseFAM(unittest.TestCase):
 	"""
 	"""
-	fam = None
+	def testsshPluginMatchScheme(self):
+		"Test sshPlugin Matching URL"
+		sshPlugin = sshFuseFAM()
+		self.assertTrue(sshPlugin.matchScheme("ssh://user:pass@server/"));
+		self.assertTrue(sshPlugin.matchScheme("ssh://user:pass@server:21/my/dir"));
+		self.assertTrue(sshPlugin.matchScheme("ssh://user@server:21/my/dir"));
+		self.assertTrue(sshPlugin.matchScheme("ssh://user@server/my/dir"));
+		self.assertFalse(sshPlugin.matchScheme("ssh://userserver/my/dir"));
+		self.assertTrue(sshPlugin.matchScheme("ssh://user@mail.com@192.168.0.4:11/"))
+		self.assertTrue(sshPlugin.matchScheme("ssh://user@mail.com:password@192.168.0.4:11/test"))
+
+	def testsshPlugindefineMount(self):
+		"Test sshPlugin define mount point"
+		sshPlugin = sshFuseFAM()
+		self.assertEqual("ssh_user@server", sshPlugin._defineMountDirName("ssh://user:pass@server/"));
+		self.assertEqual("ssh_user@server_21", sshPlugin._defineMountDirName("ssh://user:pass@server:21/my/dir"));
+		self.assertEqual("ssh_user@server_21", sshPlugin._defineMountDirName("ssh://user@server:21/my/dir"));
+		self.assertEqual("ssh_user@server", sshPlugin._defineMountDirName("ssh://user@server/my/dir"));
 	
-	def setUp(self):
-		""
-		self.fam = FuseFAM(ConfigManager(os.sep.join([os.path.abspath("test-datas"),"sbackup.conf.fusefam"])))
-		
+	def testsshPluginMount(self):
+		"Test mounting "
+		sshPlugin = sshFuseFAM()
+		rep = sshPlugin.mount("ssh://wattazoum:mpsilife@192.168.0.1/etc/", "test-tmp")
+		sshPlugin.umount(rep[1])
+		try:
+			sshPlugin.mount("ssh://wattazoum@192.168.0.1:22/etc/", "test-tmp")
+			self.fail("should fail")
+		except SBException, e:
+			self.assertEqual("sshfs is requesting a password and none has been passed.", str(e))
+			
+		sshPlugin.mount("ssh://wattazoum@192.168.0.1:21/etc/", "test-tmp")
 	
-	def testInitialize(self):
-		" Initialize "
-		self.fam.initialize()
-		
 suite = unittest.TestLoader().loadTestsFromTestCase(TestFuseFAM)
 unittest.TextTestRunner(verbosity=2).run(suite)

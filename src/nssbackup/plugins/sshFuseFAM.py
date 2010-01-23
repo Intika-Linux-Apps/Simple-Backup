@@ -16,33 +16,36 @@
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 from nssbackup.plugins import pluginFAM
-import subprocess
 import re
 import os
 import pexpect
 from gettext import gettext as _
-from tempfile import mkstemp
-import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.util.exceptions import FuseFAMException, SBException
+from nssbackup.util.log import LogFactory
 
 class sshFuseFAM (pluginFAM)  :
 	"""
 	The fuseFAM plugin for ssh
 	@requires: sshfs, python-pexpect
 	@author: Oumar Aziz Ouattara
-	@version: 1.0
 	"""
 	
-	def matchScheme(self,remoteSource):
+	schemeRE = "^ssh://([^:]+?)(:([^@]+?))?@([^/^:^@]+?)(:([0-9]+?))?/(.*)" 
+	
+	def __init__(self):
+		self.logger = LogFactory.getLogger()
+	
+	def matchScheme(self, remoteSource):
 		"""
 		SSH schema is like : ssh://user:pass@example.com/home/user/backup/ 
 		(user,pass, the first '/' ) are mandatory
 		"""
-		if re.compile("^(ssh://)([^:]+?:[^@]+?)@([^/^:^@]+?)/(.*)").search(remoteSource) :
+		self.logger.debug("matching '%s' using Regex '%s'" % (remoteSource, self.schemeRE))
+		if re.compile(self.schemeRE).search(remoteSource) :
 			return True
 		return False
 	
-	def mount(self,source, mountbase):
+	def mount(self, source, mountbase):
 		"""
 		Mount the source intor the mountbase dir . This method should create a mount point to mount the source. 
 		The name of the mount point should be very expressive so that we avoid collision with other mount points
@@ -50,60 +53,85 @@ class sshFuseFAM (pluginFAM)  :
 		@param mountbase: The mount points base dir
 		@return: The mount point complete path
 		"""
-		mountbase = mountbase.rstrip(os.sep)
-		
-		exp = re.compile("^(ssh://)([^:]+?):([^@]+?)@([^/^:^@]+?)/(.*)")
+		exp = re.compile(self.schemeRE)
 		match = exp.search(source)
 		if not match : 
 			raise FuseFAMException(_("Error matching the schema 'ssh://user:pass@example.com/home/' with '%s' (The '/' after server is mandatory)") % source)
 		else :
-			remoteSource = match.group(1)+match.group(2)+":"+match.group(3)+"@"+match.group(4)+"/"
-			user = match.group(2)
-			password = match.group(3)
-			mountpoint = mountbase+os.sep+"ssh_"+user+"@"+match.group(4)
-			if match.group(5) :
-				pathinside = match.group(5)
+			remoteSource = "ssh://" + match.group(1)
+			if match.group(3):
+				remoteSource += ":" + match.group(3)
+			remoteSource += "@" + match.group(4)
+			if match.group(6):
+				remoteSource += ":" + match.group(6)
+			remoteSource += "/"
+			
+			user = match.group(1)
+			mountpoint = os.path.join(mountbase,self._defineMountDirName(source))
+			if match.group(7) :
+				pathinside = match.group(7)
 			else :
 				pathinside = ""
 		
 		#If the path is already mounted No need to retry
 		if self.checkifmounted(source, mountbase) :
-			return (remoteSource,mountpoint,pathinside)
+			return (remoteSource, mountpoint, pathinside)
 		
-		cmd = "sshfs "+user+"@"+match.group(4)+":/"
+		cmd = "sshfs " + user + "@" + match.group(4) + ":/"
 		cmd = cmd + " " + mountpoint
 		
+		port = match.group(6)
+		if port:
+			cmd += " -p " + port
 		if not os.path.exists(mountpoint) :
 			os.mkdir(mountpoint)
 		
+		self.logger.debug("Spawning: " + cmd)
+		password = match.group(3)
 		sshfsp = pexpect.spawn(cmd)
-		sshfsp.expect(".*[pP]assword:")
-		sshfsp.sendline(password)
-		sshfsp.next()
-	#	if sshfsp.isalive() or sshfsp.exitstatus :
-	#		raise SBException ("The sshfs command '%s' didn't perform normally " % cmd )
-		return (remoteSource,mountpoint,pathinside)
+		i=sshfsp.expect(['(yes/no)','password:','Password:', pexpect.EOF])
+
+		if i==0:
+			self.logger.info("Accepting to store the key.")
+			sshfsp.sendline('yes')
+			i=sshfsp.expect(['(yes/no)','password:','Password:', pexpect.EOF])
+		
+		if i==1 or i==2:
+			self.logger.debug("Expecting password.")
+			if not password :
+				sshfsp.sendline("fake")
+				raise SBException("sshfs is requesting a password and none has been passed.")
+			sshfsp.sendline(password)
+			i=sshfsp.expect(['(yes/no)','password:','Password:', pexpect.EOF])
+		
+		result=sshfsp.before # print out the result
+
+		if sshfsp.isalive() or sshfsp.exitstatus :
+			raise SBException (_("The sshfs command '%(command)s' didn't perform normally. Output => %(erroroutput)s ") % {"command" : cmd, "erroroutput" : result} )
+		
+		return (remoteSource, mountpoint, pathinside)
 
 	def getdoc(self):
-		doc = _("SSH schema is like : ssh://user:pass@example.com/home/user/backup/")
+		doc = _("SSH schema is like : ssh://user:pass@example.com:33/home/user/backup/")
 		return doc
 
-	def checkifmounted(self,source, mountbase):
+	def checkifmounted(self, source, mountbase):
 		"""
 		@return: True if mounted, False if not
 		"""
-		mountpoint = mountbase.rstrip(os.sep)+os.sep+self.__defineMountDirName(source)
+		mountpoint = os.path.join(mountbase, self._defineMountDirName(source))
 		return os.path.ismount(mountpoint)
 		
-	def __defineMountDirName(self, remote):
+	def _defineMountDirName(self, remote):
 		"""
 		"""
-		# this will match the RE and give us a group like ('ssh://', 'test', 'pass', 'wattazoum-vm.ft.nn', 'ddd/kjlh/klhkl/vvvv')
-		exp = re.compile("^(ssh://)([^:]+?):([^@]+?)@([^/^:^@]+?)/(.*)")
+		exp = re.compile(self.schemeRE)
 		match = exp.search(remote)
 		if not match : 
-			raise FuseFAMException(_("Error matching the schema 'ssh://user:pass@example.com/home/' with '%s' (The '/' after server is mandatory)") % remote)
+			raise FuseFAMException(_("Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' (The '/' after server is mandatory)") % remote)
 		else :
-			user = match.group(2)
-			dirname = "ssh_"+user+"@"+match.group(4)
+			user = match.group(1)
+			dirname = "ssh_" + user + "@" + match.group(4)
+			if match.group(6):
+				dirname += "_" + match.group(6) 
 			return dirname
