@@ -20,6 +20,7 @@ import unittest
 
 from nssbackup.plugins.sshFuseFAM import sshFuseFAM
 from nssbackup.util.exceptions import SBException
+from nssbackup.plugins.ftpFuseFAM import ftpFuseFAM
 
 class TestFuseFAM(unittest.TestCase):
 	"""
@@ -34,6 +35,18 @@ class TestFuseFAM(unittest.TestCase):
 		self.assertFalse(sshPlugin.matchScheme("ssh://userserver/my/dir"));
 		self.assertTrue(sshPlugin.matchScheme("ssh://user@mail.com@192.168.0.4:11/"))
 		self.assertTrue(sshPlugin.matchScheme("ssh://user@mail.com:password@192.168.0.4:11/test"))
+
+	def testftpPluginMatchScheme(self):
+		"Test ftpPlugin Matching URL"
+		ftpPlugin = ftpFuseFAM()
+		self.assertTrue(ftpPlugin.matchScheme("ftp://user:pass@server/"));
+		self.assertTrue(ftpPlugin.matchScheme("ftp://user:pass@server:21/my/dir"));
+		self.assertFalse(ftpPlugin.matchScheme("ftp://user@server:21/my/dir"));
+		self.assertFalse(ftpPlugin.matchScheme("ftp://user@server/my/dir"));
+		self.assertTrue(ftpPlugin.matchScheme("ftp://userserver/my/dir"));
+		self.assertFalse(ftpPlugin.matchScheme("ftp://user@mail.com@192.168.0.4:11/"))
+		self.assertTrue(ftpPlugin.matchScheme("ftp://user@mail.com:password@192.168.0.4:11/test"))
+
 
 	def testsshPlugindefineMount(self):
 		"Test sshPlugin define mount point"
@@ -54,7 +67,7 @@ class TestFuseFAM(unittest.TestCase):
 		except SBException, e:
 			self.assertEqual("sshfs is requesting a password and none has been passed.", str(e))
 			
-		sshPlugin.mount("ssh://wattazoum@192.168.0.1:21/etc/", "test-tmp")
+		#sshPlugin.mount("ssh://wattazoum@192.168.0.1:21/etc/", "test-tmp")
 	
 suite = unittest.TestLoader().loadTestsFromTestCase(TestFuseFAM)
 unittest.TextTestRunner(verbosity=2).run(suite)

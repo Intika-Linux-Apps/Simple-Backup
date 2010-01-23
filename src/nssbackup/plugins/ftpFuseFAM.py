@@ -25,6 +25,7 @@ from tempfile import mkstemp
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.util.exceptions import FuseFAMException
 
+ftpUrlRegex = "^ftp://" + "(([^:]+):([^@]+)@)?" + "([^/^:^@]+?)" + "(:([0-9]+))?" + "/(.*)"
 
 class ftpFuseFAM (pluginFAM)  :
 	"""The fuseFAM plugin for ftp
@@ -32,10 +33,7 @@ class ftpFuseFAM (pluginFAM)  :
 	@requires: curlftpfs
 	@todo: Dependency on 'curlftpfs' must be taken into account for packaging!
 	"""
-	
-	# regular expression that matches any FTP address
-	__scheme_regex = "^(ftp://[^/]).*"
-	
+		
 	def matchScheme(self,remoteSource):
 		"""This method checks for the scheme (the protocol) of the given
 		remote source, i.e. it should not check the validity of the URL.
@@ -47,7 +45,7 @@ class ftpFuseFAM (pluginFAM)  :
 		@todo: The plugins ssh, sftp do not behave if the suggested way! Fix them!
 		""" 
 		_res = False
-		_search_res = re.compile( self.__scheme_regex ).search(remoteSource)
+		_search_res = re.compile(ftpUrlRegex).search(remoteSource)
 		if _search_res is not None:
 			_res = True
 		return _res
@@ -63,14 +61,13 @@ class ftpFuseFAM (pluginFAM)  :
 		@return: The mount point complete path
 		"""
 		#make the mount point
-		mountpoint = self.__get_mount_dir(mountbase, source)
+		spliturl = SplittedURL(source)
+		mountpoint = self.__get_mount_dir(mountbase, spliturl)
 		
 # TODO: Should we check if it is already mounted first?
 		if not os.path.exists(mountpoint) :
 # TODO: only the directories specified in URL should be created!
 			os.makedirs(mountpoint)
-
-		protocol, user, passwd, server, pathinside = self.__split_url(source)
 
 		#If the path is already mounted No need to retry
 		if not self.checkifmounted(source, mountbase) :			
@@ -81,14 +78,24 @@ class ftpFuseFAM (pluginFAM)  :
 	
 			# the option 'allow_root' is necessary to grant access
 			# if the script is invoked as superuser
+			curl_cmd = ["curlftpfs", "-o", "direct_io"]
+			
+			if spliturl.user and spliturl.password:
+				curl_cmd.append("-o")
+				opts = "user=%s:%s" % (spliturl.user, spliturl.password)
+				curl_cmd.append(opts)
 			if os.getuid() == 0:
-				curl_cmd = ["curlftpfs", "-o",
-							"user=%s:%s,allow_root" % (user, passwd),
-						    server, mountpoint]
-			else:
-				curl_cmd = ["curlftpfs", "-o", "user=%s:%s" % (user, passwd),
-						    server, mountpoint]
-	
+				curl_cmd.append("-o")
+				curl_cmd.append("allow_root")
+			
+			server = spliturl.server
+			if spliturl.port:
+				server += ":" + spliturl.port
+			
+			curl_cmd.append(server)
+			
+			curl_cmd.append(mountpoint)
+				
 			# Call the subprocess using convenience method
 			try:
 				retval = subprocess.call( curl_cmd, 0, None, None, outptr, errptr)
@@ -104,14 +111,16 @@ class ftpFuseFAM (pluginFAM)  :
 			FAM.delete(errFile)
 			if retval != 0 :
 				raise FuseFAMException(_("Couldn't mount '%(server)s' into "\
-						"'%(mountpoint)s' : %(error)s") %  {'server' : server ,
+						"'%(mountpoint)s' : %(error)s") %  {'server' : spliturl.server ,
 													'mountpoint': mountpoint,
 													'error':errStr})
 		else:
 			pass	# it is already mounted, do nothing
 		
-		remote_site = protocol+server
-		return (remote_site, mountpoint, pathinside)
+		remote_site = "ftp://"+spliturl.server
+		if spliturl.port:
+			remote_site += ":" + spliturl.port
+		return (remote_site, mountpoint, spliturl.pathinside)
 	
 	def getdoc(self):
 		"""Returns a short documentation of this plugin.
@@ -124,29 +133,30 @@ class ftpFuseFAM (pluginFAM)  :
 		
 		@return: True if mounted, False if not
 		"""
-		_res = None
-		mountpoint = self.__get_mount_dir(mountbase, source)
-		_res = os.path.ismount(mountpoint)
-		return _res
+		spliturl = SplittedURL(source)
+		mountpoint = self.__get_mount_dir(mountbase, spliturl)
+		return os.path.ismount(mountpoint)
 	
-	def __defineMountDirName(self, remote):
-		"""Helper method that builds the name of the mount directory.
+	def __defineMountDirName(self, spliturl):
 		"""
-		protocol, user, passwd, server, pathinside = self.__split_url(remote)
-		if user != "":
-			dirname = "ftp_%s@%s" % (user, server)
-		else :
-			dirname = "ftp_%s" % (server)
+		Helper method that builds the name of the mount directory.
+		"""
+		dirname = "ftp_"
+		if spliturl.user :
+			dirname += spliturl.user + "@"
+		dirname += spliturl.server
+		if spliturl.port:
+			dirname += "_%s" % spliturl.port
 		return dirname
 	
-	def __get_mount_dir(self, mountbase, source):
+	def __get_mount_dir(self, mountbase, spliturl):
 		"""Helper method that builds the full path to the mountpoint.
 		"""
-		mountpoint = os.path.join( mountbase, self.__defineMountDirName(source))
+		mountpoint = os.path.join( mountbase, self.__defineMountDirName(spliturl))
 		return mountpoint
 		
-	def __split_url(self, remote):
-		"""This will match the RE and give us a group like
+class SplittedURL:
+	"""This will match the RE and give us a group like
 		('ftp://', 'test:pass@', 'wattazoum-vm.ft.nn', 'ddd/kjlh/klhkl/vvvv')
 		
 		@param remote: the remote site address
@@ -155,36 +165,20 @@ class ftpFuseFAM (pluginFAM)  :
 		@return: the address split into protocol, user, password, server
 				 and path on server
 		@rtype:  Tuple of Strings		 
-		
-		@todo: Add support for port numbers!
-		@todo: Put the split URL into its own class!
 		"""
-		protocol = ""
-		user = ""
-		passwd = ""
-		server = ""
-		pathinside = ""
-
-		exp = re.compile("^(ftp://)([^:]+?:[^@]+?@|[^:]+?@)?([^/^:^@]+?)/(.*)")
-		match = exp.search(remote)
+	
+	def __init__(self, url):
+		
+		exp = ftpUrlRegex.compile()
+		match = exp.search(url)
 		if match is None: 
 			raise FuseFAMException(_("Error matching the schema "\
 							"'ftp://user:pass@server/anything' with '%s' "\
-							"(The '/' after server is mandatory)") % remote)
+							"(The '/' after server is mandatory)") % url)
 
-		protocol = match.group(1)
-		server = match.group(3)
+		self.user = match.group(2)
+		self.password = match.group(3)
+		self.server = match.group(4)
+		self.port = match.group(6)
+		self.pathinside = match.group(7)
 		
-		user_passwd = match.group(2)
-		if user_passwd is not None:
-			exp_user_passwd = re.compile("^([^:]+):?(.+)?@")
-			user_passwd_match = exp_user_passwd.search(user_passwd)
-
-			user = user_passwd_match.group(1)
-			passwd = user_passwd_match.group(2)
-			if passwd is None:
-				passwd = ""
-		pathinside = match.group(4)
-		if pathinside is None:
-			pathinside = ""
-		return (protocol, user, passwd, server, pathinside)
