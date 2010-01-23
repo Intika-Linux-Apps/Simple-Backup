@@ -1,0 +1,233 @@
+nssbackup (0.2-0~rc8-ppa1) hardy; urgency=low
+
+  * Update translation. Added RU translation.
+  * Support more complex Regex in SSH plugin (fixes LP #511398)
+  * Fix LP #328902: Spelling fixes
+  * patch the config UI to fit with UNR (LP Bug #364833). (thanks to Pierre Boazo)
+  * [FIX]LP #400145 : Add a warning in the Log when TAR returns status code 1.
+  * [CHANGE] LP #428863 : Added packagecmd to config to allow backing up of different distributions (Thanks to Andrew West)
+  * [FIX] LP #428341 Maximum specific time is 13:49?
+  * [FIX] LP #425101: show the default profile on the profile UI
+  * [FIX] LP #346285: backup destination is not created; backup is aborted if the target does not exist.
+  * [FIX] Makefile wasn't working on Jaunty (introduced dep on lsb-release)
+  * [FIX] Creates the logfile parent directory is it doesn't exist.
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 23 Jan 2010 22:19:01 +0100
+
+nssbackup (0.2-0~rc7-hardy1) hardy; urgency=high
+
+  * [FIX] 'nssbackupconfig' were writting back the configuration changing the case to lower case,
+          which can cause a invalidation of dirconfig pathes.
+  * [FIX] LP Bug #Bug 334580: store temporary files of non-privileged users in /home directory
+  * [FIX] LP Bug #337921: import error fixed; thanks to Martin Schaaf
+  * added Japanese menu entries (taken from sbackup; thanks to Hajime Mizuno)
+  * [CHANGE] Use python setup.py to avoid installing ourselves in a specific python version directory.
+  * [FIX] LP bug #338280 : findResource were returning a directory in place of a file. 
+          Now we can precise the type of file we are searching for.
+  * [FIX] LP Bug #176838: deactivate "restore" and "restore as" button when a non included file is selected.
+  * [FIX] LP Bug #181131: 
+          removed option "backuplinks" and make it the default behaviour
+          add option "followlinks" to follow symbolic links.
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Mon, 09 Mar 2009 22:10:00 +0100
+
+nssbackup (0.2-0~rc6-ppa1) hardy; urgency=high
+
+  * Re-upload due to errors in packacking binary packages
+  
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Fri, 20 Feb 2009 02:51:33 +0100
+
+nssbackup (0.2-0~rc5-ppa1) hardy; urgency=medium
+
+  * [FIX] LP Bug #331507: GUI fails, if configuration file does not exist
+  * [FIX] LP Bug #331349: Backup into target directory containing spaces fails
+  
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 19 Feb 2009 20:59:49 +0100
+
+nssbackup (0.2-0~rc4-ppa1) hardy; urgency=high
+
+  * [FIX] LP Bug #331282: Installation fails due to configuration error
+  
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Wed, 18 Feb 2009 23:35:49 +0100
+
+nssbackup (0.2-0~rc3-ppa1) hardy; urgency=high
+
+  * Arabic translation file added and German and Spanish translation updated
+  * Spanish translation of menu entries added: Thanks to Luis J. Claros
+  * [CHANGE]: 'upgrade-backups' renamed into 'nssbackup-upgrade-backups' 
+  * [CHANGE]: 'nssbackupconfig' added for modification of configuration files
+              during the installation
+  * [CHANGE]: existing backups are no longer upgraded automatically
+  * [FIX]: re-base was not working:
+  		   due to errorneous merging of snapshot files
+  		   and missing variable assignment -> fixed
+  * [FIX]: converting an incremental snapshot to a full one was errorneous:
+  		   base references of child snapshots was
+  		   not updated with *.ful name -> fixed
+  * [FIX] LP Bug #319294: catch execptions raised by notification daemon
+  * [FIX]: logger issue (hopefully) finally solved:
+  		   log messages were not printed and log files couldn't copied
+  		   after backups: problem was the use of log files with equal
+  		   names, the use of some static variables in ConfigManager and
+  		   errors in logger implementation: now profiles use their own
+  		   log files, some minor problems were fixed, code simplifications
+  * [FIX]: not all messages were displayed in notification pop-ups:
+  		   reason was an unescaped character: this character is now
+  		   replaced, the notification code is extracted into a mix-in
+  		   class to avoid multiple code definitions
+  * [FIX]: pathnames to log files were incorrect and copying failed:
+  		   fixed by centralized path determination
+  * [FIX]: LogFactory was re-setting log level and log file when calling for
+           a prior created logger: check if a logger was already created and
+           don't overwrite previous settings if so
+  * [FIX]: UpgradeManager used not existing FAM function:
+  		   function 'rename' added
+  * [FIX]: SnapshotManager tried to rebase a snapshot on itself:
+  		   reason was an IndexError if only 1 snapshot was left -> check
+  		   length of snapshots list
+  
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Mon, 16 Feb 2009 14:26:06 +0100
+
+nssbackup (0.2-0~rc2-ppa1) hardy; urgency=medium
+
+  * [FIX] LP Bug #299967: the regular expressions from the configuration file
+  	were checked before they are added to any lists in ui; if found regexp are
+  	invalid they were removed from the configuration and the users gets informed
+  * [FIX] LP Bug #299964: errorneous string formatting fixed
+  * [FIX] LP Bug #303648: if the target directory isn't accessible, execution of
+    backup daemon and restoration gui fails.
+  * [FIX] LP Bug #303661: * the target directory is not longer recursivly
+    created (within the configuartion GUI)
+  * [FIX] in FuseFAM.py: logger issue solved
+  * [FIX] FTP plugin: problems related to FTP solved
+  * [FIX] Bug LP #137293: display of restoration dialog fixed
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Mon, 05 Jan 2009 13:53:01 +0100
+
+nssbackup (0.2-rc1~ppa1) hardy; urgency=low
+
+  * Bug #191127 : Check the regexp before adding it to the configuration.
+  * Change the format of the mail sent to be compliant with the standards
+    (Fix LP #285927)
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Thu, 30 Oct 2008 20:52:53 +0100
+
+nssbackup (0.2-0~beta8) hardy; urgency=low
+
+  * Fixed I18N when making customized installs (LP Bug #284013). Thanks a lot
+    to Jean-Peer Lorenz (https://bugs.edge.launchpad.net/~peer.loz)
+  * [Tech] Get rid of GnomeVFS dependancy
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 18 Oct 2008 19:28:44 +0200
+
+nssbackup (0.2-0~beta6) hardy; urgency=low
+
+  * [FIX] LP Bug 281852 : Restore Gui crashing on exception in some plugins
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 11 Oct 2008 23:19:47 +0200
+
+nssbackup (0.2-0~beta5) hardy; urgency=low
+
+  * Add the backup links option in the GUI
+  * Send an email by profile
+  * One profile backup can fail and not the others so, we don't fail completely
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 13 Jul 2008 23:19:23 +0200
+
+nssbackup (0.2-0~beta3) hardy; urgency=low
+
+  * Bug 240000 : looping in symbolic links
+  * Log refactoring : we now have a proper logger by profile.
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Mon, 16 Jun 2008 20:24:57 +0200
+
+nssbackup (0.2-0~beta2) hardy; urgency=low
+
+  * Logarithm purge implemented
+  * Installing nssbackup will install FTP and SSH plugins
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 05 Apr 2008 20:31:22 +0200
+
+nssbackup (0.2-0~alpha3ppa1) hardy; urgency=low
+
+  * Snapshot management functionality implemented
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 10 Feb 2008 22:36:18 +0100
+
+nssbackup (0.2-0~alpha2ppa1) hardy; urgency=low
+
+  * Fixed bug #189879 : NSSbackup cannot find files.snar -> crash
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 10 Feb 2008 02:10:37 +0100
+
+nssbackup (0.2-0~alpha1) hardy; urgency=low
+
+  * First alpha of version 0.2
+  * New multi binaries strategy
+  * LP Bug 181998 typo in an error message
+  * LP Bug #181987 DEL key is now usable to remove some entries
+  * avoid an exception in regex tab of configGUI when adding the first regexp
+  * LP Bug #153605 Prefill the 'From' text entry in the report tab
+  * add necessary import in upgrade-backup script
+  * Upgrade backus scripts takes relative path
+  * LP BUG #184713 nssbackup doesn't backup
+  * LP BUG #184713 add a backuplinks option to backup link
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Mon, 04 Feb 2008 00:03:18 +0100
+
+nssbackup (0.1-7~ppa1) gutsy; urgency=low
+
+  * LP Bug #204285 : problem when saving while being root.A function wasn't found
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Thu, 20 Mar 2008 19:16:06 +0100
+
+nssbackup (0.1-6~ppa1) gutsy; urgency=low
+
+  * LP BUG #184713 add a backuplinks option to backup links
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Fri, 25 Jan 2008 21:55:49 +0100
+
+nssbackup (0.1-5~ppa1) gutsy; urgency=low
+
+  * LP BUG #184713 nssbackup doesn't backup
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Thu, 24 Jan 2008 21:36:34 +0100
+
+nssbackup (0.1-4~ppa1) gutsy; urgency=low
+
+  * LP Bug 181998 typo in an error message
+  * LP Bug #181987 DEL key is now usable to remove some entries
+  * avoid an exception in regex tab of configGUI when adding the first regexp
+  * LP Bug #153605 Prefill the 'From' text entry in the report tab
+  * add necessary import in upgrade-backup script
+  * Upgrade backus scripts takes relative path
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Tue, 22 Jan 2008 20:51:34 +0100
+
+nssbackup (0.1-3~ppa2) gutsy; urgency=low
+
+  * removed build dependancy on pyGTK
+  * Fixed [Bug 157250] simple-backup-config has incorrect example exclusion regex 
+  * fixed LP Bug #177385 : Maxincrement option is not working
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Fri, 21 Dec 2007 22:06:25 +0100
+
+nssbackup (0.1-2~ppa1) gutsy; urgency=low
+
+  * GNU packaging standardization
+  * Deleted unuseful documentation
+  * We don't exclude anything as a recommendation (Closes LP Bug #152861)
+  * Changed nssbackup icons
+  * changed the whole revert process ( closes LP Bug #146617 )
+  * base was always set as the last full snapshot
+  * Launchpad Bug #146618 : remove the file size limit recommendation
+  * LP #138750 & #138749 fixed
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 21 Oct 2007 07:42:55 +0200
+
+nssbackup (0.1-1) gutsy; urgency=low
+
+  * Ubuntu Initial release
+
+ -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sun, 26 Aug 2007 12:44:18 +0200
+

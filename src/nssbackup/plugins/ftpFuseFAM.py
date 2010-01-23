@@ -169,7 +169,7 @@ class SplittedURL:
 	
 	def __init__(self, url):
 		
-		exp = ftpUrlRegex.compile()
+		exp = re.compile(ftpUrlRegex)
 		match = exp.search(url)
 		if match is None: 
 			raise FuseFAMException(_("Error matching the schema "\

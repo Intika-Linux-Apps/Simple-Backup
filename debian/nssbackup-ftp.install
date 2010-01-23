@@ -1,0 +1,2 @@
+debian/tmp/usr/lib/python*/*/nssbackup/plugins/ftpFuseFAM.py
+debian/tmp/usr/lib/python*/*/nssbackup/plugins/sftpFuseFAM.py
