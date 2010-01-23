@@ -4,7 +4,7 @@ PYTHON=`which python`
 VERSION=0.2-0~rc7
 
 # available languages
-PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR sv tr uk zh_CN zh_TW
+PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR ru sv tr uk zh_CN zh_TW
 
 # installation into /usr/local to be compliant to GNU standards
 PREFIX=/usr/local
