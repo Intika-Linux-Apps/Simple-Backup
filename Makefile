@@ -12,7 +12,7 @@ DESTDIR=/usr/local
 
 SETUP.PY_OPTS=--root=/
 
-UbuntuVersion=$(shell expr "$(shell lsb_release -r)" : ".*: *\(.*\)")
+UbuntuVersion=$(shell lsb_release -rs)
 # if we use jaunty or karmic
 ifneq (,$(findstring 9.04,$(UbuntuVersion)))
     LAYOUT="--install-layout=deb"
