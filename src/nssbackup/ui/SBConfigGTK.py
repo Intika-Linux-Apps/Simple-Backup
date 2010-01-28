@@ -65,7 +65,7 @@ class SBconfigGTK(GladeGnomeApp):
 		
 		self.logger = LogFactory.getLogger()
 		
-		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '50' : ("Error", 3)}
+		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '40' : ("Error", 3)}
 		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
 		self.cformat = {'none':0, 'gzip':1, 'bzip2':2}
 		self.splitSize = {0:_('Unlimited'),100:_('100 MiB'),250:_('250 MiB'), 650 : _('650 MiB'),2000 :_('2 GiB (FAT16)'),4000 : _('4 GiB (FAT32)'), -1: _('Custom')}

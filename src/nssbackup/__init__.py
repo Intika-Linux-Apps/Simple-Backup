@@ -44,7 +44,7 @@ class Infos(object):
     
     NAME = "Not So Simple Backup Suite"
 
-    VERSION = "0.2-0 RC7"
+    VERSION = "0.2-0 RC8.1"
     
     DESCRIPTION = _("This is a user friendly backup solution for common desktop needs.\n \
 If you want to help, by submitting Bugs, by translating or anything else, please visit our website.")
