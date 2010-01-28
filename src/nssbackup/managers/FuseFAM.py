@@ -256,6 +256,7 @@ class FuseFAM(object):
 						plugin.umount(dir)
 						os.rmdir(dir)
 						_umounted = True
+						break
 				if not _umounted:
 					self.logger.warning("Couldn't unmount %s " % dir)
 

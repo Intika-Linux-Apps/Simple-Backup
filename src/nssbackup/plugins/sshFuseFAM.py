@@ -86,6 +86,8 @@ class sshFuseFAM (pluginFAM)  :
 		if not os.path.exists(mountpoint) :
 			os.mkdir(mountpoint)
 		
+		cmd += " -o allow_other"
+		
 		self.logger.debug("Spawning: " + cmd)
 		password = match.group(3)
 		sshfsp = pexpect.spawn(cmd)
