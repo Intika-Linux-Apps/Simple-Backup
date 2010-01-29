@@ -85,8 +85,9 @@ class sshFuseFAM (pluginFAM)  :
 			cmd += " -p " + port
 		if not os.path.exists(mountpoint) :
 			os.mkdir(mountpoint)
-		
-		cmd += " -o allow_other"
+			
+		if os.getuid() == 0:
+			cmd += " -o allow_root"
 		
 		self.logger.debug("Spawning: " + cmd)
 		password = match.group(3)
