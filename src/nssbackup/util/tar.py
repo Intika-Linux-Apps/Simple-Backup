@@ -357,7 +357,7 @@ def makeTarFullBackup(snapshot):
 	
 	LogFactory.getLogger().debug("Snapshot's snarfile: %s" % snarfile)
 	LogFactory.getLogger().debug("Temporary snarfile: %s" % tmp_snarfile)
-	 
+
 	# For a full backup the SNAR file shouldn't exists
 	if os.path.exists( snarfile ) :
 		os.remove( snarfile )		

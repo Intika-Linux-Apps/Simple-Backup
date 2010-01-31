@@ -514,7 +514,7 @@ class Snapshot(object):
 		# commit exclude.list.tmp
 		fe = open(self.getExcludeFListFile()+".tmp","w")
 		for f in self.__excludeFlist.getEffectiveFileList() :
-			fe.write(re.escape(str(f)) +"\n")
+			fe.write(str(f) +"\n")
 		fe.close()
 		
 		# commit exclude.list
