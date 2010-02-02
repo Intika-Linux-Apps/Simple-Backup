@@ -166,11 +166,13 @@ def _prepare_nssb_copy(src, dst):
 	
 
 def getResource(resourceName, isFile=False):
-	"""This will look for a ressource installed by nssbackup. The installation
-	script write in the ressources file were it stores the file then
-	getRessource will look for them.
-	@param ressourceName: the ressource name, as complete as possible.
-	@param the ressource: absolute path. 
+	"""Looks for certian resources installed by nssbackup.
+	The installation script writes into the 'resources' file where
+	the files/resources are being stored.
+	This function will look for them and return the appropriate path.
+	
+	@param resourceName: the ressource name, as complete as possible
+	@param isFile: flag whether the resource looked up is a file 
 	"""
 	tmp = inspect.getabsfile(nssbackup)
 	resfile = open(os.sep.join([os.path.dirname(tmp),"ressources"]))
