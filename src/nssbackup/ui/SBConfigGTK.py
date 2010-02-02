@@ -33,6 +33,8 @@ import nssbackup.util as Util
 import gobject
 import gtk
 
+from nssbackup.ui import misc
+
 
 class SBconfigGTK(GladeGnomeApp):
 	
@@ -373,7 +375,8 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_save_as_activate',
 			'on_exit_activate',
 			'on_prfManager_activate',
-			'on_about_activate',
+			'on_menu_about_activate',
+			'on_menu_help_activate',
 			'on_reload_clicked',
 			'on_save_clicked',
 			'on_backup_clicked',
@@ -850,7 +853,10 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_exit_activate(self, *args):
 		gtk.main_quit()
 
-	def on_about_activate(self, *args):
+	def on_menu_help_activate(self, button):
+		misc.open_uri("ghelp:nssbackup")
+
+	def on_menu_about_activate(self, *args):
 		about = gtk.AboutDialog()
 		about.set_name(Infos.NAME)
 		# TODO: Always keep this updated
