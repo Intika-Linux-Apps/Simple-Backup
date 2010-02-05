@@ -171,9 +171,9 @@ class SnapshotManager(object):
 				snapshots.append(Snapshot(_snppath))
 			except NotValidSnapshotException, e :
 				if isinstance(e, NotValidSnapshotNameException) :
-					self.logger.warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(_dir),'error_cause' :e.message})
+					self.logger.warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(_dir),'error_cause' :e})
 				else : 
-					self.logger.warning(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(_dir),'error_cause' :e.message})							
+					self.logger.warning(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(_dir),'error_cause' :e})							
 #TODO: remove the bad snapshot from disk? Renaming would be better I guess!
 					self.logger.info("Invalid snapshot '%s' is going to be renamed!" % _snppath)
 					os.rename(_snppath, _snppath[:-3] + "corrupt")

@@ -69,7 +69,7 @@ class SBconfigGTK(GladeGnomeApp):
 		
 		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '40' : ("Error", 3)}
 		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
-		self.cformat = {'none':0, 'gzip':1, 'bzip2':2}
+		self.cformat = ['none', 'gzip', 'bzip2']
 		self.splitSize = {0:_('Unlimited'),100:_('100 MiB'),250:_('250 MiB'), 650 : _('650 MiB'),2000 :_('2 GiB (FAT16)'),4000 : _('4 GiB (FAT32)'), -1: _('Custom')}
 		
 		self.init()
@@ -528,12 +528,12 @@ class SBconfigGTK(GladeGnomeApp):
 				#self.on_main_radio_toggled()
 		if self.configman.has_option("general", "format") :
 			cformatOpt = self.configman.get("general", "format") 
-			if cformatOpt in ["none","gzip","bzip2"]:
-				self.logger.debug("Setting compression format to %s " % self.cformat[cformatOpt])
-				self.widgets["cformat"].set_active(self.cformat[cformatOpt])
-			else:
-				self.logger.debug("Setting compression format to %s " % self.cformat['gzip'])
-				self.widgets["cformat"].set_active(self.cformat['gzip'])
+			if cformatOpt not in self.cformat:
+				cformatOpt = 'gzip'
+			
+			cformatIndex = self.cformat.index(cformatOpt)
+			self.logger.debug("Setting compression format to %s " % cformatIndex)
+			self.widgets["cformat"].set_active(cformatIndex)
 			
 				
 		#Include and exclude tabs
@@ -958,12 +958,13 @@ class SBconfigGTK(GladeGnomeApp):
 		"""
 		handle that sets the compression format
 		"""
-		selected = self.widgets["cformat"].get_active_text()
-		if selected in self.cformat.keys() :
-			self.configman.set("general", "format", selected )
+		selected = self.widgets["cformat"].get_active()
+		if 0 <= selected < len(self.cformat) :
+			self.configman.set("general", "format", self.cformat[selected] )
 		else :
 			self.configman.remove_option("general", "format")
-		if selected == "none" :
+			
+		if selected == self.cformat.index("none") :
 			# activate split functionality config
 			self.widgets['splitsizevbox'].set_sensitive(True)
 		else :
