@@ -1,0 +1,30 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      xmlns:e="http://projectmallard.org/experimental/"
+      type="topic"
+      id="data-restoration">
+
+  <info>
+    <link type="guide" xref="index#data-restore"/>
+    <desc>Information on restoration of data from backups.</desc>
+    <revision pkgversion="0.2" version="0.1" date="2010-02-5" status="draft">
+    </revision>
+    <credit type="author">
+      <name>Jean-Peer Lorenz</name>
+      <email>peer.loz@gmx.net</email>
+    </credit>
+<!--
+    <copyright>
+      <year>2010</year>
+      <name>NSsbackup Team</name>
+    </copyright>
+-->
+    <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+  </info>
+
+  <title>Restoration of data</title>
+
+    <media type="image" src="figures/nssbackup-config-gui.png" mime="image/png" style="right">
+      <p><app>NSsbackup</app> configuration window.</p>
+    </media>
+
+</page>
