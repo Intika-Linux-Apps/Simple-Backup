@@ -15,9 +15,11 @@
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox4">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <child>
           <widget class="GtkVBox" id="vbox18">
             <property name="visible">True</property>
+            <property name="orientation">vertical</property>
             <child>
               <widget class="GtkRadioButton" id="ftype_st">
                 <property name="label" translatable="yes">Standard file types:</property>
@@ -155,9 +157,11 @@ ogg
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox5">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <child>
           <widget class="GtkVBox" id="vbox19">
             <property name="visible">True</property>
+            <property name="orientation">vertical</property>
             <child>
               <widget class="GtkLabel" id="label69">
                 <property name="visible">True</property>
@@ -248,11 +252,13 @@ Files and directories matching this expression will be excluded from backup.</pr
       <widget class="GtkVBox" id="dialog-vbox3">
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkVBox" id="vbox10">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="orientation">vertical</property>
             <child>
               <widget class="GtkLabel" id="fusehelplabel">
                 <property name="visible">True</property>
@@ -415,6 +421,7 @@ Files and directories matching this expression will be excluded from backup.</pr
       <widget class="GtkVBox" id="dialog-vbox6">
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkLabel" id="label54">
@@ -487,11 +494,13 @@ Do you want to save ?</property>
       <widget class="GtkVBox" id="dialog-vbox7">
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkVBox" id="vbox16">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="orientation">vertical</property>
             <child>
               <widget class="GtkLabel" id="label56">
                 <property name="visible">True</property>
@@ -678,11 +687,13 @@ Thanks to this you can configure backup of different kinds to different places.
       <widget class="GtkVBox" id="dialog-vbox8">
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkVBox" id="vbox20">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="orientation">vertical</property>
             <child>
               <widget class="GtkLabel" id="label58">
                 <property name="visible">True</property>
@@ -964,6 +975,7 @@ Thanks to this you can configure backup of different kinds to different places.
           <widget class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="orientation">vertical</property>
             <child>
               <widget class="GtkToolbar" id="toolbar">
                 <property name="visible">True</property>
@@ -1054,6 +1066,7 @@ Thanks to this you can configure backup of different kinds to different places.
                   <widget class="GtkVBox" id="vbox2">
                     <property name="visible">True</property>
                     <property name="border_width">5</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <widget class="GtkRadioButton" id="main_radio">
                         <property name="label" translatable="yes">Use recommended backup settings</property>
@@ -1273,6 +1286,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                               <widget class="GtkVBox" id="splitsizevbox">
                                 <property name="visible">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                <property name="orientation">vertical</property>
                                 <child>
                                   <widget class="GtkComboBox" id="splitsizeCB">
                                     <property name="visible">True</property>
@@ -1341,6 +1355,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                 <child>
                   <widget class="GtkVBox" id="vbox3">
                     <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <widget class="GtkScrolledWindow" id="scrolledwindow1">
                         <property name="visible">True</property>
@@ -1637,6 +1652,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <child>
                       <widget class="GtkVBox" id="vbox4">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <widget class="GtkScrolledWindow" id="scrolledwindow2">
                             <property name="visible">True</property>
@@ -1805,6 +1821,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <child>
                       <widget class="GtkVBox" id="vbox5">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <widget class="GtkScrolledWindow" id="scrolledwindow3">
                             <property name="visible">True</property>
@@ -1890,6 +1907,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <child>
                       <widget class="GtkVBox" id="vbox6">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <widget class="GtkScrolledWindow" id="scrolledwindow4">
                             <property name="visible">True</property>
@@ -1975,6 +1993,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <child>
                       <widget class="GtkVBox" id="vbox7">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -2097,6 +2116,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                 <child>
                   <widget class="GtkVBox" id="vbox8">
                     <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <widget class="GtkRadioButton" id="dest1">
                         <property name="label" translatable="yes">Use default backup directory (/var/backup)</property>
@@ -2149,8 +2169,8 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="border_width">10</property>
-                            <property name="show_hidden">True</property>
                             <property name="action">select-folder</property>
+                            <property name="show_hidden">True</property>
                             <property name="title" translatable="yes">Select the destination folder</property>
                             <signal name="selection_changed" handler="on_dest_localpath_selection_changed"/>
                           </widget>
@@ -2328,6 +2348,7 @@ The backups can not be written there.&lt;/i&gt;</property>
                 <child>
                   <widget class="GtkVBox" id="vbox9">
                     <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <placeholder/>
                     </child>
@@ -2692,6 +2713,7 @@ See "man 5 crontab" for cron time definition format.&lt;/small&gt;</property>
                 <child>
                   <widget class="GtkVBox" id="purgevbox">
                     <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <widget class="GtkCheckButton" id="purgecheckbox">
                         <property name="label" translatable="yes">Enable purging of old and incomplete backups</property>
@@ -2882,6 +2904,7 @@ Erase all other backups.&lt;/small&gt;
                   <widget class="GtkVBox" id="reportvbox">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <widget class="GtkHBox" id="hbox19">
                         <property name="visible">True</property>
@@ -2961,8 +2984,8 @@ Error</property>
                           <widget class="GtkFileChooserButton" id="logfilechooser">
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="show_hidden">True</property>
                             <property name="action">select-folder</property>
+                            <property name="show_hidden">True</property>
                             <signal name="selection_changed" handler="on_logfilechooser_selection_changed"/>
                           </widget>
                           <packing>
@@ -3013,6 +3036,7 @@ Error</property>
                       <widget class="GtkVBox" id="vbox11">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <widget class="GtkFrame" id="Parameters">
                             <property name="visible">True</property>
@@ -3222,10 +3246,12 @@ Error</property>
                                   <widget class="GtkVBox" id="vbox13">
                                     <property name="visible">True</property>
                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                    <property name="orientation">vertical</property>
                                     <child>
                                       <widget class="GtkVBox" id="vbox14">
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                        <property name="orientation">vertical</property>
                                         <child>
                                           <widget class="GtkCheckButton" id="smtplogincheckbox">
                                             <property name="label" translatable="yes">Use a username and password</property>
@@ -3304,6 +3330,7 @@ Error</property>
                                       <widget class="GtkVBox" id="vbox15">
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                        <property name="orientation">vertical</property>
                                         <child>
                                           <widget class="GtkCheckButton" id="TLScheckbutton">
                                             <property name="label" translatable="yes">Use secured connexion</property>
@@ -3323,6 +3350,7 @@ Error</property>
                                             <property name="visible">True</property>
                                             <property name="sensitive">False</property>
                                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                            <property name="orientation">vertical</property>
                                             <child>
                                               <widget class="GtkHBox" id="hbox22">
                                                 <property name="visible">True</property>
