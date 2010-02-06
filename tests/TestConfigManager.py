@@ -35,17 +35,27 @@ class TestConfigManager(unittest.TestCase):
 		self.assertTrue(self.config.has_section("exclude"))
 		self.assertEqual(len(self.config.sections()),7)
 	
-	def testsetDefaultForRoot(self):
-		"Set the default config for root user"
-		if os.geteuid() != 0 :
-			self.assertRaises(IOError, self.config.setDefaultForRoot )
-		else :
-			self.config.setDefaultForRoot()
-			self.assertTrue(os.path.exists("/var/log/nssbackup.log"))
+	#===========================================================================
+	# def testsetDefaultForRoot(self):
+	#	"Set the default config for root user"
+	#	if os.geteuid() != 0 :
+	#		self.assertRaises(IOError, self.config.setDefaultForRoot )
+	#	else :
+	#		self.config.setDefaultForRoot()
+	#		self.assertTrue(os.path.exists("/var/log/nssbackup.log"))
+	# 
+	# def testsetDefaultForUsers(self):
+	#	"Set the default config for normal users"	
+	#	self.config.setDefaultForUsers()
+	#===========================================================================
 	
-	def testsetDefaultForUsers(self):
-		"Set the default config for normal users"	
-		self.config.setDefaultForUsers()
+	def test_set_defaults(self):
+		"""Testing of default settings.
+		"""
+		self.config._set_defaults()
+		if os.geteuid() == 0 :
+			self.assertTrue(os.path.exists("/var/log/nssbackup.log"))
+		
 	
 	def testread(self):
 		"Testing the config file read function "

@@ -174,7 +174,7 @@ class TestSnapshotManagerFromDisk(unittest.TestCase):
 		of the snapshots. Additional for full snapshots it is checked whether
 		the stored base is correct.
 		"""
-		snp_list = self.snpman.get_snapshots_allversions(forceReload=True)
+		snp_list = self.snpman.get_snapshots_allformats(forceReload=True)
 		self.assertEqual(len(snp_list), len(self.snpname))
 		for _idx in range(0, len(snp_list)):
 			_snp = snp_list[_idx]
@@ -199,7 +199,7 @@ class TestSnapshotManagerFromDisk(unittest.TestCase):
 		"""
 		
 	def test_rebase_ful_forbidden(self):
-		snp_list = self.snpman.get_snapshots_allversions(forceReload=True)
+		snp_list = self.snpman.get_snapshots_allformats(forceReload=True)
 		snp_ful = snp_list[3]
 				
 		self.assertTrue(snp_ful.isfull())
@@ -207,14 +207,14 @@ class TestSnapshotManagerFromDisk(unittest.TestCase):
 						  snp_ful)
 
 	def test_rebase_same_age_forbidden(self):
-		snp_list = self.snpman.get_snapshots_allversions(forceReload=True)
+		snp_list = self.snpman.get_snapshots_allformats(forceReload=True)
 		snp_torebase = snp_list[0]
 		snp_newbase = snp_list[0]
 		self.assertRaises(RebaseSnpException, self.snpman.rebaseSnapshot,
 						  snp_torebase, snp_newbase)
 
 	def test_rebase_younger_forbidden(self):
-		snp_list = self.snpman.get_snapshots_allversions(forceReload=True)
+		snp_list = self.snpman.get_snapshots_allformats(forceReload=True)
 		snp_torebase = snp_list[1]
 		snp_newbase = snp_list[0]
 		self.assertRaises(RebaseSnpException, self.snpman.rebaseSnapshot,
@@ -224,7 +224,7 @@ class TestSnapshotManagerFromDisk(unittest.TestCase):
 		"""
 		@todo: Should raise a RebaseFullSnpForbidden exception!
 		"""
-		snp_list = self.snpman.get_snapshots_allversions(forceReload=True)
+		snp_list = self.snpman.get_snapshots_allformats(forceReload=True)
 		snp_ful = snp_list[3]
 				
 		self.assertTrue(snp_ful.isfull())
@@ -234,7 +234,7 @@ class TestSnapshotManagerFromDisk(unittest.TestCase):
 	def test_pullsnp_inc_on_inc(self):
 		"""
 		"""
-		snp_list = self.snpman.get_snapshots_allversions(forceReload=True)
+		snp_list = self.snpman.get_snapshots_allformats(forceReload=True)
 		snp_inc = snp_list[1]
 		snp_inc_older = snp_list[2]
 		
@@ -294,7 +294,7 @@ class TestSnapshotMerge(unittest.TestCase):
 	def test_rebaseonlast_inc_on_inc(self):
 		"""
 		"""
-		snp_list = self.snpman.get_snapshots_allversions(forceReload=True)
+		snp_list = self.snpman.get_snapshots_allformats(forceReload=True)
 		snp_inc = snp_list[0]
 		snp_inc_older = snp_list[1]
 		
