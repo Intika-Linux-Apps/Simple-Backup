@@ -136,7 +136,7 @@ class TestSnapshotManagerFromDisk(unittest.TestCase):
 	snpname = [	"2009-01-20_10.17.15.090738.hostname.inc",
 				"2009-01-19_18.52.23.861532.hostname.inc",
 				"2009-01-19_18.49.12.837677.hostname.inc",
-				"2009-01-19_18.47.28.188518.hostname.ful"				
+				"2009-01-19_18.47.28.188518.hostname.ful"
 			  ]
 	
 	def setUp(self):

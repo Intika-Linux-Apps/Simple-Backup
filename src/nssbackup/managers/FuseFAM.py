@@ -135,7 +135,9 @@ class FuseFAM(object):
 	def __umount(self, mounteddir):
 		"""
 		Unmount a mounted dir that should be in __mountedDirs dict
-		@param mounteddir: 
+		@param mounteddir:
+		
+		@todo: Should we use lazy unmount (fusermount -z)?
 		"""
 		if not os.path.ismount(mounteddir) :
 			# mountpoint is not mounted 

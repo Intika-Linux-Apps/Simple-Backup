@@ -15,6 +15,11 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
+"""Module contains common functions for unified file handling.
+
+@todo: Should get renamed and moved to package 'utils'.
+"""
+
 import os, shutil,pickle
 
 
