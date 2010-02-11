@@ -15,7 +15,6 @@
 # Authors: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #		   Jean-Peer Lorenz <peer.loz@gmx.net>
 
-import os
 import os.path
 import re
 import ConfigParser
@@ -95,6 +94,23 @@ def get_profilename(conffile):
 			
 	return profilename
 
+def is_default_profile(conffile):
+	"""Checks whether the given configuration file corresponds to the
+	default profile.
+	
+	@param conffile: full path to configuration file to check
+	@return: True if the file corresponds to the default profile, otherwise False.
+	@rtype: Boolean
+	
+	"""
+	is_default = False
+	cfile = os.path.basename(conffile)
+	
+	if cfile == ConfigStaticData.get_default_conffile():
+		is_default = True
+	
+	return is_default
+
 def get_logfile_name(conffile):
 	"""Determines the profilename from the given pathname `conffile`
 	and returns an appropriate logfile name.
@@ -114,18 +130,17 @@ def get_profiles(prfdir):
 	 
 	@return: a dictionarity of { name: [path_to_conffile, enable] } 
 	"""
-	if not os.path.exists(prfdir) or not os.path.isdir(prfdir) :
-		return dict()
-	
 	profiles = dict()
-	
-	for conff in os.listdir(prfdir) :
-		mobj = ConfigStaticData.get_profilename_re().match(conff)
-		if mobj: 
-			name = mobj.group(1)
-			path = os.path.join(prfdir, mobj.group(0))
-			enable = (mobj.group(2) is None)
-			profiles[name] = [path, enable]
+	if not os.path.exists(prfdir) or not os.path.isdir(prfdir) :
+		pass
+	else:
+		for conff in os.listdir(prfdir) :
+			mobj = ConfigStaticData.get_profilename_re().match(conff)
+			if mobj: 
+				name = mobj.group(1)
+				path = os.path.join(prfdir, mobj.group(0))
+				enable = (mobj.group(2) is None)
+				profiles[name] = [path, enable]
 	
 	return profiles
 
@@ -242,7 +257,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		self.regex		= r"\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,"\
 		                   "/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,"\
 		                   "/home/[^/]+?/\..+/[cC]ache"
-		                   
+		
 		self.dirconfig	= { '/etc/'			: '1',
 							'/var/'			: '1',
 							'/home/'		: '1',
@@ -395,7 +410,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		by overiding this method, we make it case sensitive. that's really important for dirconfig pathes 
 		"""
 		return str( option )
-	           
+
 	def has_option(self, section, option) :
 		if section == "dirconfig" and not ConfigParser.ConfigParser.has_option(self,section, option) :
 			if option == "remote" :
@@ -469,9 +484,10 @@ class ConfigManager(ConfigParser.ConfigParser):
 			ConfigParser.ConfigParser.set(self, section, option, value)
 			
 	def remove_option(self,section, option):
-		"""
-		remove an option, but it's different for remote. if option = "remote" then the whole remote option will be removed.
-		If option is in remote dict, section ='dirconfig' and option='ssh://test/me' . then the entry in the remote dict will be removed.
+		"""Remove an option, but it's different for remote.
+		If option = "remote" then the whole remote option will be removed.
+		If option is in remote dict, section ='dirconfig' and
+		option='ssh://test/me' then the entry in the remote dict will be removed.
 		"""
 		if section == "dirconfig" and not ConfigParser.ConfigParser.has_option(self,section, option) :
 			#search through remote option to get the option
@@ -591,37 +607,54 @@ class ConfigManager(ConfigParser.ConfigParser):
 		return "\n".join(retVal)
 	
 	def setSchedule(self, isCron, value):
-		"""Set the backup Schedule
-		@param isCron : 0 for anacron schedule , 1 for Cron
-		@param value : daily/monthly/hourly/weekly for anacron, or the cronline to add at /etc/cron.d/nssbackup for cron  
+		"""Set the backup Schedule.
+		
+		@param isCron : 0 for Anacron use , 1 for Cron use
+		@param value : a string containing the value to set for Cron/Anacron. \
+						Valid values for Anacron are: \
+							daily/monthly/hourly/weekly
+						Valid values for Cron:
+							cronline to add at /etc/cron.d/nssbackup.
+							
 		"""
 		anacronValues = ["daily","monthly","hourly","weekly"]
 		if type(isCron) != int or not (isCron in [0,1]) : 
 			raise NonValidOptionException("isCron must be 0 or 1")
 		if isCron == 0 :
+			# an Anacron entry was given (simple scheduling)
 			if value not in anacronValues :
-				raise NonValidOptionException("Valid values for anacron are : %s , I recieved '%s'" % (str(anacronValues),value))
+				raise NonValidOptionException("Valid values for anacron are: "\
+						"%s, got '%s' instead." % (str(anacronValues), value))
 			else :
 				if self.has_option("schedule", "cron") :
-					self.logger.debug("Removing Cron config ")
+					self.logger.debug("Removing Cron config to set Anacron config.")
 					self.remove_option("schedule", "cron")
-				self.logger.debug("Setting anacron to :"+ value)
+				self.logger.debug("Setting Anacron config to: %s" % value)
 				self.set("schedule", "anacron", value)
-		elif isCron == 1 :
+		elif isCron == 1:
+			# a Cron entry was given (precise scheduling)
 			if self.has_option("schedule", "anacron") :
-				self.logger.debug("Removing anaCron config ")
+				self.logger.debug("Removing Anacron config to set Cron config.")
 				self.remove_option("schedule", "anacron")
-			self.logger.debug("Setting cron to :"+ value)
+			self.logger.debug("Setting cron config to: %s" % value)
 			self.set("schedule", "cron", value)
 	
 	def getSchedule(self):
+		"""Retrieves the current schedule state.
+
+		@return: (isCron, value) a tuple where isCron = 0 if Anacron is used \
+				 and isCron = 1 Cron is used. If no schedule setup has been \
+				 found, 'None' is returned.
+				 
 		"""
-		get the actual schedule state
-		@return: (isCron, value) a tuple where isCron = 0 if anacron is set and 1 \
-		if cron is set . If None has been found , 'None' is return
-		"""
-		if not self.has_section("schedule") or (not self.has_option("schedule", "cron") and not self.has_option("schedule", "anacron")) :
-			self.logger.warning("Config file doesn't have schedule infos, probing from filesystem ")
+		_value = None
+		if not self.has_section("schedule") \
+				or (not self.has_option("schedule", "cron") \
+				and not self.has_option("schedule", "anacron")):
+			
+			# no entry in configuration found, look at Cron/Anacron directly
+			self.logger.warning("Config file doesn't have schedule infos, "\
+								"probing from filesystem.")
 			#hourly
 			if os.path.exists("/etc/cron.hourly/nssbackup"):
 				self.logger.debug("Anacron hourly has been found")
@@ -639,18 +672,51 @@ class ConfigManager(ConfigParser.ConfigParser):
 				self.logger.debug("Anacron monthly has been found")
 				return (0, "monthly")
 			if os.path.exists("/etc/cron.d/nssbackup"):
-				self.logger.debug("Cron has been found")
-				return (1, FAM.readfile("/etc/cron.d/nssbackup"))
+				_value = FAM.readfile("/etc/cron.d/nssbackup")
+				self.logger.debug("Custom Cron has been found: %s" % _value)
+				return (1, _value)
 			# none has been found
 			return None
-		else :
-			if self.has_option("schedule", "cron") : 
-				return (1, self.get("schedule", "cron"))
-			elif self.has_option("schedule", "anacron") :
-				return (0, self.get("schedule", "anacron"))
-			else :
+		
+		else:
+			# scheduling is stored in configuration file
+			if self.has_option("schedule", "cron"):
+				_value = self.get("schedule", "cron")
+				self.logger.debug("Schedule type Cron found in Config: %s" % _value)
+				return (1, _value)
+			elif self.has_option("schedule", "anacron"):
+				_value = self.get("schedule", "anacron")
+				self.logger.debug("Schedule type Anacron found in Config: %s" % _value)
+				return (0, _value)
+			else:
 				return None
 	
+	def remove_schedule(self):
+		"""Removes all options stored in section 'schedule'. The section
+		itself remains.
+		
+		@return: Flag, whether something was removed or not. True is returned
+					in the case that any schedule information was found by
+					'getSchedule'.
+					
+		The return of this flag is somewhat a hack to force the GUI to enable
+		the Save button for the rare case that:
+		* the user wants to remove the schedule (i.e. sets it to 'Never')
+		* no schedule information is stored in the configuration file
+		* a script is linked in Anacron directories or in 'etc/cron.d/' which
+		  is found when probing the filesystem for schedules.		  
+		  
+		"""
+		_something_removed = False
+		if self.getSchedule() is not None:
+			_something_removed = True
+			for _option in self.options("schedule"):
+				self.logger.debug("Removing ('schedule','%s') "\
+								"from configuration." % _option)
+				self.remove_option("schedule", _option)
+			
+		return _something_removed
+
 	def getProfileName(self):
 		"""Returns the current profile name for the current ConfigManager.
 		
@@ -659,6 +725,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		@raise SBException: if the configfile isn't set
 		
 		@todo: Implement Command-Query Separation Principle (CQS)!
+		
 		"""
 		if self.__profileName : 
 			return self.__profileName
@@ -669,30 +736,52 @@ class ConfigManager(ConfigParser.ConfigParser):
 		self.__profileName = get_profilename(self.conffile)
 		return self.__profileName
 	
+	def is_default_profile(self):
+		"""Checks whether this configuration is the default configuration
+		(i.e. default profile).
+		
+		@return: True if this is the default profile, False otherwise.
+		
+		"""
+		if not self.conffile: 
+			raise SBException(_("The config file is not set yet into this "\
+							    "ConfigManager"))
+		is_default = is_default_profile(self.conffile)
+		return is_default
+		
 	def getProfiles(self):
-		"""Get the configuration profiles list
+		"""Returns the list of defined backup profiles. Both, active and
+		disabled profiles are retrieved.
 		 
-		@return: a dictionarity of { name: [path_to_conffile, enable] } 
+		@return: a dictionary of {profilename: [path_to_conffile, enabled]} 
+		
 		"""
 		prfDir = getUserConfDir()+"nssbackup.d/"
 		
 		self.logger.debug("Getting profiles from '%s'" % prfDir)
-		
-		profiles = get_profiles(prfDir)
-		return profiles
+		_prfls = get_profiles(prfDir)
+		# debug output of found profiles
+		for _prfk in _prfls.keys():
+			self.logger.debug("Found profile '%s' (active = %s)" % (_prfk,
+															_prfls[_prfk][1]))
+		# end of debug output
+		return _prfls
 	
 	def set_logdir(self, logdir):
 		"""The given directory is set for use with log files.
+		
 		"""
 		self.__logfile_dir = logdir
 		
 	def get_logdir(self):
 		"""Returns the currently set directory for log files.
+		
 		"""
 		return self.__logfile_dir
 
 	def set_logfile(self):
 		"""Retrieves the path to log file and writes it into the configuration.
+		
 		"""
 		logf = self.get_logfile()
 		if not self.has_section("log") :
@@ -720,6 +809,9 @@ class ConfigManager(ConfigParser.ConfigParser):
 		file = /var/log/nssbackup.log
 		@param level : 10 = DEBUG, 20 = INFO, 50 = ERROR
 		@param file : The logfile to use
+
+		@todo: Remove this method!
+		
 		"""
 		if not self.has_section("log") :
 			self.add_section("log")
@@ -732,6 +824,9 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 		Get the log section
 		@return: a tuple (level, file) , (None, None) is return if none has been found
+		
+		@todo: Remove this method!
+
 		"""
 		filen, level = None, None
 		if self.has_section("log") :
@@ -751,8 +846,8 @@ class ConfigManager(ConfigParser.ConfigParser):
 	
 	def setReportSection(self, to, smtpserver, smtpport, _from=None , smtpuser = None, smtppassword = None,
 						  smtptls = None, smtpcert = None, smtpkey = None ):
-		"""
-		Sets the report section
+		"""Sets the report section.
+		
 		@param to :
 		@param smtpserver :
 		@param smtpport :
@@ -762,6 +857,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		@param smtptls : (= None) 1 to activate TLS or SSL
 		@param smtpcert : (= None)  
 		@param smtpkey : (= None)
+		
 		"""
 		if not self.has_section("report") :
 			self.add_section("report")
@@ -783,9 +879,12 @@ class ConfigManager(ConfigParser.ConfigParser):
 		self.remove_section("report")
 		
 	def saveConf(self,configfile=None):
-		"""
-		Save the configuration 
-		@param configfile: The config file in which to write the configuration. Default is in the default location 
+		"""Saves the configuration (i.e. writes it into the specified file
+		and sets scheduling in the case this is the default profile).
+		 
+		@param configfile: The config file in which to write the configuration.
+							Default is in the default location
+							 
 		"""
 		if configfile :
 			fd = FAM.openfile(configfile, True)
@@ -794,55 +893,63 @@ class ConfigManager(ConfigParser.ConfigParser):
 		self.write(fd)
 		fd.close()
 		
-		self.writeSchedule()
+		if self.is_default_profile():
+			self.writeSchedule()
 	
 	def writeSchedule(self):
-		"""
-		Write the schedule from the configuration file
-		"""
+		"""Write the schedule from the configuration file.
 		
-		if not self.has_section("schedule") or (not self.has_option("schedule", "anacron") and not self.has_option("schedule", "cron")) :
+		"""
+		if os.geteuid() != 0 :
+			self.logger.warning("Not implemented for non root users yet")
 			return
-		elif os.geteuid() != 0 :
-				self.logger.warning("Not implemented for non root users yet")
-				return
+		
+		if not self.has_section("schedule") \
+				or (not self.has_option("schedule", "anacron") and not self.has_option("schedule", "cron")) :
+			return
+		
 		else :
+			self.erase_services()
 			if self.has_option("schedule", "cron") :
 				self.logger.debug("Saving Cron entries")
-				self.erase_services()
 				execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
 				FAM.writetofile("/etc/cron.d/nssbackup", self.cronheader + self.get("schedule", "cron") + "\troot\t"+ execline)
 				
 			if self.has_option("schedule", "anacron") :
-				self.logger.debug("Saving Cron entries")
+				self.logger.debug("Saving Anacron entries")
 				if self.get("schedule", "anacron") == "hourly" :
-					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.hourly/nssbackup")
 				elif self.get("schedule", "anacron") == "daily" :
-					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.daily/nssbackup")
 				elif self.get("schedule", "anacron") == "weekly" :
-					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.weekly/nssbackup")
 				elif self.get("schedule", "anacron") == "monthly" :
-					self.erase_services()
 					os.symlink(self.servicefile,"/etc/cron.monthly/nssbackup")
 				else : 
-					self.logger.warning("'%s' is not a valid value" % self.get("schedule", "anacron"))
+					self.logger.warning("'%s' is not a valid value" \
+										% self.get("schedule", "anacron"))
+				return
 
 	def erase_services(self):
-			listServ = ["/etc/cron.hourly/nssbackup", "/etc/cron.daily/nssbackup", 
-					"/etc/cron.weekly/nssbackup", "/etc/cron.monthly/nssbackup", "/etc/cron.d/nssbackup"]
-			for l in listServ : 
-				if os.path.exists(l) :
-					self.logger.debug("Unlinking '%s'" % l )
-					os.unlink(l)
+		"""Removes Cron and Anacron service from /etc/cron.*
+		 
+		"""
+		listserv = ["/etc/cron.hourly/nssbackup",
+					"/etc/cron.daily/nssbackup",
+					"/etc/cron.weekly/nssbackup",
+					"/etc/cron.monthly/nssbackup",
+					"/etc/cron.d/nssbackup"]
+		for serv in listserv:
+			if os.path.exists(serv) :
+				self.logger.debug("Unlinking '%s'" % serv )
+				os.unlink(serv)
 	
 	def testMail(self):
-		"""
-		Test the mail settings
+		"""Test the mail settings
+		
 		@return: True if succeded
-		@raise SBException: catch this to get the error message of why it didn't run
+		@raise SBException: the error message why it didn't run
+		
 		"""
 		if not self.has_option("report", "to"):
 			raise SBException (_("Set the reciever of this mail"))
@@ -881,14 +988,16 @@ class ConfigManager(ConfigParser.ConfigParser):
 			raise SBException(e)
 		
 	def isConfigEquals(self,config):
-		"""
-		a function to compare two configuration manager.
+		"""Compares this configuration and the given configuration.
+
 		@param config : a configManager instance
 		@return: True if the config are equals, False otherwise
 		@rtype: boolean
+		
 		"""
 		if not isinstance(config, ConfigManager) :
-			raise SBException("Can't compare a ConfigManager with type '%s'"% str(type(config)))
+			raise SBException("Can't compare a ConfigManager with type '%s'"\
+							% str(type(config)))
 		
 		for s in self.sections() :
 			if not config.has_section(s) :
@@ -1008,6 +1117,10 @@ class ConfigStaticData(object):
 
 	@classmethod
 	def get_profiles_dir(cls):
+		"""Returns the name (only basename, no path) of the directory where
+		profile configurations are stored.
+		
+		"""
 		return cls.__profiles_dir
 
 	@classmethod
@@ -1037,4 +1150,3 @@ class ConfigStaticData(object):
 	@classmethod		
 	def get_our_options(cls):
 		return cls.__our_options
-	

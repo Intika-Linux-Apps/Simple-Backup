@@ -47,7 +47,7 @@ class SBconfigGTK(GladeGnomeApp):
 		''' '''
 		# it is distinguished between the 'current' conffile and
 		# the 'default file' configuring the default profile
-		self.default_conffile = None 
+		self.default_conffile = None
 		
 		if os.geteuid() == 0 :
 			if os.path.exists("/etc/nssbackup.conf") :
@@ -77,8 +77,9 @@ class SBconfigGTK(GladeGnomeApp):
 		self.widgets['nssbackupConfApp'].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
 		
 		# hide the schedule tab if not root
-		if os.geteuid() != 0 :
-			self.widgets['notebook'].remove_page(4)	
+		if os.geteuid() != 0:
+#			self.widgets['notebook'].remove_page(4)
+			self.__enable_schedule_page(enable=False)
 		
 		# Initiate all data structures
 		# Paths to be included or excluded
@@ -298,11 +299,12 @@ class SBconfigGTK(GladeGnomeApp):
 			'dest_remote_light1',
 			'hbox11',
 			'dest_unusable',
-			'vbox9',
 			'hbox12',
 			'time_freq',
 			'anacronRadio',
 			'preciselyRadio',
+			'label_schedule_page',
+			'vbox_schedule_page',
 			'croninfos',
 			'time_hour',
 			'time_min',
@@ -445,10 +447,19 @@ class SBconfigGTK(GladeGnomeApp):
 		top_window = 'nssbackupConfApp'
 		GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window, widget_list, handlers)
 
-	def isConfigChanged(self):
-		"""
+	def isConfigChanged(self, force_the_change = False):
+		"""Checks whether the current configuration has changed compared to
+		the configuration which was originally loaded resp. stored on last
+		save action.
+		
+		@param force_the_change: Flag that that forces the check to be True
+								(i.e. the method acts as there were changes
+								regardless of the real test result)
+								
 		"""
 		changed = not self.configman.isConfigEquals(self.orig_configman)
+		if force_the_change == True:
+			changed = True
 		self.widgets['save'].set_sensitive(changed)
 		self.widgets['save_as'].set_sensitive(changed)
 		self.widgets['saveButton'].set_sensitive(changed)
@@ -506,26 +517,37 @@ class SBconfigGTK(GladeGnomeApp):
 					self.__set_destination_widgets_to_remote(ctarget)
 			else :
 				self.__set_destination_widgets_to_default()
+							
+		# Schedule page
+		if not recommened_setting:
+			if os.geteuid() == 0 and self.configman.is_default_profile():
+				self.__enable_schedule_page(enable=True)
 				
-			
+				croninfos = self.configman.getSchedule()	# = (isCron, val)
+				if  croninfos:
+					# any schedule information was found
+					self.widgets['main_radio2'].set_active(True)
+					if croninfos[0] == 1:
+						# scheduled using Cron
+						self.widgets['time_freq'].set_active(5)
+						self.on_time_freq_changed()
+						self.widgets['ccronline'].set_text(croninfos[1])
+					elif croninfos[0] == 0:
+						# scheduled using Anacron
+						if croninfos[1] in self.timefreqs.keys():
+							self.widgets['time_freq'].set_active(self.timefreqs[croninfos[1]])
+						else :
+							self.widgets['time_freq'].set_active(self.timefreqs["never"])
+						self.on_time_freq_changed()
+				else :
+					# no scheduled backups
+					# 'main_radio3' is the radio button 'Manual backups only'
+					self.widgets['main_radio3'].set_active(True)
+					#self.on_main_radio_toggled()
+			else:
+				self.__enable_schedule_page(enable=False)
+
 		# General tab
-		croninfos = self.configman.getSchedule()
-		if not recommened_setting :	
-			if  croninfos :
-				self.widgets['main_radio2'].set_active(True)
-				if croninfos[0] == 1 :
-					self.widgets['time_freq'].set_active(5)
-					self.on_time_freq_changed()
-					self.widgets['ccronline'].set_text(croninfos[1])
-				elif croninfos[0] == 0 :
-					if croninfos[1] in self.timefreqs.keys():
-						self.widgets['time_freq'].set_active(self.timefreqs[croninfos[1]])
-					else :
-						self.widgets['time_freq'].set_active(self.timefreqs["never"])
-					self.on_time_freq_changed()
-			else :
-				self.widgets['main_radio3'].set_active(True)
-				#self.on_main_radio_toggled()
 		if self.configman.has_option("general", "format") :
 			cformatOpt = self.configman.get("general", "format") 
 			if cformatOpt not in self.cformat:
@@ -534,8 +556,7 @@ class SBconfigGTK(GladeGnomeApp):
 			cformatIndex = self.cformat.index(cformatOpt)
 			self.logger.debug("Setting compression format to %s " % cformatIndex)
 			self.widgets["cformat"].set_active(cformatIndex)
-			
-				
+							
 		#Include and exclude tabs
 		self.include.clear()
 		self.ex_paths.clear()
@@ -545,7 +566,8 @@ class SBconfigGTK(GladeGnomeApp):
 					self.include.append( [i] )
 				elif v =="0":
 					self.ex_paths.append( [i] )
-		#remote inc
+					
+		#remote includes
 		self.remoteinc.clear()
 		if self.configman.has_option("dirconfig", "remote") :
 			for i,v in self.configman.get("dirconfig", "remote").iteritems():
@@ -554,7 +576,7 @@ class SBconfigGTK(GladeGnomeApp):
 				elif v =="0":
 					print ("TODO: add a remote ex widget")
 					
-		# regexp
+		# regexp excludes
 		_invalid_regex_found = False
 		_invalid_regex = ""
 		self.ex_ftype.clear()
@@ -873,6 +895,13 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_reload_clicked(self, *args):
 		self.configman = ConfigManager(self.conffile)
+		# hack to get rid of schedule settings in non-default profiles
+		# we just remove existing schedules from the non-default config files
+		# and don't allow new settings by disabling the schedule page
+		if not self.configman.is_default_profile():
+			self.configman.remove_schedule()
+			self.configman.saveConf()
+		# end of hack
 		self.orig_configman = ConfigManager(self.conffile)
 		self.prefillWindow()
 		self.isConfigChanged()
@@ -888,7 +917,6 @@ class SBconfigGTK(GladeGnomeApp):
 		self.isConfigChanged()
 		
 	def on_backup_clicked(self, *args):
-		
 		self.askSaveConfig()
 		try :
 			pid = subprocess.Popen(["nssbackupd"]).pid
@@ -930,7 +958,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["vbox3"].set_sensitive( False )
 			self.widgets["notebook2"].set_sensitive( False )
 			self.widgets["vbox8"].set_sensitive( False )
-			self.widgets["vbox9"].set_sensitive( False )
+			self.widgets["vbox_schedule_page"].set_sensitive(False)
 			self.widgets["reportvbox"].set_sensitive( True )
 
 		elif self.widgets["main_radio2"].get_active():
@@ -938,7 +966,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["vbox3"].set_sensitive( True )
 			self.widgets["notebook2"].set_sensitive( True )
 			self.widgets["vbox8"].set_sensitive( True )
-			self.widgets["vbox9"].set_sensitive( True )
+			self.widgets["vbox_schedule_page"].set_sensitive(True)
 			self.widgets["reportvbox"].set_sensitive( True )
 			
 		elif self.widgets["main_radio3"].get_active():
@@ -946,7 +974,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["vbox3"].set_sensitive( True )
 			self.widgets["notebook2"].set_sensitive( True )
 			self.widgets["vbox8"].set_sensitive( True )
-			self.widgets["vbox9"].set_sensitive( True )
+			self.widgets["vbox_schedule_page"].set_sensitive(True)
 			self.widgets["reportvbox"].set_sensitive( True )
 			# disable Time tab
 			self.logger.debug("self.widgets['time_freq'].set_active( 0 )")
@@ -1219,21 +1247,42 @@ class SBconfigGTK(GladeGnomeApp):
 		self.configman.setSchedule(1, self.widgets['ccronline'].get_text())
 		self.isConfigChanged()
 		self.logger.debug("Cronline is " +self.configman.get("schedule", "cron"))
+
+	def __enable_schedule_page(self, enable = True):
+		"""Enables resp. disables the complete schedule page including the
+		tab label.
 		
-	
+		@param enable: If True the page gets enabled, if False disabled.
+		
+		"""
+		self.widgets["time_freq"].set_sensitive(enable)
+		self.widgets["anacronRadio"].set_sensitive(enable)
+		self.widgets["preciselyRadio"].set_sensitive(enable)
+		self.widgets["time_domtv"].set_sensitive(enable)
+		self.widgets["time_dowtv"].set_sensitive(enable)
+		self.widgets["time_min"].set_sensitive(enable)
+		self.widgets["time_hour"].set_sensitive(enable)
+		self.widgets["ccronline"].set_sensitive(enable)
+		self.widgets["croninfos"].set_sensitive(enable)
+		self.widgets["label_schedule_page"].set_sensitive(enable)
+		self.widgets["vbox_schedule_page"].set_sensitive(enable)
+
 	def on_time_freq_changed(self, *args):
+		"""Signal handler which is called whenever the user changes the
+		desired schedule time frequency in the 'time_freq' combo box.
+		
+		"""
+		# Never is chosen
 		if self.widgets["time_freq"].get_active()==0:
-			# Never is chosen
 			self.widgets["croninfos"].set_sensitive( False )
 			self.widgets["ccronline"].set_sensitive( False )
 			self.widgets["anacronRadio"].set_sensitive( False )
 			self.widgets["preciselyRadio"].set_sensitive( False )
 			self.widgets["main_radio3"].set_active(True)
-			if self.configman.getSchedule() :
-				for option in self.configman.options("schedule") :
-					self.logger.debug("Removing ('schedule','%s') from config file " % option)
-					self.configman.remove_option("schedule", option)
-					self.isConfigChanged()
+			_forcechange = self.configman.remove_schedule()
+			self.isConfigChanged(_forcechange)
+
+		# Custom is chosen
 		elif self.widgets["time_freq"].get_active()==5:
 			# In custom mode we can't use anacron
 			self.widgets["main_radio3"].set_active(False)
@@ -1246,6 +1295,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["ccronline"].set_sensitive( True )
 			# set config
 			self.on_ccronline_changed()
+		# Hourly, Daily, Weekly or Monthly is chosen 
 		else :
 			if not self.widgets["main_radio"].get_active() :
 				self.widgets["main_radio3"].set_active(False)
@@ -1254,6 +1304,8 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["preciselyRadio"].set_sensitive( True )
 			self.widgets["croninfos"].set_sensitive( True )
 			self.widgets["ccronline"].set_sensitive( False )
+			
+			# using Cron
 			if self.widgets["preciselyRadio"].get_active() :
 				if self.widgets["time_freq"].get_active()==1:
 					self.widgets["time_min"].set_sensitive( True )
@@ -1309,6 +1361,8 @@ class SBconfigGTK(GladeGnomeApp):
 					self.isConfigChanged()
 				# put current cronline into the ccronline widget here
 				self.widgets["ccronline"].set_text(cronline)
+			
+			# using Anacron
 			else :
 				# We are in anacron mode (everything is disable)
 				self.widgets["croninfos"].set_sensitive( False )
@@ -1426,14 +1480,20 @@ class SBconfigGTK(GladeGnomeApp):
 		self.isConfigChanged()
 	
 	def on_anacronRadio_toggled(self, *args):
-		if self.widgets["anacronRadio"].get_active() :
-			self.widgets["croninfos"].set_sensitive( False )
-			self.widgets["ccronline"].set_sensitive( False )
-			self.widgets["anacronRadio"].set_sensitive( True )
-			self.widgets["preciselyRadio"].set_sensitive( True )
-		elif self.widgets["preciselyRadio"].get_active() :
-			self.widgets["croninfos"].set_sensitive( True )
-			self.on_time_freq_changed()
+		"""Signal handler that is called when the user switches between
+		*precise* (i.e. Cron) and *simple* (i.e. Anacron) scheduling.
+		
+		"""
+		# simple scheduling = Anacron
+		if self.widgets["anacronRadio"].get_active():
+			self.widgets["croninfos"].set_sensitive(False)
+			self.widgets["ccronline"].set_sensitive(False)
+			self.widgets["anacronRadio"].set_sensitive(True)
+			self.widgets["preciselyRadio"].set_sensitive(True)
+		# precise scheduling = Cron
+		elif self.widgets["preciselyRadio"].get_active():
+			self.widgets["croninfos"].set_sensitive(True)
+		self.on_time_freq_changed()
 
 	def on_purgecheckbox_toggled(self, *args):
 		if self.widgets["purgecheckbox"].get_active() :
@@ -1444,7 +1504,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets['hbox16'].set_sensitive(False)
 			self.widgets['hbox17'].set_sensitive(False)
 			self.configman.remove_option( "general", "purge")
-			self.isConfigChanged()	
+			self.isConfigChanged()
 
 	def on_purgeradiobutton_toggled(self, *args):
 		if self.widgets["purgeradiobutton"].get_active():
