@@ -6,6 +6,8 @@ import gtk.glade
 import gnome
 # import mandatory for GnomeApp to work
 import gnome.ui
+
+import nssbackup.ui.misc
 #----------------------------------------------------------------------
 
 def search_file(filename, search_path):
@@ -60,6 +62,7 @@ class GladeGnomeApp(object):
 		pull_down_dict: a dictionary that maps combo names to a tuple of
 		    strings to put in the combo
 		'''
+		nssbackup.ui.misc.set_default_environment()
 		
 		self.widget_list = widget_list
 		
@@ -97,7 +100,7 @@ class GladeGnomeApp(object):
 		self.cb_func = None
 
 	#----------------------------------------------------------------------
-	
+			
 	def set_top_window(self, top_window):
 		
 		'''set_top_window(self, top_window):

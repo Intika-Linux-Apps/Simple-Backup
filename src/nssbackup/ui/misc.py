@@ -18,7 +18,13 @@
 """Module containing commonly used helper classes and functions related to UI
 """
 
+import os
 import gtk
+
+# default values for environment variable if not set
+# see: http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
+__ENVVAR_XDG_DATA_DIRS = "XDG_DATA_DIRS"
+__DEFAULT_XDG_DATA_DIRS = "/usr/local/share/:/usr/share/"
 
 def open_uri(uri, timestamp=0):
 	"""Convenience function for opening a given URI with the default
@@ -33,3 +39,16 @@ def open_uri(uri, timestamp=0):
 			gnome.url_show(uri)
 		except ImportError:
 			pass
+
+def set_default_environment():
+	"""Sets required environment variables to their specified default
+	values if not defined. This can happen e.g. some root shells where
+	no environment variable for the freedesktop.org base directories
+	are defined.
+	
+	"""
+	var = __ENVVAR_XDG_DATA_DIRS
+	defval = __DEFAULT_XDG_DATA_DIRS
+	val = os.getenv(var)
+	if val is None:
+		os.putenv(var, defval)

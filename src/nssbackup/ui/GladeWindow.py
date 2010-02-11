@@ -26,6 +26,7 @@ import gtk
 import gtk.glade
 import gobject
 
+import nssbackup.ui.misc
 
 def search_file(filename, search_path):
 	"""Given a search path, find file
@@ -67,6 +68,8 @@ class GladeWindow(object):
 			   later releases: Create the XML external and give it to the\
 			   widget classes to avoid multiple instantiations!
 		'''
+		nssbackup.ui.misc.set_default_environment()
+
 #TODO: Needs improvement - not so good style!
 		try:
 			search_path = GladeWindow.search_path
