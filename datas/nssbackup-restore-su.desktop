@@ -22,7 +22,7 @@ Exec=gksu nssbackup-restore-gui
 #
 Terminal=false
 Categories=System;Settings
-StartupNotify=true
+StartupNotify=false
 Icon=nssbackup-restore
 #
 X-KDE-SubstituteUID = true

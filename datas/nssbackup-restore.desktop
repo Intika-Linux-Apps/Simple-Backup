@@ -22,5 +22,5 @@ Exec=nssbackup-restore-gui
 #
 Terminal=false
 Categories=Utility;
-StartupNotify=true
+StartupNotify=false
 Icon=nssbackup-restore
