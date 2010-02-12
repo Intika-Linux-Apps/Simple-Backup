@@ -21,7 +21,7 @@ GenericName[es]=Herramienta de restauración
 Exec=gksu nssbackup-restore-gui
 #
 Terminal=false
-Categories=System;Settings
+Categories=GTK;GNOME;System;
 StartupNotify=false
 Icon=nssbackup-restore
 #
