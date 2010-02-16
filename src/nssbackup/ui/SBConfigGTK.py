@@ -19,24 +19,31 @@
 import re
 import subprocess
 import os
-import time
-from nssbackup import Infos
-from nssbackup.plugins import PluginManager
-from nssbackup.managers.FuseFAM import FuseFAM
-from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import SBException
-from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir, getUserDatasDir,\
-	ConfigStaticData
-from nssbackup.ui.GladeGnomeApp import GladeGnomeApp
-from gettext import gettext as _
-import nssbackup.util as Util
+
 import gobject
 import gtk
 
+from gettext import gettext as _
+
+# project imports
+from nssbackup import Infos
+from nssbackup.plugins import PluginManager
+from nssbackup.managers.FuseFAM import FuseFAM
+from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir
+from nssbackup.managers.ConfigManager import getUserDatasDir, ConfigStaticData
+from nssbackup.util.log import LogFactory
+from nssbackup.util.exceptions import SBException
+import nssbackup.util as Util
+from nssbackup.ui.GladeGnomeApp import GladeGnomeApp
 from nssbackup.ui import misc
 
 
 class SBconfigGTK(GladeGnomeApp):
+	"""
+	
+	@todo: Unify displaying of error messages/dialog boxes!
+	@todo: Strictly separate UI from core. Don't set defaults from the UI.
+	"""
 	
 	configman = None
 	conffile = None
@@ -68,9 +75,20 @@ class SBconfigGTK(GladeGnomeApp):
 		self.logger = LogFactory.getLogger()
 		
 		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '40' : ("Error", 3)}
-		self.timefreqs = {"never":0, "hourly": 1,"daily": 2,"weekly": 3,"monthly": 4,"custom":5}
+		self.__simple_schedule_freqs = 	{	"hourly"	: 0,
+											"daily"		: 1,
+											"weekly"	: 2,
+											"monthly"	: 3
+										}
 		self.cformat = ['none', 'gzip', 'bzip2']
-		self.splitSize = {0:_('Unlimited'),100:_('100 MiB'),250:_('250 MiB'), 650 : _('650 MiB'),2000 :_('2 GiB (FAT16)'),4000 : _('4 GiB (FAT32)'), -1: _('Custom')}
+		self.splitSize =	{	0		: _('Unlimited'),
+								100		: _('100 MiB'),
+								250		: _('250 MiB'),
+								650 	: _('650 MiB'),
+								2000 	: _('2 GiB (FAT16)'),
+								4000	: _('4 GiB (FAT32)'),
+								-1		: _('Custom')
+							}
 		
 		self.init()
 		
@@ -78,7 +96,6 @@ class SBconfigGTK(GladeGnomeApp):
 		
 		# hide the schedule tab if not root
 		if os.geteuid() != 0:
-#			self.widgets['notebook'].remove_page(4)
 			self.__enable_schedule_page(enable=False)
 		
 		# Initiate all data structures
@@ -135,30 +152,8 @@ class SBconfigGTK(GladeGnomeApp):
 		column = gtk.TreeViewColumn(_('Name'), cell, text=0)
 		self.rem_includetv.append_column(column)
 		
-		# Day of month table
-		self.time_dom = gtk.ListStore( str )
-		self.time_domtv = self.widgets["time_domtv"]
-		self.time_domtv.set_model( self.time_dom )
-		cell6 = gtk.CellRendererText()
-		column6 = gtk.TreeViewColumn(_('Name'), cell6, text=0)
-		self.time_domtv.append_column(column6)
-
-		for i in range(1, 32):
-			self.time_dom.append( [str(i)] )
-
-		# Day of week table
-		self.time_dow = gtk.ListStore( str )
-		self.time_dowtv = self.widgets["time_dowtv"]
-		self.time_dowtv.set_model( self.time_dow )
-		cell7 = gtk.CellRendererText()
-		column7 = gtk.TreeViewColumn(_('Name'), cell7, text=0)
-		self.time_dowtv.append_column(column7)
-
 		self.known_ftypes = { "mp3": _("MP3 Music"), "avi": _("AVI Video"), "mpeg": _("MPEG Video"), "mpg": _("MPEG Video"), "mkv": _("Matrjoshka Video"), "ogg": _("OGG Multimedia container"), "iso": _("CD Images")}
-		
-		for i in range(0,7):
-			self.time_dow.append([ time.strftime( "%A", (2000,1,1,1,1,1,i,1,1)) ])
-			
+					
 		# Profile Manager
 		# [ enable , profilename, cfPath ]
 		self.profiles = gtk.ListStore( bool, str, str )
@@ -169,11 +164,9 @@ class SBconfigGTK(GladeGnomeApp):
 		self.profilestv = self.widgets['profilesListTreeView']
 		self.profilestv.set_model(self.profiles )
 		
-		
 		cell8,cell9 = gtk.CellRendererToggle(), gtk.CellRendererText()
 		cell8.set_active(True)
 		cell8.connect("toggled", self.on_prfEnableCB_toggled)
-		
 		
 		enableCBColumn = gtk.TreeViewColumn(_("Enable"), cell8, active=0 ) 
 		prfNameColumn = gtk.TreeViewColumn(_("Profile Name"), cell9, text=1 )
@@ -299,24 +292,25 @@ class SBconfigGTK(GladeGnomeApp):
 			'dest_remote_light1',
 			'hbox11',
 			'dest_unusable',
-			'hbox12',
-			'time_freq',
-			'anacronRadio',
-			'preciselyRadio',
+#
+#			schedule page
 			'label_schedule_page',
 			'vbox_schedule_page',
-			'croninfos',
-			'time_hour',
-			'time_min',
-			'scrolledwindow6',
-			'time_dowtv',
-			'scrolledwindow5',
-			'time_domtv',
-			'hbox13',
-			'ccronline',
-			'hbox14',
+			'table_schedule',
+			'rdbtn_no_schedule',
+			'rdbtn_simple_schedule',
+			'rdbtn_custom_schedule',
+			'label_simple_schedule_freq',
+			'label_custom_cronline',
+			'txtfld_custom_cronline',
+			'cmbbx_simple_schedule_freq',
+			'lnkbtn_help_schedule',
+			'hbox_schedule_footer',
+			'hbox_schedule_infotext',
+			'img_schedule_infotext',
+			'label_schedule_infotext',
+#
 			'time_maxinc',
-			'hbox15',
 			'purgevbox',
 			'purgecheckbox',
 			'hbox16',
@@ -405,13 +399,12 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_dest_localpath_selection_changed',
 			'on_dest_remote_changed',
 			'on_dest_remotetest_clicked',
-			'on_time_freq_changed',
-			'on_time_hour_changed',
-			'on_time_min_changed',
-			'on_anacronRadio_toggled',
-			'on_ccronline_changed',
-			'on_time_domtv_cursor_changed',
-			'on_time_dowtv_cursor_changed',
+#			
+#			scheduling
+			'on_cmbbx_simple_schedule_freq_changed',
+			'on_rdbtn_schedule_toggled',
+			'on_txtfld_custom_cronline_changed',
+#
             'on_time_maxinc_changed',
 			'on_purgecheckbox_toggled',
 			'on_purgeradiobutton_toggled',
@@ -474,8 +467,7 @@ class SBconfigGTK(GladeGnomeApp):
 			question.hide()
 			if response == gtk.RESPONSE_YES:
 				self.on_save_clicked()
-	
-	
+
 	def prefillWindow(self, recommened_setting=False):
 		"""
 		Prefill the GTK window with config infos
@@ -484,6 +476,9 @@ class SBconfigGTK(GladeGnomeApp):
 			   modules that use such functionality!
 		"""
 		def __prefill_destination_widgets():
+			"""Local helper function which fills the UI widgets related to
+			the backup target (i.e. destination).
+			"""
 			# Target 
 			if self.configman.has_option("general", "target" ) :
 				ctarget = self.configman.get("general", "target" )
@@ -504,7 +499,7 @@ class SBconfigGTK(GladeGnomeApp):
 					 "value. Check this on the destination settings page "\
 					 "before saving the configuration."
 							_boxtitle = _("NSsbackup configuration error")
-							_headline_str =\
+							_headline_str = \
 							_("Unable to open backup target")
 
 							gobject.idle_add( self._show_errdialog,
@@ -524,26 +519,26 @@ class SBconfigGTK(GladeGnomeApp):
 				self.__enable_schedule_page(enable=True)
 				
 				croninfos = self.configman.getSchedule()	# = (isCron, val)
-				if  croninfos:
-					# any schedule information was found
+				
+				# any schedule information was found
+				if  croninfos is not None:
 					self.widgets['main_radio2'].set_active(True)
+
+					# scheduled using Cron i.e. a custom setting
 					if croninfos[0] == 1:
-						# scheduled using Cron
-						self.widgets['time_freq'].set_active(5)
-						self.on_time_freq_changed()
-						self.widgets['ccronline'].set_text(croninfos[1])
+						self.__set_schedule_option('custom')
+						self.__set_value_txtfld_custom_cronline(croninfos[1])
+
+					# scheduled using Anacron
 					elif croninfos[0] == 0:
-						# scheduled using Anacron
-						if croninfos[1] in self.timefreqs.keys():
-							self.widgets['time_freq'].set_active(self.timefreqs[croninfos[1]])
-						else :
-							self.widgets['time_freq'].set_active(self.timefreqs["never"])
-						self.on_time_freq_changed()
-				else :
-					# no scheduled backups
+						self.__set_schedule_option('simple')
+						self.__set_value_cmbbx_simple_schedule_freq(croninfos[1])
+
+				# no scheduled backups
+				else:
 					# 'main_radio3' is the radio button 'Manual backups only'
 					self.widgets['main_radio3'].set_active(True)
-					#self.on_main_radio_toggled()
+					self.__set_schedule_option('no')
 			else:
 				self.__enable_schedule_page(enable=False)
 
@@ -743,7 +738,6 @@ class SBconfigGTK(GladeGnomeApp):
 		self.widgets["dest1"].set_active( True )
 		self.widgets["hbox9"].set_sensitive( False )
 		self.widgets["hbox10"].set_sensitive( False )
-		#self.on_dest1_toggled()
 		
 	def __set_destination_widgets_to_local(self, atarget):
 		"""The widgets within the 'Destination' page are enabled/disabled/set
@@ -763,11 +757,11 @@ class SBconfigGTK(GladeGnomeApp):
 		self.widgets["hbox10"].set_sensitive( True )
 		self.widgets["dest_remote"].set_text( atarget )
 	
-	#   configlist is like self.conf.items( "dirconfig" ) 
-	#	return True if the dir is already included
-	#			False if not
-	#
 	def already_inc (self, configlist, toInclude):
+		"""configlist is like self.conf.items( "dirconfig" )
+		 
+		@return: True if the dir is already included, False if not
+		"""
 		for i,v in configlist :
 			if v=="1" and i == toInclude :
 				# the chosen item match an included one 
@@ -778,11 +772,11 @@ class SBconfigGTK(GladeGnomeApp):
 		# No match found
 		return False
 	
-	#   configlist is like self.conf.items( "dirconfig" ) 
-	#	return True if the dir is already excluded
-	#			False if not
-	#
 	def already_ex (self, configlist, toExclude):
+		"""configlist is like self.conf.items( "dirconfig" )
+		
+		@return: True if the dir is already excluded, False if not
+		"""
 		for i,v in configlist :
 			if v=="0" and i == toExclude :
 				# the chosen item match an included one 
@@ -796,7 +790,10 @@ class SBconfigGTK(GladeGnomeApp):
 	def cell_remoteinc_edited_callback(self, cell, path, new_text, data):
 		# Check if new path is empty
 		if (new_text == None) or (new_text == ""):
-			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Empty filename or path. Please enter a valid filename or path."))
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,
+						flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+						buttons=gtk.BUTTONS_CLOSE,
+						message_format=_("Empty filename or path. Please enter a valid filename or path."))
 			dialog.run()
 			dialog.destroy()
 			return
@@ -828,13 +825,19 @@ class SBconfigGTK(GladeGnomeApp):
 	def cell_edited_callback(self, cell, path, new_text, data):
 		# Check if new path is empty
 		if (new_text == None) or (new_text == ""):
-			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Empty filename or path. Please enter a valid filename or path."))
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,
+						flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+						buttons=gtk.BUTTONS_CLOSE,
+						message_format=_("Empty filename or path. Please enter a valid filename or path."))
 			dialog.run()
 			dialog.destroy()
 			return
 		# Check if new path exists and asks the user if path does not exists
 		if not os.path.exists(new_text):
-			dialog = gtk.MessageDialog(type=gtk.MESSAGE_QUESTION, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_YES_NO, message_format=_("It seems the path you entered does not exists. Do you want to add this wrong path?"))
+			dialog = gtk.MessageDialog(type=gtk.MESSAGE_QUESTION,
+						flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+						buttons=gtk.BUTTONS_YES_NO,
+						message_format=_("It seems the path you entered does not exists. Do you want to add this wrong path?"))
 			response = dialog.run()
 			dialog.destroy()
 			if response == gtk.RESPONSE_NO:
@@ -862,7 +865,11 @@ class SBconfigGTK(GladeGnomeApp):
 		self.on_save_clicked()
 
 	def on_save_as_activate(self, *args):
-		dialog = gtk.FileChooserDialog(_("Save to file ..."), None, gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(_("Save to file ..."),
+									None,
+									gtk.FILE_CHOOSER_ACTION_SAVE,
+									(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+									 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		response = dialog.run()
 		if response == gtk.RESPONSE_OK :
@@ -931,24 +938,29 @@ class SBconfigGTK(GladeGnomeApp):
 			raise e
 
 	def on_main_radio_toggled(self, *args):
+		"""Signal handler which is called when the radio buttons on the main
+		page are toggled.
+		"""
 		if self.widgets["main_radio"].get_active():
 			# set all values to defaults
 		
 			self.configman = ConfigManager()
 			self.prefillWindow(True)
-			self.widgets["time_freq"].set_active( 2 )
-			# choose between anacron or cron here (old behaviour has been kept for the moment.
-			self.widgets["preciselyRadio"].set_active( True )
-			self.widgets["anacronRadio"].set_active( False )
 			
-			self.widgets["croninfos"].set_sensitive( True )
-			self.widgets["time_min"].set_sensitive( True )
-			self.widgets["time_hour"].set_sensitive( True )
-			self.widgets["time_min"].set_value( 0 )
-			self.widgets["time_hour"].set_value( 0 )
-			self.widgets["scrolledwindow5"].set_sensitive( False )
-			self.widgets["scrolledwindow6"].set_sensitive( False )
-			self.widgets["ccronline"].set_sensitive( False )
+#			self.widgets["time_freq"].set_active( 2 )
+			# choose between anacron or cron here (old behaviour has been kept for the moment.
+			# TODO: Needs review!
+#			self.widgets["preciselyRadio"].set_active( True )
+#			self.widgets["anacronRadio"].set_active( False )
+
+#			self.widgets["croninfos"].set_sensitive( True )
+#			self.widgets["time_min"].set_sensitive( True )
+#			self.widgets["time_hour"].set_sensitive( True )
+#			self.widgets["time_min"].set_value( 0 )
+#			self.widgets["time_hour"].set_value( 0 )
+#			self.widgets["scrolledwindow5"].set_sensitive( False )
+#			self.widgets["scrolledwindow6"].set_sensitive( False )
+#			self.widgets["ccronline"].set_sensitive( False )
 
 			self.widgets["purgecheckbox"].set_active( True )
 			self.widgets["purgeradiobutton"].set_active( 1 )
@@ -977,10 +989,10 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["vbox_schedule_page"].set_sensitive(True)
 			self.widgets["reportvbox"].set_sensitive( True )
 			# disable Time tab
-			self.logger.debug("self.widgets['time_freq'].set_active( 0 )")
-			self.widgets["time_freq"].set_active( 0 )
-			self.widgets["croninfos"].set_sensitive( False )
-			self.widgets["ccronline"].set_sensitive( False )
+#			self.logger.debug("self.widgets['time_freq'].set_active( 0 )")
+#			self.widgets["time_freq"].set_active( 0 )
+#			self.widgets["croninfos"].set_sensitive( False )
+#			self.widgets["ccronline"].set_sensitive( False )
 
 	def on_cformat_changed(self, *args):
 		"""
@@ -1026,7 +1038,11 @@ class SBconfigGTK(GladeGnomeApp):
 		self.isConfigChanged()
 	
 	def on_inc_addfile_clicked(self, *args):
-		dialog = gtk.FileChooserDialog(_("Include file ..."), None, gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(_("Include file ..."),
+									None,
+									gtk.FILE_CHOOSER_ACTION_OPEN,
+									(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+									 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		filter = gtk.FileFilter()
 		filter.set_name(_("All files"))
@@ -1043,7 +1059,11 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.destroy()
 
 	def on_inc_adddir_clicked(self, *args):
-		dialog = gtk.FileChooserDialog(_("Include folder ..."), None, gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(_("Include folder ..."),
+									None,
+									gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+									(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+									 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		
 		response = dialog.run()
@@ -1205,6 +1225,9 @@ class SBconfigGTK(GladeGnomeApp):
 		default settings:
 		'/var/backup' for root, 'homedir+/backups' for non-admins.
 		@rtype: Boolean
+		
+		@todo: Use functions from ConfigManager to proceed the check in
+				a consistent manner.
 		"""
 		_reslt = False
 		if (os.getuid() == 0 and atarget == "/var/backup") or\
@@ -1219,6 +1242,9 @@ class SBconfigGTK(GladeGnomeApp):
 		@todo: The result of 'os.getuid' should be retrieved during the
 			   initialization process and stored in a member attribute, so
 			   we don't need to use operation system call over and over!
+
+		@todo: Use functions from ConfigManager to set the paths in
+				a consistent manner.
 		"""
 		if os.getuid() == 0 :
 			self.configman.set( "general", "target", "/var/backup")
@@ -1226,7 +1252,6 @@ class SBconfigGTK(GladeGnomeApp):
 		else :
 			self.configman.set( "general", "target", getUserDatasDir()+"backups")
 			self.isConfigChanged()
-
 
 	def on_dest1_toggled(self, *args):
 		if self.widgets["dest1"].get_active():
@@ -1243,11 +1268,6 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["hbox10"].set_sensitive( True )
 			self.on_dest_remote_changed()
 
-	def on_ccronline_changed(self, *args):
-		self.configman.setSchedule(1, self.widgets['ccronline'].get_text())
-		self.isConfigChanged()
-		self.logger.debug("Cronline is " +self.configman.get("schedule", "cron"))
-
 	def __enable_schedule_page(self, enable = True):
 		"""Enables resp. disables the complete schedule page including the
 		tab label.
@@ -1255,246 +1275,150 @@ class SBconfigGTK(GladeGnomeApp):
 		@param enable: If True the page gets enabled, if False disabled.
 		
 		"""
-		self.widgets["time_freq"].set_sensitive(enable)
-		self.widgets["anacronRadio"].set_sensitive(enable)
-		self.widgets["preciselyRadio"].set_sensitive(enable)
-		self.widgets["time_domtv"].set_sensitive(enable)
-		self.widgets["time_dowtv"].set_sensitive(enable)
-		self.widgets["time_min"].set_sensitive(enable)
-		self.widgets["time_hour"].set_sensitive(enable)
-		self.widgets["ccronline"].set_sensitive(enable)
-		self.widgets["croninfos"].set_sensitive(enable)
 		self.widgets["label_schedule_page"].set_sensitive(enable)
-		self.widgets["vbox_schedule_page"].set_sensitive(enable)
-
-	def on_time_freq_changed(self, *args):
-		"""Signal handler which is called whenever the user changes the
-		desired schedule time frequency in the 'time_freq' combo box.
 		
+		self.widgets["rdbtn_no_schedule"].set_sensitive(enable)
+		self.widgets["rdbtn_simple_schedule"].set_sensitive(enable)
+		self.widgets["rdbtn_custom_schedule"].set_sensitive(enable)
+		
+		self.widgets["label_simple_schedule_freq"].set_sensitive(enable)
+		self.widgets["cmbbx_simple_schedule_freq"].set_sensitive(enable)
+		
+		self.widgets["label_custom_cronline"].set_sensitive(enable)
+		self.widgets["txtfld_custom_cronline"].set_sensitive(enable)
+		
+		self.widgets["img_schedule_infotext"].set_sensitive(enable)
+		self.widgets["label_schedule_infotext"].set_sensitive(enable)
+
+	def __enable_schedule_option(self, option):
+		"""Enables resp. disables the according widgets for the given schedule
+		option. Values are not set.
 		"""
-		# Never is chosen
-		if self.widgets["time_freq"].get_active()==0:
-			self.widgets["croninfos"].set_sensitive( False )
-			self.widgets["ccronline"].set_sensitive( False )
-			self.widgets["anacronRadio"].set_sensitive( False )
-			self.widgets["preciselyRadio"].set_sensitive( False )
-			self.widgets["main_radio3"].set_active(True)
+		def __enable_no_scheduling(enable = True):
+			"""Enables resp. disables options related to 'No scheduling'.
+			Values are not set.
+			"""
+			pass
+	
+		def __enable_simple_scheduling(enable = True):
+			"""Enables resp. disables options related to 'Simple scheduling'.
+			Values are not set.
+			"""
+			self.widgets["label_simple_schedule_freq"].set_sensitive(enable)
+			self.widgets["cmbbx_simple_schedule_freq"].set_sensitive(enable)
+		
+		def __enable_custom_scheduling(enable = True):
+			"""Enables resp. disables options related to 'Custom scheduling'.
+			Values are not set.
+			"""		
+			self.widgets["label_custom_cronline"].set_sensitive(enable)
+			self.widgets["txtfld_custom_cronline"].set_sensitive(enable)
+
+		if option == "no":
+			__enable_no_scheduling(enable=True)
+			__enable_simple_scheduling(enable=False)
+			__enable_custom_scheduling(enable=False)
+		elif option == "simple":
+			__enable_no_scheduling(enable=False)
+			__enable_simple_scheduling(enable=True)
+			__enable_custom_scheduling(enable=False)
+		elif option == "custom":
+			__enable_no_scheduling(enable=False)
+			__enable_simple_scheduling(enable=False)
+			__enable_custom_scheduling(enable=True)
+		else:
+			raise ValueError("Unknown schedule option given.")
+		
+	def __set_schedule_option(self, option):
+		self.__enable_schedule_option(option)
+		if option == "no":
+			self.widgets["rdbtn_no_schedule"].set_active(is_active=True)
+		elif option == "simple":
+			self.widgets["rdbtn_simple_schedule"].set_active(is_active=True)
+		elif option == "custom":
+			self.widgets["rdbtn_custom_schedule"].set_active(is_active=True)
+		else:
+			raise ValueError("Unknown schedule option given.")
+		
+#	def __set_schedule_defaults(self):
+#		_default_schedule = "simple"
+#		_simple_default_freq = "daily"
+#		_custom_default_cronline = "0 0 * * *"
+#		
+#		self.__set_schedule_option(_default_schedule)
+#		self.__set_value_cmbbx_simple_schedule_freq(_simple_default_freq)
+#		self.__set_value_txtfld_custom_cronline(_custom_default_cronline)
+		
+	def __set_default_cmbbx_simple_schedule_freq(self):
+		_simple_default_freq = "daily"		
+		self.__set_value_cmbbx_simple_schedule_freq(_simple_default_freq)
+
+	def __set_value_txtfld_custom_cronline(self, cronline):
+		self.widgets['txtfld_custom_cronline'].set_text(cronline)
+#TODO: Review - is it required?
+#		self.on_txtfld_custom_cronline_changed()
+
+	def __set_value_cmbbx_simple_schedule_freq(self, frequency):
+		if frequency in self.__simple_schedule_freqs.keys():
+			self.widgets['cmbbx_simple_schedule_freq'].set_active(\
+										self.__simple_schedule_freqs[frequency])
+		else:
+			raise ValueError("Unknown anacron setting found!")
+#TODO: Review - is it required?
+#		self.on_cmbbx_simple_schedule_freq_changed()
+
+	def on_rdbtn_schedule_toggled(self, *args):
+		if self.widgets["rdbtn_no_schedule"].get_active():
+			self.logger.debug("NO SCHEDULING selected.")
+			self.__enable_schedule_option("no")
 			_forcechange = self.configman.remove_schedule()
-			self.isConfigChanged(_forcechange)
-
-		# Custom is chosen
-		elif self.widgets["time_freq"].get_active()==5:
-			# In custom mode we can't use anacron
-			self.widgets["main_radio3"].set_active(False)
-			self.widgets["main_radio2"].set_active(True)
-			self.widgets["preciselyRadio"].set_active( True )
-			self.widgets["anacronRadio"].set_active( False )
-			self.widgets["anacronRadio"].set_sensitive( False )
-			self.widgets["preciselyRadio"].set_sensitive( False )
-			self.widgets["croninfos"].set_sensitive( False )
-			self.widgets["ccronline"].set_sensitive( True )
-			# set config
-			self.on_ccronline_changed()
-		# Hourly, Daily, Weekly or Monthly is chosen 
-		else :
-			if not self.widgets["main_radio"].get_active() :
-				self.widgets["main_radio3"].set_active(False)
-				self.widgets["main_radio2"].set_active(True)
-			self.widgets["anacronRadio"].set_sensitive( True )
-			self.widgets["preciselyRadio"].set_sensitive( True )
-			self.widgets["croninfos"].set_sensitive( True )
-			self.widgets["ccronline"].set_sensitive( False )
-			
-			# using Cron
-			if self.widgets["preciselyRadio"].get_active() :
-				if self.widgets["time_freq"].get_active()==1:
-					self.widgets["time_min"].set_sensitive( True )
-					self.widgets["time_hour"].set_sensitive( False )
-					self.widgets["scrolledwindow5"].set_sensitive( False )
-					self.widgets["scrolledwindow6"].set_sensitive( False )
-					# Add in the configfile now
-					cmin = str(int(self.widgets["time_min"].get_value()))
-					cronline = " ".join([cmin,"*","*","*","*"])
-					self.configman.setSchedule(1, cronline)
-					self.isConfigChanged()
-					
-				elif self.widgets["time_freq"].get_active()==2:
-					self.widgets["time_min"].set_sensitive( True )
-					self.widgets["time_hour"].set_sensitive( True )
-					self.widgets["scrolledwindow5"].set_sensitive( False )
-					self.widgets["scrolledwindow6"].set_sensitive( False )
-					# Add in the configfile now
-					cmin = str(int(self.widgets["time_min"].get_value()))
-					chour = str(int(self.widgets["time_hour"].get_value()))
-					cronline = " ".join([cmin,chour,"*","*","*"])
-					self.configman.setSchedule(1, cronline)
-					self.isConfigChanged()
-					
-				elif self.widgets["time_freq"].get_active()==3:
-					self.widgets["time_min"].set_sensitive( True )
-					self.widgets["time_hour"].set_sensitive( True )
-					self.widgets["scrolledwindow6"].set_sensitive( True )
-					self.widgets["scrolledwindow5"].set_sensitive( False )
-					# Add in the configfile now
-					cmin = str(int(self.widgets["time_min"].get_value()))
-					chour = str(int(self.widgets["time_hour"].get_value()))
-					cdow  = self.widgets["time_dowtv"].get_selection().get_selected_rows()[1]
-					try:  cdow = str(int(cdow[0][0])+1)
-					except: cdow = "1"
-					cronline = " ".join([cmin,chour,cdow,"*","*"])
-					self.configman.setSchedule(1, cronline)
-					self.isConfigChanged()
-					
-				elif self.widgets["time_freq"].get_active()==4:
-					self.widgets["time_min"].set_sensitive( True )
-					self.widgets["time_hour"].set_sensitive( True )
-					self.widgets["scrolledwindow6"].set_sensitive( False )
-					self.widgets["scrolledwindow5"].set_sensitive( True )
-					# Add in the configfile now
-					cmin = str(int(self.widgets["time_min"].get_value()))
-					chour = str(int(self.widgets["time_hour"].get_value()))
-					cdom  = self.widgets["time_domtv"].get_selection().get_selected_rows()[1]
-					try:  cdom = str(int(cdom[0][0])+1)
-					except: cdom = "1"
-					cronline = " ".join([cmin,chour,"*",cdom,"*"])
-					self.configman.setSchedule(1, cronline)
-					self.isConfigChanged()
-				# put current cronline into the ccronline widget here
-				self.widgets["ccronline"].set_text(cronline)
-			
-			# using Anacron
-			else :
-				# We are in anacron mode (everything is disable)
-				self.widgets["croninfos"].set_sensitive( False )
-				self.widgets["ccronline"].set_sensitive( False )
-				if self.widgets["time_freq"].get_active()==1:			
-					self.configman.setSchedule(0, "hourly")
-					self.isConfigChanged()
-					self.logger.debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
-				elif self.widgets["time_freq"].get_active()==2:
-					self.widgets["time_min"].set_sensitive( True )
-					self.widgets["time_hour"].set_sensitive( True )
-					self.widgets["scrolledwindow5"].set_sensitive( False )
-					self.widgets["scrolledwindow6"].set_sensitive( False )
-					self.widgets["ccronline"].set_sensitive( False )
-					self.configman.setSchedule(0, "daily")
-					self.isConfigChanged()
-					self.logger.debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
-				elif self.widgets["time_freq"].get_active()==3:
-					self.widgets["time_min"].set_sensitive( True )
-					self.widgets["time_hour"].set_sensitive( True )
-					self.widgets["scrolledwindow6"].set_sensitive( True )
-					self.widgets["scrolledwindow5"].set_sensitive( False )
-					self.widgets["ccronline"].set_sensitive( False )
-					self.configman.setSchedule(0, "weekly")
-					self.isConfigChanged()
-					self.logger.debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
-				elif self.widgets["time_freq"].get_active()==4:
-					self.widgets["time_min"].set_sensitive( True )
-					self.widgets["time_hour"].set_sensitive( True )
-					self.widgets["scrolledwindow6"].set_sensitive( False )
-					self.widgets["scrolledwindow5"].set_sensitive( True )
-					self.widgets["ccronline"].set_sensitive( False )
-					self.configman.setSchedule(0, "monthly")
-					self.isConfigChanged()
-					self.logger.debug("AnaCronline is " +self.configman.get("schedule", "anacron"))
-
-	def on_time_domtv_cursor_changed(self, *args):
-		# Add in the configfile now
-		cmin = str(int(self.widgets["time_min"].get_value()))
-		chour = str(int(self.widgets["time_hour"].get_value()))
-		cdom  = self.widgets["time_domtv"].get_selection().get_selected_rows()[1]
-		try:  cdom = str(int(cdom[0][0])+1)
-		except: cdom = "1"
-		cronline = " ".join([cmin,chour,"*",cdom,"*"])
-		self.configman.setSchedule(1, cronline)
-		self.isConfigChanged()
-		# put current cronline into the ccronline widget here
-		self.widgets["ccronline"].set_text(cronline)
+			self.isConfigChanged(_forcechange)			
 		
+		elif self.widgets["rdbtn_simple_schedule"].get_active():
+			self.logger.debug("SIMPLE SCHEDULING selected.")
+			self.__enable_schedule_option("simple")
+			self.on_cmbbx_simple_schedule_freq_changed()
 		
-	def on_time_dowtv_cursor_changed(self, *args):
-		# Add in the configfile now
-		cmin = str(int(self.widgets["time_min"].get_value()))
-		chour = str(int(self.widgets["time_hour"].get_value()))
-		cdow  = self.widgets["time_dowtv"].get_selection().get_selected_rows()[1]
-		try:  cdow = str(int(cdow[0][0])+1)
-		except: cdow = "1"
-		cronline = " ".join([cmin,chour,cdow,"*","*"])
-		self.configman.setSchedule(1, cronline)
-		self.isConfigChanged()
-		# put current cronline into the ccronline widget here
-		self.widgets["ccronline"].set_text(cronline)
-
-	def on_time_hour_changed(self, *args):
-		# Add in the configfile now
-		cmin = str(int(self.widgets["time_min"].get_value()))
-		chour = str(int(self.widgets["time_hour"].get_value()))
-		# if every day is selected, 
-		if self.widgets["time_freq"].get_active()==2:	
-			cronline = " ".join([cmin,chour,"*","*","*"])
+		elif self.widgets["rdbtn_custom_schedule"].get_active():
+			self.logger.debug("CUSTOM SCHEDULING selected.")
+			self.__enable_schedule_option("custom")
+			self.on_txtfld_custom_cronline_changed()
+		
 		else:
-			if self.widgets["time_freq"].get_active()==3:
-				cdow  = self.widgets["time_dowtv"].get_selection().get_selected_rows()[1]
-				try:  cdow = str(int(cdow[0][0])+1)
-				except: cdow = "1"
-				cronline = " ".join([cmin,chour,cdow,"*","*"])
-			elif self.widgets["time_freq"].get_active()==4:
-				cdom  = self.widgets["time_domtv"].get_selection().get_selected_rows()[1]
-				try:  cdom = str(int(cdom[0][0])+1)
-				except: cdom = "1"
-				cronline = " ".join([cmin,chour,"*",cdom,"*"])
-		self.configman.setSchedule(1, cronline)
-		self.isConfigChanged()
-		# put current cronline into the ccronline widget here
-		self.widgets["ccronline"].set_text(cronline)
+			raise ValueError("Unexpected radio button group member was changed.")
+			
+	def on_cmbbx_simple_schedule_freq_changed(self, *args):
+		"""Signal handler which is called whenever the schedule time frequency
+		in the 'time_freq' combo box is changed.
 		
-	def on_time_min_changed(self, *args):
-		# Add in the configfile now
-		cmin = str(int(self.widgets["time_min"].get_value()))
-		# if every day is selected, 
-		if self.widgets["time_freq"].get_active()==1:	
-			cronline = " ".join([cmin,"*","*","*","*"])
-		else:
-			chour = str(int(self.widgets["time_hour"].get_value()))
-			if self.widgets["time_freq"].get_active()==2:	
-				cronline = " ".join([cmin,chour,"*","*","*"])
-			elif self.widgets["time_freq"].get_active()==3:
-				cdow  = self.widgets["time_dowtv"].get_selection().get_selected_rows()[1]
-				try:  cdow = str(int(cdow[0][0])+1)
-				except: cdow = "1"
-				cronline = " ".join([cmin,chour,cdow,"*","*"])
-			elif self.widgets["time_freq"].get_active()==4:
-				cdom  = self.widgets["time_domtv"].get_selection().get_selected_rows()[1]
-				try:  cdom = str(int(cdom[0][0])+1)
-				except: cdom = "1"
-				cronline = " ".join([cmin,chour,"*",cdom,"*"])
-		self.configman.setSchedule(1, cronline)
-		self.isConfigChanged()
-		# put current cronline into the ccronline widget here
-		self.widgets["ccronline"].set_text(cronline)
+		@todo: Use __simple_schedule_freqs keys!
+		"""
+		_selection = self.widgets["cmbbx_simple_schedule_freq"].get_active()
 		
+		if _selection not in self.__simple_schedule_freqs.values():
+			self.__set_default_cmbbx_simple_schedule_freq()
+
+		for _freq_key in self.__simple_schedule_freqs.keys():
+			if _selection == self.__simple_schedule_freqs[_freq_key]:
+				self.configman.setSchedule(0, _freq_key)
+			
+		self.isConfigChanged()
+		self.logger.debug("AnaCronline is: %s" % self.configman.get("schedule",
+																	"anacron"))
+
+	def on_txtfld_custom_cronline_changed(self, *args):
+		_cronline = self.widgets['txtfld_custom_cronline'].get_text()
+		print "WE MUST CHECK THE INPUT HERE!"
+#TODO: WE MUST CHECK THE INPUT HERE!
+		self.configman.setSchedule(1, _cronline)
+		self.isConfigChanged()
+		self.logger.debug("Cronline set to '%s'" % self.configman.get("schedule", "cron"))
+
 	def on_time_maxinc_changed(self,*args):
 		# add maxinc to the config
 		self.configman.set("general", "maxincrement", int(self.widgets["time_maxinc"].get_value())) 
 		self.isConfigChanged()
 	
-	def on_anacronRadio_toggled(self, *args):
-		"""Signal handler that is called when the user switches between
-		*precise* (i.e. Cron) and *simple* (i.e. Anacron) scheduling.
-		
-		"""
-		# simple scheduling = Anacron
-		if self.widgets["anacronRadio"].get_active():
-			self.widgets["croninfos"].set_sensitive(False)
-			self.widgets["ccronline"].set_sensitive(False)
-			self.widgets["anacronRadio"].set_sensitive(True)
-			self.widgets["preciselyRadio"].set_sensitive(True)
-		# precise scheduling = Cron
-		elif self.widgets["preciselyRadio"].get_active():
-			self.widgets["croninfos"].set_sensitive(True)
-		self.on_time_freq_changed()
-
 	def on_purgecheckbox_toggled(self, *args):
 		if self.widgets["purgecheckbox"].get_active() :
 			self.widgets['hbox16'].set_sensitive(True)
@@ -2003,18 +1927,22 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.destroy()
 
 	def _forbid_default_profile_removal(self, action):
-		"""
-		Shows an info box stating that we are not able to do the given action on the default profile.
-		"""
-		info = _("You can't %s the Default Profile. Please use it if you need only one profile." % action)
+		"""Shows an info box which states that we are not able to do the
+		given action on the default profile.
 		
-		dialog = gtk.MessageDialog(type=gtk.MESSAGE_INFO, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE)
+		"""
+		info = _("You can't %s the Default Profile. Please use it if you "\
+				 "need only one profile." % action)
+		
+		dialog = gtk.MessageDialog(type=gtk.MESSAGE_INFO,
+						flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+						buttons=gtk.BUTTONS_CLOSE)
 		dialog.set_markup(info)
 		dialog.run()
 		dialog.destroy()
 				
 
 def main(argv):
-	w = SBconfigGTK()
-	w.show()
+	window = SBconfigGTK()
+	window.show()
 	gtk.main()

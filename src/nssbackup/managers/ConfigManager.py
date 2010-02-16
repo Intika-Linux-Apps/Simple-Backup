@@ -707,6 +707,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		  is found when probing the filesystem for schedules.		  
 		  
 		"""
+#		print "\n\nConfig\n%s" % self
 		_something_removed = False
 		if self.getSchedule() is not None:
 			_something_removed = True
@@ -714,6 +715,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 				self.logger.debug("Removing ('schedule','%s') "\
 								"from configuration." % _option)
 				self.remove_option("schedule", _option)
+#		print "\n\nRemoved Config\n%s" % self
 			
 		return _something_removed
 
@@ -903,13 +905,14 @@ class ConfigManager(ConfigParser.ConfigParser):
 		if os.geteuid() != 0 :
 			self.logger.warning("Not implemented for non root users yet")
 			return
+
+		self.erase_services()
 		
 		if not self.has_section("schedule") \
 				or (not self.has_option("schedule", "anacron") and not self.has_option("schedule", "cron")) :
 			return
 		
-		else :
-			self.erase_services()
+		else:
 			if self.has_option("schedule", "cron") :
 				self.logger.debug("Saving Cron entries")
 				execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
@@ -940,7 +943,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 					"/etc/cron.monthly/nssbackup",
 					"/etc/cron.d/nssbackup"]
 		for serv in listserv:
-			if os.path.exists(serv) :
+			if os.path.exists(serv):
 				self.logger.debug("Unlinking '%s'" % serv )
 				os.unlink(serv)
 	
