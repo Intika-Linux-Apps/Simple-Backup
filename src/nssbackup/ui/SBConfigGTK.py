@@ -233,17 +233,16 @@ class SBconfigGTK(GladeGnomeApp):
 			'about',
 			'vbox1',
 			'notebook',
-			'vbox2',
-			'main_radio',
-			'hbox1',
-			'main_radio2',
-			'hbox2',
-			'main_radio3',
+#
+# general/main page
+			'vbox_general_page',
+			'rdbtn_recommended_settings',
+			'rdbtn_custom_settings',
 			'cformat',
 			'splitsizeCB',
 			'splitsizeSB',
 			'splitsizevbox',
-			'hbox3',
+#
 			'vbox3',
 			'scrolledwindow1',
 			'includetv',
@@ -522,8 +521,9 @@ class SBconfigGTK(GladeGnomeApp):
 				
 				# any schedule information was found
 				if  croninfos is not None:
-					self.widgets['main_radio2'].set_active(True)
-
+					self.widgets['rdbtn_custom_settings'].set_active(True)
+# TODO: This is obviously a bug: how to treat settings with no scheduling? \
+#		As 'recommended setting' is definitely wrong.
 					# scheduled using Cron i.e. a custom setting
 					if croninfos[0] == 1:
 						self.__set_schedule_option('custom')
@@ -536,8 +536,6 @@ class SBconfigGTK(GladeGnomeApp):
 
 				# no scheduled backups
 				else:
-					# 'main_radio3' is the radio button 'Manual backups only'
-					self.widgets['main_radio3'].set_active(True)
 					self.__set_schedule_option('no')
 			else:
 				self.__enable_schedule_page(enable=False)
@@ -941,7 +939,7 @@ class SBconfigGTK(GladeGnomeApp):
 		"""Signal handler which is called when the radio buttons on the main
 		page are toggled.
 		"""
-		if self.widgets["main_radio"].get_active():
+		if self.widgets["rdbtn_recommended_settings"].get_active():
 			# set all values to defaults
 		
 			self.configman = ConfigManager()
@@ -973,26 +971,13 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["vbox_schedule_page"].set_sensitive(False)
 			self.widgets["reportvbox"].set_sensitive( True )
 
-		elif self.widgets["main_radio2"].get_active():
+		elif self.widgets["rdbtn_custom_settings"].get_active():
 			# enable all tabs
 			self.widgets["vbox3"].set_sensitive( True )
 			self.widgets["notebook2"].set_sensitive( True )
 			self.widgets["vbox8"].set_sensitive( True )
 			self.widgets["vbox_schedule_page"].set_sensitive(True)
 			self.widgets["reportvbox"].set_sensitive( True )
-			
-		elif self.widgets["main_radio3"].get_active():
-			# enable all tabs
-			self.widgets["vbox3"].set_sensitive( True )
-			self.widgets["notebook2"].set_sensitive( True )
-			self.widgets["vbox8"].set_sensitive( True )
-			self.widgets["vbox_schedule_page"].set_sensitive(True)
-			self.widgets["reportvbox"].set_sensitive( True )
-			# disable Time tab
-#			self.logger.debug("self.widgets['time_freq'].set_active( 0 )")
-#			self.widgets["time_freq"].set_active( 0 )
-#			self.widgets["croninfos"].set_sensitive( False )
-#			self.widgets["ccronline"].set_sensitive( False )
 
 	def on_cformat_changed(self, *args):
 		"""
