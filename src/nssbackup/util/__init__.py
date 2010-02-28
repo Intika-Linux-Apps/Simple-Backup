@@ -309,7 +309,7 @@ def is_empty_regexp( aregex ):
 
 def remove_conf_entry(confline, entry, separator = ","):
 	"""Removes the given entry from the given string. Entries in configurations
-	were separated by specified token. Leading and trailing separators are
+	are separated by the specified token. Leading and trailing separators are
 	taken into account.
 	
 	@param confline:  the string from which the entry should be removed
@@ -325,17 +325,53 @@ def remove_conf_entry(confline, entry, separator = ","):
 	
 	@raise TypeError: If one of the given parameters is not of string type
 	"""
-	if not isinstance( confline, types.StringTypes):
+	if not isinstance(confline, types.StringTypes):
 		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
 					    "Got %s instead." % (type(confline)))
-	if not isinstance( entry, types.StringTypes):
+	if not isinstance(entry, types.StringTypes):
 		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
 					    "Got %s instead." % (type(entry)))
-	if not isinstance( separator, types.StringTypes):
+	if not isinstance(separator, types.StringTypes):
 		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
 					    "Got %s instead." % (type(separator)))
 	_line = "%s%s%s" % (separator, confline, separator)
-	_mentry = r"%s%s%s" % (separator, re.escape( entry ), separator)
-	_line = re.sub( _mentry , separator, _line )
+	_mentry = "%s%s%s" % (separator, re.escape(entry), separator)
+	_line = re.sub(_mentry , separator, _line)
+	_line = _line.strip(separator)
+	return _line
+
+def add_conf_entry(confline, entry, separator = ","):
+	"""Appends the given entry to the given configuration line. Entries in
+	configurations are separated by specified token.
+	
+	@param confline:  the string the entry is appended to
+	@param entry:	  the string that is added
+	@param separator: the token that separates the entries
+	
+	@type confline:	  String
+	@type entry:      String
+	@type separator:  String
+	
+	@return: the configuration line with the added entry
+	@rtype:  String
+	
+	@raise TypeError: If one of the given parameters is not of string type
+	
+	@todo: Review behaviour if the entry contains characters equal to the \
+			separator.
+	"""
+	if not isinstance(confline, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(confline)))
+	if not isinstance(entry, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(entry)))
+	if not isinstance(separator, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(separator)))
+#	_strip_entry = entry.strip()
+	_strip_entry = entry
+	_strip_confline = confline.strip(separator)
+	_line = "%s%s%s" % (_strip_confline, separator, _strip_entry)	
 	_line = _line.strip( separator )
 	return _line
