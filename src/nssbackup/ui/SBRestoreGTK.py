@@ -236,49 +236,48 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		"""Initializes the statusbar, i.e. gets the context (here
 		'nssbackup restore') and displays 'Ready'.
 		"""
- 		if self.__context_id is not None:
- 			raise AssertionError("Statusbar cannot be intialized multiple times!")		
+		if self.__context_id is not None:
+			raise AssertionError("Statusbar cannot be intialized multiple times!")		
 		self.__context_id = self.widgets['statusbar'].get_context_id("nssbackup restore")
 		self.__send_statusbar_msg(message=_("Ready"))
 
- 	def __send_statusbar_msg(self, message):
- 		"""Puts the given message on the statusbar's message stack and
- 		returns the id.
- 		
- 		@param message: The message that should be displayed
- 		@type message:  String
- 		
- 		@return: the id of the message
- 		@rtype:  Integer
+	def __send_statusbar_msg(self, message):
+		"""Puts the given message on the statusbar's message stack and
+		returns the id.
 		
+		@param message: The message that should be displayed
+		@type message:  String
+		
+		@return: the id of the message
+		@rtype:  Integer
+	
 		@raise AssertionError: if the statusbar is not initialized
- 		"""
- 		if self.__context_id is None:
- 			raise AssertionError("Please initialize statusbar first!")
- 		message_id = self.widgets['statusbar'].push(self.__context_id, message)
+		"""
+		if self.__context_id is None:
+			raise AssertionError("Please initialize statusbar first!")
+		message_id = self.widgets['statusbar'].push(self.__context_id, message)
 		return message_id
 
- 	def __clean_statusbar_msg(self, message_id = None):
- 		"""Removes a message from the statusbar's message stack. If a
- 		message id is given this particular message is removed from the stack.
- 		If no id is given the last message is removed from stack. Whenever
- 		it is possible one should use the message id to remove a certain
- 		message to prevent unwanted removal of 'other' messages.
- 		
- 		@param message_id: the id of the message to remove
- 		@type message_id:  Integer
- 		 
- 		@return: None
+	def __clean_statusbar_msg(self, message_id = None):
+		"""Removes a message from the statusbar's message stack. If a
+		message id is given this particular message is removed from the stack.
+		If no id is given the last message is removed from stack. Whenever
+		it is possible one should use the message id to remove a certain
+		message to prevent unwanted removal of 'other' messages.
+		
+		@param message_id: the id of the message to remove
+		@type message_id:  Integer
+		 
+		@return: None
 
 		@raise AssertionError: if the statusbar is not initialized
- 		"""
- 		if self.__context_id is None:
- 			raise AssertionError("Please initialize statusbar first!")
- 		if message_id is None:
- 			self.widgets['statusbar'].pop(self.__context_id)
- 		else:
- 			self.widgets['statusbar'].remove(self.__context_id, message_id)
-
+		"""
+		if self.__context_id is None:
+			raise AssertionError("Please initialize statusbar first!")
+		if message_id is None:
+			self.widgets['statusbar'].pop(self.__context_id)
+		else:
+			self.widgets['statusbar'].remove(self.__context_id, message_id)
 	
 	def status_callback(self, getstatus):
 		"""
