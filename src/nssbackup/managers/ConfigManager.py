@@ -15,13 +15,102 @@
 # Authors: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #		   Jean-Peer Lorenz <peer.loz@gmx.net>
 
+"""
+Format of the configuration file used by NSsbackup:
+
+[general]
+mountdir = /mnt/nssbackup
+target=/var/backup
+#target=ssh://user:pass@example.com/home/user/backup/
+
+# Where to put a lockfile (Leave the default)
+lockfile=/var/lock/nssbackup.lock
+
+# Maximal interval between two full backups (in days)
+maxincrement = 21
+
+# Backup format:
+
+# none : use a tar - All files are stored in a non compressed tar archive
+# gzip : use a tar.gz - All files are stored in the files.tar.gz
+# bzip2 :use a tar.bz2 - All files are stored in the files.tar.bz2
+format = gzip
+# backup the links 
+backuplinks=1
+# follow symlinks
+followlinks=1
+
+# For the split functionality :
+# this should be an integer.
+# It represent the size in KiB (1024 B) of each archive
+# (splitsize <= 0: unlimited)
+splitsize = 0
+
+# Set the package manager command to backup the package list
+packagecmd = <whatever command that will be launched>
+
+[log]
+level = 20
+file = nssbackup.log
+
+[report]
+from =
+to = 
+smtpserver =
+smtpport = 
+smtptls =
+
+
+[dirconfig]
+# In this section you describe, what directories to backup and what to skip 
+# More precise commands override wider ones, for example:
+# /var=1  # This means that the whole /var directory is to be backuped
+# /var/cache=0 # This means the /var/cache and its subdirectories are not
+#              # to  be backuped
+# In this case all /var, except /var/cache will be backuped
+# It works the othe way around too
+# by default nothing is backuped
+
+/etc/=1
+/home/=1
+/usr/local/=1
+/var/=1
+/var/cache/=0
+/var/tmp/=0
+/proc/=0
+/dev/=0
+/sys/=0
+/tmp/=0
+/var/tmp/=0
+
+[schedule]
+anacron = daily
+cron = 
+
+[exclude]
+
+# Comma-separated list of regular expressions to exclude from backup
+# use this to exclude certain types of files or directories
+#
+# Note: If any of these expressions matches within the whole pathname
+#	of the file, it will NOT be backuped. Keep this list as specific 
+#	and as short as possible.
+
+regex=\.mp3,\.avi,\.mpeg,\.mpg,\.mkv,\.ogg,\.ogm,\.tmp,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache
+
+# Do not backup files bigger then this (in bytes)
+maxsize=100000000
+"""
+
 import os.path
 import re
 import ConfigParser
 import smtplib
+import types
 from gettext import gettext as _
 from optparse import OptionParser
 
+from nssbackup import Infos
 from nssbackup.util.log import LogFactory
 import FileAccessManager as FAM
 import nssbackup.util as Util
@@ -32,23 +121,30 @@ from nssbackup.util.exceptions import NotValidSectionException
 
 def getUserConfDir():
 	"""Get the user config dir using the XDG specification.
-	:todo: Use the constants defined in `ConfigStaticData`!
 	
+	:todo: Use the constants defined in `ConfigManagerStaticData`!
 	"""
 	if os.getuid() == 0 :
 		confdir = "/etc/"
 	else :
 		confdir = os.sep.join([os.getenv("XDG_CONFIG_DIR", 
-					os.path.normpath(os.sep.join( [os.getenv("HOME"),".config"] )) ),
+				os.path.normpath(os.sep.join([os.getenv("HOME"),".config"]))),
 						"nssbackup/"])
 	if not os.path.exists(confdir) :
 		os.makedirs(confdir)
-	
+		
 	return confdir
+
+def get_default_conffile_fullpath():
+	"""Returns the full path (incl. filename) o the default config file.
+	"""
+	conffile = os.path.join(getUserConfDir(),
+							ConfigManagerStaticData.get_default_conffile())
+	return conffile
 
 def getUserDatasDir():
 	"""Get the user datas dir using the XDG specification.
-	:todo: Use the constants defined in `ConfigStaticData`!	
+	:todo: Use the constants defined in `ConfigManagerStaticData`!	
 	
 	"""
 	datadir = os.sep.join([os.getenv("XDG_DATA_HOME", 
@@ -66,7 +162,7 @@ def getUserTempDir():
 	
 	:todo: Review the use of '/tmp' as tempdir as solution for several\
 		   different distributions?
-	:todo: Put the definition of used paths into `ConfigStaticData`!
+	:todo: Put the definition of used paths into `ConfigManagerStaticData`!
 		   
 	"""
 	if os.getuid() == 0 :
@@ -80,15 +176,18 @@ def getUserTempDir():
 	return tempdir
 
 def get_profilename(conffile):
+	"""Retrieves the name of the profile corresponding to given
+	configuration file and returns them.
+	"""
 	# find the profile 
 	cfile = os.path.basename(conffile)
 
-	if cfile == ConfigStaticData.get_default_conffile():
-		profilename = ConfigStaticData.get_default_profilename()
+	if cfile == ConfigManagerStaticData.get_default_conffile():
+		profilename = ConfigManagerStaticData.get_default_profilename()
 	else :
-		m = ConfigStaticData.get_profilename_re().match(cfile)
+		m = ConfigManagerStaticData.get_profilename_re().match(cfile)
 		if not m:
-			profilename = ConfigStaticData.get_unknown_profilename()
+			profilename = ConfigManagerStaticData.get_unknown_profilename()
 		else :
 			profilename = m.group(1)
 			
@@ -106,7 +205,7 @@ def is_default_profile(conffile):
 	is_default = False
 	cfile = os.path.basename(conffile)
 	
-	if cfile == ConfigStaticData.get_default_conffile():
+	if cfile == ConfigManagerStaticData.get_default_conffile():
 		is_default = True
 	
 	return is_default
@@ -119,10 +218,10 @@ def get_logfile_name(conffile):
 	 	
 	"""
 	profilename = get_profilename(conffile)
-	if profilename == ConfigStaticData.get_default_profilename():
-		logfname = ConfigStaticData.get_default_logfile()
+	if profilename == ConfigManagerStaticData.get_default_profilename():
+		logfname = ConfigManagerStaticData.get_default_logfile()
 	else:
-		logfname = ConfigStaticData.get_profile_logfile(profilename)
+		logfname = ConfigManagerStaticData.get_profile_logfile(profilename)
 	return logfname
 
 def get_profiles(prfdir):
@@ -135,7 +234,7 @@ def get_profiles(prfdir):
 		pass
 	else:
 		for conff in os.listdir(prfdir) :
-			mobj = ConfigStaticData.get_profilename_re().match(conff)
+			mobj = ConfigManagerStaticData.get_profilename_re().match(conff)
 			if mobj: 
 				name = mobj.group(1)
 				path = os.path.join(prfdir, mobj.group(0))
@@ -145,7 +244,6 @@ def get_profiles(prfdir):
 	return profiles
 
 
-# TODO: Use the RawConfigParser instead of ConfigParser! And maybe the parser should be a member of NSsbackup config!
 class ConfigManager(ConfigParser.ConfigParser):
 	"""nssbackup config manager
 	
@@ -153,131 +251,40 @@ class ConfigManager(ConfigParser.ConfigParser):
 	 
 	* creates a logger instance with specified log level and log file target
 	
-	
-	Format of the configuration file used by NSsbackup:
-	
-	[general]
-	mountdir = /mnt/nssbackup
-	target=/var/backup
-	#target=ssh://user:pass@example.com/home/user/backup/
-	
-	# Where to put a lockfile (Leave the default)
-	lockfile=/var/lock/nssbackup.lock
-	
-	# Maximal interval between two full backups (in days)
-	maxincrement = 21
-	
-	# Backup format:
-
-	# none : use a tar - All files are stored in a non compressed tar archive
-	# gzip : use a tar.gz - All files are stored in the files.tar.gz
-	# bzip2 :use a tar.bz2 - All files are stored in the files.tar.bz2
-	format = gzip
-	# backup the links 
-	backuplinks=1
-	# follow symlinks
-	followlinks=1
-	
-	# For the split functionality :
-	# this should be an integer . It represent the size in KB of each archive (0 => unlimited)
-	splitsize = 0
-	
-	# Set the package manager command to backup the package list
-	packagecmd = <whatever command that will be launched>
-	
-	[log]
-	level = 20
-	file = nssbackup.log
-	
-	[report]
-	from =
-	to = 
-	smtpserver =
-	smtpport = 
-	smtptls =
-	
-	
-	[dirconfig]
-	# In this section you describe, what directories to backup and what to skip 
-	# More precise commands override wider ones, for example:
-	# /var=1  # This means that the whole /var directory is to be backuped
-	# /var/cache=0 # This means the /var/cache and its subdirectories are not
-	#              # to  be backuped
-	# In this case all /var, except /var/cache will be backuped
-	# It works the othe way around too
-	# by default nothing is backuped
-	
-	/etc/=1
-	/home/=1
-	/usr/local/=1
-	/var/=1
-	/var/cache/=0
-	/var/tmp/=0
-	/proc/=0
-	/dev/=0
-	/sys/=0
-	/tmp/=0
-	/var/tmp/=0
-	
-	[schedule]
-	anacron = daily
-	cron = 
-	
-	[exclude]
-	
-	# Comma-separated list of regular expressions to exclude from backup
-	# use this to exclude certain types of files or directories
-	#
-	# Note: If any of these expressions matches within the whole pathname
-	#	of the file, it will NOT be backuped. Keep this list as specific 
-	#	and as short as possible.
-	
-	regex=\.mp3,\.avi,\.mpeg,\.mpg,\.mkv,\.ogg,\.ogm,\.tmp,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache
-	
-	# Do not backup files bigger then this (in bytes)
-	
-	maxsize=100000000
-	
 	@todo: The configuration manager should not create the logger itself!
 		   This should be done outside of the configuration after reading and
 		   parsing the config file.
+		   
+	@todo: When a configuration is loaded from disk/file this configuration
+			is checked for every required option. Non-existing options are
+			then filled with reasonable default values.
+			Default values should never be set from the GUI nor should
+			default values are taken as 'implicitly' given in any method
+			that requires such setting.
+			This is not implemented yet.
+			
+	@todo: Use the RawConfigParser instead of ConfigParser! And maybe the \
+			parser should be a member of NSsbackup config!
 	"""
-	
-	cronheader = "SHELL=/bin/bash \nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\n"
-	
-	servicefile 		 = Util.getResource("nssbackup", True)
+	__servicefile 		 = Util.getResource("nssbackup", isFile = True)
 	
 	def __init__(self, configfile = None):
 		"""Default constructor.
 		
-		@param configfile: Full path to the used configuration file. 
+		@param configfile: Full path to the used configuration file.
+		
+		@todo: remove command-line parsing from here; \
+				this class should only take a filename as parameter.
 		"""
 		ConfigParser.ConfigParser.__init__(self)
 
-		self.regex		= r"\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,"\
-		                   "/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,"\
-		                   "/home/[^/]+?/\..+/[cC]ache"
+		# configuration object which is set to valid default values
+		self.__default_config = _DefaultConfiguration() # is a dummy
+		self.__create_default_config_obj()
 		
-		self.dirconfig	= { '/etc/'			: '1',
-							'/var/'			: '1',
-							'/home/'		: '1',
-							'/var/cache/'	: '0',
-							'/var/tmp/'		: '0',
-							'/var/spool/'	: '0',
-							'/usr/local/'	: '1',
-							'/media/'		: '0'
-						  }
+		self.__dirconfig	= {}
 		
-		self.mountdir			= "/mnt/nssbackup"
-		self.target				= "/var/backup"
-		self.maxincrement		= str(7)
-		self.prefix				= "/usr"
-		self.lockfile			= "/var/lock/nssbackup.lock"
-		
-		self.__logfile_dir		= "/var/log"
-		
-		self.format				= "gzip"
-		
+		self.__logfile_dir		= ""
 		self.conffile 			= None
 		self.logger 			= None
 		self.__profileName 		= None
@@ -286,11 +293,11 @@ class ConfigManager(ConfigParser.ConfigParser):
 		self.filename_from_argv = None
 		self.argv_options 		= {}
 		
-		self.setValidOpts( ConfigStaticData.get_our_options() )
+		self.setValidOpts(ConfigManagerStaticData.get_our_options())
 		
 		# command line preempt default option location
-		self.parseCmdLine()
-# TODO: remove command-line parsing from here; this class should only take a filenam as parameter
+		self.__parseCmdLine()
+# TODO: remove command-line parsing; class should only take a filename as param
 
 		# use the given conf-file only if no was given on cmdline
 		if not self.conffile and configfile:
@@ -303,7 +310,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 			self.read(self.conffile)
 			_conffile_used = True
 		else:
-			self._set_defaults()
+			self._set_defaultprofile_values_to_default()
 			
 		self.__create_logger()
 			
@@ -317,8 +324,21 @@ class ConfigManager(ConfigParser.ConfigParser):
 			self.logger.info("ConfigManager created with default values. "\
 							 "Config file set to '%s'." % self.conffile)
 			
-	def initSection(self):
-		"""Init the config sections.
+	def __str__(self):
+		retval = []
+		for section, sec_data in self._sections.iteritems():
+			retval.append("[%s]" % section)
+			[retval.append("%s = %s" % (o, repr(v)))
+				for o, v in sec_data.items() if o != '__name__']
+		return "\n".join(retval)
+			
+	def __init_sections(self):
+		"""Initializes the sections of the configuration.
+		
+		@todo: Use the 'our_options' from ConfigManagerStaticData class for \
+				initialisation.
+				
+		@todo: Should we remove *unknown* sections?
 		"""
 		if not self.has_section("general"):
 			self.add_section("general")
@@ -335,107 +355,156 @@ class ConfigManager(ConfigParser.ConfigParser):
 		if not self.has_section("schedule"):
 			self.add_section("schedule")
 
-	def _set_defaults(self):
-		"""Sets default values for this configuration. It distinguishes between
-		users and super-users.
+	def _set_defaultprofile_values_to_default(self):
+		"""Makes this configuration the default profile by pointing it to
+		the default configuration file and sets according default values
+		for the configuration. It distinguishes between users and super-users.
 		"""
-		if os.geteuid() == 0 :
-			self.__set_defaults_for_root()
-		else :
-			self.__set_defaults_for_users()
-	
-	def __set_defaults_for_root(self):
-		"""Set the default config for root user.
-		"""
-		self.initSection()
-		self.conffile = "/etc/nssbackup.conf"
+		self.conffile = get_default_conffile_fullpath()
+		self.set_values_to_default()
 
-		# Section general
-		self.set("general", "mountdir", self.mountdir )
-		self.set("general", "target", self.target )
-		self.set("general", "lockfile", self.lockfile )
-		self.set("general", "maxincrement", self.maxincrement )
-		self.set("general", "format", self.format )
-		self.set("general", "purge", "log")
+	def __create_default_config_obj(self):
+		"""Creates an object containing the default configuration and stores it
+		in the according instance variable. Differences between normal users
+		and privileged users (i.e. admins) is taken into account.
+		"""
+		if os.geteuid() == 0:
+			self.__default_config = _DefaultConfigurationForAdmins()
+		else:
+			self.__default_config = _DefaultConfigurationForUsers()
+
+	def __get_default_config_obj(self):
+		"""Private accessor method that returns the default configuration
+		object. Use this method rather direct access to the instance
+		variable in order to ensure the object exists.
+		"""
+		if self.__default_config is None:
+			raise ValueError("No default configuration object was created yet.")
+		if not isinstance(self.__default_config, _DefaultConfiguration):
+			raise TypeError("Given configuration is not of type \
+							'DefaultConfiguration'. Got '%s' instead." \
+							% type(self.__default_config))
+		return self.__default_config
+
+	def set_values_to_default(self):
+		"""Sets default values for this configuration. It is distinguished
+		between normal users and super-users. The path to the current
+		configuration file (i.e. the current profile) is not touched.
 		
+		@note: This method's purpose is to provide reasonable values when
+				creating a fresh configuration and restoring of these
+				'recommended' (or predefined) defaults on existing configs.
+		"""
+		defaults = self.__get_default_config_obj()
+		self.__init_sections()		
+		# General
+		self.set("general", "maxincrement", str(defaults.get_max_increment()))
+		self.set("general", "format", defaults.get_compress_format())
+		self.set("general", "splitsize", str(defaults.get_split_size()))
+
+		# dirconfig and excludes
+		self.__set_dirconfig(defaults.get_dir_config())
+		self.__set_regex_excludes(defaults.get_regex_excludes())
+
+		# other exclude reasons
+		self.set("exclude", "maxsize", str(defaults.get_max_filesize()))		
+		followlinks = "0"
+		if defaults.get_follow_links() is True:
+			followlinks = "1"
+		self.set("general", "followlinks", followlinks)
+		
+		# target (= destination)
+		self.set_target_to_default()
+
+		# schedule
+		schedule = defaults.get_schedule()
+		if schedule[1] != "":
+			is_cron = 0
+			if schedule[0] is True:
+				is_cron = 1
+			self.setSchedule(is_cron, schedule[1])
+
+		# Purging
+		self.set("general", "purge", defaults.get_purge())
+
 		# Section log
-		self.set("log", "level", "20" )
+		self.set("log", "level", str(defaults.get_loglevel()))
+		self.set_logdir(defaults.get_logdir())
 		self.set_logfile()
-		
-		# Section dirconfig
-		for a,b in self.dirconfig.iteritems() :
-			self.set("dirconfig", a, b) 
-		
-		# Section exclude
-		
-		# Section places
-		self.set("places", "prefix", self.prefix)
-		
 		if not FAM.exists(self.get("log","file")) :
 			FAM.createfile(self.get("log","file"))
-	
-	def __set_defaults_for_users(self):
-		"""Set the default config for normal users.
-		"""
-		self.initSection()		
-		self.conffile = getUserConfDir() + "nssbackup.conf"
 
-		# Section general
-		self.set("general", "mountdir",  getUserDatasDir()+"mountdir" )
-		self.set("general", "target", getUserDatasDir()+"backups" )
-		self.set("general", "lockfile", getUserDatasDir()+"nssbackup.lock" )
-		self.set("general", "maxincrement", self.maxincrement )
-		self.set("general", "format", self.format )
-		self.set("general", "purge", "log")
+		# report settings
+		self.__clear_report_section()
+		# LP Bug #153605
+# TODO: we should not set a default 'from' since the value is not usable
+# for 99% of the users (despite LP Bug #153605)
+		self.set("report", "from", defaults.get_report_smtpfrom())
 		
-		# Section log
-		self.set("log", "level", "20" )
-		self.set_logdir(getUserDatasDir())
-		self.set_logfile()
+		# remaining administrative settings
+		self.set("general", "mountdir", defaults.get_mountdir())
+		self.set("general", "lockfile", defaults.get_lockfile())
+		self.set("places", "prefix", defaults.get_prefix())
+				
+	def set_target_to_default(self):
+		"""The destination (target) option is set to the default value
+		valid for the current user.
+		"""
+		self.set("general", "target", self.get_target_default())
 		
-		# Section dirconfig
-		self.set("dirconfig",os.getenv("HOME")+os.sep,"1")
-		
-		# Section exclude
-		
-		# Section places
-		self.set("places", "prefix", self.prefix)
-		
-		if not FAM.exists(self.get("log","file")) :
-			FAM.createfile(self.get("log","file"))
-		
+	def get_target_default(self):
+		"""Wrapper method that return the default target path for
+		the current user. No values of this configuration (actually
+		configuration manager) are touched. 
+		"""
+		defaults = self.__get_default_config_obj()
+		target = defaults.get_target()
+		return target
+				
 	def optionxform(self, option):
+		"""Default behaviour of ConfigParser is to set the option
+		keys to lowercase. By overiding this method, we make it
+		case sensitive. that's really important for dirconfig paths. 
 		"""
-		Default behaviour of ConfigParser is to set the option keys to lowercase. 
-		by overiding this method, we make it case sensitive. that's really important for dirconfig pathes 
-		"""
-		return str( option )
+		return str(option)
 
-	def has_option(self, section, option) :
-		if section == "dirconfig" and not ConfigParser.ConfigParser.has_option(self,section, option) :
+	def has_option(self, section, option):
+		"""Checks this configuration for a given option comprising of
+		section name and option name.
+		
+		@rtype: Boolean
+		"""
+		if section == "dirconfig" and \
+				not ConfigParser.ConfigParser.has_option(self,section, option):
 			if option == "remote" :
-				return ConfigParser.ConfigParser.has_option(self, section, option)
+				return ConfigParser.ConfigParser.has_option(self, section,
+															option)
 			#search through remote option to get the option
-			if ConfigParser.ConfigParser.has_option(self, "dirconfig", 'remote') :
+			if ConfigParser.ConfigParser.has_option(self, "dirconfig",
+															'remote'):
 				remotes = self.get("dirconfig", "remote")
 				if type(remotes) == str :
 					remotes = eval(remotes)
 				if type(remotes) != dict :
-					raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': remotes,'value': type(remotes)})
+					raise SBException(_("Couldn't evaluate '%(parameter)s' as "\
+							"a dictionary (value got = '%(value)r' )") \
+							% {'parameter': remotes,'value': type(remotes)})
 				if not remotes.has_key(option) :
 					# then it wasn't for us , fall back on the parent
-					return ConfigParser.ConfigParser.has_option(self, section, option)
+					return ConfigParser.ConfigParser.has_option(self, section,
+																option)
 				else :
 					# we have this key
 					return True
 			else : 
-				return ConfigParser.ConfigParser.has_option(self, section, option)
+				return ConfigParser.ConfigParser.has_option(self, section,
+															option)
 		else :
 			#fall back in parent behaviour
 			return ConfigParser.ConfigParser.has_option(self, section, option)
 		
 	def get(self, section, option):
-		"""
+		"""Returns a given option value from this config.
 		"""
 		# if we have (dirconfig,opt), if opt=remote
 		if section == "dirconfig" and not option == 'remote' and self.has_option(section, option) and not ConfigParser.ConfigParser.has_option(self,section, option):
@@ -459,11 +528,12 @@ class ConfigManager(ConfigParser.ConfigParser):
 			return ConfigParser.ConfigParser.get(self, section, option,True)
 		
 	def set(self,section, option, value):
-		"""
-		Set an option just like a configParser but in case of the 'remote' option in 'dirconfig'.
-		In this case, value must be a dict with the value you want to set.
-		eg. value = {'ssh://test/': 1, 'ssh://test/test': 0}
-		You can set one at a time, the value will be append to the 'remote' dict
+		"""Set an option just like a configParser but in case of
+		the 'remote' option in 'dirconfig'. In this case, value
+		must be a dict with the value you want to set, e.g.
+		value = {'ssh://test/': 1, 'ssh://test/test': 0}
+		You can set one at a time, the value will be append to
+		the 'remote' dict.
 		"""
 		if section == "dirconfig" and option == "remote" :
 			if type(value) != dict :
@@ -513,11 +583,57 @@ class ConfigManager(ConfigParser.ConfigParser):
 			#fall back in parent behaviour
 			ConfigParser.ConfigParser.remove_option(self, section, option)
 			
+	def __clear_dirconfig(self):
+		"""The internal variable containing the directory configuration
+		(i.e. what directories are being included resp. excluded) is
+		cleared. The according config section remains but is empty then.
+		"""
+		_section = "dirconfig"
+		self.__dirconfig.clear()
+		if self.has_section(_section):
+			self.remove_section(_section)
+		if not self.has_section(_section):
+			self.add_section(_section)
+
+	def __set_dirconfig(self, dirconf):
+		"""The configuration item 'dirconfig' (Directory configuration) is
+		set to the value of the given dictionary. Previous values are
+		overwritten.
+		
+		@param dirconf:  new value
 	
+		@type dirconf:	  Dictionary
+		
+		@return: None
+		
+		@raise TypeError: If the given parameter is not of dictionary type
+
+		"""
+		_section = "dirconfig"
+		if not isinstance(dirconf, types.DictionaryType):
+			raise TypeError("Given parameter must be a Dictionary. "\
+						    "Got %s instead." % (type(dirconf)))
+		
+		self.__clear_dirconfig()
+		self.__dirconfig.update(dirconf)
+		for a, b in self.__dirconfig.iteritems() :
+			self.set(_section, a, b)
+			
+	def __set_regex_excludes(self, aregex):
+		"""Helper method that sets the excludes defined by Regular
+		Expressions.
+		"""
+		_section = "exclude"
+		_option = "regex"
+		if not isinstance(aregex, types.StringTypes):
+			raise TypeError("Given parameter must be of string type. "\
+						    "Got %s instead." % (type(aregex)))
+		self.set(_section, _option, aregex)
+
 	def setValidOpts(self, valid_options, parse_cmdline = False):
 		self.valid_options = valid_options
 		if parse_cmdline :
-			self.parseCmdLine()
+			self.__parseCmdLine()
 
 	def __create_logger(self):
 		"""Initializes logger with profile name as identifier
@@ -561,7 +677,12 @@ class ConfigManager(ConfigParser.ConfigParser):
 								% self.conffile )
 		return retValue
 
-	def parseCmdLine(self):
+	def __parseCmdLine(self):
+		"""
+		@todo: Remove this from the ConfigurationManager. A better place
+				for command line parsing is	the application class which
+				in turn gives the parameters to the objects it creates.
+		"""
 		usage = "Usage: %prog [options] (use -h for more infos)"
 		parser = OptionParser(usage, version="%prog 0.2")
 		parser.add_option("-c", "--config-file", dest="config",
@@ -597,14 +718,6 @@ class ConfigManager(ConfigParser.ConfigParser):
 				value = self.get(section, key, raw = True)
 				retVal.append( (key,value))
 		return retVal
-
-	def __str__(self):
-		retVal = []
-		for section, sec_data in self._sections.iteritems():
-			retVal.append("[%s]" % section)
-			[retVal.append("%s = %s" % (o, repr(v)))
-				for o, v in sec_data.items() if o != '__name__']
-		return "\n".join(retVal)
 	
 	def setSchedule(self, isCron, value):
 		"""Set the backup Schedule.
@@ -626,21 +739,23 @@ class ConfigManager(ConfigParser.ConfigParser):
 				raise NonValidOptionException("Valid values for anacron are: "\
 						"%s, got '%s' instead." % (str(anacronValues), value))
 			else :
-				if self.has_option("schedule", "cron") :
-					self.logger.debug("Removing Cron config to set Anacron config.")
+				if self.has_option("schedule", "cron"):
+# in some cases a logger is not yet available
+#					self.logger.debug("Removing Cron config to set Anacron config.")
 					self.remove_option("schedule", "cron")
-				self.logger.debug("Setting Anacron config to: %s" % value)
+#				self.logger.debug("Setting Anacron config to: %s" % value)
 				self.set("schedule", "anacron", value)
 		elif isCron == 1:
 			# a Cron entry was given (precise scheduling)
-			if self.has_option("schedule", "anacron") :
-				self.logger.debug("Removing Anacron config to set Cron config.")
+			if self.has_option("schedule", "anacron"):
+#				self.logger.debug("Removing Anacron config to set Cron config.")
 				self.remove_option("schedule", "anacron")
-			self.logger.debug("Setting cron config to: %s" % value)
+#			self.logger.debug("Setting cron config to: %s" % value)
 			self.set("schedule", "cron", value)
 	
-	def getSchedule(self):
-		"""Retrieves the current schedule state.
+	def get_schedule_and_probe(self):
+		"""Retrieves the current schedule state from configuration settings
+		and from filesystem.
 
 		@return: (isCron, value) a tuple where isCron = 0 if Anacron is used \
 				 and isCron = 1 Cron is used. If no schedule setup has been \
@@ -690,10 +805,28 @@ class ConfigManager(ConfigParser.ConfigParser):
 				return (0, _value)
 			else:
 				return None
+			
+	def get_schedule(self):
+		"""Returns the scheduling information that are currently
+		set in this configuration regardless of filesystem state.
+		"""
+		# scheduling is stored in configuration file
+		ret_val = None
+		if self.has_option("schedule", "cron"):
+			_value = self.get("schedule", "cron")
+			self.logger.debug("Schedule type Cron found in Config: %s" % _value)
+			ret_val = (1, _value)
+		elif self.has_option("schedule", "anacron"):
+			_value = self.get("schedule", "anacron")
+			self.logger.debug("Schedule type Anacron found in Config: %s" % _value)
+			ret_val = (0, _value)
+		else:
+			ret_val = None	
+		return ret_val
 	
 	def remove_schedule(self):
 		"""Removes all options stored in section 'schedule'. The section
-		itself remains.
+		itself remains. Existing entries in crontab etc. are not touched.
 		
 		@return: Flag, whether something was removed or not. True is returned
 					in the case that any schedule information was found by
@@ -707,16 +840,13 @@ class ConfigManager(ConfigParser.ConfigParser):
 		  is found when probing the filesystem for schedules.		  
 		  
 		"""
-#		print "\n\nConfig\n%s" % self
 		_something_removed = False
-		if self.getSchedule() is not None:
+		if self.get_schedule_and_probe() is not None:
 			_something_removed = True
 			for _option in self.options("schedule"):
 				self.logger.debug("Removing ('schedule','%s') "\
 								"from configuration." % _option)
-				self.remove_option("schedule", _option)
-#		print "\n\nRemoved Config\n%s" % self
-			
+				self.remove_option("schedule", _option)			
 		return _something_removed
 
 	def getProfileName(self):
@@ -770,8 +900,8 @@ class ConfigManager(ConfigParser.ConfigParser):
 		return _prfls
 	
 	def set_logdir(self, logdir):
-		"""The given directory is set for use with log files.
-		
+		"""Sets the given directory as current log directory for use with
+		log files.		
 		"""
 		self.__logfile_dir = logdir
 		
@@ -801,139 +931,76 @@ class ConfigManager(ConfigParser.ConfigParser):
 		logf = os.path.join(self.__logfile_dir, logfname)
 		return logf
 		
-	def setLogSection(self, level=20 , filen = None ):
-		"""CURRENTLY NOT USED ANYWHERE!
-		
-		Log section is :
-		[Log]
-		# level is in ( 10, 20( default ), 30, 40, 50 ) 
-		level = 20
-		file = /var/log/nssbackup.log
-		@param level : 10 = DEBUG, 20 = INFO, 50 = ERROR
-		@param file : The logfile to use
-
-		@todo: Remove this method!
-		
+	def __clear_report_section(self):
+		"""Any options present in the report section are removed. The section
+		itself is not removed. 
 		"""
-		if not self.has_section("log") :
-			self.add_section("log")
-		self.set("log", "level", level)
-		if filen is not None :
-			self.set("log", "file", filen )
-	
-	def getLogSection (self):
-		"""CURRENTLY NOT USED ANYWHERE!
+		_section = "report"
+		self.remove_section(_section)
+		if not self.has_section(_section):
+			self.add_section(_section)
 		
-		Get the log section
-		@return: a tuple (level, file) , (None, None) is return if none has been found
-		
-		@todo: Remove this method!
-
-		"""
-		filen, level = None, None
-		if self.has_section("log") :
-			if self.has_option("log", "level") :
-				level = self.get("log", "level")
-			else:
-				level = None
-			
-			if self.has_option("log", "file") :
-				filen = self.get("log", "file")
-			else:
-				filen = None
-		else : 
-			filen, level = None, None
-		
-		return ( level, filen )
-	
-	def setReportSection(self, to, smtpserver, smtpport, _from=None , smtpuser = None, smtppassword = None,
-						  smtptls = None, smtpcert = None, smtpkey = None ):
-		"""Sets the report section.
-		
-		@param to :
-		@param smtpserver :
-		@param smtpport :
-		@param _from : (= None)
-		@param smtpuser : (= None)
-		@param smtppassword :(= None)
-		@param smtptls : (= None) 1 to activate TLS or SSL
-		@param smtpcert : (= None)  
-		@param smtpkey : (= None)
-		
-		"""
-		if not self.has_section("report") :
-			self.add_section("report")
-		
-		self.set("report", "to", to)
-		self.set("report", "smtpserver", smtpserver)
-		self.set("report", "smtpport", smtpport)
-		
-		if _from : self.set("report", "from", _from)
-		if smtptls : self.set("report", "smtptls", smtptls)
-		if smtpuser and smtppassword : 
-			self.set("report", "smtpuser", smtpuser)
-			self.set("report", "smtppassword", smtppassword)
-		if smtpcert and smtpkey :
-			self.set("report", "smtpcert", smtpcert)
-			self.set("report", "smtpkey", smtpkey)
-		
-	def removeReportSection(self):
-		self.remove_section("report")
-		
-	def saveConf(self,configfile=None):
+	def saveConf(self,configfile = None):
 		"""Saves the configuration (i.e. writes it into the specified file
 		and sets scheduling in the case this is the default profile).
 		 
 		@param configfile: The config file in which to write the configuration.
 							Default is in the default location
 							 
+		@todo: What happens if the config file is 'Save as ...' in order to
+				store a configuration aside but the scheduling is different
+				from the *original* configuration that is used by nssbackupd?
 		"""
-		if configfile :
-			fd = FAM.openfile(configfile, True)
+		if configfile:
+			fld = FAM.openfile(configfile, True)
 		else :
-			fd = FAM.openfile(self.conffile, True)
-		self.write(fd)
-		fd.close()
-		
-		if self.is_default_profile():
-			self.writeSchedule()
+			fld = FAM.openfile(self.conffile, True)
+		self.write(fld)
+		fld.close()		
+		self.__write_schedule()
 	
-	def writeSchedule(self):
-		"""Write the schedule from the configuration file.
+	def __write_schedule(self):
+		"""Write the schedule from the configuration file. Scheduling is only
+		written for admin default profiles.
 		
 		"""
 		if os.geteuid() != 0 :
-			self.logger.warning("Not implemented for non root users yet")
-			return
-
-		self.erase_services()
-		
-		if not self.has_section("schedule") \
-				or (not self.has_option("schedule", "anacron") and not self.has_option("schedule", "cron")) :
+			self.logger.warning("Not implemented for non root users yet.")
 			return
 		
-		else:
-			if self.has_option("schedule", "cron") :
-				self.logger.debug("Saving Cron entries")
-				execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
-				FAM.writetofile("/etc/cron.d/nssbackup", self.cronheader + self.get("schedule", "cron") + "\troot\t"+ execline)
-				
-			if self.has_option("schedule", "anacron") :
-				self.logger.debug("Saving Anacron entries")
-				if self.get("schedule", "anacron") == "hourly" :
-					os.symlink(self.servicefile,"/etc/cron.hourly/nssbackup")
-				elif self.get("schedule", "anacron") == "daily" :
-					os.symlink(self.servicefile,"/etc/cron.daily/nssbackup")
-				elif self.get("schedule", "anacron") == "weekly" :
-					os.symlink(self.servicefile,"/etc/cron.weekly/nssbackup")
-				elif self.get("schedule", "anacron") == "monthly" :
-					os.symlink(self.servicefile,"/etc/cron.monthly/nssbackup")
-				else : 
-					self.logger.warning("'%s' is not a valid value" \
-										% self.get("schedule", "anacron"))
+		if self.is_default_profile():
+			self.__erase_services()
+			
+			if not self.has_section("schedule") \
+					or (not self.has_option("schedule", "anacron") and not self.has_option("schedule", "cron")) :
 				return
-
-	def erase_services(self):
+			
+			else:
+				if self.has_option("schedule", "cron") :
+					self.logger.debug("Saving Cron entries")
+					execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
+					FAM.writetofile("/etc/cron.d/nssbackup",
+							ConfigManagerStaticData.get_cronheader() + self.get("schedule", "cron") + "\troot\t"+ execline)
+					
+				if self.has_option("schedule", "anacron") :
+					self.logger.debug("Saving Anacron entries")
+					if self.get("schedule", "anacron") == "hourly" :
+						os.symlink(self.__servicefile,"/etc/cron.hourly/nssbackup")
+					elif self.get("schedule", "anacron") == "daily" :
+						os.symlink(self.__servicefile,"/etc/cron.daily/nssbackup")
+					elif self.get("schedule", "anacron") == "weekly" :
+						os.symlink(self.__servicefile,"/etc/cron.weekly/nssbackup")
+					elif self.get("schedule", "anacron") == "monthly" :
+						os.symlink(self.__servicefile,"/etc/cron.monthly/nssbackup")
+					else : 
+						self.logger.warning("'%s' is not a valid value" \
+											% self.get("schedule", "anacron"))
+					return
+		else:
+			self.logger.warning("Not implemented for non-default profiles yet.")
+			return
+			
+	def __erase_services(self):
 		"""Removes Cron and Anacron service from /etc/cron.*
 		 
 		"""
@@ -952,6 +1019,8 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 		@return: True if succeded
 		@raise SBException: the error message why it didn't run
+		
+		@todo: Not the right place for this kind of functionality?!?
 		
 		"""
 		if not self.has_option("report", "to"):
@@ -998,9 +1067,11 @@ class ConfigManager(ConfigParser.ConfigParser):
 		@rtype: boolean
 		
 		"""
-		if not isinstance(config, ConfigManager) :
+		if not (isinstance(config, ConfigManager) or config is None):
 			raise SBException("Can't compare a ConfigManager with type '%s'"\
 							% str(type(config)))
+		if config is None:
+			return False
 		
 		for s in self.sections() :
 			if not config.has_section(s) :
@@ -1031,31 +1102,16 @@ class ConfigManager(ConfigParser.ConfigParser):
 		return True
 		
 		
-class ConfigStaticData(object):
-	"""Any static data related to configurations are stored here. 
+class ConfigManagerStaticData(object):
+	"""Any static data related to configurations are stored here.
+	
+	@todo: Refactor this class into a class containing a default
+			configuration, one containing name definitions, and one
+			containing path and file names.
 	
 	"""	
-	__loglevels = {'20' : ("Info",1),
-				   '10' : ("Debug", 0),
-				   '30' : ("Warning", 2),
-				   '50' : ("Error", 3)}
-	
-	__timefreqs = {"never"  : 0,
-				   "hourly" : 1,
-				   "daily"  : 2,
-				   "weekly" : 3,
-				   "monthly": 4,
-				   "custom" : 5}
-	
-	__cformat = {'none':0, 'gzip':1, 'bzip2':2}
-	
-	__splitSize = {'Unlimited'    : 0,
-				   '100 MiB'       : 100,
-				   '250 MiB'       : 250,
-				   '650 MiB'       : 650,
-				   '2 GiB (FAT16)' : 2000,
-				   '4 GiB (FAT32)' : 4000,
-				   'Custom'       : -1}
+	__cronheader = "SHELL=/bin/bash \n"\
+		"PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\n"
 
 	__default_profilename = _("Default Profile")
 	__unknown_profilename = _("Unknown Profile")
@@ -1072,7 +1128,7 @@ class ConfigStaticData(object):
 	
 	__profilename_re = re.compile('^nssbackup-(.+?).conf(-disable)?$')
 	
-	# Default values, constants and the like
+	# configuration's existing sections and options
 	__our_options = {
 	 'general' 		: { 'mountdir'		: str,
 				        'target'  		: str ,
@@ -1095,23 +1151,70 @@ class ConfigStaticData(object):
 	 'schedule' 	: {'anacron' : str , 'cron' : str }
 	}
 	
+	__loglevels = {	'10' : ("Debug",	0),
+					'20' : ("Info",		1),
+					'30' : ("Warning",	2),
+					'40' : ("Error",	3)}
+	
+	__simple_schedule_freqs = 	{	"hourly"	: 0,
+									"daily"		: 1,
+									"weekly"	: 2,
+									"monthly"	: 3
+								}
+	
+	__cformats = ['none', 'gzip', 'bzip2']
+	
+	__splitsize =	{	0		: _('Unlimited'),
+						100		: _('100 MiB'),
+						250		: _('250 MiB'),
+						650 	: _('650 MiB'),
+						2000 	: _('2 GiB (FAT16)'),
+						4000	: _('4 GiB (FAT32)'),
+						-1		: _('Custom')
+					}
+	__known_ftypes =	{	"mp3"	: _("MP3 Music"),
+							"avi"	: _("AVI Video"),
+							"mpeg"	: _("MPEG Video"),
+							"mpg"	: _("MPEG Video"),
+							"mkv"	: _("Matrjoshka Video"),
+							"ogg"	: _("OGG Multimedia container"),
+							"iso"	: _("CD Images")
+						}
+
 	def __init__(self):
 		pass
+	
+	@classmethod
+	def get_simple_schedule_frequencies(cls):
+		"""Returns a dictionary of schedule frequencies and IDs.
+		"""
+		return cls.__simple_schedule_freqs
 
 	@classmethod
-	def get_default_logfile(cls):
-		"""Returns the name of the logfile for the default profile.
+	def get_cronheader(cls):
+		"""Returns the static cron header.
+		"""
+		return cls.__cronheader
 		
+	@classmethod
+	def get_default_logfile(cls):
+		"""Returns the name of the logfile for the default profile.		
 		"""
 		logfname = "%s.%s" % (cls.__logfile_basename,
 							  cls.__logfile_ext)
 		return logfname
 
 	@classmethod
+	def get_valid_loglevels(cls):
+		"""Returns a dictionary of valid log levels (a number) and
+		corresponding log level name.
+		"""
+		return cls.__loglevels
+	
+	@classmethod
 	def get_profile_logfile(cls, profilename):
 		"""Returns the name of the logfile for a certain profile
-		named `profilename`.
-		
+		named `profilename`.		
 		"""
 		logfname = "%s-%s.%s" % (cls.__logfile_basename,
 								 profilename,
@@ -1121,8 +1224,7 @@ class ConfigStaticData(object):
 	@classmethod
 	def get_profiles_dir(cls):
 		"""Returns the name (only basename, no path) of the directory where
-		profile configurations are stored.
-		
+		profile configurations are stored.		
 		"""
 		return cls.__profiles_dir
 
@@ -1141,7 +1243,7 @@ class ConfigStaticData(object):
 	@classmethod
 	def get_superuser_confdir(cls):
 		return cls.__superuser_confdir
-		
+			
 	@classmethod
 	def get_user_confdir_template(cls):
 		return cls.__user_confdir_template
@@ -1153,3 +1255,206 @@ class ConfigStaticData(object):
 	@classmethod		
 	def get_our_options(cls):
 		return cls.__our_options
+	
+	@classmethod
+	def get_splitsize_dict(cls):
+		return cls.__splitsize
+	
+	@classmethod
+	def get_known_ftypes_dict(cls):
+		return cls.__known_ftypes
+
+	@classmethod
+	def get_compr_formats(cls):
+		return cls.__cformats
+
+class Configuration(object):
+	"""Encapsulates a configuration, that is a set of backup profile related
+	settings.
+
+	Configuration values are stored in their natural type and format instead
+	of the type and format that is used for storage of the configuration
+	(i.e. Boolean values get the value True/False, not '0/1' or 'yes/no').
+	The transformation of the actual configuration values to data that is
+	written to disk is done in the ConfigManager.
+	
+	@note: This is an early attempt to refactor the configuration thing:
+			* there are objects that represent the actual profile settings
+			* there are certain global preferences that are valid for
+				each profile (e.g. prefix, mountdir, etc.)
+			* there is a Manager class that is responsible for handling
+				of several profile configurations
+			* there is an object that forms an interface between the actual
+				configuration and their storage on disk, reading, evaluating
+				and so on (probably derived from ConfigParser)
+	"""
+	
+	def __init__(self):
+		self._maxinc = 0
+		self._cformat = ""
+		self._follow_links = False
+		self._splitsize = 0
+		
+		self._dirconf = {}
+		self._regex_excludes = ""
+		self._max_filesize = 0
+
+		self._purge = ""
+		self._target = ""
+
+		# administrative settings
+		self._mountdir = ""
+		self._lockfile = ""
+		self._prefix = ""
+		
+		self._logdir = ""
+		self._loglevel = 0
+		
+# TODO: Collect report related settings in separate class.
+		self._report_smtpfrom = ""
+		
+		self._schedule = [False, ""]	# isCron = False, frequency = ""
+
+	# access methods
+	def get_report_smtpfrom(self):
+		return self._report_smtpfrom
+		
+	def get_schedule(self):
+		return self._schedule
+	
+	def get_regex_excludes(self):
+		return self._regex_excludes
+	
+	def get_max_filesize(self):
+		return self._max_filesize
+	
+	def get_max_increment(self):
+		return self._maxinc
+	
+	def get_compress_format(self):
+		return self._cformat
+	
+	def get_follow_links(self):
+		if not isinstance(self._follow_links, types.BooleanType):
+			raise TypeError("Boolean value for 'followlinks' expected. "\
+							"Found '%s' instead." % type(self._follow_links))
+		return self._follow_links
+	
+	def get_split_size(self):
+		return self._splitsize
+	
+	def get_dir_config(self):
+		return self._dirconf
+	
+	def get_mountdir(self):
+		return self._mountdir
+	
+	def get_purge(self):
+		return self._purge
+	
+	def get_target(self):
+		return self._target
+	
+	def get_lockfile(self):
+		return self._lockfile
+	
+	def get_prefix(self):
+		return self._prefix
+	
+	def get_logdir(self):
+		return self._logdir
+	
+	def get_loglevel(self):
+		return self._loglevel
+	
+
+class _DefaultConfiguration(Configuration):
+	"""Abstract base class for a default configuration. A default
+	configuration is basically a configuration however the settings
+	are predefined (and read-only in the best case).
+	
+	@todo: Change this: the default configuration should not be a derived
+			class rather an instance of a regular configuration which gets
+			its content from a default config file (in share). Doing so,
+			would be more flexible? What is with /home/$username?
+	
+	"""
+	
+	def __init__(self):
+#		super(DefaultConfiguration, self).__init__() # don't use this form
+		Configuration.__init__(self)
+		
+		self._regex_excludes = "\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,"\
+		                   "/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,"\
+		                   "/home/[^/]+?/\..+/[cC]ache"
+
+		self._maxinc = 7
+		self._cformat = 'gzip'
+		self._follow_links = False
+		self._splitsize = 0
+		self._max_filesize = 104857600		# in bytes = 100 MB * 1024 * 1024
+
+		self._loglevel = 20
+		self._report_smtpfrom = Infos.SMTPFROM
+		
+		self._prefix = '/usr'		
+		self._purge = "30"
+		
+
+class _DefaultConfigurationForAdmins(_DefaultConfiguration):
+	"""Derived default configuration that specializes it for
+	privileged users. Only settings that are unique for
+	admins are defined here.
+	
+	@todo: Change this: the default configuration should not be a derived
+			class rather an instance of a regular configuration which gets
+			its content from a default config file (in share). Doing so,
+			would be more flexible? What is with /home/$username?
+	
+	"""
+	
+	def __init__(self):
+		_DefaultConfiguration.__init__(self)
+				
+		self._mountdir = "/mnt/nssbackup"
+		self._target = "/var/backup"
+		self._lockfile = "/var/lock/nssbackup.lock"
+
+		self._dirconf = { '/etc/'			: '1',
+							'/var/'			: '1',
+							'/home/'		: '1',
+							'/var/cache/'	: '0',
+							'/var/tmp/'		: '0',
+							'/var/spool/'	: '0',
+							'/usr/local/'	: '1',
+							'/media/'		: '0' }
+		
+		self._logdir = "/var/log"
+		
+		self._schedule = [False, "daily"]
+
+
+class _DefaultConfigurationForUsers(_DefaultConfiguration):
+	"""Derived default configuration that specializes it for
+	normal users. Only settings that are unique for normal users
+	are defined here.
+	
+	@todo: Change this: the default configuration should not be a derived
+			class rather an instance of a regular configuration which gets
+			its content from a default config file (in share). Doing so,
+			would be more flexible? What is with /home/$username?
+	
+	"""
+	
+	def __init__(self):
+		_DefaultConfiguration.__init__(self)
+
+		self._mountdir = os.path.join(getUserDatasDir(), "mountdir")
+		self._target = os.path.join(getUserDatasDir(), "backups")
+		self._lockfile = os.path.join(getUserDatasDir(), "nssbackup.lock")
+				
+		self._dirconf = {	os.getenv("HOME")+os.sep		: '1' }
+		
+		self._logdir = getUserDatasDir()
+
+		self._schedule = [False, ""]	# no scheduling

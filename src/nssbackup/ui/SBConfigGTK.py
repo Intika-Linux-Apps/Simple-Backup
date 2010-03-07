@@ -19,6 +19,7 @@
 import re
 import subprocess
 import os
+import types
 
 import gobject
 import gtk
@@ -30,7 +31,8 @@ from nssbackup import Infos
 from nssbackup.plugins import PluginManager
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir
-from nssbackup.managers.ConfigManager import getUserDatasDir, ConfigStaticData
+from nssbackup.managers.ConfigManager import get_default_conffile_fullpath
+from nssbackup.managers.ConfigManager import ConfigManagerStaticData
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 import nssbackup.util as Util
@@ -43,8 +45,14 @@ class SBconfigGTK(GladeGnomeApp):
 	
 	@todo: Unify displaying of error messages/dialog boxes!
 	@todo: Strictly separate UI from core. Don't set defaults from the UI.
+	@todo: The result of 'os.getuid' should be retrieved during the
+	   initialization process and stored in a member attribute, so
+	   we don't need to use operation system call over and over!
+	@todo: Use functions from ConfigManager to set the paths in
+			a consistent manner.
+
 	"""
-	
+	# why class variables?
 	configman = None
 	conffile = None
 	orig_configman = None
@@ -52,52 +60,35 @@ class SBconfigGTK(GladeGnomeApp):
 	
 	def __init__(self):
 		''' '''
-		# it is distinguished between the 'current' conffile and
-		# the 'default file' configuring the default profile
-		self.default_conffile = None
-		
-		if os.geteuid() == 0 :
-			if os.path.exists("/etc/nssbackup.conf") :
-				self.default_conffile = "/etc/nssbackup.conf"
-				self.configman = ConfigManager("/etc/nssbackup.conf")
-			else :
-				self.configman = ConfigManager()
-		else :
-			if os.path.exists(getUserConfDir()+"nssbackup.conf") :
-				self.default_conffile = getUserConfDir()+"nssbackup.conf"
-				self.conffile = getUserConfDir()+"nssbackup.conf"
-				self.configman = ConfigManager(self.default_conffile)
-			else :
-				self.configman = ConfigManager()
-		
-		self.orig_configman = ConfigManager(self.default_conffile)
-		
 		self.logger = LogFactory.getLogger()
 		
-		self.loglevels = {'20' : ("Info",1) ,'10' : ("Debug", 0), '30' : ("Warning", 2), '40' : ("Error", 3)}
-		self.__simple_schedule_freqs = 	{	"hourly"	: 0,
-											"daily"		: 1,
-											"weekly"	: 2,
-											"monthly"	: 3
-										}
-		self.cformat = ['none', 'gzip', 'bzip2']
-		self.splitSize =	{	0		: _('Unlimited'),
-								100		: _('100 MiB'),
-								250		: _('250 MiB'),
-								650 	: _('650 MiB'),
-								2000 	: _('2 GiB (FAT16)'),
-								4000	: _('4 GiB (FAT32)'),
-								-1		: _('Custom')
-							}
-		
-		self.init()
-		
+		# it is distinguished between the 'current' conffile and
+		# the 'default file' configuring the default profile
+		self.default_conffile = None		
+		_path_conffile = get_default_conffile_fullpath()
+		if os.path.exists(_path_conffile):
+			self.default_conffile = _path_conffile
+			self.conffile = self.default_conffile
+			self.configman = ConfigManager(self.default_conffile)
+			# hack to get rid of schedule settings in non-admin profiles
+			# we just remove existing schedules from the config files
+			# and don't allow new settings by disabling the schedule page
+			if os.geteuid() != 0:
+				self.configman.remove_schedule()
+				self.configman.saveConf()
+			# end of hack
+			self.orig_configman = ConfigManager(self.default_conffile)
+		else :
+			self.configman = ConfigManager()		
+			self.orig_configman = None
+				
+		self._init_ui()		
 		self.widgets['nssbackupConfApp'].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
 		
 		# hide the schedule tab if not root
 		if os.geteuid() != 0:
 			self.__enable_schedule_page(enable=False)
-		
+
 		# Initiate all data structures
 		# Paths to be included or excluded
 		self.include = gtk.ListStore( str )
@@ -129,10 +120,10 @@ class SBconfigGTK(GladeGnomeApp):
 		self.ex_ftypetv.append_column(column3)
 		self.ex_ftypetv.append_column(column2)
 
-		if os.getuid() == 0 :
-			self.widgets['dest1'].set_label(_("Use default backup directory (/var/backup)"))
-		else :
-			self.widgets['dest1'].set_label(_("Use default backup directory (%s)") % (getUserDatasDir()+"backups") )
+		# set label of default target option
+		_default_target = self.configman.get_target_default()
+		_def_targ_lab = _("Use default backup directory (%s)") % _default_target
+		self.widgets['dest1'].set_label(_def_targ_lab)
 		
 		self.ex_regex = gtk.ListStore( str )
 		self.ex_regextv = self.widgets["ex_regextv"]
@@ -151,14 +142,14 @@ class SBconfigGTK(GladeGnomeApp):
 		cell.connect('edited', self.cell_remoteinc_edited_callback, (self.remoteinc, "dirconfig", 1))
 		column = gtk.TreeViewColumn(_('Name'), cell, text=0)
 		self.rem_includetv.append_column(column)
-		
-		self.known_ftypes = { "mp3": _("MP3 Music"), "avi": _("AVI Video"), "mpeg": _("MPEG Video"), "mpg": _("MPEG Video"), "mkv": _("Matrjoshka Video"), "ogg": _("OGG Multimedia container"), "iso": _("CD Images")}
-					
+							
 		# Profile Manager
 		# [ enable , profilename, cfPath ]
 		self.profiles = gtk.ListStore( bool, str, str )
 		# add the default profile and disable any modification to it
-		self.profiles.append([True, ConfigStaticData.get_default_profilename(), getUserConfDir() + ConfigStaticData.get_default_conffile()]) 
+		self.profiles.append([True,
+			ConfigManagerStaticData.get_default_profilename(),
+			get_default_conffile_fullpath()])
 		for i,v in self.configman.getProfiles().iteritems() :
 			self.profiles.append( [v[1], i, v[0]] )
 		self.profilestv = self.widgets['profilesListTreeView']
@@ -177,23 +168,22 @@ class SBconfigGTK(GladeGnomeApp):
 		# The split size coices
 		self.splitSizeLS = gtk.ListStore( str, int )
 		values = []
-		for k in self.splitSize.keys() :
+		splitsize_dict = ConfigManagerStaticData.get_splitsize_dict()
+		for k in splitsize_dict.keys() :
 			values.append(k)
 		values.sort()
 		
 		for k in values :
-			self.splitSizeLS.append([self.splitSize[k],k])
+			self.splitSizeLS.append([splitsize_dict[k],k])
 		self.widgets['splitsizeCB'].set_model(self.splitSizeLS)
 		cell = gtk.CellRendererText()
 		self.widgets['splitsizeCB'].pack_start(cell, True)
 		self.widgets['splitsizeCB'].add_attribute(cell, 'text', 0) 
 			
-		self.prefillWindow()
+		self._fill_widgets_from_config(probe_fs = True)
 
-	def init(self):
-		
-		filename = Util.getResource('nssbackup-config.glade')
-		
+	def _init_ui(self):		
+		filename = Util.getResource('nssbackup-config.glade')		
 		widget_list = [
 			'askSaveDialog',
 			'remote_inc_dialog',
@@ -236,12 +226,11 @@ class SBconfigGTK(GladeGnomeApp):
 #
 # general/main page
 			'vbox_general_page',
-			'rdbtn_recommended_settings',
-			'rdbtn_custom_settings',
 			'cformat',
 			'splitsizeCB',
 			'splitsizeSB',
 			'splitsizevbox',
+			'label_splitsize_custom',
 #
 			'vbox3',
 			'scrolledwindow1',
@@ -315,8 +304,10 @@ class SBconfigGTK(GladeGnomeApp):
 			'hbox16',
 			'purgeradiobutton',
 			'purgedays',
+			'purgelabel',
 			'hbox17',
 			'logpurgeradiobutton',
+			'purgelabel2',
 			'hbox18',
 			'reportvbox',
 			'hbox19',
@@ -359,6 +350,11 @@ class SBconfigGTK(GladeGnomeApp):
 			'enableNewPrfCB',
 			'newPrfNameEntry',
 			'followlinks',
+#
+			'dialog_default_settings',
+			'label_dialog_default_settings_content',
+			'btn_set_default_settings',
+			'btn_cancel_default_settings'
 			]
 
 		handlers = [
@@ -375,7 +371,6 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_reload_clicked',
 			'on_save_clicked',
 			'on_backup_clicked',
-			'on_main_radio_toggled',
 			'on_cformat_changed',
 			'on_splitsizeCB_changed',
 			'on_splitsizeSB_value_changed',
@@ -434,10 +429,13 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_ex_ftypetv_key_press_event',
 			'on_ex_regextv_key_press_event',
 			'on_followlinks_toggled',
+#
+			'on_menu_set_default_settings_activate'
 			]
 
 		top_window = 'nssbackupConfApp'
-		GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window, widget_list, handlers)
+		GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window,
+														widget_list, handlers)
 
 	def isConfigChanged(self, force_the_change = False):
 		"""Checks whether the current configuration has changed compared to
@@ -467,109 +465,47 @@ class SBconfigGTK(GladeGnomeApp):
 			if response == gtk.RESPONSE_YES:
 				self.on_save_clicked()
 
-	def prefillWindow(self, recommened_setting=False):
+	def __unfill_report_entries(self):
+		self.widgets["smtpto"].set_text("")
+		self.widgets["smtpfrom"].set_text("")
+		self.widgets["smtpserver"].set_text("")
+		self.widgets["smtpport"].set_text("")
+		self.widgets["smtplogin"].set_text("")
+		self.widgets["smtppassword"].set_text("")
+		self.widgets["smtplogincheckbox"].set_active(False)
+		self.widgets["TLScheckbutton"].set_active(False)
+
+	def __fill_dir_widgets_from_config(self):
+		"""Fills the directory include and exclude tabs according to
+		the values found in the current configuration.
 		"""
-		Prefill the GTK window with config infos
-		
-		@todo: Opening of directories (e.g. target) must be unified over all
-			   modules that use such functionality!
-		"""
-		def __prefill_destination_widgets():
-			"""Local helper function which fills the UI widgets related to
-			the backup target (i.e. destination).
-			"""
-			# Target 
-			if self.configman.has_option("general", "target" ) :
-				ctarget = self.configman.get("general", "target" )
-				if ctarget.startswith(os.sep) :
-					if self.__is_target_set_to_default(ctarget):
-						self.__set_destination_widgets_to_default()
-					else :
-						if not os.path.exists(ctarget ):
-							self.__set_target_to_default()
-							self.__set_destination_widgets_to_default()
-							
-							_sec_msg = _("Please make "\
-					 "sure the missing directory exists (e.g. by mounting "\
-					 "an external disk) or change the specified target "\
-					 "to an existing one.")
-							_message_str = "Backup target does not exist.\n\n"\
-					 "Attention: The target will be set to the default "\
-					 "value. Check this on the destination settings page "\
-					 "before saving the configuration."
-							_boxtitle = _("NSsbackup configuration error")
-							_headline_str = \
-							_("Unable to open backup target")
-
-							gobject.idle_add( self._show_errdialog,
-											  _message_str, _boxtitle,
-											  _headline_str, _sec_msg )
-							return
-							
-						self.__set_destination_widgets_to_local(ctarget)
-				else :
-					self.__set_destination_widgets_to_remote(ctarget)
-			else :
-				self.__set_destination_widgets_to_default()
-							
-		# Schedule page
-		if not recommened_setting:
-			if os.geteuid() == 0 and self.configman.is_default_profile():
-				self.__enable_schedule_page(enable=True)
-				
-				croninfos = self.configman.getSchedule()	# = (isCron, val)
-				
-				# any schedule information was found
-				if  croninfos is not None:
-					self.widgets['rdbtn_custom_settings'].set_active(True)
-# TODO: This is obviously a bug: how to treat settings with no scheduling? \
-#		As 'recommended setting' is definitely wrong.
-					# scheduled using Cron i.e. a custom setting
-					if croninfos[0] == 1:
-						self.__set_schedule_option('custom')
-						self.__set_value_txtfld_custom_cronline(croninfos[1])
-
-					# scheduled using Anacron
-					elif croninfos[0] == 0:
-						self.__set_schedule_option('simple')
-						self.__set_value_cmbbx_simple_schedule_freq(croninfos[1])
-
-				# no scheduled backups
-				else:
-					self.__set_schedule_option('no')
-			else:
-				self.__enable_schedule_page(enable=False)
-
-		# General tab
-		if self.configman.has_option("general", "format") :
-			cformatOpt = self.configman.get("general", "format") 
-			if cformatOpt not in self.cformat:
-				cformatOpt = 'gzip'
-			
-			cformatIndex = self.cformat.index(cformatOpt)
-			self.logger.debug("Setting compression format to %s " % cformatIndex)
-			self.widgets["cformat"].set_active(cformatIndex)
-							
-		#Include and exclude tabs
+		_section = "dirconfig"
 		self.include.clear()
 		self.ex_paths.clear()
-		if self.configman.has_section("dirconfig") :
-			for i,v in self.configman.items( "dirconfig" ) :
-				if v=="1":
-					self.include.append( [i] )
-				elif v =="0":
-					self.ex_paths.append( [i] )
-					
-		#remote includes
+		if self.configman.has_section(_section) :
+			for _item, _value in self.configman.items(_section):
+				if _value == "1":
+					self.include.append([_item])
+				elif _value == "0":
+					self.ex_paths.append([_item])
+
+	def __fill_remotedir_widgets_from_config(self):
+		"""Fills the remote directory include tab according to
+		the values found in the current configuration.
+		"""
+		_section = "dirconfig"
+		_option = "remote"
 		self.remoteinc.clear()
-		if self.configman.has_option("dirconfig", "remote") :
-			for i,v in self.configman.get("dirconfig", "remote").iteritems():
-				if str(v) == "1":
-					self.remoteinc.append( [i] )
-				elif v =="0":
+		if self.configman.has_option(_section, _option) :
+			for _itm, _val in self.configman.get(_section, _option).iteritems():
+				if _val == "1":
+					self.remoteinc.append([_itm])
+				elif _val == "0":
 					print ("TODO: add a remote ex widget")
-					
+
+	def __fill_regex_widgets_from_config(self):
 		# regexp excludes
+		_known_ftypes_dict = ConfigManagerStaticData.get_known_ftypes_dict()
 		_invalid_regex_found = False
 		_invalid_regex = ""
 		self.ex_ftype.clear()
@@ -580,16 +516,16 @@ class SBconfigGTK(GladeGnomeApp):
 				list = str(r).split(",")
 				for i in list:
 					if re.match( r"\\\.\w+", i ):
-						if i[2:] in self.known_ftypes:
-							self.ex_ftype.append( [self.known_ftypes[i[2:]], i[2:]] )
+						if i[2:] in _known_ftypes_dict:
+							self.ex_ftype.append( [_known_ftypes_dict[i[2:]], i[2:]] )
 						else:
 							self.ex_ftype.append( [_("Custom"), i[2:]] )
 					else:
-						if (not Util.is_empty_regexp( i )) and Util.is_valid_regexp( i ):
+						if (not Util.is_empty_regexp(i)) and Util.is_valid_regexp(i):
 							self.ex_regex.append( [i] )
 						else:
-							r = Util.remove_conf_entry(r, i); print "r: %s" % r
-							self.logger.warning(_("Invalid regular "\
+							r = Util.remove_conf_entry(r, i)
+							self.logger.warning(_("Invalid or empty regular "\
 										"expression ('%s') found in "\
 										"configuration. Removed.") % i )
 							_invalid_regex_found = True
@@ -598,162 +534,365 @@ class SBconfigGTK(GladeGnomeApp):
 		if _invalid_regex_found:
 			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
-			_msg = _("Invalid regular expressions found\n"\
+			_msg = _("Invalid or empty regular expressions found\n"\
 					 "in configuration file:\n"\
 					 "'%s'\n\nThese expressions are not used and were\n"\
 					 "removed from the "\
 					 "configuration.") % (_invalid_regex.lstrip(","))
-			gobject.idle_add(self._show_errdialog, _msg)
-		
-		# Set maximum size limits
-		if self.configman.has_option("exclude", "maxsize") :
-			self.widgets["ex_maxsize"].set_value( self.configman.getint("exclude", "maxsize")/(1024*1024) )
-			if self.configman.getint("exclude", "maxsize") < 0:
-				self.widgets["ex_maxsize"].set_sensitive( False )
-				self.widgets["ex_max"].set_active( False )
-			else:
-				self.widgets["ex_maxsize"].set_sensitive( True )
-				self.widgets["ex_max"].set_active( True )
-		
-		# backup links
-		if self.configman.has_option("general", "followlinks") :
-			self.widgets["followlinks"].set_active(True)
-		else :
-			self.widgets["followlinks"].set_active(False)
-		
-		# Maximum of inc
-		if self.configman.has_option("general", "maxincrement") :
-			self.widgets["time_maxinc"].set_value( int(self.configman.get("general", "maxincrement")))
-	
-		__prefill_destination_widgets()
-		
-		# log
-		if self.configman.has_option("log", "level") :
-			self.widgets["loglevelcombobox"].set_active(self.loglevels[self.configman.get("log", "level")][1])
-		else :
-			self.widgets["loglevelcombobox"].set_active(self.loglevels['20'][1])
+			gobject.idle_add(misc.show_errdialog, _msg)
 
-		self.widgets["logfilechooser"].set_current_folder(self.configman.get_logdir())
-				
-		# report
-		def unfillreportentries():
-			self.widgets["smtpto"].set_text("")
-			self.widgets["smtpfrom"].set_text("")
-			self.widgets["smtpserver"].set_text("")
-			self.widgets["smtpport"].set_text("")
-			self.widgets["smtplogin"].set_text("")
-			self.widgets["smtppassword"].set_text("")
-			self.widgets["smtplogincheckbox"].set_active(False)
-			self.widgets["TLScheckbutton"].set_active(False)
-		
-		if self.configman.has_section("report") :
-			opts = self.configman.options("report")
-			if not opts or len(opts)==0:
-				unfillreportentries()
-				# LP Bug #153605
-				self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
-				self.widgets['smtplogininfo'].set_sensitive(False)
-				self.widgets['TLSinfos'].set_sensitive(False)
-			else :
-				if self.configman.has_option("report", "from") :
-					self.widgets["smtpfrom"].set_text(self.configman.get("report", "from"))
-				if self.configman.has_option("report", "to") :
-					self.widgets["smtpto"].set_text(self.configman.get("report", "to"))
-				if self.configman.has_option("report", "smtpserver") :
-					self.widgets["smtpserver"].set_text(self.configman.get("report", "smtpserver"))
-				if self.configman.has_option("report", "smtpport") :
-					self.widgets["smtpport"].set_text(self.configman.get("report", "smtpport"))
-				if self.configman.has_option("report", "smtpuser") or self.configman.has_option("report", "smtppassword") :
-					self.widgets["smtplogincheckbox"].set_active(True)
-					self.widgets['smtplogininfo'].set_sensitive(True)
-					if self.configman.has_option("report", "smtpuser") :
-						self.widgets["smtplogin"].set_text(self.configman.get("report", "smtpuser"))
-					if self.configman.has_option("report", "smtppassword") :
-						self.widgets["smtppassword"].set_text(self.configman.get("report", "smtppassword"))
-				if self.configman.has_option("report", "smtptls"):
-					self.widgets["TLScheckbutton"].set_active(True)
-					self.widgets['TLSinfos'].set_sensitive(True)
-				else:
-					self.widgets["TLScheckbutton"].set_active(False)
-				if self.configman.has_option("report", "smtpcert") or self.configman.has_option("report", "smtpkey") :
-					self.widgets["SSLradiobutton"].set_active(True)
-					self.widgets['SSLinfos'].set_sensitive(True)
-					if self.configman.has_option("report", "smtpcert") :
-						self.widgets['crtfilechooser'].set_filename(self.configman.get("report", "smtpcert"))
-					if self.configman.has_option("report", "smtpkey") :
-						self.widgets['crtfilechooser'].set_filename(self.configman.get("report", "smtpkey"))
-				else :
-					self.widgets["TLSradiobutton"].set_active(True)
-					self.widgets['SSLinfos'].set_sensitive(False)
-					self.widgets['crtfilechooser'].set_filename("")
-					self.widgets['keyfilechooser'].set_filename("")
-		else :
-			unfillreportentries()
-			# LP Bug #153605
-			self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
-			self.widgets['smtplogininfo'].set_sensitive(False)
-			self.widgets['TLSinfos'].set_sensitive(False)
+	def __fill_max_filesize_widgets_from_config(self):
+		"""Sets the UI elements for 'maximum size limit' to the value
+		specified in configuration.
+		"""
+		if self.configman.has_option("exclude", "maxsize"):
+			_maxsize = self.configman.getint("exclude", "maxsize")
+			self.widgets["ex_maxsize"].set_value(_maxsize/(1024*1024))
+			if _maxsize > 0:
+				self.widgets["ex_maxsize"].set_sensitive(True)
+				self.widgets["ex_max"].set_active(True)
+			else:
+				self.widgets["ex_maxsize"].set_sensitive(False)
+				self.widgets["ex_max"].set_active(False)
+		else:
+			self.widgets["ex_maxsize"].set_sensitive(False)
+			self.widgets["ex_max"].set_active(False)
+
+	def __fill_followlinks_widgets_from_config(self):
+		"""Sets the UI elements for 'followlinks' to the value
+		specified in configuration.
+		"""
+		section = "general"
+		option = "followlinks"
+		followlinks = False
+		if self.configman.has_option(section, option):
+			config_fl = self.configman.get(section, option)
+			if config_fl is True or config_fl == 1 or config_fl == "1":
+				followlinks = True
+		self.widgets["followlinks"].set_active(followlinks)
 			
-		# Purge setting 
+	def __fill_compression_widgets_from_config(self):
+		"""Sets the UI elements for 'compression format' to the value
+		specified in configuration.
+		"""		
+		cformats = ConfigManagerStaticData.get_compr_formats()
+		if self.configman.has_option("general", "format") :
+			cformatOpt = self.configman.get("general", "format") 
+			if cformatOpt not in cformats:
+				cformatOpt = 'gzip'			
+			cformatIndex = cformats.index(cformatOpt)
+			self.widgets["cformat"].set_active(cformatIndex)
+			
+	def __fill_purge_widgets_from_config(self):
+		"""Sets the UI elements for 'purge' to the value
+		specified in configuration.
+		"""
 		if self.configman.has_option("general", "purge") :
-			self.logger.debug("setting purge")
+			self.logger.debug("Setting purge")
 			if self.configman.get("general", "purge") == "log" :
 				self.widgets['logpurgeradiobutton'].set_active(True)
 			else:
 				try : 
 					purge = int(self.configman.get("general", "purge"))
 				except Exception,e:
-					self.logger.error("Purge value '%s' is invalide : " + e %self.configman.get("general", "purge"))	
+					self.logger.error("Purge value '%s' is invalid: '%s'" \
+								% (self.configman.get("general", "purge"), e))	
 					purge = 30
 				self.widgets['purgedays'].set_text(str(purge))
 				self.widgets['purgeradiobutton'].set_active(True)
 				self.widgets["purgedays"].set_sensitive( True )
 				self.on_purgedays_changed()
 			self.widgets['purgecheckbox'].set_active(True)
+		else:
+			self.widgets["purgecheckbox"].set_active(False)
+		self.on_purgecheckbox_toggled()
 		
+	def __fill_max_inc_widgets_from_config(self):
+		"""Sets the UI elements for 'Maximum of inc' to the value
+		specified in configuration.
+		"""
+		if self.configman.has_option("general", "maxincrement"):
+			self.widgets["time_maxinc"].set_value( \
+							int(self.configman.get("general", "maxincrement")))
+			
+	def __fill_log_widgets_from_config(self):
+		"""Sets the UI elements for 'log' to the value
+		specified in configuration.
+		"""
+		if not self.configman.has_option("log", "level"):
+			raise ValueError("No option 'loglevel' found.")
+		
+		loglevel = self.configman.get("log", "level")
+		valid_levels = ConfigManagerStaticData.get_valid_loglevels()
+		selection = valid_levels[loglevel][1]
+		self.widgets["loglevelcombobox"].set_active(selection)
+		self.widgets["logfilechooser"].set_current_folder(self.configman.get_logdir())
+
+	def __fill_report_widgets_from_config(self):
+		"""Sets the UI elements for 'report' to the value
+		specified in configuration.
+
+		@todo: Handling of non-existing settings must be removed and unified.
+		"""
+		if self.configman.has_section("report") :
+			opts = self.configman.options("report")
+			if self.configman.has_option("report", "from") :
+				self.widgets["smtpfrom"].set_text(self.configman.get("report", "from"))
+			if self.configman.has_option("report", "to") :
+				self.widgets["smtpto"].set_text(self.configman.get("report", "to"))
+			if self.configman.has_option("report", "smtpserver") :
+				self.widgets["smtpserver"].set_text(self.configman.get("report", "smtpserver"))
+			if self.configman.has_option("report", "smtpport") :
+				self.widgets["smtpport"].set_text(self.configman.get("report", "smtpport"))
+			if self.configman.has_option("report", "smtpuser") or self.configman.has_option("report", "smtppassword") :
+				self.widgets["smtplogincheckbox"].set_active(True)
+				self.widgets['smtplogininfo'].set_sensitive(True)
+				if self.configman.has_option("report", "smtpuser") :
+					self.widgets["smtplogin"].set_text(self.configman.get("report", "smtpuser"))
+				if self.configman.has_option("report", "smtppassword") :
+					self.widgets["smtppassword"].set_text(self.configman.get("report", "smtppassword"))
+			if self.configman.has_option("report", "smtptls"):
+				self.widgets["TLScheckbutton"].set_active(True)
+				self.widgets['TLSinfos'].set_sensitive(True)
+			else:
+				self.widgets["TLScheckbutton"].set_active(False)
+			if self.configman.has_option("report", "smtpcert") or self.configman.has_option("report", "smtpkey") :
+				self.widgets["SSLradiobutton"].set_active(True)
+				self.widgets['SSLinfos'].set_sensitive(True)
+				if self.configman.has_option("report", "smtpcert") :
+					self.widgets['crtfilechooser'].set_filename(self.configman.get("report", "smtpcert"))
+				if self.configman.has_option("report", "smtpkey") :
+					self.widgets['crtfilechooser'].set_filename(self.configman.get("report", "smtpkey"))
+			else :
+				self.widgets["TLSradiobutton"].set_active(True)
+				self.widgets['SSLinfos'].set_sensitive(False)
+				self.widgets['crtfilechooser'].set_filename("")
+				self.widgets['keyfilechooser'].set_filename("")
+		
+	def __fill_schedule_widgets(self, from_func):		
+		"""Sets the UI elements for 'schedule' to the value
+		specified in configuration (only from configuration or from file
+		and file system).
+		
+		@param from_func: function object reference which is called in order
+							to retrieve the current cron state
+							
+		@note: Purpose of the given function object is to use this method
+				with `ConfigManager.get_schedule` as well as
+				`ConfigManager.get_schedule_and_probe`.
+				
+		@todo: Implement signature checking. 
+		"""
+		if not isinstance(from_func, types.MethodType):
+			raise TypeError("Given parameter 'from_func' must be of type "\
+							"Method. Got %s instead." % (type(from_func)))
+
+		if os.geteuid() == 0 and self.configman.is_default_profile():
+			self.__enable_schedule_page(enable=True)
+			
+			croninfos = from_func()	# = (isCron, val)
+			
+			# any schedule information was found
+			if  croninfos is not None:
+				# scheduled using Cron i.e. a custom setting
+				if croninfos[0] == 1:
+					self.__set_schedule_option('custom')
+					self.__set_value_txtfld_custom_cronline(croninfos[1])
+
+				# scheduled using Anacron
+				elif croninfos[0] == 0:
+					self.__set_schedule_option('simple')
+					self.__set_value_cmbbx_simple_schedule_freq(croninfos[1])
+
+			# no scheduled backups
+			else:
+				self.__set_schedule_option('no')
+		else:
+			self.__enable_schedule_page(enable=False)
+			
+	def __fill_splitsize_widgets_from_config(self):
 		if self.configman.has_option("general", "splitsize") :
 			model = self.widgets["splitsizeCB"].get_model()
 			custom = True
-			for i in range(0,len(model)) :
-				if model[i][1] == int(self.configman.get("general", "splitsize")) / 1024 :
+			for i in range(0, len(model)) :
+				if model[i][1] == int(self.configman.get("general",
+														"splitsize")) / 1024:
 					self.widgets["splitsizeCB"].set_active(i)
-					self.widgets["splitsizeSB"].set_sensitive(False)
-					custom =False
-			if custom :
-				# NOTE: if we don't do this is this order, the handler on splitsizeCB will overide splitsizeSB value
-				self.widgets["splitsizeSB"].set_value(int(self.configman.get("general", "splitsize")) / 1024 )
+					self.__enable_splitsize_custom_option(enable=False)
+					custom = False
+			if custom:
+				# NOTE: if we don't do this is this order, the handler
+				#		on splitsizeCB will overide splitsizeSB value
+				self.widgets["splitsizeSB"].set_value(\
+						int(self.configman.get("general", "splitsize")) / 1024)
 				self.widgets["splitsizeCB"].set_active(0)
+
+	def __fill_destination_widgets(self):
+		"""Local helper function which fills the UI widgets related to
+		the backup target (i.e. destination).
+		"""
+		if self.configman.has_option("general", "target" ) :
+			ctarget = self.configman.get("general", "target" )
+			if ctarget.startswith(os.sep) :
+				if self.__is_target_set_to_default(ctarget):
+					self.__set_target_option("default")
+				else:
+					if not os.path.exists(ctarget):
+						self.__set_config_target_to_default()
+						self.__set_target_option("default")
+						
+						_sec_msg = _("Please make "\
+				 "sure the missing directory exists (e.g. by mounting "\
+				 "an external disk) or change the specified target "\
+				 "to an existing one.")
+						_message_str = "Backup target does not exist.\n\n"\
+				 "Attention: The target will be set to the default "\
+				 "value. Check this on the destination settings page "\
+				 "before saving the configuration."
+						_boxtitle = _("NSsbackup configuration error")
+						_headline_str = \
+						_("Unable to open backup target")
+
+						gobject.idle_add( misc.show_errdialog,
+										  _message_str, _boxtitle,
+										  _headline_str, _sec_msg )
+						return
+						
+					self.__set_target_option("local")
+					self.__set_target_value("local", ctarget)
+			else :
+				self.__set_target_option("remote")
+				self.__set_target_value("remote", ctarget)
+		else:
+			self.__set_config_target_to_default()
+			# target set to default if no config option exists
+			self.__set_target_option("default")
+		
+	def _fill_widgets_from_config(self, probe_fs):
+		"""Prefill the GTK window with config infos.
+		
+		@param probe_fs: Flag whether to probe the filesystem for schedule info
+		
+		@todo: Opening of directories (e.g. target) must be unified over all
+			   modules that use such functionality!
+		"""
+		if not isinstance(probe_fs, types.BooleanType):
+			raise TypeError("Given parameter must be of boolean type. "\
+						    "Got %s instead." % (type(probe_fs)))
+
+		# General
+		self.__fill_max_inc_widgets_from_config()		
+		self.__fill_compression_widgets_from_config()
+		self.__fill_splitsize_widgets_from_config()
+		
+		# dirconfig and excludes
+		self.__fill_dir_widgets_from_config()
+		self.__fill_remotedir_widgets_from_config()
+		self.__fill_regex_widgets_from_config()		
+		
+		# other exclude reasons
+		self.__fill_max_filesize_widgets_from_config()
+		self.__fill_followlinks_widgets_from_config()
+
+		# target (= destination)
+		self.__fill_destination_widgets()
+
+		# schedule - with probing the filesystem or without
+		if probe_fs:
+			sched_func = self.configman.get_schedule_and_probe
+		else:
+			sched_func = self.configman.get_schedule
+		self.__fill_schedule_widgets(from_func = sched_func)
+
+		# Purging
+		self.__fill_purge_widgets_from_config()
+
+		# Log and report
+		self.__fill_log_widgets_from_config()
+		self.__fill_report_widgets_from_config()
 		
 		# set the profile name
-		self.widgets['statusBar'].push(_("Editing profile : %s ") % self.configman.getProfileName())
+		self.widgets['statusBar'].push(_("Editing profile : %s ") \
+										% self.configman.getProfileName())
 		
 		self.isConfigChanged()
-	
-	def __set_destination_widgets_to_default(self):
-		"""The widgets within the 'Destination' page are enabled/disabled/set
-		according to default setting.
-		""" 
-		self.widgets["dest1"].set_active( True )
-		self.widgets["hbox9"].set_sensitive( False )
-		self.widgets["hbox10"].set_sensitive( False )
 		
-	def __set_destination_widgets_to_local(self, atarget):
-		"""The widgets within the 'Destination' page are enabled/disabled/set
-		according to the given local target directory.
-		""" 
-		self.widgets["dest2"].set_active( True )			
-		self.widgets["hbox9"].set_sensitive( True )
-		self.widgets["dest_localpath"].set_current_folder( atarget )
-		self.widgets["hbox10"].set_sensitive( False )
+	def __enable_splitsize_custom_option(self, enable = True):
+		"""Enables resp. disables widgets for setting a custom archive
+		splitsize.
+		"""
+		self.widgets["splitsizeSB"].set_sensitive(enable)
+		self.widgets["label_splitsize_custom"].set_sensitive(enable)
+			
+	def __enable_target_option(self, option):
+		"""The widgets within the 'Destination' page are
+		enabled/disabled/set according to the given option.
+		Unusable widgets are automatically disabled.
+		"""
+		def __enable_default_target(enable = True):
+			"""The widgets within the 'Destination' page are
+			enabled/disabled/set according to default setting.
+			"""
+			pass
+		
+		def __enable_local_target(enable = True):
+			"""The widgets within the 'Destination' page are
+			enabled/disabled/set according to the given local target directory.
+			"""
+			self.widgets["hbox9"].set_sensitive(enable)
+	
+		def __enable_remote_target(enable = True):
+			"""The widgets within the 'Destination' page are
+			enabled/disabled/set according to the given remote target.
+			"""
+			self.widgets["hbox10"].set_sensitive(enable)
 
-	def __set_destination_widgets_to_remote(self, atarget):
-		"""The widgets within the 'Destination' page are enabled/disabled/set
-		according to the given remote target.
-		""" 
-		self.widgets["dest3"].set_active( True )			
-		self.widgets["hbox9"].set_sensitive( False )
-		self.widgets["hbox10"].set_sensitive( True )
-		self.widgets["dest_remote"].set_text( atarget )
+		if option == "default":
+			__enable_default_target(enable=True)
+			__enable_local_target(enable=False)
+			__enable_remote_target(enable=False)
+		elif option == "local":
+			__enable_default_target(enable=False)
+			__enable_local_target(enable=True)
+			__enable_remote_target(enable=False)
+		elif option == "remote":
+			__enable_default_target(enable=False)
+			__enable_local_target(enable=False)
+			__enable_remote_target(enable=True)
+		else:
+			raise ValueError("Unknown target option given.")
+
+	def __set_target_option(self, option):
+		"""Selects resp. sets the given choice for backup target. Possible
+		values are 'default', 'local', and 'remote'.
+		"""
+		self.__enable_target_option(option)
+		twidget = None
+		if option == "default":
+			twidget = self.widgets["dest1"]
+		elif option == "local":
+			twidget = self.widgets["dest2"]
+		elif option == "remote":
+			twidget = self.widgets["dest3"]
+		else:
+			raise ValueError("Unknown target option given.")
+		twidget.set_active(True)
+		twidget.grab_focus()
+		
+	def __set_target_value(self, option, value):
+		"""Sets the destination widget according to the given option. Valid
+		options are: 'default', 'local', and 'remote'. In the case of the
+		default option, the given value is ignored (since the default
+		is used). 
+		"""
+		if option == "default":
+			pass
+		elif option == "local":
+			self.widgets["dest_localpath"].set_current_folder(value)
+		elif option == "remote":
+			self.widgets["dest_remote"].set_text(value)
+		else:
+			raise ValueError("Unknown target option given.")
 	
 	def already_inc (self, configlist, toInclude):
 		"""configlist is like self.conf.items( "dirconfig" )
@@ -805,7 +944,8 @@ class SBconfigGTK(GladeGnomeApp):
 	def cell_regex_edited_callback(self, cell, path, new_text):
 		# Check if new path is empty
 		if Util.is_empty_regexp(new_text):
-			self._show_errdialog(message_str = _("Empty expression. Please enter a valid regular expression."))
+			misc.show_errdialog(message_str = \
+				_("Empty expression. Please enter a valid regular expression."))
 		else:
 			if Util.is_valid_regexp(new_text):				
 				# Remove old expression and add the new one
@@ -818,7 +958,8 @@ class SBconfigGTK(GladeGnomeApp):
 				self.ex_regex[path][0] = new_text
 				self.isConfigChanged()
 			else:
-				self._show_errdialog(message_str = _("Provided regular expression is not valid."))		
+				misc.show_errdialog(message_str = \
+								_("Provided regular expression is not valid."))		
 
 	def cell_edited_callback(self, cell, path, new_text, data):
 		# Check if new path is empty
@@ -908,7 +1049,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman.saveConf()
 		# end of hack
 		self.orig_configman = ConfigManager(self.conffile)
-		self.prefillWindow()
+		self._fill_widgets_from_config(probe_fs = True)
 		self.isConfigChanged()
 		self.logger.debug("Config '%s' loaded" % self.conffile)
 
@@ -935,62 +1076,19 @@ class SBconfigGTK(GladeGnomeApp):
 			dialog.destroy()
 			raise e
 
-	def on_main_radio_toggled(self, *args):
-		"""Signal handler which is called when the radio buttons on the main
-		page are toggled.
-		"""
-		if self.widgets["rdbtn_recommended_settings"].get_active():
-			# set all values to defaults
-		
-			self.configman = ConfigManager()
-			self.prefillWindow(True)
-			
-#			self.widgets["time_freq"].set_active( 2 )
-			# choose between anacron or cron here (old behaviour has been kept for the moment.
-			# TODO: Needs review!
-#			self.widgets["preciselyRadio"].set_active( True )
-#			self.widgets["anacronRadio"].set_active( False )
-
-#			self.widgets["croninfos"].set_sensitive( True )
-#			self.widgets["time_min"].set_sensitive( True )
-#			self.widgets["time_hour"].set_sensitive( True )
-#			self.widgets["time_min"].set_value( 0 )
-#			self.widgets["time_hour"].set_value( 0 )
-#			self.widgets["scrolledwindow5"].set_sensitive( False )
-#			self.widgets["scrolledwindow6"].set_sensitive( False )
-#			self.widgets["ccronline"].set_sensitive( False )
-
-			self.widgets["purgecheckbox"].set_active( True )
-			self.widgets["purgeradiobutton"].set_active( 1 )
-			self.widgets["purgedays"].set_sensitive( False )
-
-			# disable all tabs
-			self.widgets["vbox3"].set_sensitive( False )
-			self.widgets["notebook2"].set_sensitive( False )
-			self.widgets["vbox8"].set_sensitive( False )
-			self.widgets["vbox_schedule_page"].set_sensitive(False)
-			self.widgets["reportvbox"].set_sensitive( True )
-
-		elif self.widgets["rdbtn_custom_settings"].get_active():
-			# enable all tabs
-			self.widgets["vbox3"].set_sensitive( True )
-			self.widgets["notebook2"].set_sensitive( True )
-			self.widgets["vbox8"].set_sensitive( True )
-			self.widgets["vbox_schedule_page"].set_sensitive(True)
-			self.widgets["reportvbox"].set_sensitive( True )
-
 	def on_cformat_changed(self, *args):
 		"""
 		handle that sets the compression format
 		"""
 		selected = self.widgets["cformat"].get_active()
-		if 0 <= selected < len(self.cformat) :
-			self.configman.set("general", "format", self.cformat[selected] )
+		cformats = ConfigManagerStaticData.get_compr_formats()
+		if 0 <= selected < len(cformats):
+			self.configman.set("general", "format", cformats[selected])
 		else :
 			self.configman.remove_option("general", "format")
 			
-		if selected == self.cformat.index("none") :
-			# activate split functionality config
+		if selected == cformats.index("none"):
+			# 'none' -> activate split functionality
 			self.widgets['splitsizevbox'].set_sensitive(True)
 		else :
 			self.widgets["splitsizeCB"].set_active(1)
@@ -1006,11 +1104,11 @@ class SBconfigGTK(GladeGnomeApp):
 		model = self.widgets["splitsizeCB"].get_model()
 		label,value = model[self.widgets["splitsizeCB"].get_active()]
 		if value != -1 :
-			self.widgets['splitsizeSB'].set_sensitive(False)
+			self.__enable_splitsize_custom_option(enable=False)
 			self.configman.set("general", "splitsize", value*1024)
 		else :
 			# activate Spin box
-			self.widgets['splitsizeSB'].set_sensitive(True)
+			self.__enable_splitsize_custom_option(enable=True)
 			val = self.widgets['splitsizeSB'].get_value_as_int()
 			self.configman.set("general", "splitsize", val * 1024)
 		self.isConfigChanged()
@@ -1023,6 +1121,7 @@ class SBconfigGTK(GladeGnomeApp):
 		self.isConfigChanged()
 	
 	def on_inc_addfile_clicked(self, *args):
+		self.__check_for_section("dirconfig")		
 		dialog = gtk.FileChooserDialog(_("Include file ..."),
 									None,
 									gtk.FILE_CHOOSER_ACTION_OPEN,
@@ -1043,7 +1142,12 @@ class SBconfigGTK(GladeGnomeApp):
 			pass
 		dialog.destroy()
 
+	def __check_for_section(self, section):
+		if not self.configman.has_section(section):
+			self.configman.add_section(section)
+			
 	def on_inc_adddir_clicked(self, *args):
+		self.__check_for_section("dirconfig")
 		dialog = gtk.FileChooserDialog(_("Include folder ..."),
 									None,
 									gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -1061,6 +1165,7 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.destroy()
 
 	def on_inc_del_clicked(self, *args):
+		self.__check_for_section("dirconfig")
 		(store, iter) = self.includetv.get_selection().get_selected()
 		if store and iter:
 			value = store.get_value( iter, 0 )
@@ -1069,6 +1174,7 @@ class SBconfigGTK(GladeGnomeApp):
 			store.remove( iter )
 
 	def on_remote_inc_add_clicked(self,*args):
+		self.__check_for_section("dirconfig")
 		global plugin_manager
 		question = self.widgets['remote_inc_dialog']
 		#add the plugin list in the dialog
@@ -1131,6 +1237,7 @@ class SBconfigGTK(GladeGnomeApp):
 			dialog.destroy()
 
 	def on_remote_inc_del_clicked(self,*args):
+		self.__check_for_section("dirconfig")
 		(store, iter) = self.rem_includetv.get_selection().get_selected()
 		if store and iter:
 			value = store.get_value( iter, 0 )
@@ -1168,6 +1275,7 @@ class SBconfigGTK(GladeGnomeApp):
 			dialog.destroy()
 
 	def on_ex_addfile_clicked(self, *args):
+		self.__check_for_section("dirconfig")
 		dialog = gtk.FileChooserDialog(_("Include file ..."), None, gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		filter = gtk.FileFilter()
@@ -1185,6 +1293,7 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.destroy()
 
 	def on_ex_adddir_clicked(self, *args):
+		self.__check_for_section("dirconfig")
 		dialog = gtk.FileChooserDialog(_("Exclude folder ..."), None, gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		
@@ -1198,6 +1307,7 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.destroy()
 
 	def on_ex_delpath_clicked(self, *args):
+		self.__check_for_section("dirconfig")
 		(store, iter) = self.ex_pathstv.get_selection().get_selected()
 		if store and iter:
 			value = store.get_value( iter, 0 )
@@ -1207,43 +1317,34 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def __is_target_set_to_default(self, atarget):
 		"""Checks if the given target directory is equal to the
-		default settings:
-		'/var/backup' for root, 'homedir+/backups' for non-admins.
+		default settings.
+
 		@rtype: Boolean
 		
 		@todo: Use functions from ConfigManager to proceed the check in
 				a consistent manner.
 		"""
 		_reslt = False
-		if (os.getuid() == 0 and atarget == "/var/backup") or\
-		   (os.getuid() != 0 and atarget == getUserDatasDir()+"backups"):
+		_def_target = self.configman.get_target_default()
+		if (os.getuid() == 0 and atarget == _def_target) or\
+		   (os.getuid() != 0 and atarget == _def_target):
 			_reslt = True
 		return _reslt
 
-	def __set_target_to_default(self):
-		"""The target option within the configuration is set to the default:
-		'/var/backup' for root, 'homedir+/backups' for non-admins.
-		
-		@todo: The result of 'os.getuid' should be retrieved during the
-			   initialization process and stored in a member attribute, so
-			   we don't need to use operation system call over and over!
-
-		@todo: Use functions from ConfigManager to set the paths in
-				a consistent manner.
+	def __set_config_target_to_default(self):
+		"""The target option within the configuration is set to the defaults.
+						
+		@todo: We must ensure the default paths really do exist.
 		"""
-		if os.getuid() == 0 :
-			self.configman.set( "general", "target", "/var/backup")
-			self.isConfigChanged()
-		else :
-			self.configman.set( "general", "target", getUserDatasDir()+"backups")
-			self.isConfigChanged()
+		self.configman.set_target_to_default()
+		self.isConfigChanged()
 
 	def on_dest1_toggled(self, *args):
 		if self.widgets["dest1"].get_active():
 			self.widgets["hbox9"].set_sensitive( False )
 			self.widgets["hbox10"].set_sensitive( False )
 			self.widgets["dest_unusable"].hide()
-			self.__set_target_to_default()
+			self.__set_config_target_to_default()
 		elif self.widgets["dest2"].get_active():
 			self.widgets["hbox9"].set_sensitive( True )
 			self.widgets["hbox10"].set_sensitive( False )
@@ -1324,34 +1425,32 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["rdbtn_custom_schedule"].set_active(is_active=True)
 		else:
 			raise ValueError("Unknown schedule option given.")
-		
-#	def __set_schedule_defaults(self):
-#		_default_schedule = "simple"
-#		_simple_default_freq = "daily"
-#		_custom_default_cronline = "0 0 * * *"
-#		
-#		self.__set_schedule_option(_default_schedule)
-#		self.__set_value_cmbbx_simple_schedule_freq(_simple_default_freq)
-#		self.__set_value_txtfld_custom_cronline(_custom_default_cronline)
-		
-	def __set_default_cmbbx_simple_schedule_freq(self):
-		_simple_default_freq = "daily"		
-		self.__set_value_cmbbx_simple_schedule_freq(_simple_default_freq)
-
+				
 	def __set_value_txtfld_custom_cronline(self, cronline):
 		self.widgets['txtfld_custom_cronline'].set_text(cronline)
 #TODO: Review - is it required?
 #		self.on_txtfld_custom_cronline_changed()
 
 	def __set_value_cmbbx_simple_schedule_freq(self, frequency):
-		if frequency in self.__simple_schedule_freqs.keys():
+		_valid_freqs = ConfigManagerStaticData.get_simple_schedule_frequencies()
+		
+		if frequency in _valid_freqs.keys():
 			self.widgets['cmbbx_simple_schedule_freq'].set_active(\
-										self.__simple_schedule_freqs[frequency])
+														_valid_freqs[frequency])
 		else:
 			raise ValueError("Unknown anacron setting found!")
 #TODO: Review - is it required?
 #		self.on_cmbbx_simple_schedule_freq_changed()
 
+	def __set_defaults_report_page(self):
+		self.__unfill_report_entries()
+		# LP Bug #153605
+# TODO: we should not set a default from since the value is not usable
+# for 99% of the users (despite LP Bug #153605)
+		self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
+		self.widgets['smtplogininfo'].set_sensitive(False)
+		self.widgets['TLSinfos'].set_sensitive(False)
+		
 	def on_rdbtn_schedule_toggled(self, *args):
 		if self.widgets["rdbtn_no_schedule"].get_active():
 			self.logger.debug("NO SCHEDULING selected.")
@@ -1376,42 +1475,50 @@ class SBconfigGTK(GladeGnomeApp):
 		"""Signal handler which is called whenever the schedule time frequency
 		in the 'time_freq' combo box is changed.
 		
-		@todo: Use __simple_schedule_freqs keys!
 		"""
 		_selection = self.widgets["cmbbx_simple_schedule_freq"].get_active()
 		
-		if _selection not in self.__simple_schedule_freqs.values():
-			self.__set_default_cmbbx_simple_schedule_freq()
-
-		for _freq_key in self.__simple_schedule_freqs.keys():
-			if _selection == self.__simple_schedule_freqs[_freq_key]:
-				self.configman.setSchedule(0, _freq_key)
-			
+		_valid_freqs = ConfigManagerStaticData.get_simple_schedule_frequencies()
+		if _selection in _valid_freqs.values():
+			for _freq_key in _valid_freqs.keys():
+				if _selection == _valid_freqs[_freq_key]:
+					self.configman.setSchedule(0, _freq_key)			
 		self.isConfigChanged()
-		self.logger.debug("AnaCronline is: %s" % self.configman.get("schedule",
-																	"anacron"))
+		self.logger.debug("Scheduling is: %s" % str(self.configman.get_schedule()))
 
 	def on_txtfld_custom_cronline_changed(self, *args):
 		_cronline = self.widgets['txtfld_custom_cronline'].get_text()
-		print "WE MUST CHECK THE INPUT HERE!"
-#TODO: WE MUST CHECK THE INPUT HERE!
+		print "WE MUST CHECK THE INPUT!"
+#TODO: WE MUST CHECK THE INPUT!
 		self.configman.setSchedule(1, _cronline)
 		self.isConfigChanged()
-		self.logger.debug("Cronline set to '%s'" % self.configman.get("schedule", "cron"))
+		self.logger.debug("Scheduling is: %s" % str(self.configman.get_schedule()))
 
 	def on_time_maxinc_changed(self,*args):
-		# add maxinc to the config
-		self.configman.set("general", "maxincrement", int(self.widgets["time_maxinc"].get_value())) 
+		"""Adds a changed value for 'maximum increment days' to the
+		configuration.
+		"""
+		self.configman.set("general", "maxincrement",
+							int(self.widgets["time_maxinc"].get_value())) 
 		self.isConfigChanged()
 	
+	def __enable_purge_options(self, enable=True):
+			self.widgets['purgeradiobutton'].set_sensitive(enable)
+			self.widgets['purgedays'].set_sensitive(enable)
+			self.widgets['purgelabel'].set_sensitive(enable)
+			self.widgets['logpurgeradiobutton'].set_sensitive(enable)
+			self.widgets['purgelabel2'].set_sensitive(enable)
+		
 	def on_purgecheckbox_toggled(self, *args):
-		if self.widgets["purgecheckbox"].get_active() :
-			self.widgets['hbox16'].set_sensitive(True)
-			self.widgets['hbox17'].set_sensitive(True)
+		"""Signal handler that is called whenever the state of the 'Purging'
+		checkbox is toggled.
+		"""
+		purge = self.widgets["purgecheckbox"].get_active()
+		if purge:
+			self.__enable_purge_options(enable = True)
 			self.on_purgeradiobutton_toggled()
-		else :
-			self.widgets['hbox16'].set_sensitive(False)
-			self.widgets['hbox17'].set_sensitive(False)
+		else:
+			self.__enable_purge_options(enable = False)
 			self.configman.remove_option( "general", "purge")
 			self.isConfigChanged()
 
@@ -1430,10 +1537,13 @@ class SBconfigGTK(GladeGnomeApp):
 			self.isConfigChanged()
 
 	def on_purgedays_changed( self, *args ):
-		try: i = int(self.widgets["purgedays"].get_text())
-		except: i = -1
-		if not ( i>0 and i<10000 ):	i=30
-		self.configman.set( "general", "purge", str(i) )
+		try:
+			i = int(self.widgets["purgedays"].get_text())
+		except:
+			i = 30
+		if not ( i>0 and i<10000 ):
+			i=30
+		self.configman.set("general", "purge", str(i))
 		self.isConfigChanged()
 		
 	def on_testMailButton_clicked(self, *args):
@@ -1501,6 +1611,10 @@ class SBconfigGTK(GladeGnomeApp):
 				self.on_keyfilechooser_selection_changed()
 
 	def on_ex_addftype_clicked(self, *args):
+		"""
+		A dot separating filename and extension is added automatically.
+		"""
+		_known_ftypes_dict = ConfigManagerStaticData.get_known_ftypes_dict()
 		dialog = self.widgets["ftypedialog"]
 		response = dialog.run()
 		dialog.hide()
@@ -1510,55 +1624,63 @@ class SBconfigGTK(GladeGnomeApp):
 			else:
 				ftype = self.widgets["ftype_custom_ex"].get_text()
 
+			r = ""
 			if self.configman.has_option("exclude", "regex") :
-				r = self.configman.get( "exclude", "regex" )
-			else:
-				r=""
-			r = r + r",\." + ftype.strip()
+				r = self.configman.get("exclude", "regex")
+			ftype_regex = "\.%s" % ftype.strip()
+			r = Util.add_conf_entry(r, ftype_regex)
 			self.configman.set( "exclude", "regex", r )
 			
-			if ftype in self.known_ftypes:
-				self.ex_ftype.append( [self.known_ftypes[ftype], ftype] )
+			if ftype in _known_ftypes_dict:
+				self.ex_ftype.append( [_known_ftypes_dict[ftype], ftype] )
 			else:
 				self.ex_ftype.append( [_("Custom"), ftype] )
-
 			self.isConfigChanged()
+			
 		elif response == gtk.RESPONSE_CANCEL:
 			pass		                
 
 	def on_ex_delftype_clicked(self, *args):
+		"""
+		@todo: Check whether escaping of value (re.escape(value)) before \
+				adding it is required?
+		"""
 		(store, iter) = self.ex_ftypetv.get_selection().get_selected()
+#		print "store: '%s', iter: '%s'" % (store, iter)
 		if store and iter:
-			value = store.get_value( iter, 1 )
+			value = store.get_value(iter, 1)
 			r = self.configman.get( "exclude", "regex" )
-			r = ","+r+","
-			r = re.sub( r",\\."+re.escape(value)+"," , ",", r )
-			r = r.lstrip( "," ).rstrip( "," )
+#			r = re.sub( r",\\."+re.escape(value)+"," , ",", r )
+			ftype_regex = "\.%s" % value
+			r = Util.remove_conf_entry(r, ftype_regex)
 			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
 			store.remove( iter )		
 
 	def on_ex_addregex_clicked(self, *args):
+		"""Signal handler which is called when button 'Add regex' for
+		exclusion is clicked.
+		"""
 		dialog = self.widgets["regexdialog"]
 		response = dialog.run()
 		dialog.hide()
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
 			if Util.is_empty_regexp(regex):
-				self._show_errdialog(message_str = _("Empty expression. Please enter a valid regular expression."))
+				misc.show_errdialog(message_str = \
+				_("Empty expression. Please enter a valid regular expression."))
 			else:
-				if Util.is_valid_regexp(regex):			
-					if self.configman.has_option("exclude", "regex") :
+				if Util.is_valid_regexp(regex):
+					r = ""
+					if self.configman.has_option("exclude", "regex"):
 						r = self.configman.get( "exclude", "regex" )
-					else:
-						r=""
-					r = r + r"," + regex.strip()
-					r = r.strip(",")
-					self.configman.set( "exclude", "regex", r )					
+					r = Util.add_conf_entry(r, regex)
+					self.configman.set("exclude", "regex", r)					
 					self.ex_regex.append( [regex] )
 					self.isConfigChanged()
 				else:
-					self._show_errdialog(message_str = _("Provided regular expression is not valid."))
+					misc.show_errdialog(message_str = \
+								_("Provided regular expression is not valid."))
 
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
@@ -1566,7 +1688,7 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_ex_delregex_clicked(self, *args):
 		(store, iter) = self.ex_regextv.get_selection().get_selected()
 		if store and iter:
-			value = store.get_value( iter, 0 )
+			value = store.get_value(iter, 0)
 			r = self.configman.get( "exclude", "regex" )
 			r = Util.remove_conf_entry(r, value)
 			self.configman.set( "exclude", "regex", r )
@@ -1594,13 +1716,27 @@ class SBconfigGTK(GladeGnomeApp):
 			self.on_ex_delregex_clicked()
 
 	def on_ex_max_toggled(self, *args):
-		if self.widgets["ex_max"].get_active():
-			self.widgets["ex_maxsize"].set_sensitive( True )
+		"""Signal handler which is called whenever the checkbutton
+		'Do not backup files bigger than' is checked resp. unchecked.
+		"""
+		_exclude_max = self.widgets["ex_max"].get_active()
+		
+		if _exclude_max:
+			self.widgets["ex_maxsize"].set_sensitive(True)
 			self.on_ex_maxsize_changed()
-		elif not self.widgets["ex_max"].get_active():
-			self.widgets["ex_maxsize"].set_sensitive( False )
+		else:
+			self.widgets["ex_maxsize"].set_sensitive(False)
 			self.configman.remove_option("exclude", "maxsize")
 			self.isConfigChanged()
+
+	def on_ex_maxsize_changed(self, *args):
+		"""Signal handler which is called when the value for
+		maximum file size is changed. The number (from the text field)
+		is interpreted as Megabyte (MB).
+		"""
+		msize = int(self.widgets["ex_maxsize"].get_value())
+		self.configman.set("exclude", "maxsize",str(msize*1024*1024))
+		self.isConfigChanged()
 
 	def on_followlinks_toggled(self, *args):
 		if self.widgets['followlinks'].get_active():
@@ -1608,14 +1744,13 @@ class SBconfigGTK(GladeGnomeApp):
 		else :
 			self.configman.remove_option("general", "followlinks")
 		self.isConfigChanged()
-
-	def on_ex_maxsize_changed(self, *args):
-		self.configman.set( "exclude", "maxsize", str(int(self.widgets["ex_maxsize"].get_value())*1024*1024) )
-		self.isConfigChanged()
 	
 	def on_dest_localpath_selection_changed(self, *args):
+		"""
+		@todo: Check of accessibility should not take place in the UI.
+		"""
 		t = self.widgets["dest_localpath"].get_filename()
-		if (os.path.isdir( t ) and os.access( t, os.R_OK | os.W_OK | os.X_OK ) ):
+		if (os.path.isdir( t ) and os.access(t, os.R_OK | os.W_OK | os.X_OK)):
 			self.configman.set( "general", "target", t )
 			self.isConfigChanged()
 			self.widgets["dest_unusable"].hide()
@@ -1674,6 +1809,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.logger.debug("Log level : " + self.configman.get("log", "level"))
 
 	def on_smtpfrom_changed(self, *args):
+		self.__check_for_section("report")
 		if self.widgets['smtpfrom'].get_text() != "":
 			self.configman.set("report", "from", self.widgets['smtpfrom'].get_text())
 			self.isConfigChanged()
@@ -1806,8 +1942,8 @@ class SBconfigGTK(GladeGnomeApp):
 			return 
 		
 		prfName, prfConf = tm.get_value(iter,1), tm.get_value(iter,2)
-		if prfName == ConfigStaticData.get_default_profilename():
-			self._forbid_default_profile_removal(_("remove"))
+		if prfName == ConfigManagerStaticData.get_default_profilename():
+			_forbid_default_profile_removal(_("remove"))
 		else :
 			warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n <b>Are you sure to want to delete the '%(name)s' profile ?</b> " % {'name': prfName})
 			
@@ -1825,8 +1961,7 @@ class SBconfigGTK(GladeGnomeApp):
 			elif response == gtk.RESPONSE_NO :
 				pass
 
-	def on_editProfileButton_clicked(self, *args):
-		
+	def on_editProfileButton_clicked(self, *args):		
 		tm, iter = self.profilestv.get_selection().get_selected()
 		if not iter :
 			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Please select a Profile !"))
@@ -1858,8 +1993,8 @@ class SBconfigGTK(GladeGnomeApp):
 			return 
 		enable, prfName, prfConf =tm.get_value(iter,0), tm.get_value(iter,1), tm.get_value(iter,2)
 		
-		if prfName == ConfigStaticData.get_default_profilename():
-			self._forbid_default_profile_removal(_("disable"))
+		if prfName == ConfigManagerStaticData.get_default_profilename():
+			_forbid_default_profile_removal(_("disable"))
 		else :
 			dir, file = prfConf.rsplit(os.sep,1)
 			
@@ -1878,54 +2013,65 @@ class SBconfigGTK(GladeGnomeApp):
 				self.profiles.set_value(iter, 0, True)
 				self.profiles.set_value(iter, 2, prfConf.rstrip("-disable"))
 
-	def _show_errdialog(self, message_str, boxtitle = "",
-							   headline_str = "", secmsg_str = ""):
-		"""Creates und displays a modal dialog box. Main purpose is
-		displaying of error messages.
-		
-		@param message_format: error message to show
-		@type message_format: String
-		
-		@todo: Should we use the button OK or CLOSE?
+	def on_menu_set_default_settings_activate(self, *args):
+		"""Signal handler which is activated when the user either selects
+		the menu item 'Set default settings ...' or clicks the according
+		toolbar button. The method presents a message box where
+		confirmation for the changes is required.
 		"""
-		dialog = gtk.MessageDialog(
-					flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-					type = gtk.MESSAGE_ERROR,
-					buttons=gtk.BUTTONS_CLOSE)
-		if boxtitle.strip() != "":
-			dialog.set_title( boxtitle )
-			
-		_hdl = headline_str.strip(" \n\t")
-		if _hdl != "":
-			_hdl = "<b>%s</b>\n\n" % _hdl
-		_msg = "%s%s" % ( _hdl, message_str )
-		dialog.set_markup(_msg)
+		dialog = self.widgets["dialog_default_settings"]
+		label = self.widgets["label_dialog_default_settings_content"]
+		btn_cancel = self.widgets['btn_cancel_default_settings'] 
 
-		# an optional secondary message is added
-		_sec = secmsg_str.strip(" \n\t")
-		if _sec != "":
-			_sec = "<small>%s</small>" % ( _sec )
-			dialog.format_secondary_markup(_sec)
-			
-		# the message box is showed
-		dialog.run()
-		dialog.destroy()
+		txt = _("<big><b>Set default values for current profile?</b></big>\n"\
+				"This will set the default values for the profile currently "\
+				"edited: '%s'.\n\n"\
+				"These predefined settings are recommended for most users. "\
+				"Check whether they are appropriate for your use before saving"\
+				" the changed configuration.") % self.configman.getProfileName()
 
-	def _forbid_default_profile_removal(self, action):
-		"""Shows an info box which states that we are not able to do the
-		given action on the default profile.
+		label.set_line_wrap(True)
+		label.set_markup(txt)
+		misc.label_set_autowrap(label)		
+		btn_cancel.grab_focus()
 		
-		"""
-		info = _("You can't %s the Default Profile. Please use it if you "\
-				 "need only one profile." % action)
-		
-		dialog = gtk.MessageDialog(type=gtk.MESSAGE_INFO,
-						flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-						buttons=gtk.BUTTONS_CLOSE)
-		dialog.set_markup(info)
-		dialog.run()
-		dialog.destroy()
+		response = dialog.run()
+		dialog.hide()
+		if response == gtk.RESPONSE_APPLY:
+			self.logger.info("Default settings are being applied.")
+			self._set_default_settings()			
+		elif response == gtk.RESPONSE_CANCEL or \
+			 response == gtk.RESPONSE_DELETE_EVENT:
+			pass
+		else:
+			self.logger.error("Unexpected dialog response: %s" % response)
+			raise ValueError("Unexpected dialog response: %s" % response)
 				
+	def _set_default_settings(self):
+		"""Sets default values (which might be considered as recommended
+		values for some usecase) for the current profile.
+		"""
+		# implementation note: the values are set in the configuration
+		# 	manager and afterwards the according UI widgets are updated
+		#	with these new values.
+		self.configman.set_values_to_default()
+		# filesystem is not probed, we want to set new values
+		self._fill_widgets_from_config(probe_fs = False)
+
+def _forbid_default_profile_removal(action):
+	"""Helper function that shows an info box which states that we are
+	not able to do the given action on the default profile.	
+	"""
+	info = _("You can't %s the Default Profile. Please use it if you "\
+			 "need only one profile." % action)
+	
+	dialog = gtk.MessageDialog(type=gtk.MESSAGE_INFO,
+					flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+					buttons=gtk.BUTTONS_CLOSE)
+	dialog.set_markup(info)
+	dialog.run()
+	dialog.destroy()
+
 
 def main(argv):
 	window = SBconfigGTK()
