@@ -119,8 +119,8 @@ def extract2(sourcear, fileslist, dest, bckupsuffix = None,additionalOpts=None )
 	@param additionalOpts: a list of aption to add
 	"""
 	# tar option  -p, --same-permissions, --preserve-permissions:
-    # ignore umask when extracting files (the default for root)
- 
+	# ignore umask when extracting files (the default for root)
+
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
 	archType = getArchiveType(sourcear)

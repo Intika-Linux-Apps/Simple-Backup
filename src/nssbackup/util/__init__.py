@@ -28,17 +28,19 @@
 
 """
 
-import nssbackup.managers.FileAccessManager as FAM
 import os
-import subprocess, nssbackup
-from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.exceptions import ChmodNotSupportedError
+import subprocess
 import tempfile
-import inspect, shutil
+import inspect
 import shutil
 import types
 import re
+
+import nssbackup
+import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.util import log
+from nssbackup.util import exceptions
+
 
 
 def nssb_copytree(src, dst, symlinks=False):
@@ -115,7 +117,8 @@ def nssb_copy(src, dst):
 	try:
 		shutil.copymode(prep_src, prep_dst)
 	except OSError:
-		raise ChmodNotSupportedError("Unable to change permissions of file '%s'." % prep_dst)
+		raise exceptions.ChmodNotSupportedError(\
+						"Unable to change permissions of file '%s'." % prep_dst)
 		
 def _prepare_nssb_copy(src, dst):
 	"""Helper function that prepares the given paths for copying
@@ -190,7 +193,8 @@ def getResource(resourceName, isFile=False):
 	devvalue = os.path.dirname(tmp)+"/../../datas/"
 	if os.path.exists(devvalue + resourceName) :
 		return os.path.normpath(devvalue + resourceName)
-	raise SBException("'%s' hasn't been found in the ressource list"% resourceName)
+	raise exceptions.SBException(\
+				"'%s' hasn't been found in the ressource list"% resourceName)
 					
 def launch(cmd, opts):
 	"""
@@ -201,7 +205,7 @@ def launch(cmd, opts):
 	@param cmd: The command to launch
 	@return: (outStr, errStr, retVal)
 	"""
-	_logger = LogFactory.getLogger()
+	_logger = log.LogFactory.getLogger()
 	# Create output log file
 	outptr,outFile = tempfile.mkstemp(prefix="output_")
 
@@ -268,7 +272,8 @@ def readlineNULSep(fd,fd1):
 			_continue += 1
 		
 		if _continue == 1 :
-			raise SBException("The length of flist and Fprops are not equals")
+			raise exceptions.SBException(\
+								"The length of flist and Fprops are not equals")
 		yield (currentline,currentline1)
 
 
