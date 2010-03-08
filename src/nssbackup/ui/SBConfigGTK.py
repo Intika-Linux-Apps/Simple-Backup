@@ -274,10 +274,9 @@ class SBconfigGTK(GladeGnomeApp):
 			'dest_localpath',
 			'dest3',
 			'hbox10',
-			'eventbox',
 			'dest_remote',
 			'dest_remotetest',
-			'dest_remote_light1',
+			'dest_remote_light',
 			'hbox11',
 			'dest_unusable',
 #
@@ -839,13 +838,15 @@ class SBconfigGTK(GladeGnomeApp):
 			"""The widgets within the 'Destination' page are
 			enabled/disabled/set according to the given local target directory.
 			"""
-			self.widgets["hbox9"].set_sensitive(enable)
-	
+			self.widgets["dest_localpath"].set_sensitive(enable)			
+			
 		def __enable_remote_target(enable = True):
 			"""The widgets within the 'Destination' page are
 			enabled/disabled/set according to the given remote target.
 			"""
-			self.widgets["hbox10"].set_sensitive(enable)
+			self.widgets["dest_remote_light"].set_sensitive(enable)
+			self.widgets["dest_remote"].set_sensitive(enable)
+			self.widgets["dest_remotetest"].set_sensitive(enable)
 
 		if option == "default":
 			__enable_default_target(enable=True)
@@ -1341,18 +1342,20 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_dest1_toggled(self, *args):
 		if self.widgets["dest1"].get_active():
-			self.widgets["hbox9"].set_sensitive( False )
-			self.widgets["hbox10"].set_sensitive( False )
+			self.__enable_target_option("default")
 			self.widgets["dest_unusable"].hide()
 			self.__set_config_target_to_default()
+			
 		elif self.widgets["dest2"].get_active():
-			self.widgets["hbox9"].set_sensitive( True )
-			self.widgets["hbox10"].set_sensitive( False )
+			self.__enable_target_option("local")
 			self.on_dest_localpath_selection_changed()
-		else:
-			self.widgets["hbox9"].set_sensitive( False )
-			self.widgets["hbox10"].set_sensitive( True )
+			
+		elif self.widgets["dest3"].get_active():
+			self.__enable_target_option("remote")
 			self.on_dest_remote_changed()
+			
+		else:
+			raise ValueError("Unexpected widget was toggled.")
 
 	def __enable_schedule_page(self, enable = True):
 		"""Enables resp. disables the complete schedule page including the
@@ -1758,13 +1761,18 @@ class SBconfigGTK(GladeGnomeApp):
 			self.widgets["dest_unusable"].show()
 
 	def on_dest_remote_changed(self, *args):
-		self.widgets["dest_remote_light1"].set_from_stock( gtk.STOCK_DIALOG_WARNING , gtk.ICON_SIZE_BUTTON)
-		gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], _("Please test writability of the target directory by pressing \"Test\" button on the right."))
-		self.configman.set( "general", "target", self.widgets['dest_remote'].get_text() )
+		_icon = self.widgets["dest_remote_light"]
+		_icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
+		_icon.set_tooltip_text(_("Please test writability of the target "\
+						"directory by pressing \"Test\" button on the right."))
+		
+		self.configman.set("general", "target",
+							self.widgets['dest_remote'].get_text())
 		self.isConfigChanged()
 
 	def on_dest_remotetest_clicked(self, *args):
 		_fusefam = FuseFAM()
+		_icon = self.widgets["dest_remote_light"]
 		try :
 			_remote_dest = self.widgets['dest_remote'].get_text()
 			if (_fusefam.testFusePlugins( _remote_dest )) :
@@ -1773,15 +1781,20 @@ class SBconfigGTK(GladeGnomeApp):
 				dialog.destroy()
 				
 				self.widgets["dest_unusable"].hide()
-				self.widgets["dest_remote_light1"].set_from_stock( gtk.STOCK_YES , gtk.ICON_SIZE_BUTTON )
-				gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], _("Target directory is writable."))				
+				_icon.set_from_stock(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
+				_icon.set_tooltip_text(_("Target directory is writable."))
+				
 		except Exception, e: 
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
 				dialog.run()
 				dialog.destroy()
-				
-				self.widgets["dest_remote_light1"].set_from_stock( gtk.STOCK_DIALOG_ERROR , gtk.ICON_SIZE_BUTTON )
-				gtk.tooltips_data_get(self.widgets["eventbox"])[0].set_tip(self.widgets["eventbox"], _("Please change target directory and test writability of the target directory by pressing \"Test\" button on the right."))
+
+				_icon.set_from_stock(gtk.STOCK_DIALOG_ERROR,
+									 gtk.ICON_SIZE_MENU)
+				_icon.set_tooltip_text(_("Please change target directory "\
+								"and test writability of the target directory "\
+								"by pressing \"Test\" button on the right."))
+
 				self.widgets["dest_unusable"].show()
 	
 	def on_logfilechooser_selection_changed(self, *args):
