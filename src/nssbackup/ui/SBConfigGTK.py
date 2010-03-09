@@ -195,6 +195,7 @@ class SBconfigGTK(GladeGnomeApp):
 	def _init_ui(self):		
 		filename = Util.getResource('nssbackup-config.glade')		
 		widget_list = [
+			'toolbar',
 			'askSaveDialog',
 			'remote_inc_dialog',
 			'remote_inc_entry',
@@ -1067,8 +1068,8 @@ class SBconfigGTK(GladeGnomeApp):
 		about.set_version(Infos.VERSION)
 		about.set_comments(Infos.DESCRIPTION)
 		about.set_transient_for(self.widgets["nssbackupConfApp"])
-		about.set_copyright("Oumar Aziz Ouattara <wattazoum@gmail.com>")
-		about.set_translator_credits(_("translator-credits"))
+		about.set_copyright(Infos.COPYRIGHT)
+		about.set_translator_credits(Infos.TRANSLATORS)
 		about.set_authors(Infos.AUTHORS)
 		about.set_website(Infos.WEBSITE)
 		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
@@ -2071,8 +2072,8 @@ class SBconfigGTK(GladeGnomeApp):
 		btn_cancel = self.widgets['btn_cancel_default_settings'] 
 
 		txt = _("<big><b>Set default values for current profile?</b></big>\n"\
-				"This will set the default values for the profile currently "\
-				"edited: '%s'.\n\n"\
+				"This will restore the default values for the profile "\
+				"currently edited: '%s'.\n\n"\
 				"These predefined settings are recommended for most users. "\
 				"Check whether they are appropriate for your use before saving"\
 				" the changed configuration.") % self.configman.getProfileName()
