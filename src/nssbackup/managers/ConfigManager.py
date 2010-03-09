@@ -1167,8 +1167,8 @@ class ConfigManagerStaticData(object):
 						100		: _('100 MiB'),
 						250		: _('250 MiB'),
 						650 	: _('650 MiB'),
-						2000 	: _('2 GiB (FAT16)'),
-						4000	: _('4 GiB (FAT32)'),
+						2048 	: _('2 GiB (FAT16)'),
+						4096	: _('4 GiB (FAT32)'),
 						-1		: _('Custom')
 					}
 	__known_ftypes =	{	"mp3"	: _("MP3 Music"),
