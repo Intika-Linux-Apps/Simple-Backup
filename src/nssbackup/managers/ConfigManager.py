@@ -1038,7 +1038,6 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 		try :
 			server = smtplib.SMTP()
-			
 			# getting the connection
 			if self.has_option("report","smtpport") :
 				server.connect(self.get("report","smtpserver"), self.get("report","smtpport"))

@@ -50,6 +50,13 @@ class SBconfigGTK(GladeGnomeApp):
 	   we don't need to use operation system call over and over!
 	@todo: Use functions from ConfigManager to set the paths in
 			a consistent manner.
+			
+	@todo: Configuration handling must be reviewed. Direct manipulation
+			of the configuration from widget's signal handler is *really*
+			errorprone and hard to debug (e.g. clearing a text input field
+			from the source code/application side before filling it with new
+			content currently yields in the removal of the according
+			config option and the config is unintentionally changed). 
 
 	"""
 	# why class variables?
@@ -59,7 +66,8 @@ class SBconfigGTK(GladeGnomeApp):
 	plugin_manager = None
 	
 	def __init__(self):
-		''' '''
+		"""Default constructor.
+		"""
 		self.logger = LogFactory.getLogger()
 		
 		# it is distinguished between the 'current' conffile and
@@ -88,6 +96,8 @@ class SBconfigGTK(GladeGnomeApp):
 		# hide the schedule tab if not root
 		if os.geteuid() != 0:
 			self.__enable_schedule_page(enable=False)
+			self.widgets['label_schedule_page'].set_tooltip_text(\
+			_('Scheduled backups are available for Administrator users only.'))
 
 		# Initiate all data structures
 		# Paths to be included or excluded
@@ -225,6 +235,7 @@ class SBconfigGTK(GladeGnomeApp):
 			'notebook',
 #
 # general/main page
+			'label_general_page',
 			'vbox_general_page',
 			'cformat',
 			'splitsizeCB',
@@ -332,12 +343,13 @@ class SBconfigGTK(GladeGnomeApp):
 			'vbox15',
 			'TLScheckbutton',
 			'TLSinfos',
-			'hbox22',
 			'TLSradiobutton',
 			'SSLradiobutton',
-			'SSLinfos',
 			'crtfilechooser',
 			'keyfilechooser',
+			'label_certificate',
+			'label_key',
+#
 			'pluginscombobox',
 			'ProfileManagerDialog',
 			'profilesListTreeView',
@@ -463,16 +475,6 @@ class SBconfigGTK(GladeGnomeApp):
 			question.hide()
 			if response == gtk.RESPONSE_YES:
 				self.on_save_clicked()
-
-	def __unfill_report_entries(self):
-		self.widgets["smtpto"].set_text("")
-		self.widgets["smtpfrom"].set_text("")
-		self.widgets["smtpserver"].set_text("")
-		self.widgets["smtpport"].set_text("")
-		self.widgets["smtplogin"].set_text("")
-		self.widgets["smtppassword"].set_text("")
-		self.widgets["smtplogincheckbox"].set_active(False)
-		self.widgets["TLScheckbutton"].set_active(False)
 
 	def __fill_dir_widgets_from_config(self):
 		"""Fills the directory include and exclude tabs according to
@@ -633,40 +635,70 @@ class SBconfigGTK(GladeGnomeApp):
 
 		@todo: Handling of non-existing settings must be removed and unified.
 		"""
-		if self.configman.has_section("report") :
-			opts = self.configman.options("report")
-			if self.configman.has_option("report", "from") :
-				self.widgets["smtpfrom"].set_text(self.configman.get("report", "from"))
-			if self.configman.has_option("report", "to") :
-				self.widgets["smtpto"].set_text(self.configman.get("report", "to"))
-			if self.configman.has_option("report", "smtpserver") :
-				self.widgets["smtpserver"].set_text(self.configman.get("report", "smtpserver"))
-			if self.configman.has_option("report", "smtpport") :
-				self.widgets["smtpport"].set_text(self.configman.get("report", "smtpport"))
-			if self.configman.has_option("report", "smtpuser") or self.configman.has_option("report", "smtppassword") :
+		_from = ""
+		_to = ""
+		_server = ""
+		_port = ""
+		_user = ""
+		_passw = ""
+		_cert = None
+		_key = None
+		
+		if self.configman.has_section("report"):			
+			if self.configman.has_option("report", "from"):
+				_from = self.configman.get("report", "from")
+				
+			if self.configman.has_option("report", "to"):
+				_to = self.configman.get("report", "to")
+				
+			if self.configman.has_option("report", "smtpserver"):
+				_server = self.configman.get("report", "smtpserver")
+				
+			if self.configman.has_option("report", "smtpport"):
+				_port = self.configman.get("report", "smtpport")
+				
+			if self.configman.has_option("report", "smtpuser") or \
+			   self.configman.has_option("report", "smtppassword"):
 				self.widgets["smtplogincheckbox"].set_active(True)
-				self.widgets['smtplogininfo'].set_sensitive(True)
-				if self.configman.has_option("report", "smtpuser") :
-					self.widgets["smtplogin"].set_text(self.configman.get("report", "smtpuser"))
-				if self.configman.has_option("report", "smtppassword") :
-					self.widgets["smtppassword"].set_text(self.configman.get("report", "smtppassword"))
+				self.widgets['smtplogininfo'].set_sensitive(True)				
+				
+				if self.configman.has_option("report", "smtpuser"):
+					_user = self.configman.get("report", "smtpuser")
+					
+				if self.configman.has_option("report", "smtppassword"):
+					_passw = self.configman.get("report", "smtppassword")
+			else:
+				self.widgets["smtplogincheckbox"].set_active(False)
+				self.widgets['smtplogininfo'].set_sensitive(False)				
+									
 			if self.configman.has_option("report", "smtptls"):
 				self.widgets["TLScheckbutton"].set_active(True)
 				self.widgets['TLSinfos'].set_sensitive(True)
 			else:
 				self.widgets["TLScheckbutton"].set_active(False)
-			if self.configman.has_option("report", "smtpcert") or self.configman.has_option("report", "smtpkey") :
+				
+			if self.configman.has_option("report", "smtpcert") or \
+			   self.configman.has_option("report", "smtpkey"):
 				self.widgets["SSLradiobutton"].set_active(True)
-				self.widgets['SSLinfos'].set_sensitive(True)
-				if self.configman.has_option("report", "smtpcert") :
-					self.widgets['crtfilechooser'].set_filename(self.configman.get("report", "smtpcert"))
-				if self.configman.has_option("report", "smtpkey") :
-					self.widgets['crtfilechooser'].set_filename(self.configman.get("report", "smtpkey"))
+				self.__enable_ssl_options(enable = True)
+				
+				if self.configman.has_option("report", "smtpcert"):
+					_cert = self.configman.get("report", "smtpcert")					
+					self.widgets['crtfilechooser'].set_filename(_cert)
+					
+				if self.configman.has_option("report", "smtpkey"):
+					_key = self.configman.get("report", "smtpkey")
+					self.widgets['keyfilechooser'].set_filename(_key)
 			else :
 				self.widgets["TLSradiobutton"].set_active(True)
-				self.widgets['SSLinfos'].set_sensitive(False)
-				self.widgets['crtfilechooser'].set_filename("")
-				self.widgets['keyfilechooser'].set_filename("")
+				self.__enable_ssl_options(enable = False)
+
+		self.widgets["smtpfrom"].set_text(_from)
+		self.widgets["smtpto"].set_text(_to)
+		self.widgets["smtpserver"].set_text(_server)
+		self.widgets["smtpport"].set_text(_port)
+		self.widgets["smtplogin"].set_text(_user)
+		self.widgets["smtppassword"].set_text(_passw)
 		
 	def __fill_schedule_widgets(self, from_func):		
 		"""Sets the UI elements for 'schedule' to the value
@@ -813,8 +845,11 @@ class SBconfigGTK(GladeGnomeApp):
 		# set the profile name
 		self.widgets['statusBar'].push(_("Editing profile : %s ") \
 										% self.configman.getProfileName())
-		
+#		self.__set_default_focus()
 		self.isConfigChanged()
+		
+#	def __set_default_focus(self):
+#		self.widgets['label_general_page'].grab_focus()
 		
 	def __enable_splitsize_custom_option(self, enable = True):
 		"""Enables resp. disables widgets for setting a custom archive
@@ -1431,8 +1466,6 @@ class SBconfigGTK(GladeGnomeApp):
 				
 	def __set_value_txtfld_custom_cronline(self, cronline):
 		self.widgets['txtfld_custom_cronline'].set_text(cronline)
-#TODO: Review - is it required?
-#		self.on_txtfld_custom_cronline_changed()
 
 	def __set_value_cmbbx_simple_schedule_freq(self, frequency):
 		_valid_freqs = ConfigManagerStaticData.get_simple_schedule_frequencies()
@@ -1442,17 +1475,6 @@ class SBconfigGTK(GladeGnomeApp):
 														_valid_freqs[frequency])
 		else:
 			raise ValueError("Unknown anacron setting found!")
-#TODO: Review - is it required?
-#		self.on_cmbbx_simple_schedule_freq_changed()
-
-	def __set_defaults_report_page(self):
-		self.__unfill_report_entries()
-		# LP Bug #153605
-# TODO: we should not set a default from since the value is not usable
-# for 99% of the users (despite LP Bug #153605)
-		self.widgets['smtpfrom'].set_text(Infos.SMTPFROM)
-		self.widgets['smtplogininfo'].set_sensitive(False)
-		self.widgets['TLSinfos'].set_sensitive(False)
 		
 	def on_rdbtn_schedule_toggled(self, *args):
 		if self.widgets["rdbtn_no_schedule"].get_active():
@@ -1549,6 +1571,12 @@ class SBconfigGTK(GladeGnomeApp):
 		self.configman.set("general", "purge", str(i))
 		self.isConfigChanged()
 		
+	def __enable_ssl_options(self, enable = True):
+		self.widgets['label_certificate'].set_sensitive(enable)
+		self.widgets['label_key'].set_sensitive(enable)
+		self.widgets['keyfilechooser'].set_sensitive(enable)
+		self.widgets['crtfilechooser'].set_sensitive(enable)
+
 	def on_testMailButton_clicked(self, *args):
 		result = False
 		try :
@@ -1564,54 +1592,60 @@ class SBconfigGTK(GladeGnomeApp):
 			dialog.destroy()
 
 	def on_smtplogincheckbox_toggled(self, *args):
-		if not self.widgets['smtplogincheckbox'].get_active():
+		if self.widgets['smtplogincheckbox'].get_active():
+			self.widgets['smtplogininfo'].set_sensitive(True)
+			if self.widgets['smtplogin'].get_text():
+				self.configman.set("report", "smtpuser",
+									self.widgets['smtplogin'].get_text())
+			if self.widgets['smtppassword'].get_text() :
+				self.configman.set("report", "smtpuser", self.widgets['smtppassword'].get_text())
+		else:
 			self.widgets['smtplogininfo'].set_sensitive(False)
 			if self.configman.has_option("report", "smtpuser") :
 				self.configman.remove_option("report", "smtpuser")
 			if self.configman.has_option("report", "smtppassword") :
 				self.configman.remove_option("report", "smtppassword")
-			self.isConfigChanged()
-		else :
-			self.widgets['smtplogininfo'].set_sensitive(True)
-			if self.widgets['smtplogin'].get_text() :
-				self.configman.set("report", "smtpuser",self.widgets['smtplogin'].get_text())
-				self.isConfigChanged()
-				self.logger.debug("login : " + self.configman.get("report", "smtpuser"))
-			if self.widgets['smtppassword'].get_text() :
-				self.configman.set("report", "smtpuser", self.widgets['smtppassword'].get_text())
-				self.isConfigChanged()
-				self.logger.debug("Password : " + self.configman.get("report", "smtppassword"))
-				
+		self.isConfigChanged()
+			
+	def __enable_secure_email_options(self, enable = True):
+		self.widgets['TLSinfos'].set_sensitive(enable)
+		
 	def on_TLScheckbutton_toggled(self, *args):
-		if not self.widgets['TLScheckbutton'].get_active():
-			self.widgets['TLSinfos'].set_sensitive(False)
+		"""Signal handler that is called when the checkbutton for
+		'secure email connection' is checked/unchecked.
+		"""
+		if self.widgets['TLScheckbutton'].get_active():
+			# secure connection is enabled
+			self.__enable_secure_email_options(enable = True)
+			self.configman.set("report", "smtptls","1")
+		else:
+			# *NO* secure connection
+			self.__enable_secure_email_options(enable = False)
 			if self.configman.has_option("report", "smtptls") :
 				self.configman.remove_option("report", "smtptls")
 			if self.configman.has_option("report", "smtpcert") :
 				self.configman.remove_option("report", "smtpcert")
 			if self.configman.has_option("report", "smtpkey") :
 				self.configman.remove_option("report", "smtpkey")
-			self.isConfigChanged()
-		else :
-			self.configman.set("report", "smtptls","1")
-			self.isConfigChanged()
-			self.widgets['TLSinfos'].set_sensitive(True)
-			self.on_TLSradiobutton_toggled()
+		self.isConfigChanged()
 			
 	def on_TLSradiobutton_toggled(self, *args):
 		if self.widgets['TLSradiobutton'].get_active():
-			self.widgets['SSLinfos'].set_sensitive(False)
-			if self.configman.has_option("report", "smptcert") :
-				self.configman.remove_option("report", "smptcert")
-			if self.configman.has_option("report", "smptkey") :
-				self.configman.remove_option("report", "smptkey")
-			self.isConfigChanged()
+			# TLS (i.e. no cert/key required)
+			self.__enable_ssl_options(enable = False)
+			if self.configman.has_option("report", "smtpcert"):
+				self.configman.remove_option("report", "smtpcert")
+			if self.configman.has_option("report", "smtpkey"):
+				self.configman.remove_option("report", "smtpkey")
 		elif self.widgets['SSLradiobutton'].get_active():
-			self.widgets['SSLinfos'].set_sensitive(True)
+			self.__enable_ssl_options(enable = True)
 			if self.widgets['crtfilechooser'].get_filename() :
 				self.on_crtfilechooser_selection_changed()
 			if self.widgets['keyfilechooser'].get_filename() :
-				self.on_keyfilechooser_selection_changed()
+				self.on_keyfilechooser_selection_changed()				
+		else:
+			raise ValueError("Unexpected signal received.")
+		self.isConfigChanged()
 
 	def on_ex_addftype_clicked(self, *args):
 		"""
