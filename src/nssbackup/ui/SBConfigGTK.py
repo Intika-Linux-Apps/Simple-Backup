@@ -369,7 +369,6 @@ class SBconfigGTK(GladeGnomeApp):
 			]
 
 		handlers = [
-			'gtk_main_quit',
 			'on_ftype_toggled',
 			'on_ftype_st_box_changed',
 			'on_ftype_custom_ex_changed',
@@ -441,7 +440,11 @@ class SBconfigGTK(GladeGnomeApp):
 			'on_ex_regextv_key_press_event',
 			'on_followlinks_toggled',
 #
-			'on_menu_set_default_settings_activate'
+			'on_menu_set_default_settings_activate',
+			
+			'on_exit_activate',
+			'on_nssbackupConfApp_delete_event',
+			'on_nssbackupConfApp_destroy'
 			]
 
 		top_window = 'nssbackupConfApp'
@@ -469,17 +472,28 @@ class SBconfigGTK(GladeGnomeApp):
 		self.widgets['saveButton'].set_sensitive(changed)
 		return changed
 	
-	def askSaveConfig(self):
+	def ask_save_config(self):
+		"""Checks whether the configuration has changed and displays
+		a dialog window if so. The user then can decide to save, not to save
+		the configuration or to cancel the process.
+		
+		@return: False if the user pressed 'yes' or 'no'; True in any other case
+		@rtype: Boolean
 		"""
-		"""
-		changed = not self.configman.isConfigEquals(self.orig_configman)
-		if changed :
+		cancelled = False
+		changed = self.isConfigChanged()
+		if changed:
 			question = self.widgets['askSaveDialog']
 			question.set_title("")
 			response = question.run()
 			question.hide()
 			if response == gtk.RESPONSE_YES:
 				self.on_save_clicked()
+			elif response == gtk.RESPONSE_NO:
+				pass
+			else:
+				cancelled = True
+		return cancelled
 
 	def __fill_dir_widgets_from_config(self):
 		"""Fills the directory include and exclude tabs according to
@@ -1060,9 +1074,6 @@ class SBconfigGTK(GladeGnomeApp):
 			pass
 		dialog.destroy()
 
-	def on_exit_activate(self, *args):
-		gtk.main_quit()
-
 	def on_menu_help_activate(self, button):
 		misc.open_uri("ghelp:nssbackup")
 
@@ -1105,18 +1116,24 @@ class SBconfigGTK(GladeGnomeApp):
 		self.isConfigChanged()
 		
 	def on_backup_clicked(self, *args):
-		self.askSaveConfig()
-		try :
-			pid = subprocess.Popen(["nssbackupd"]).pid
-			
-			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("A backup run is initiated in the background. The process id is: ")+str(pid)+".")
-			dialog.run()
-			dialog.destroy()
-		except Exception, e:
-			dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
-			dialog.run()
-			dialog.destroy()
-			raise e
+		cancelled = self.ask_save_config()
+		if not cancelled:
+			try :
+				pid = subprocess.Popen(["nssbackupd"]).pid
+				
+				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | \
+									gtk.DIALOG_DESTROY_WITH_PARENT,
+									buttons=gtk.BUTTONS_CLOSE,
+									message_format=_("A backup run is "\
+									"initiated in the background. The process "\
+									"id is: ")+str(pid)+".")
+				dialog.run()
+				dialog.destroy()
+			except Exception, e:
+				dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
+				dialog.run()
+				dialog.destroy()
+				raise e
 
 	def on_cformat_changed(self, *args):
 		"""
@@ -1941,23 +1958,37 @@ class SBconfigGTK(GladeGnomeApp):
 			self.isConfigChanged()
 			self.logger.debug("Key : " + str(self.configman.get("report", "smtpkey")))
 
-	def gtk_main_quit( self, *args):
-		self.askSaveConfig()
+	def on_nssbackupConfApp_delete_event(self, *args):
+		"""Signal handler that is called when the window decorator close
+		button is clicked.
+		"""
+		cancelled = self.ask_save_config()		
+		return cancelled
+		
+	def on_nssbackupConfApp_destroy(self, *args):
+		"""Signal handler that is called when the window was destroyed.
+		"""
 		gtk.main_quit()
+		
+	def on_exit_activate(self, *args):
+		"""Signal handler that is called when the 'Quit' menu item
+		is selected.
+		"""
+		cancelled = self.ask_save_config()
+		if not cancelled:
+			gtk.main_quit()
 
 	def on_ftype_custom_ex_changed(self, *args):
 		print("TODO: on_ftype_custom_ex_changed")
-		pass
 
 	def on_prfManager_activate(self, *args):
+		"""Launch Profile manager dialog
 		"""
-		Launch Profile manager dialog
-		"""
-		self.askSaveConfig()
-		
-		dialog = self.widgets["ProfileManagerDialog"]
-		dialog.run()
-		dialog.hide()
+		cancelled = self.ask_save_config()
+		if not cancelled:
+			dialog = self.widgets["ProfileManagerDialog"]
+			dialog.run()
+			dialog.hide()
 
 	def on_addProfileButton_clicked(self, *args):
 		valid_input = False
