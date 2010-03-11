@@ -90,8 +90,7 @@ class SBconfigGTK(GladeGnomeApp):
 			self.configman = ConfigManager()		
 			self.orig_configman = None
 				
-		self._init_ui()		
-		self.widgets['nssbackupConfApp'].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
+		self._init_ui()
 		
 		# hide the schedule tab if not root
 		if os.geteuid() != 0:
@@ -195,6 +194,7 @@ class SBconfigGTK(GladeGnomeApp):
 	def _init_ui(self):		
 		filename = Util.getResource('nssbackup-config.glade')		
 		widget_list = [
+			'nssbackupConfApp',
 			'toolbar',
 			'askSaveDialog',
 			'remote_inc_dialog',
@@ -220,7 +220,6 @@ class SBconfigGTK(GladeGnomeApp):
 			'regex_box',
 			'cancelbutton2',
 			'okbutton2',
-			'nssbackupConfApp',
 			'statusBar',
 			'vbox17',
 			'save',
@@ -452,12 +451,15 @@ class SBconfigGTK(GladeGnomeApp):
 	def isConfigChanged(self, force_the_change = False):
 		"""Checks whether the current configuration has changed compared to
 		the configuration which was originally loaded resp. stored on last
-		save action.
+		save action. The result (irrespective whether it was forced or not)
+		is returned by the method.
 		
 		@param force_the_change: Flag that that forces the check to be True
 								(i.e. the method acts as there were changes
 								regardless of the real test result)
-								
+		
+		@return: True if the config has changed, False otherwise
+		@rtype: Boolean						
 		"""
 		changed = not self.configman.isConfigEquals(self.orig_configman)
 		if force_the_change == True:
@@ -465,6 +467,7 @@ class SBconfigGTK(GladeGnomeApp):
 		self.widgets['save'].set_sensitive(changed)
 		self.widgets['save_as'].set_sensitive(changed)
 		self.widgets['saveButton'].set_sensitive(changed)
+		return changed
 	
 	def askSaveConfig(self):
 		"""
@@ -472,6 +475,7 @@ class SBconfigGTK(GladeGnomeApp):
 		changed = not self.configman.isConfigEquals(self.orig_configman)
 		if changed :
 			question = self.widgets['askSaveDialog']
+			question.set_title("")
 			response = question.run()
 			question.hide()
 			if response == gtk.RESPONSE_YES:
@@ -541,7 +545,8 @@ class SBconfigGTK(GladeGnomeApp):
 					 "'%s'\n\nThese expressions are not used and were\n"\
 					 "removed from the "\
 					 "configuration.") % (_invalid_regex.lstrip(","))
-			gobject.idle_add(misc.show_errdialog, _msg)
+			gobject.idle_add(misc.show_errdialog, _msg,
+							 self.__get_application_widget())
 
 	def __fill_max_filesize_widgets_from_config(self):
 		"""Sets the UI elements for 'maximum size limit' to the value
@@ -781,12 +786,12 @@ class SBconfigGTK(GladeGnomeApp):
 				 "Attention: The target will be set to the default "\
 				 "value. Check this on the destination settings page "\
 				 "before saving the configuration."
-						_boxtitle = _("NSsbackup configuration error")
 						_headline_str = \
 						_("Unable to open backup target")
 
 						gobject.idle_add( misc.show_errdialog,
-										  _message_str, _boxtitle,
+										  _message_str,
+										  self.__get_application_widget(),
 										  _headline_str, _sec_msg )
 						return
 						
@@ -1577,20 +1582,34 @@ class SBconfigGTK(GladeGnomeApp):
 		self.widgets['label_key'].set_sensitive(enable)
 		self.widgets['keyfilechooser'].set_sensitive(enable)
 		self.widgets['crtfilechooser'].set_sensitive(enable)
+		
+	def __get_application_widget(self):
+		"""Returns the top level application widget object.
+		"""
+		app_obj = self.widgets['nssbackupConfApp']
+		return app_obj
 
 	def on_testMailButton_clicked(self, *args):
-		result = False
-		try :
-			result = self.configman.testMail()
-		except SBException, e:
-			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=str(e))
-			dialog.run()
-			dialog.destroy()
-		
-		if result :
-			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Test Succeeded !"))
-			dialog.run()
-			dialog.destroy()
+		testmail_res = False
+		if self.isConfigChanged(force_the_change = False) is True:
+			misc.show_infodialog(parent = self.__get_application_widget(),
+					headline_str = _("Configuration has changed"),
+					message_str = _("There are unsaved modifications. Please "\
+					"save the configuration or revert these changes before "\
+					"testing the mail settings."))
+		else:
+			try :
+				testmail_res = self.configman.testMail()
+			except SBException, _exc:
+				misc.show_warndialog(parent = self.__get_application_widget(),
+					headline_str = _("Test mail settings"),
+					message_str = _("The test failed with following output:"),
+					secmsg_str = "%s" % (_exc))
+			
+			if testmail_res is True:
+				misc.show_infodialog(parent = self.__get_application_widget(),
+						headline_str = _("Test mail settings"),
+						message_str = _("The test was successful."))
 
 	def on_smtplogincheckbox_toggled(self, *args):
 		if self.widgets['smtplogincheckbox'].get_active():
@@ -1599,7 +1618,8 @@ class SBconfigGTK(GladeGnomeApp):
 				self.configman.set("report", "smtpuser",
 									self.widgets['smtplogin'].get_text())
 			if self.widgets['smtppassword'].get_text() :
-				self.configman.set("report", "smtpuser", self.widgets['smtppassword'].get_text())
+				self.configman.set("report", "smtpuser",
+									self.widgets['smtppassword'].get_text())
 		else:
 			self.widgets['smtplogininfo'].set_sensitive(False)
 			if self.configman.has_option("report", "smtpuser") :
@@ -1705,7 +1725,8 @@ class SBconfigGTK(GladeGnomeApp):
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
 			if Util.is_empty_regexp(regex):
-				misc.show_errdialog(message_str = \
+				misc.show_errdialog(parent = self.__get_application_widget(),
+							message_str = \
 				_("Empty expression. Please enter a valid regular expression."))
 			else:
 				if Util.is_valid_regexp(regex):
@@ -1717,7 +1738,8 @@ class SBconfigGTK(GladeGnomeApp):
 					self.ex_regex.append( [regex] )
 					self.isConfigChanged()
 				else:
-					misc.show_errdialog(message_str = \
+					misc.show_errdialog(parent = self.__get_application_widget(),
+							message_str = \
 								_("Provided regular expression is not valid."))
 
 		elif response == gtk.RESPONSE_CANCEL:
@@ -1938,46 +1960,58 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.hide()
 
 	def on_addProfileButton_clicked(self, *args):
-		
-		prfDir = getUserConfDir()+"nssbackup.d/"
-		if not os.path.exists(prfDir):
-			os.makedirs(prfDir)
-		
-		dialog = self.widgets['askNewPrfNameDialog']
-		response = dialog.run()
-		dialog.hide()
-		
-		if response == gtk.RESPONSE_OK :
+		valid_input = False
+		prf_set = False
+		while not valid_input:
+			prfDir = getUserConfDir()+"nssbackup.d/"
+			if not os.path.exists(prfDir):
+				os.makedirs(prfDir)
+			
+			dialog = self.widgets['askNewPrfNameDialog']
+			dialog.set_title("")
+			response = dialog.run()
+			dialog.hide()
+			
+			if response == gtk.RESPONSE_OK :	
+				enable = self.widgets['enableNewPrfCB'].get_active()
+				prfName = self.widgets['newPrfNameEntry'].get_text()
+				prfName = prfName.strip()
+				prfConf = getUserConfDir()+"nssbackup.d/nssbackup-"+prfName+".conf"
+				prfConfDisabled = "%s-disable" % prfConf
+							
+				if not prfName or prfName is '':
+					misc.show_warndialog(
+						parent=self.widgets["ProfileManagerDialog"],
+						message_str=_("The given name of the new profile "\
+						"is empty. Please enter a valid profile name."),
+						headline_str=_("Profile name not valid"))
+					continue
+				
+				if os.path.exists(prfConf) or os.path.exists(prfConfDisabled):
+					misc.show_warndialog(
+						parent=self.widgets["ProfileManagerDialog"],
+						message_str=_("The given name of the new profile "\
+						"already exists. Please enter another name."),
+						headline_str=_("Profile name not valid"),
+						secmsg_str=_("Renaming of profiles is not supported."))
+					continue
+				# if we reach this branch a valid profile name was choosen
+				prf_set = True
+			# if this branch is reached the input (OK, Cancel, Destroy) was
+			# valid
+			valid_input = True
+		# end of while loop
 
-			enable = self.widgets['enableNewPrfCB'].get_active()
-			prfName = self.widgets['newPrfNameEntry'].get_text()
-			prfConf = getUserConfDir()+"nssbackup.d/nssbackup-"+prfName.strip()+".conf"
-			
-			if not prfName or prfName is '' :
-				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-										 buttons=gtk.BUTTONS_CLOSE, message_format="Profile Name must not be empty ! " )
-				dialog.run()
-				dialog.destroy()
-			
-			elif os.path.exists(prfConf) :
-				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-										 buttons=gtk.BUTTONS_CLOSE, message_format="%s already exists . Please use 'Edit' instead of 'Add' !" % prfName )
-				dialog.run()
-				dialog.destroy()
-			else :
-					
-				self.logger.debug("Got new profile name '%s : enable=%r' " % (prfName,enable) )
-			
-				if not enable : 
-					prfConf += "-disable"
-				
-				confman = ConfigManager()
-				confman.saveConf(prfConf)
-				
-				self.profiles.append([enable, prfName, prfConf])
-		
-		elif response == gtk.RESPONSE_CANCEL :
-			pass
+		if prf_set:						
+			self.logger.debug("Got new profile name '%s : enable=%r' " % (prfName,enable) )
+#			print "Got new profile name '%s : enable=%r' " % (prfName,enable)
+			if not enable:
+				prfConf = prfConfDisabled			
+			confman = ConfigManager()
+			confman.saveConf(prfConf)			
+			self.profiles.append([enable, prfName, prfConf])
+#		else:
+#			print "Adding of profile canceled."
 		
 	def on_removeProfileButton_clicked(self, *args):
 		

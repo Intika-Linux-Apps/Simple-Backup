@@ -1024,14 +1024,17 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 		"""
 		if not self.has_option("report", "to"):
-			raise SBException (_("Set the reciever of this mail"))
+			raise SBException (_("No receiver set."))
 		if not self.has_option("report","smtpserver") :
-			raise SBException (_("Set the SMTP server"))
+			raise SBException (_("No SMTP server set."))
+		
 		if (self.has_option("report","smtpuser") and not self.has_option("report","smtppassword") ) \
 			or (not self.has_option("report","smtpuser") and self.has_option("report","smtppassword") ) :
 			raise SBException (_("When setting a username (resp password), password (resp username) is mandatory"))
+		
 		if not self.has_option("report", "smtptls") and (self.has_option("report", "smtpcert") or self.has_option("report","smtpkey)") ) :
-			raise SBException (_("Choose the SSL option (smtptls=1) to be able to use Cert and Key"))
+			raise SBException (_("SSL option (smtptls=1) is not set while a certificate and key file is given.\nSelect SSL in order to use Certificate and Key"))
+		
 		if self.has_option("report", "smtptls") and ((self.has_option("report","smtpcert") and not self.has_option("report","smtpkey") ) \
 			or (not self.has_option("report","smtpcert") and self.has_option("report","smtpkey") ) ):
 			raise SBException (_("When setting a ssl certificate (resp key), key (resp certificate) is mandatory"))
@@ -1380,7 +1383,8 @@ class _DefaultConfiguration(Configuration):
 	"""
 	
 	def __init__(self):
-#		super(DefaultConfiguration, self).__init__() # don't use this form
+#		super(DefaultConfiguration, self).__init__() # don't use this form,
+# see http://fuhm.net/super-harmful/
 		Configuration.__init__(self)
 		
 		self._regex_excludes = "\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,"\

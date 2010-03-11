@@ -88,28 +88,66 @@ def _label_size_allocate(widget, allocation):
 	if lh_old != lah:
 		widget.set_size_request(-1, lah / pango.SCALE)
 		
-def show_errdialog(message_str, boxtitle = "",
-					headline_str = "", secmsg_str = ""):
+def show_infodialog(message_str, parent, headline_str = "", secmsg_str = ""):
 	"""Creates und displays a modal dialog box. Main purpose is
 	displaying of error messages.
 	
 	@param message_format: error message to show
 	@type message_format: String
 	
-	@todo: Should we use the button OK or CLOSE?
-	@todo: Refactor this as function into UI.util module.
 	"""
-	dialog = gtk.MessageDialog(
-				flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-				type = gtk.MESSAGE_ERROR,
+	__show_msgdialog(message_str=message_str, type=gtk.MESSAGE_INFO,
+					parent=parent, boxtitle="",
+					headline_str=headline_str, secmsg_str=secmsg_str)
+
+def show_warndialog(message_str, parent, headline_str = "", secmsg_str = ""):
+	"""Creates und displays a modal dialog box. Main purpose is
+	displaying of error messages.
+	
+	@param message_format: error message to show
+	@type message_format: String
+	
+	"""
+	__show_msgdialog(message_str=message_str, type=gtk.MESSAGE_WARNING,
+					parent=parent, boxtitle="",
+					headline_str=headline_str, secmsg_str=secmsg_str)
+
+def show_errdialog(message_str, parent, headline_str = "", secmsg_str = ""):
+	"""Creates und displays a modal dialog box. Main purpose is
+	displaying of error messages.
+	
+	@param message_format: error message to show
+	@type message_format: String
+	"""
+	__show_msgdialog(message_str=message_str, type=gtk.MESSAGE_ERROR,
+					parent=parent, boxtitle="",
+					headline_str=headline_str, secmsg_str=secmsg_str)
+
+def __show_msgdialog(message_str, type, parent, boxtitle = "",
+					headline_str = "", secmsg_str = ""):
+	"""Creates und displays a modal dialog box. Main purpose is
+	displaying of error messages.
+	
+	Do not use markup for the strings.
+	
+	@param message_format: error message to show
+	@type message_format: String
+	
+	@todo: Add proper escaping before markup is applied to the headlline.
+	"""
+	# in compliance with Gnome HIG a 'Close' button instead of 'OK' is used
+	
+	dialog = gtk.MessageDialog(parent=parent, type = type,
+				flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,				
 				buttons=gtk.BUTTONS_CLOSE)
+	
 	if boxtitle.strip() != "":
-		dialog.set_title( boxtitle )
+		dialog.set_title(boxtitle)
 		
 	_hdl = headline_str.strip(" \n\t")
 	if _hdl != "":
 		_hdl = "<b>%s</b>\n\n" % _hdl
-	_msg = "%s%s" % ( _hdl, message_str )
+	_msg = "%s%s" % (_hdl, message_str)
 	dialog.set_markup(_msg)
 
 	# an optional secondary message is added
@@ -121,4 +159,3 @@ def show_errdialog(message_str, boxtitle = "",
 	# the message box is showed
 	dialog.run()
 	dialog.destroy()
-
