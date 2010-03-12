@@ -266,7 +266,6 @@ class ConfigManager(ConfigParser.ConfigParser):
 	@todo: Use the RawConfigParser instead of ConfigParser! And maybe the \
 			parser should be a member of NSsbackup config!
 	"""
-	__servicefile 		 = Util.getResource("nssbackup", isFile = True)
 	
 	def __init__(self, configfile = None):
 		"""Default constructor.
@@ -278,11 +277,14 @@ class ConfigManager(ConfigParser.ConfigParser):
 		"""
 		ConfigParser.ConfigParser.__init__(self)
 
+		self.__servicefile = ConfigManagerStaticData.get_schedule_script_file()
+		self.__schedules_user = "root"	# schedules are only usable by root 
+
 		# configuration object which is set to valid default values
 		self.__default_config = _DefaultConfiguration() # is a dummy
 		self.__create_default_config_obj()
 		
-		self.__dirconfig	= {}
+		self.__dirconfig		= {}
 		
 		self.__logfile_dir		= ""
 		self.conffile 			= None
@@ -978,20 +980,29 @@ class ConfigManager(ConfigParser.ConfigParser):
 			else:
 				if self.has_option("schedule", "cron") :
 					self.logger.debug("Saving Cron entries")
-					execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
 					FAM.writetofile("/etc/cron.d/nssbackup",
-							ConfigManagerStaticData.get_cronheader() + self.get("schedule", "cron") + "\troot\t"+ execline)
+									self.__make_cronfile_content())
+#					execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
+#					FAM.writetofile("/etc/cron.d/nssbackup",
+#							ConfigManagerStaticData.get_cronheader() + self.get("schedule", "cron") + "\troot\t"+ execline)
 					
-				if self.has_option("schedule", "anacron") :
+				if self.has_option("schedule", "anacron"):
 					self.logger.debug("Saving Anacron entries")
-					if self.get("schedule", "anacron") == "hourly" :
-						os.symlink(self.__servicefile,"/etc/cron.hourly/nssbackup")
-					elif self.get("schedule", "anacron") == "daily" :
-						os.symlink(self.__servicefile,"/etc/cron.daily/nssbackup")
-					elif self.get("schedule", "anacron") == "weekly" :
-						os.symlink(self.__servicefile,"/etc/cron.weekly/nssbackup")
-					elif self.get("schedule", "anacron") == "monthly" :
-						os.symlink(self.__servicefile,"/etc/cron.monthly/nssbackup")
+					if self.get("schedule", "anacron") == "hourly":
+						os.symlink(self.__servicefile,
+									"/etc/cron.hourly/nssbackup")
+						
+					elif self.get("schedule", "anacron") == "daily":
+						os.symlink(self.__servicefile,
+									"/etc/cron.daily/nssbackup")
+						
+					elif self.get("schedule", "anacron") == "weekly":
+						os.symlink(self.__servicefile,
+									"/etc/cron.weekly/nssbackup")
+						
+					elif self.get("schedule", "anacron") == "monthly":
+						os.symlink(self.__servicefile,
+									"/etc/cron.monthly/nssbackup")
 					else : 
 						self.logger.warning("'%s' is not a valid value" \
 											% self.get("schedule", "anacron"))
@@ -999,6 +1010,21 @@ class ConfigManager(ConfigParser.ConfigParser):
 		else:
 			self.logger.warning("Not implemented for non-default profiles yet.")
 			return
+		
+	def __make_cronfile_content(self):
+		"""Collects required data in order to create the content for
+		the file used to setup CRON (precise setting). 
+		"""
+		_cronheader = ConfigManagerStaticData.get_cronheader()
+		_cronline = self.get("schedule", "cron")
+		_cronuser = self.__schedules_user
+		_execline = "if [ -x '%s' ]; then %s; fi;" % (self.__servicefile,
+													  self.__servicefile)
+						
+		_content = "%s\n%s\t%s\t%s" % (_cronheader, _cronline,
+									   _cronuser, _execline)
+		print "Content: '%s'" % _content
+		return _content
 			
 	def __erase_services(self):
 		"""Removes Cron and Anacron service from /etc/cron.*
@@ -1113,7 +1139,9 @@ class ConfigManagerStaticData(object):
 	
 	"""	
 	__cronheader = "SHELL=/bin/bash \n"\
-		"PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\n"
+		"PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n"
+		
+	__schedule_script_file = Util.getResource("nssbackup", isFile = True)
 
 	__default_profilename = _("Default Profile")
 	__unknown_profilename = _("Unknown Profile")
@@ -1198,6 +1226,13 @@ class ConfigManagerStaticData(object):
 		"""
 		return cls.__cronheader
 		
+	@classmethod
+	def get_schedule_script_file(cls):
+		"""Returns the service file (helper script) that is called when
+		using scheduled backups.
+		"""
+		return cls.__schedule_script_file
+	
 	@classmethod
 	def get_default_logfile(cls):
 		"""Returns the name of the logfile for the default profile.		

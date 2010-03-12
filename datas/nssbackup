@@ -1,9 +1,10 @@
 #!/bin/bash
 #
-# Sbackup Service file used by anacron
+# NSsbackup service file used by cron/anacron
 
 if [ -x /usr/bin/nssbackupd ]
 then /usr/bin/nssbackupd
 elif [ -x /usr/local/bin/nssbackupd ]
 then /usr/local/bin/nssbackupd
 fi
+

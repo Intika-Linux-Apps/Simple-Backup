@@ -169,30 +169,35 @@ def _prepare_nssb_copy(src, dst):
 	
 
 def getResource(resourceName, isFile=False):
-	"""Looks for certian resources installed by nssbackup.
+	"""Looks for certain resources installed by nssbackup.
 	The installation script writes into the 'resources' file where
 	the files/resources are being stored.
 	This function will look for them and return the appropriate path.
 	
 	@param resourceName: the ressource name, as complete as possible
-	@param isFile: flag whether the resource looked up is a file 
+	@param isFile: flag whether the resource looked up is a file
+	
+	@note: The file 'ressources' is required to be located in the
+			root directory of the nssbackup package. 
 	"""
 	tmp = inspect.getabsfile(nssbackup)
-	resfile = open(os.sep.join([os.path.dirname(tmp),"ressources"]))
-	for _dir in resfile.readlines() :
+	resfile = open(os.sep.join([os.path.dirname(tmp), "ressources"]))
+	
+	for _dir in resfile.readlines():
 		_dir = _dir.strip()
 		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
 		if os.path.exists(_dir) and os.path.isdir(_dir):
 			if _dir.endswith(resourceName) and not isFile:
-				return _dir 
-			list = os.listdir(_dir)
+				return _dir
+			
+			_flist = os.listdir(_dir)
 			#LogFactory.getLogger().debug("File list is :" + str(list))
-			for f in list :
-				if f == resourceName :
-					return os.path.normpath(os.sep.join([_dir,resourceName]))
-	devvalue = os.path.dirname(tmp)+"/../../datas/"
-	if os.path.exists(devvalue + resourceName) :
-		return os.path.normpath(devvalue + resourceName)
+			for _file in _flist :
+				if _file == resourceName:
+					return os.path.normpath(os.sep.join([_dir, resourceName]))
+#	devvalue = os.path.dirname(tmp)+"/../../datas/"
+#	if os.path.exists(devvalue + resourceName) :
+#		return os.path.normpath(devvalue + resourceName)
 	raise exceptions.SBException(\
 				"'%s' hasn't been found in the ressource list"% resourceName)
 					
