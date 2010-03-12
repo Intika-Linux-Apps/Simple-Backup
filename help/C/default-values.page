@@ -3,7 +3,7 @@
       id="defaults">
 
   <info>
-    <link type="guide" xref="index"/>
+    <link type="guide" xref="index#backup-conf"/>
     <desc>
       Introduction to the <app>Not So Simple Backup</app> application.
     </desc>

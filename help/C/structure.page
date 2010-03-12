@@ -1,0 +1,79 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      type="topic"
+      id="structure">
+
+  <info>
+    <link type="guide" xref="index#basics"/>
+    <link type="topic" xref="introduction"/>
+    <desc>
+      Explains the structure of the application.
+    </desc>
+    <revision pkgversion="0.2" version="0.1" date="2010-03-10" status="draft">
+    </revision>
+    <credit type="author">
+      <name>Jean-Peer Lorenz</name>
+      <email>peer.loz@gmx.net</email>
+    </credit>
+<!--
+    <copyright>
+      <year>2010</year>
+      <name>NSsbackup Team</name>
+    </copyright>
+-->
+    <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude" />
+  </info>
+
+  <title>Application structure and components</title>
+
+  <p>
+    Basically, there are three main components which build up the
+    <app>Not So Simple Backup Suite</app>. These components are
+  </p>
+  <list type="numbered">
+    <item><p>Configuration Graphical User Interface</p></item>
+    <item><p>Restore Graphical User Interface</p></item>
+    <item><p>Backup daemon.</p></item>
+  </list>
+
+  <p>
+    In the following sections these components and their usage are being
+    described.
+  </p>
+  
+  <section id="basics-config-gui">
+  <title>Configuration Graphical User Interface</title>
+  <p>
+    The <app>Configuration User Interface</app> provides an easy way to
+    access the configuration that are later used for the creation of backups.
+  </p>
+
+  <figure>
+    <title>Configuration GUI</title>
+    <desc>The Configuration GUI is a GTK+ application.</desc>
+    <media type="image" src="./figures/config-gui.png">
+      <p>The Configuration GUI: a GTK+ application</p>
+    </media>
+  </figure>
+
+  </section>
+
+  <section id="basics-restore-gui">
+  <title>Restore User Interface</title>
+  <p>
+    The <app>Restore User Interface</app> provides a graphical way to
+    access existing backup snapshots and restore data from them.
+  </p>
+
+  </section>
+
+  <section id="basics-backup-daemon">
+  <title>Backup daemon</title>
+  <p>
+    The <app>Backup daemon</app> is the actual core application that
+    creates backups using prior defined configurations.
+  </p>
+
+  </section>
+
+</page>
+

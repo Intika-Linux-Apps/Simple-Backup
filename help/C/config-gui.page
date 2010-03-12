@@ -1,0 +1,117 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      type="topic"
+      id="config-gui">
+
+  <info>
+    <link type="guide" xref="index#backup-conf"/>
+    <desc>
+      The <app>Not So Simple Backup</app> Configuration user interface.
+    </desc>
+    <revision pkgversion="0.2" version="0.1" date="2010-03-10" status="draft">
+    </revision>
+    <credit type="author">
+      <name>Jean-Peer Lorenz</name>
+      <email>peer.loz@gmx.net</email>
+    </credit>
+<!--
+    <copyright>
+      <year>2010</year>
+      <name>NSsbackup Team</name>
+    </copyright>
+-->
+    <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude" />
+  </info>
+
+  <title>Configuration User Interface</title>
+
+  <p>
+    <app>NSsbackup</app>, shortform of Not So Simple Backup suite, is a backup
+    solution for common desktop use.
+  </p>
+  <p>
+    <app>NSsbackup</app> is basically using the same technology that Unix
+    administrators have been used for decades but it adds some some intelligence
+    for interaction with users within a graphical interface. This means dumps of
+    files were created using the good old TAR but the usage is much more
+    convenient than from a command line.
+  </p>
+  
+  <section id="intro-feature-overview">
+  <title>Feature overview</title>
+  
+  <terms>
+    <item>
+      <title>Profiles Management</title>
+      <p>
+        You can have multiple Backup Profiles in order to prepare
+        different backups to be performed e.g. one for your photos, one for
+        personal settings, and one more for your documents. A Backup Profile
+        is a comprehensive configuration comprising of separate specified
+        locations, includes and excludes etc.
+      </p>
+    </item>
+    
+    <item>
+      <title>Snapshots Management</title>
+      <p>
+        A general management of backups is provided. Management of snapshots
+        includes the change of the base of a backup, deleting a backup, and the
+        transfer of backups.
+      </p>
+    </item>
+    
+    <item>
+      <title>Compression Options</title>
+      <p>
+        NSsbackup allows to choose you from 3 different compressions:
+        Gzip, Bzip2, and uncompressed. You can use uncompressed backups e.g.
+        for making a backup of photos, which are already compressed, without
+        wasting time and resources.
+      </p>
+    </item>
+    
+    <item>
+      <title>Split of the Archive</title>
+      <p>
+        In order to make backups suitable for burning onto CD or DVD or just in
+        the case of a harddisk formatted with FAT32, it is possible to make a
+        backup with the resulting backup file divided into files of specified
+        size.
+      </p>
+      <note>
+        <p>
+          If you want to use the split feature please consider its limitation:
+          The snapshots are required to be uncompressed.
+        </p>
+      </note>
+    </item>
+    
+    <item>
+      <title>Logarithmic Purge</title>
+      <p>
+        The removal of old backups in a logarithmic manner.
+      </p>
+    </item>
+    
+    <item>
+      <title>System Program Restore</title>
+      <p>
+        On Debian based systems <app>NSsbackup</app> makes a backup of the
+        list of software installed. You can use this list from an arbitrary
+        backup(at the terminal) to restore the state of installed software.
+      </p>
+    </item>
+    
+    <item>
+      <title>Command line interface</title>
+      <p>
+        Any core functionality can be accessed by plain text editors and
+        shell commands. Therefore, <app>NSsbackup</app> can easily be
+        installed on a server without X.
+      </p>
+    </item>
+    
+</terms>
+</section>
+</page>
+

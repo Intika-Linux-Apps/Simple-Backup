@@ -21,6 +21,10 @@
 
   <title>Not so simple backup</title>
 
+  <section id="basics" style="2column">
+    <title>Basics</title>
+  </section>
+
   <section id="backup-conf" style="2column">
     <title>Backup configuration</title>
   </section>
