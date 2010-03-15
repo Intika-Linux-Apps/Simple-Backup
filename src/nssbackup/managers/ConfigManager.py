@@ -982,9 +982,6 @@ class ConfigManager(ConfigParser.ConfigParser):
 					self.logger.debug("Saving Cron entries")
 					FAM.writetofile("/etc/cron.d/nssbackup",
 									self.__make_cronfile_content())
-#					execline = "if [ -x '"+Util.getResource("nssbackup")+"' ]; then "+Util.getResource("nssbackup")+"; fi;"
-#					FAM.writetofile("/etc/cron.d/nssbackup",
-#							ConfigManagerStaticData.get_cronheader() + self.get("schedule", "cron") + "\troot\t"+ execline)
 					
 				if self.has_option("schedule", "anacron"):
 					self.logger.debug("Saving Anacron entries")

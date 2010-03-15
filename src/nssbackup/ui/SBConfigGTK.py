@@ -129,10 +129,9 @@ class SBconfigGTK(GladeGnomeApp):
 		self.ex_ftypetv.append_column(column3)
 		self.ex_ftypetv.append_column(column2)
 
-		# set label of default target option
-		_default_target = self.configman.get_target_default()
-		_def_targ_lab = _("Use default backup directory (%s)") % _default_target
-		self.widgets['dest1'].set_label(_def_targ_lab)
+		# set label of default target
+		_default_target = str(self.configman.get_target_default())
+		self.widgets['label_default_target'].set_text(_default_target)
 		
 		self.ex_regex = gtk.ListStore( str )
 		self.ex_regextv = self.widgets["ex_regextv"]
@@ -281,6 +280,7 @@ class SBconfigGTK(GladeGnomeApp):
 			'vbox8',
 			'dest1',
 			'dest2',
+			'label_default_target',
 			'hbox9',
 			'dest_localpath',
 			'dest3',
