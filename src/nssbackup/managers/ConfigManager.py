@@ -450,10 +450,14 @@ class ConfigManager(ConfigParser.ConfigParser):
 				
 	def set_target_to_default(self):
 		"""The destination (target) option is set to the default value
-		valid for the current user.
+		valid for the current user. If the specified path does not
+		exist is a directory created.
 		"""
-		self.set("general", "target", self.get_target_default())
-		
+		_def_target_path = self.get_target_default()
+		self.set("general", "target", _def_target_path)
+		if not os.path.exists(_def_target_path):
+			os.mkdir(_def_target_path)
+
 	def get_target_default(self):
 		"""Wrapper method that return the default target path for
 		the current user. No values of this configuration (actually
