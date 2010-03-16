@@ -21,11 +21,15 @@ import unittest
 from nssbackup import util as Util
 
 class TestUtilsRemoveConfEntry(unittest.TestCase):
-
+	"""Testing function 'util.remove_conf_entry'.
+	"""
+	
 	def setUp(self):
 		pass
 	
 	def test_types(self):
+		"""Given parameter types for function 'util.remove_conf_entry'.
+		"""
 		confline = ["adjh", "fdshf"]
 		rm_entry = "skjsfhk"
 		delim    = "akjdlj"
@@ -42,7 +46,10 @@ class TestUtilsRemoveConfEntry(unittest.TestCase):
 		self.assertRaises( TypeError, Util.remove_conf_entry, confline, rm_entry, delim)
 
 	def test_simple(self):
+		"""Simple removal of configuration entry.
+		"""
 		confline	= "entry_a,entry_b,entry_c"
+
 		target_val	= "entry_b,entry_c"
 		rm_entry	= "entry_a"		
 		res = Util.remove_conf_entry(confline, rm_entry)
@@ -59,7 +66,10 @@ class TestUtilsRemoveConfEntry(unittest.TestCase):
 		self.assertEqual(res, target_val)
 
 	def test_simple_with_spaces(self):
+		"""Simple removal of configuration entry from input containing spaces.
+		"""
 		confline	= " entry_a , entry_b , entry_c "
+		
 		target_val	= " entry_b , entry_c "
 		rm_entry	= " entry_a "		
 		res = Util.remove_conf_entry(confline, rm_entry)
@@ -76,14 +86,16 @@ class TestUtilsRemoveConfEntry(unittest.TestCase):
 		self.assertEqual(res, target_val)
 		
 	def test_entry_not_contained(self):
+		"""Removal of not contained configuration entry.
+		"""
 		confline	= "entry_a,entry_b,entry_c"
 		target_val	= "entry_a,entry_b,entry_c"
 		rm_entry	= "entry_d"
 		res = Util.remove_conf_entry(confline, rm_entry)
 		self.assertEqual(res, target_val)
 
-	def test_entry_double(self):
-		"""
+	def test_entry_double_not_contained(self):
+		"""Removal of two entries not in given order.
 		@todo: This test case needs to be reviewed!
 		"""
 		confline	= "entry_a,entry_b,entry_c"
@@ -92,28 +104,50 @@ class TestUtilsRemoveConfEntry(unittest.TestCase):
 		res = Util.remove_conf_entry(confline, rm_entry)
 		self.assertEqual(res, target_val)
 
+	def test_entry_double(self):
+		"""Removal of two entries in given order.
+		@todo: This test case needs to be reviewed!
+		"""
+		confline	= "entry_a,entry_b,entry_c"
+		target_val	= "entry_c"
+		rm_entry	= "entry_a,entry_b"
+		res = Util.remove_conf_entry(confline, rm_entry)
+		self.assertEqual(res, target_val)
+
 
 class TestUtilsRegex(unittest.TestCase):
-
+	"""Testing of regexp related functions.
+	"""
+	
 	def setUp(self):
 		pass
 
 	def test_types(self):
+		"""Given parameter types for regexp related functions.
+		"""
 		regex = ["[]", "{}"]
 		self.assertRaises(TypeError, Util.is_empty_regexp, regex)
 		self.assertRaises(TypeError, Util.is_valid_regexp, regex)
 
 	def test_is_valid(self):
+		"""Given regexp is valid.
+		@todo: Extend number of tested expressions!
+		"""
 		regex = ""
 		self.assertTrue( Util.is_valid_regexp(regex) )
 		regex = "()"
 		self.assertTrue( Util.is_valid_regexp(regex) )
 		
 	def test_is_not_valid(self):
+		"""Given regexp is invalid.
+		@todo: Extend number of tested expressions!
+		"""
 		regex = "[[["
 		self.assertFalse( Util.is_valid_regexp(regex) )
 
 	def test_is_empty(self):
+		"""Given regexp is empty.
+		"""
 		regex = ""
 		self.assertTrue( Util.is_empty_regexp(regex) )
 		regex = " "
@@ -124,14 +158,18 @@ class TestUtilsRegex(unittest.TestCase):
 		self.assertTrue( Util.is_empty_regexp(regex) )
 
 	def test_is_not_empty(self):
+		"""Given regexp is not empty.
+		"""
 		regex = "[[["
 		self.assertFalse( Util.is_empty_regexp(regex) )
 
 		regex = "[  [["
 		self.assertFalse( Util.is_empty_regexp(regex) )
 
-		
+
 class TestUtilsNssbCopy(unittest.TestCase):
+	"""Testing of nssbcopy related functions.
+	"""
 
 	def setUp(self):
 		self.src_relpath = "./test-datas/test_utils.src"
@@ -145,6 +183,8 @@ class TestUtilsNssbCopy(unittest.TestCase):
 		self.dst_absdir_notexist  = os.path.abspath(self.dst_reldir_notexist).rstrip(os.path.sep)+os.path.sep
 
 	def test_prepare_types(self):
+		"""Given parameter types for nssbcopy related functions.
+		"""
 		src = ["test", "test"]
 		dst = "test"
 		self.assertRaises(TypeError, Util._prepare_nssb_copy, src, dst )

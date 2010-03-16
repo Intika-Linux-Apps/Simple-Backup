@@ -1,0 +1,158 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      type="topic"
+      id="defaults">
+
+  <info>
+    <link type="guide" xref="index#backup-conf"/>
+    <desc>
+      Introduction to the <app>Not So Simple Backup</app> application.
+    </desc>
+    <revision pkgversion="0.2" version="0.1" date="2010-02-5" status="draft">
+    </revision>
+    <credit type="author">
+      <name>Jean-Peer Lorenz</name>
+      <email>peer.loz@gmx.net</email>
+    </credit>
+<!--
+    <copyright>
+      <year>2010</year>
+      <name>NSsbackup Team</name>
+    </copyright>
+-->
+    <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude" />
+  </info>
+
+  <title>Default values</title>
+  <p>
+    When selecting the menu entry 'Set default values' resp. clicking the
+    according toolbar button, default values are applied for the current
+    profile. You can consider these default values as a suggestion or
+    recommendation suitable for many users. If these settings are
+    appropriate for you - decide for yourself.
+  </p>
+  
+  <table frame="all" shade="rows">
+  <tr>
+    <td><p>Mallard</p></td> <td><p>Anas platyrhynchos</p></td>
+    <td><p>56-65cm</p></td> <td><p>900-1200g</p></td>
+  </tr>
+  <tr>
+    <td><p>Eurasian Wigeon</p></td> <td><p>Anas penelope</p></td>
+    <td><p>45-50cm</p></td>         <td><p>680g</p></td>
+  </tr>
+  <tr>
+    <td><p>Common Teal</p></td> <td><p>Anas crecca</p></td>
+    <td><p>34-43cm</p></td>     <td><p>360g</p></td>
+  </tr>
+  <tr>
+    <td><p>Northern Pintail</p></td> <td><p>Anas acuta</p></td>
+    <td><p>59-76cm</p></td>          <td><p>450-1360g</p></td>
+  </tr>
+</table>
+
+
+
+  <section id="defaults-normal-users">
+  <title>For normal users</title>
+
+  <p>
+    For non-privileged users the following default values are applied.
+  </p>
+  
+  <terms>
+    <item>
+      <title>Incremental backups</title>
+      <p>
+        max. increment set to 7 days
+      </p>
+    </item>
+</terms>
+</section>
+  
+  <section id="defaults-root-users">
+  <title>For users with root-priviliges</title>
+
+  <p>
+    For users with root-priviliges (administrators) the following default
+    values are applied.
+  </p>
+  
+  <terms>
+    <item>
+      <title>Incremental backups</title>
+      <p>
+        max. increment set to 7 days
+      </p>
+    </item>
+  
+    <item>
+      <title>Compression</title>
+      <p>
+        compression set to gzip
+      </p>
+    </item>
+  
+    <item>
+      <title>Splitting</title>
+      <p>
+        no splitting of backups
+      </p>
+    </item>
+  
+    <item>
+      <title>Includes and excludes</title>
+      
+    <terms>
+    <item>
+      <title>directories being included</title>
+      <p>
+       directories being included:
+    /var
+    /home
+    /usr/local
+    /etc
+      </p>
+    </item>
+
+    <item>
+      <title>paths being excluded</title>
+          <list>
+          <item><p>/media</p></item>
+          <item><p>/var/cache</p></item>
+          <item><p>/var/spool</p></item>
+          <item><p>/var/tmp</p></item>
+    </list>
+    </item>
+
+        <item>
+      <title>excluded file types</title>
+      <p>
+  excluded file types:
+    multimedia files (mp3, avi, mpeg, mkv, ogg)
+    cd/dvd images (iso)
+      </p>
+    </item>
+
+        <item>
+      <title>regular expressions</title>
+      <p>
+          regular expressions:
+    /home/[^/]+?/\.thumbnails/
+    /home/[^/]+?/\.Trash
+    /home/[^/]+?/\..+/[cC]ache
+      </p>
+    </item>
+    </terms>
+        </item>
+
+
+    
+  files bigger than 100 MB are *not* backuped
+  symbolic links are not followed
+  
+  Destination
+  the backup target is set to the /var/backup
+</terms>
+</section>
+</page>
+

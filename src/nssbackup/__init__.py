@@ -34,33 +34,42 @@ import socket
 from gettext import gettext as _
 
 class Infos(object):
-    """Collects general informations about NSsbackup.
-    
-    `name` The application's full name
+	"""Collects general informations about NSsbackup.
+	
+	`name` The application's full name
 	`version` Full current version
 	`description` some description
+	
+	@todo: Remove the smtpfrom info from here.
+	
+	"""
+	
+	NAME = "Not So Simple Backup Suite"
+	
+	VERSION = "0.2-0"
+	
+	DESCRIPTION = _("This is a user friendly backup solution for common "\
+					"desktop needs. If you want to help by submitting bugs, "\
+					"by translating or anything else please visit our website.")
+	
+	WEBSITE = "https://launchpad.net/nssbackup/"
 
-    """
-    
-    NAME = "Not So Simple Backup Suite"
-
-    VERSION = "0.2-0 RC7"
-    
-    DESCRIPTION = _("This is a user friendly backup solution for common desktop needs.")
-    WEBSITE = "https://launchpad.net/nssbackup/"
-    
-    hostname = socket.gethostname()
-    if "." in hostname :
-        mailsuffix = hostname
-    else :
-        mailsuffix = hostname + ".ext"
-    SMTPFROM = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {
-					'login' : os.getenv("USERNAME"), 'hostname': mailsuffix }
-    
-    SNPCURVERSION = "1.5"
-    
-    AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
+	SNPCURVERSION = "1.5"
+	
+	COPYRIGHT = "2007-2010 NSsbackup Development team"
+	
+	AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
 			   "Jean-Peer Lorenz <peer.loz@gmx.net>",
 			   "Aigars Mahinovs <aigarius@debian.org>",
 			   "Mathias Houngbo <mathias.houngbo@gmail.com>"
 			  ]
+	TRANSLATORS = _("translator-credits")
+	
+	#
+	hostname = socket.gethostname()
+	if "." in hostname:
+		mailsuffix = hostname
+	else:
+		mailsuffix = hostname + ".ext"
+	SMTPFROM = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {
+					'login' : os.getenv("USERNAME"), 'hostname': mailsuffix }

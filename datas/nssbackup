@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#   NSsbackup - Service file used by anacron
+#
+#   NSsbackup service file used by cron/anacron
 #
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #

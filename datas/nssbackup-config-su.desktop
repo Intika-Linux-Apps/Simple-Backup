@@ -21,8 +21,8 @@ GenericName[es]=Herramienta de copia de seguridad
 Exec=gksu nssbackup-config-gui
 #
 Terminal=false
-Categories=System;Settings;
-StartupNotify=true
+Categories=GTK;GNOME;System;
+StartupNotify=false
 Icon=nssbackup-conf
 #
 X-KDE-SubstituteUID = true

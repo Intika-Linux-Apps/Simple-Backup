@@ -120,8 +120,8 @@ def extract2(sourcear, fileslist, dest, bckupsuffix = None,additionalOpts=None )
 	@param additionalOpts: a list of aption to add
 	"""
 	# tar option  -p, --same-permissions, --preserve-permissions:
-    # ignore umask when extracting files (the default for root)
- 
+	# ignore umask when extracting files (the default for root)
+
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
 	archType = getArchiveType(sourcear)
@@ -270,7 +270,7 @@ def __addSplitOpts(snapshot, options, size):
 	@type snapshot: Snapshot
 	@param options: the option in which to append
 	@type options: list
-	@param size: the size of each part (in KB)
+	@param size: the size of each part (in KiB)
 	@type size: int
 	@raise SBException: if the snapshot format is other than none
 	"""
@@ -329,8 +329,10 @@ def makeTarIncBackup(snapshot):
 			LogFactory.getLogger().warning(_("Unable to change permissions for "\
 									  "file '%s'.") % snarfile )
 		os.remove( tmp_snarfile )
-
-		if retVal != 0 :
+		if retVal == 1 :
+			# list-incremental is not compatible with ignore failed read
+			LogFactory.getLogger().warning(_("TAR sent a warning when making the backup : ") + errStr )
+		elif retVal != 0 :
 			# list-incremental is not compatible with ignore failed read
 			LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
 			raise SBException(_("Couldn't make a proper backup : ") + errStr )
@@ -356,7 +358,7 @@ def makeTarFullBackup(snapshot):
 	
 	LogFactory.getLogger().debug("Snapshot's snarfile: %s" % snarfile)
 	LogFactory.getLogger().debug("Temporary snarfile: %s" % tmp_snarfile)
-	 
+
 	# For a full backup the SNAR file shouldn't exists
 	if os.path.exists( snarfile ) :
 		os.remove( snarfile )		
@@ -376,7 +378,10 @@ def makeTarFullBackup(snapshot):
 									  "file '%s'.") % snarfile )
 	os.remove( tmp_snarfile )
 
-	if retVal != 0 :
+	if retVal == 1 :
+		# list-incremental is not compatible with ignore failed read
+		LogFactory.getLogger().warning(_("TAR sent a warning when making the backup : ") + errStr )
+	elif retVal != 0 :
 		# list-incremental is not compatible with ignore failed read
 		LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
 		raise SBException(_("Couldn't make a proper backup : ") + errStr )

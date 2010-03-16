@@ -128,6 +128,7 @@ class FuseFAM(object):
 					self.logger.debug("Removing '%s' from configManager" % remotedir)
 					self.__config.remove_option("dirconfig",remotedir)
 				elif self.__config.has_option("general","target") and self.__config.get("general","target") == remotedir :
+					self.logger.error("ERROR when trying to use plugin '%s' to mount target destination '%s' ! Cause : %s"% (p_name,remotedir,str(e)))
 					raise SBException("We are unable to mount the target dir !")
 				return False
 		self.logger.warning("No plugin could deal with that schema '%s', disabling it" % remotedir)
@@ -136,7 +137,9 @@ class FuseFAM(object):
 	def __umount(self, mounteddir):
 		"""
 		Unmount a mounted dir that should be in __mountedDirs dict
-		@param mounteddir: 
+		@param mounteddir:
+		
+		@todo: Should we use lazy unmount (fusermount -z)?
 		"""
 		if not os.path.ismount(mounteddir) :
 			# mountpoint is not mounted 
@@ -195,14 +198,14 @@ class FuseFAM(object):
 		
 		#start the mount process
 		#  mount target
-		if self.__config.has_option("general","target") and not self.__config.get("general","target").startswith(os.sep):
-			self.__mount(self.__config.get("general","target"))
-		elif self.__config.get("general","target").startswith(os.sep) :   # this assumes absolute paths
-			if not os.path.exists(self.__config.get("general","target")) :
-				try:
-					os.mkdir(self.__config.get("general","target"))
-				except OSError, exc:
-					raise exceptions.FuseFAMException(_("Unable to open target directory.\n")+str(exc))
+		if self.__config.has_option("general","target"):
+			if self.__config.get("general","target").startswith(os.sep) :   # this assumes absolute paths
+				if not os.path.exists(self.__config.get("general","target")) :
+					raise exceptions.FuseFAMException(_("Target directory "\
+								"'%(target)s' does not exist.")% {"target" : self.__config.get("general","target")} )
+			else: # this means remote target
+				self.__mount(self.__config.get("general","target"))
+
 		#mount dirs from dirconfig if needed
 		if self.__config.has_section("dirconfig") and self.__config.has_option("dirconfig", "remote") :
 			remotes = self.__config.get("dirconfig", "remote")
@@ -257,6 +260,7 @@ class FuseFAM(object):
 						plugin.umount(dir)
 						os.rmdir(dir)
 						_umounted = True
+						break
 				if not _umounted:
 					self.logger.warning("Couldn't unmount %s " % dir)
 

@@ -417,9 +417,8 @@ class Snapshot(object):
 	
 	def setSplitedSize(self, size):
 		"""
-		@param size: The size in KB to set
+		@param size: The size in KiB to set
 		
-		@todo: Wrong parameter type should raise a TypeError!
 		"""
 		if type(size) != int :
 			raise TypeError("The size parameter must be an integer")
@@ -515,7 +514,7 @@ class Snapshot(object):
 		# commit exclude.list.tmp
 		fe = open(self.getExcludeFListFile()+".tmp","w")
 		for f in self.__excludeFlist.getEffectiveFileList() :
-			fe.write(re.escape(str(f)) +"\n")
+			fe.write(str(f) +"\n")
 		fe.close()
 		
 		# commit exclude.list

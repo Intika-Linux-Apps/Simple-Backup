@@ -1,0 +1,27 @@
+<page xmlns="http://projectmallard.org/1.0/"
+  type="guide"
+  id="limits-probs">
+
+  <info>
+    <link type="guide" xref="index#limitations-problems"/>
+    <desc>
+      Diagnose common problems connecting to an instant messaging service.
+    </desc>
+    <revision pkgversion="0.2" version="0.1" date="2010-02-5" status="draft">
+    </revision>
+    <credit type="author">
+      <name>Jean-Peer Lorenz</name>
+      <email>peer.loz@gmx.net</email>
+    </credit>
+<!--
+    <copyright>
+      <year>2010</year>
+      <name>NSsbackup Team</name>
+    </copyright>
+-->
+    <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude" />
+  </info>
+
+  <title>Problems backing up your data.</title>
+
+</page>

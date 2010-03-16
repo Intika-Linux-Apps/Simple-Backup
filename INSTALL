@@ -10,9 +10,15 @@ pygnome
 pyglade
 pynotify
 fuse
+python-pexpect
+sshfs (for ssh plugin)
+curlftpfs (for ftp and sftp plugins)
 gettext
 python-setuptools
 pyGTK (>= 2.10)
+
+* On Ubuntu:
+  sudo apt-get install python-notify fuse-utils python-gnome python-glade python-gtk
 
 Easiest way
 ===========
@@ -23,6 +29,9 @@ Easiest way
   * deb http://ppa.launchpad.net/nssbackup-team/ubuntu hardy main
   * deb http://ppa.launchpad.net/nssbackup-team/ubuntu gutsy main
  * sudo apt-get install nssbackup
+
+ [Note] See the PPA page for the full list of repository:
+        https://launchpad.net/~nssbackup-team/+archive/ppa
 
 
 From source code way

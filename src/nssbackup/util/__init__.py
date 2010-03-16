@@ -28,17 +28,19 @@
 
 """
 
-import nssbackup.managers.FileAccessManager as FAM
 import os
-import subprocess, nssbackup
-from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.exceptions import ChmodNotSupportedError
+import subprocess
 import tempfile
-import inspect, shutil
+import inspect
 import shutil
 import types
 import re
+
+import nssbackup
+import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.util import log
+from nssbackup.util import exceptions
+
 
 
 def nssb_copytree(src, dst, symlinks=False):
@@ -115,7 +117,8 @@ def nssb_copy(src, dst):
 	try:
 		shutil.copymode(prep_src, prep_dst)
 	except OSError:
-		raise ChmodNotSupportedError("Unable to change permissions of file '%s'." % prep_dst)
+		raise exceptions.ChmodNotSupportedError(\
+						"Unable to change permissions of file '%s'." % prep_dst)
 		
 def _prepare_nssb_copy(src, dst):
 	"""Helper function that prepares the given paths for copying
@@ -166,29 +169,37 @@ def _prepare_nssb_copy(src, dst):
 	
 
 def getResource(resourceName, isFile=False):
-	"""This will look for a ressource installed by nssbackup. The installation
-	script write in the ressources file were it stores the file then
-	getRessource will look for them.
-	@param ressourceName: the ressource name, as complete as possible.
-	@param the ressource: absolute path. 
+	"""Looks for certain resources installed by nssbackup.
+	The installation script writes into the 'resources' file where
+	the files/resources are being stored.
+	This function will look for them and return the appropriate path.
+	
+	@param resourceName: the ressource name, as complete as possible
+	@param isFile: flag whether the resource looked up is a file
+	
+	@note: The file 'ressources' is required to be located in the
+			root directory of the nssbackup package. 
 	"""
 	tmp = inspect.getabsfile(nssbackup)
-	resfile = open(os.sep.join([os.path.dirname(tmp),"ressources"]))
-	for _dir in resfile.readlines() :
+	resfile = open(os.sep.join([os.path.dirname(tmp), "ressources"]))
+	
+	for _dir in resfile.readlines():
 		_dir = _dir.strip()
 		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
 		if os.path.exists(_dir) and os.path.isdir(_dir):
 			if _dir.endswith(resourceName) and not isFile:
-				return _dir 
-			list = os.listdir(_dir)
+				return _dir
+			
+			_flist = os.listdir(_dir)
 			#LogFactory.getLogger().debug("File list is :" + str(list))
-			for f in list :
-				if f == resourceName :
-					return os.path.normpath(os.sep.join([_dir,resourceName]))
-	devvalue = os.path.dirname(tmp)+"/../../datas/"
-	if os.path.exists(devvalue + resourceName) :
-		return os.path.normpath(devvalue + resourceName)
-	raise SBException("'%s' hasn't been found in the ressource list"% resourceName)
+			for _file in _flist :
+				if _file == resourceName:
+					return os.path.normpath(os.sep.join([_dir, resourceName]))
+#	devvalue = os.path.dirname(tmp)+"/../../datas/"
+#	if os.path.exists(devvalue + resourceName) :
+#		return os.path.normpath(devvalue + resourceName)
+	raise exceptions.SBException(\
+				"'%s' hasn't been found in the ressource list"% resourceName)
 					
 def launch(cmd, opts):
 	"""
@@ -199,7 +210,7 @@ def launch(cmd, opts):
 	@param cmd: The command to launch
 	@return: (outStr, errStr, retVal)
 	"""
-	_logger = LogFactory.getLogger()
+	_logger = log.LogFactory.getLogger()
 	# Create output log file
 	outptr,outFile = tempfile.mkstemp(prefix="output_")
 
@@ -266,7 +277,8 @@ def readlineNULSep(fd,fd1):
 			_continue += 1
 		
 		if _continue == 1 :
-			raise SBException("The length of flist and Fprops are not equals")
+			raise exceptions.SBException(\
+								"The length of flist and Fprops are not equals")
 		yield (currentline,currentline1)
 
 
@@ -307,7 +319,7 @@ def is_empty_regexp( aregex ):
 
 def remove_conf_entry(confline, entry, separator = ","):
 	"""Removes the given entry from the given string. Entries in configurations
-	were separated by specified token. Leading and trailing separators are
+	are separated by the specified token. Leading and trailing separators are
 	taken into account.
 	
 	@param confline:  the string from which the entry should be removed
@@ -323,17 +335,53 @@ def remove_conf_entry(confline, entry, separator = ","):
 	
 	@raise TypeError: If one of the given parameters is not of string type
 	"""
-	if not isinstance( confline, types.StringTypes):
+	if not isinstance(confline, types.StringTypes):
 		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
 					    "Got %s instead." % (type(confline)))
-	if not isinstance( entry, types.StringTypes):
+	if not isinstance(entry, types.StringTypes):
 		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
 					    "Got %s instead." % (type(entry)))
-	if not isinstance( separator, types.StringTypes):
+	if not isinstance(separator, types.StringTypes):
 		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
 					    "Got %s instead." % (type(separator)))
 	_line = "%s%s%s" % (separator, confline, separator)
-	_mentry = r"%s%s%s" % (separator, re.escape( entry ), separator)
-	_line = re.sub( _mentry , separator, _line )
+	_mentry = "%s%s%s" % (separator, re.escape(entry), separator)
+	_line = re.sub(_mentry , separator, _line)
+	_line = _line.strip(separator)
+	return _line
+
+def add_conf_entry(confline, entry, separator = ","):
+	"""Appends the given entry to the given configuration line. Entries in
+	configurations are separated by specified token.
+	
+	@param confline:  the string the entry is appended to
+	@param entry:	  the string that is added
+	@param separator: the token that separates the entries
+	
+	@type confline:	  String
+	@type entry:      String
+	@type separator:  String
+	
+	@return: the configuration line with the added entry
+	@rtype:  String
+	
+	@raise TypeError: If one of the given parameters is not of string type
+	
+	@todo: Review behaviour if the entry contains characters equal to the \
+			separator.
+	"""
+	if not isinstance(confline, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(confline)))
+	if not isinstance(entry, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(entry)))
+	if not isinstance(separator, types.StringTypes):
+		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+					    "Got %s instead." % (type(separator)))
+#	_strip_entry = entry.strip()
+	_strip_entry = entry
+	_strip_confline = confline.strip(separator)
+	_line = "%s%s%s" % (_strip_confline, separator, _strip_entry)	
 	_line = _line.strip( separator )
 	return _line

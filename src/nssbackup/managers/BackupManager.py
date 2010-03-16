@@ -155,16 +155,19 @@ class BackupManager(object):
                 self.__actualSnapshot.setBase(base.getName())
         del base
 
-        # Backup list of installed packages (Debian only part)
-        try:
-            self.logger.info(_("Setting packages File "))
-            command = "dpkg --get-selections"
-            s = os.popen( command )
-            pkg = s.read()
-            s.close()
-            self.__actualSnapshot.setPackages(pkg)
-        except Exception, e:
-            self.logger.warning(_("Problem when setting the packages : ") + str(e))
+        # Backup list of installed packages
+        self.__packagecmd = "dpkg --get-selections"
+        if self.config.has_option( "general", "packagecmd" ):
+            self.__packagecmd = self.config.get("general", "packagecmd" )
+        if self.__packagecmd:
+            try:
+                self.logger.info(_("Setting packages File "))
+                s = os.popen( self.__packagecmd )
+                pkg = s.read()
+                s.close()
+                self.__actualSnapshot.setPackages(pkg)
+            except Exception, e:
+                self.logger.warning(_("Problem when setting the packages : ") + str(e))
         
         # set Excludes
         self.logger.info(_("Setting Excludes File "))
@@ -183,14 +186,14 @@ class BackupManager(object):
         self.logger.info(_("Setting split size"))
         if self.config.has_option( "general", "splitsize" ):
             self.__actualSnapshot.setSplitedSize(int(self.config.get("general","splitsize")))
-			
+            
         # set followlinks
         self.__followlinks = False
         if self.config.has_option( "general", "followlinks" ) and self.config.get("general","followlinks") == "1":
             self.logger.info(_("Setting follow symbolic links"))
             self.__followlinks = True
             self.__actualSnapshot.setFollowLinks(self.__followlinks)
-			
+            
         # Reduce the priority, so not to interfere with other processes
         os.nice(20)
         
@@ -286,37 +289,37 @@ class BackupManager(object):
                 if not self.__actualSnapshot.getIncludeFlist().hasFile(path):
                     self.__actualSnapshot.addToExcludeFlist(path)
             else :
-				# add _file and then check if it's a dir to add the contents , We won't follow links by default
-				stop = False
-				if os.path.islink(path.rstrip(os.sep)) :
-					# we got a link, always backup links, then tar will follow it if 
-					# followlinks is set
-					self.logger.debug("backing up the link '%s' ! " % path)
-					if not self.__followlinks:
-						stop = True
-				if not stop :
+                # add _file and then check if it's a dir to add the contents , We won't follow links by default
+                stop = False
+                if os.path.islink(path.rstrip(os.sep)) :
+                    # we got a link, always backup links, then tar will follow it if 
+                    # followlinks is set
+                    self.logger.debug("backing up the link '%s' ! " % path)
+                    if not self.__followlinks:
+                        stop = True
+                if not stop :
                     # if it's a directory
-					if os.path.isdir(path):
+                    if os.path.isdir(path):
                         #enter inside
                         # we remove the dir as an effective file of the exclude list
                         # This will prevent full exclusion of that directory
-						if self.__actualSnapshot.getExcludeFlist().hasFile(path):
-							self.__actualSnapshot.getExcludeFlist()[path][0] = None
-						try :
-							for contents in FAM.listdir(path) :
-								# contents is a path of a file or dir to include 
-								contents = os.path.normpath( os.sep.join([path,contents]) )
-								# if the file is included precisely, don't force exclusion
-								checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
+                        if self.__actualSnapshot.getExcludeFlist().hasFile(path):
+                            self.__actualSnapshot.getExcludeFlist()[path][0] = None
+                        try :
+                            for contents in FAM.listdir(path) :
+                                # contents is a path of a file or dir to include 
+                                contents = os.path.normpath( os.sep.join([path,contents]) )
+                                # if the file is included precisely, don't force exclusion
+                                checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
                             
-						except OSError, e :
-							self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
-							# Add to exclude file list
-							self.__actualSnapshot.addToExcludeFlist(path)
-					else:
-						self.fullsize += os.lstat(path).st_size
-					
-		# End of Subroutines
+                        except OSError, e :
+                            self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
+                            # Add to exclude file list
+                            self.__actualSnapshot.addToExcludeFlist(path)
+                    else:
+                        self.fullsize += os.lstat(path).st_size
+                    
+        # End of Subroutines
         
         # Use this for getting the size limit 
         self.fullsize = 0L
@@ -365,11 +368,11 @@ class BackupManager(object):
         mb = self.fullsize / (1024*1024)
         kb = ( self.fullsize % (1024*1024) ) / 1024
         b = ( self.fullsize % (1024*1024) ) % 1024
-        neededspace = "%d Mb %d Kb %d" % (mb,kb,b)
+        neededspace = "%d MiB %d KiB %d" % (mb,kb,b)
         self.logger.debug("Maximum free size required is '%s' " % neededspace)
         vstat = os.statvfs( self.__actualSnapshot.getPath() )
         if (vstat.f_bavail * vstat.f_bsize) <= self.fullsize:
-            raise exceptions.SBException(_("Not enough free space on the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
+            raise exceptions.SBException(_("Not enough free space in the target directory for the planned backup (%(freespace)d <= %(neededspace)s)") % { 'freespace':(vstat.f_bavail * vstat.f_bsize), 'neededspace': neededspace})
     
     def __setlockfile(self):
         """Set the lockfile.
@@ -414,7 +417,7 @@ class BackupManager(object):
                     self.logger.warning(_("Unable to change permissions for "\
                                           "file '%s'.") % logf_target )
             else :
-                self.logger.warning(_("Unable to find logfile to copy into snapshot"))
+                self.logger.warning(_("Unable to find logfile to copy into snapshot."))
         else:
             self.logger.warning(_("No snapshot to copy logfile."))
         
@@ -458,7 +461,7 @@ class BackupManager(object):
             FAM.writetofile(_testfile, "testWritable")
             FAM.delete(_testfile)
         except Exception, e :
-            self.logger.error(_("Target not writable : ") + str(e))
+            self.logger.error(_("Target not writeable: ") + str(e))
             raise e
     
     def __retrieve_basic_infos(self):

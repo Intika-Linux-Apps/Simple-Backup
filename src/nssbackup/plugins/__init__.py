@@ -14,6 +14,10 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
+"""
+@todo: Remove wildcard imports!
+"""
+
 import inspect
 import os
 import sys
@@ -24,6 +28,7 @@ from tempfile import *
 from nssbackup.managers.FileAccessManager import *
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
+
 
 class pluginFAM(object):
 	"""
@@ -99,7 +104,8 @@ class pluginFAM(object):
 		@return: The schema doc (eg. return 'example : sch://user:password@server/dir')
 		"""
 		raise SBException("Help not implemented for this plugin")
-		
+
+
 class PluginManager(object):
 	"""
 	"""
@@ -110,9 +116,10 @@ class PluginManager(object):
 		self.logger = LogFactory.getLogger()
 		
 	def getPlugins(self):
-		"""
-		Search for plugins into the plugin directory and load them.
-		@return : The plugins dictionary list {'name':class}. Look at FuseFAM to know how it's used
+		"""Searches for plugins in the plugin directory and loads them.
+		
+		@return : The plugins dictionary list {'name':class}.
+		@note: Look at FuseFAM to know how it's used.
 		"""
 		
 		if self.__pluginList : return self.__pluginList
@@ -123,7 +130,7 @@ class PluginManager(object):
 			if os.path.isdir(plugins_dir):
 				if plugins_dir not in sys.path:
 					sys.path.append(plugins_dir)
-	                   
+					
 				for file in glob.glob('%s/*FuseFAM.py' % plugins_dir):
 					try:
 						module_filename = os.path.basename(file)
@@ -132,14 +139,11 @@ class PluginManager(object):
 						for symbol_name in dir(plugin):
 							symbol = getattr(plugin, symbol_name)
 							if inspect.isclass(symbol) and symbol != pluginFAM and \
-	                               issubclass(symbol, pluginFAM):
-	                            #symbol.enabled = symbol.name in plugin_names
+								issubclass(symbol, pluginFAM):
+								#symbol.enabled = symbol.name in plugin_names
 								self.__pluginList[symbol_name] = symbol
-	                            
 					except Exception, e:
 						from gettext import gettext as _
 						self.logger.warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
 						continue
 			return self.__pluginList
-		
-	

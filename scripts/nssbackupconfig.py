@@ -231,7 +231,7 @@ class UpgradeLogOption(object):
 		self.__configdirs = []
 		# for the superuser
 		self.__configdirs.append(ConfigManager.\
-								 ConfigStaticData.get_superuser_confdir())
+								 ConfigManagerStaticData.get_superuser_confdir())
 		
 		# for the other users
 		for user in self.__users:
@@ -240,7 +240,7 @@ class UpgradeLogOption(object):
 			except KeyError:
 				continue
 			wdir = os.path.join(wdir,
-					ConfigManager.ConfigStaticData.get_user_confdir_template())
+					ConfigManager.ConfigManagerStaticData.get_user_confdir_template())
 			self.__configdirs.append(wdir)	 
 		
 	def _modify_default_profile(self):
@@ -249,7 +249,7 @@ class UpgradeLogOption(object):
 		"""
 		for cdir in self.__configdirs:
 			cfile = os.path.join(cdir,
-						ConfigManager.ConfigStaticData.get_default_conffile())
+						ConfigManager.ConfigManagerStaticData.get_default_conffile())
 			self._modify_configfile(cfile)
 			
 	def _modify_other_profiles(self):
@@ -258,7 +258,7 @@ class UpgradeLogOption(object):
 		"""
 		for cdir in self.__configdirs:
 			pdir = os.path.join(cdir,
-							ConfigManager.ConfigStaticData.get_profiles_dir())
+							ConfigManager.ConfigManagerStaticData.get_profiles_dir())
 			# get the profile directory for current configuration directory
 			if os.path.isdir(pdir) and\
 			   os.access(pdir, os.F_OK and os.R_OK and os.W_OK):

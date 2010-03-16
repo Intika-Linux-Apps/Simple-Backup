@@ -1,0 +1,40 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      xmlns:e="http://projectmallard.org/experimental/"
+      type="guide"
+      id="index">
+
+  <info>
+    <revision pkgversion="0.2" version="0.1" date="2010-02-5" status="draft">
+    </revision>
+    <credit type="author">
+      <name>Jean-Peer Lorenz</name>
+      <email>peer.loz@gmx.net</email>
+    </credit>
+<!--
+    <copyright>
+      <year>2010</year>
+      <name>NSsbackup Team</name>
+    </copyright>
+-->
+    <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude" />
+  </info>
+
+  <title>Not so simple backup</title>
+
+  <section id="basics" style="2column">
+    <title>Basics</title>
+  </section>
+
+  <section id="backup-conf" style="2column">
+    <title>Backup configuration</title>
+  </section>
+
+  <section id="data-restore" style="2column">
+    <title>Data restoration</title>
+  </section>
+
+  <section id="limitations-problems">
+    <title>Known Limitations and Common Problems</title>
+  </section>
+
+</page>
