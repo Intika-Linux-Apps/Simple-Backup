@@ -450,6 +450,8 @@ class SBconfigGTK(GladeGnomeApp):
 		top_window = 'nssbackupConfApp'
 		GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window,
 														widget_list, handlers)
+		self.widgets['nssbackupConfApp'].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
+
 
 	def isConfigChanged(self, force_the_change = False):
 		"""Checks whether the current configuration has changed compared to
@@ -468,7 +470,6 @@ class SBconfigGTK(GladeGnomeApp):
 		if force_the_change == True:
 			changed = True
 		self.widgets['save'].set_sensitive(changed)
-		self.widgets['save_as'].set_sensitive(changed)
 		self.widgets['saveButton'].set_sensitive(changed)
 		return changed
 	
@@ -1060,16 +1061,15 @@ class SBconfigGTK(GladeGnomeApp):
 		self.on_save_clicked()
 
 	def on_save_as_activate(self, *args):
-		dialog = gtk.FileChooserDialog(_("Save to file ..."),
-									None,
-									gtk.FILE_CHOOSER_ACTION_SAVE,
-									(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-									 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(title=_("Save configuration as..."),
+								parent=self.__get_application_widget(),
+								action=gtk.FILE_CHOOSER_ACTION_SAVE,
+								buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
+									 	 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		response = dialog.run()
 		if response == gtk.RESPONSE_OK :
 			self.configman.saveConf(dialog.get_filename())
-			self.isConfigChanged()
 		elif response == gtk.RESPONSE_CANCEL:
 			pass
 		dialog.destroy()
@@ -1181,11 +1181,11 @@ class SBconfigGTK(GladeGnomeApp):
 	
 	def on_inc_addfile_clicked(self, *args):
 		self.__check_for_section("dirconfig")		
-		dialog = gtk.FileChooserDialog(_("Include file ..."),
-									None,
-									gtk.FILE_CHOOSER_ACTION_OPEN,
-									(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-									 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(title=_("Include file..."),
+								parent=self.__get_application_widget(),
+								action=gtk.FILE_CHOOSER_ACTION_OPEN,
+								buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+									 	 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		filter = gtk.FileFilter()
 		filter.set_name(_("All files"))
@@ -1207,11 +1207,11 @@ class SBconfigGTK(GladeGnomeApp):
 			
 	def on_inc_adddir_clicked(self, *args):
 		self.__check_for_section("dirconfig")
-		dialog = gtk.FileChooserDialog(_("Include folder ..."),
-									None,
-									gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-									(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-									 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(title=_("Include folder..."),
+								parent=self.__get_application_widget(),
+								action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+								buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+									 	 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		
 		response = dialog.run()
@@ -1335,7 +1335,11 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_ex_addfile_clicked(self, *args):
 		self.__check_for_section("dirconfig")
-		dialog = gtk.FileChooserDialog(_("Include file ..."), None, gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(title=_("Exclude file..."),
+								parent=self.__get_application_widget(),
+								action=gtk.FILE_CHOOSER_ACTION_OPEN,
+								buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+										 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		filter = gtk.FileFilter()
 		filter.set_name(_("All files"))
@@ -1353,7 +1357,11 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_ex_adddir_clicked(self, *args):
 		self.__check_for_section("dirconfig")
-		dialog = gtk.FileChooserDialog(_("Exclude folder ..."), None, gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(title=_("Exclude folder..."),
+								parent=self.__get_application_widget(),
+								action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+								buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+										 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		
 		response = dialog.run()
@@ -2128,7 +2136,7 @@ class SBconfigGTK(GladeGnomeApp):
 
 	def on_menu_set_default_settings_activate(self, *args):
 		"""Signal handler which is activated when the user either selects
-		the menu item 'Set default settings ...' or clicks the according
+		the menu item 'Set default settings...' or clicks the according
 		toolbar button. The method presents a message box where
 		confirmation for the changes is required.
 		"""

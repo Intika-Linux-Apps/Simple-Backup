@@ -953,17 +953,18 @@ class ConfigManager(ConfigParser.ConfigParser):
 		@param configfile: The config file in which to write the configuration.
 							Default is in the default location
 							 
-		@todo: What happens if the config file is 'Save as ...' in order to
+		@todo: What happens if the config file is 'Save as...' in order to
 				store a configuration aside but the scheduling is different
 				from the *original* configuration that is used by nssbackupd?
 		"""
-		if configfile:
-			fld = FAM.openfile(configfile, True)
-		else :
-			fld = FAM.openfile(self.conffile, True)
+		if configfile is not None:
+			fld = FAM.openfile(configfile, True)			
+		else:
+			fld = FAM.openfile(self.conffile, True)			
 		self.write(fld)
-		fld.close()		
-		self.__write_schedule()
+		fld.close()
+		if configfile is None:
+			self.__write_schedule()
 	
 	def __write_schedule(self):
 		"""Write the schedule from the configuration file. Scheduling is only
