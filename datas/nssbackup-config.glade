@@ -1176,7 +1176,7 @@ Please enter the new profile name and set the according checkbox in order to ena
               <widget class="GtkNotebook" id="notebook">
                 <property name="visible">True</property>
                 <property name="tab_border">0</property>
-                <property name="tab_hborder">6</property>
+                <property name="tab_hborder">3</property>
                 <property name="tab_vborder">3</property>
                 <child>
                   <widget class="GtkVBox" id="vbox_general_page">
@@ -1818,6 +1818,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                   <widget class="GtkNotebook" id="notebook2">
                     <property name="visible">True</property>
                     <property name="tab_pos">left</property>
+                    <property name="homogeneous">True</property>
                     <child>
                       <widget class="GtkVBox" id="vbox4">
                         <property name="visible">True</property>
@@ -2018,6 +2019,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                       <widget class="GtkLabel" id="label14">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Paths</property>
+                        <property name="justify">center</property>
                       </widget>
                       <packing>
                         <property name="tab_fill">False</property>
@@ -2175,6 +2177,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                       <widget class="GtkLabel" id="label15">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">File types</property>
+                        <property name="justify">center</property>
                       </widget>
                       <packing>
                         <property name="position">1</property>
@@ -2332,7 +2335,9 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                     <child>
                       <widget class="GtkLabel" id="label16">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Regex</property>
+                        <property name="label" translatable="yes">Regular
+Expressions</property>
+                        <property name="justify">center</property>
                       </widget>
                       <packing>
                         <property name="position">2</property>
@@ -2437,6 +2442,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                       <widget class="GtkLabel" id="label18">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Others</property>
+                        <property name="justify">center</property>
                       </widget>
                       <packing>
                         <property name="position">3</property>
@@ -3777,7 +3783,6 @@ Error</property>
                                                 <signal name="toggled" handler="on_TLSradiobutton_toggled"/>
                                               </widget>
                                               <packing>
-                                                <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options"></property>
                                               </packing>
                                             </child>

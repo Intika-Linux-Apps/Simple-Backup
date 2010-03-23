@@ -863,11 +863,18 @@ class SBconfigGTK(GladeGnomeApp):
 		self.__fill_log_widgets_from_config()
 		self.__fill_report_widgets_from_config()
 		
-		# set the profile name
-		self.widgets['statusBar'].push(_("Editing profile : %s ") \
-										% self.configman.getProfileName())
+		self.__fill_statusbar_from_config()
+		
 #		self.__set_default_focus()
 		self.isConfigChanged()
+
+	def __fill_statusbar_from_config(self):
+		"""Sets the profile name and the user mode.
+		"""
+		stattxt = _("Current profile: %s") % self.configman.getProfileName()
+		if os.geteuid() == 0:
+			stattxt = _("%s   (Administrator mode)") % stattxt
+		self.widgets['statusBar'].push(stattxt)
 		
 #	def __set_default_focus(self):
 #		self.widgets['label_general_page'].grab_focus()
