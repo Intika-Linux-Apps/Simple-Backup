@@ -1,4 +1,6 @@
-Simple Backup Solution
+**************************
+Not So Simple Backup Suite
+**************************
 
 Installation Instructions
 =========================
@@ -18,10 +20,11 @@ python-setuptools
 pyGTK (>= 2.10)
 
 * On Ubuntu:
-  sudo apt-get install python-notify fuse-utils python-gnome python-glade python-gtk
+  sudo apt-get install python-notify fuse-utils python-gnome python-glade\
+                       python-gtk
 
-Easiest way
-===========
+Easy way
+========
 
 * If you use Debian or Ubuntu, try apt-get:
  * Install the nssbackup team repository 
@@ -34,8 +37,10 @@ Easiest way
         https://launchpad.net/~nssbackup-team/+archive/ppa
 
 
-From source code way
-===================
+From source code
+================
+
+By default, nssbackup will be installed under "/usr/local" folder.
 
 * Install python and python-gnome2 libraries, fuse-utils and pynotify.
   - probably it's already installed in your dist
@@ -46,14 +51,9 @@ From source code way
 * Run 'sudo nssbackupconfig'
 
 
-* By default, nssbackup will be installed under "/usr/local" folder.
-
-
 Uninstalling
 ============
 
 * If installed via apt: 'sudo apt-get remove nssbackup'. Else:
 
 * Just type 'sudo make uninstall' in the source code folder
-
-

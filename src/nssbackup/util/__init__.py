@@ -181,9 +181,11 @@ def getResource(resourceName, isFile=False):
 			root directory of the nssbackup package. 
 	"""
 	tmp = inspect.getabsfile(nssbackup)
-	resfile = open(os.sep.join([os.path.dirname(tmp), "ressources"]))
+	resfile = file(os.sep.join([os.path.dirname(tmp), "ressources"]), "r")
+	resfilelines = resfile.readlines()
+	resfile.close()
 	
-	for _dir in resfile.readlines():
+	for _dir in resfilelines:
 		_dir = _dir.strip()
 		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
 		if os.path.exists(_dir) and os.path.isdir(_dir):
@@ -195,12 +197,33 @@ def getResource(resourceName, isFile=False):
 			for _file in _flist :
 				if _file == resourceName:
 					return os.path.normpath(os.sep.join([_dir, resourceName]))
-#	devvalue = os.path.dirname(tmp)+"/../../datas/"
-#	if os.path.exists(devvalue + resourceName) :
-#		return os.path.normpath(devvalue + resourceName)
 	raise exceptions.SBException(\
 				"'%s' hasn't been found in the ressource list"% resourceName)
-					
+
+
+def get_version_number():
+	"""Returns the version number that is stored in according 'metainfo' file.
+	"""
+	ver_line = "VERSION=n.a."
+	
+	tmp = inspect.getabsfile(nssbackup)
+	resfile = file(os.sep.join([os.path.dirname(tmp), "metainfo"]), "r")
+	resfilelines = resfile.readlines()
+	resfile.close()
+	
+	for _line in resfilelines:
+		_line = _line.strip()		
+		if _line.startswith("VERSION="):
+			ver_line = _line
+		
+	versfull_t = ver_line.split("=")
+	versfull = versfull_t[1]
+
+	version_t = versfull.split("~")
+	vers = version_t[0]
+	# version-postfix is currently ignored
+	return vers
+							
 def launch(cmd, opts):
 	"""
 	launch a command and gets stdout and stderr

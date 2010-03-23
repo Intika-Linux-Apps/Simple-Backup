@@ -2,14 +2,15 @@
 
 from setuptools import setup, find_packages
 
-setup(name='nssbackup', version='@version@',
+setup(name='@pkgname@', version='@version@',
     description='NSsbackup, shortform of Not So Simple Backup suite, is a backup solution for common desktop use.',
     author='http://launchpad.net/~nssbackup-team',
     author_email='nssbackup-team@lists.launchpad.net',
     url='http://launchpad.net/nssbackup',
     packages = find_packages("src"),
     package_dir = {'':'src'},
-    package_data = {'': ['ressources'],},
+    package_data = {'': ['ressources',
+                         'metainfo'],},
     data_files=[('share/nssbackup', ['datas/nssbackup-restore.glade', 
                                      'datas/nssbackup-config.glade', 
                                      'datas/multipleTarScript', 
@@ -21,7 +22,13 @@ setup(name='nssbackup', version='@version@',
                   ('share/applications', ['datas/nssbackup-config.desktop', 
                                           'datas/nssbackup-config-su.desktop', 
                                           'datas/nssbackup-restore.desktop', 
-                                          'datas/nssbackup-restore-su.desktop'])],
-
-
+                                          'datas/nssbackup-restore-su.desktop']),
+                  ('share/doc/nssbackup', [	'AUTHORS',
+                  							'ChangeLog',
+                  							'COPYING',
+                  							'HACKING',
+                  							'INSTALL',
+                  							'NEWS',
+                  							'README',
+                  							'TODO',]) ],
     )
