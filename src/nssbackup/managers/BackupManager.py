@@ -210,7 +210,8 @@ class PyNotifyMixin(object):
 				
 				
 class BackupManager(PyNotifyMixin):
-	"""Class that handles the backup process.
+	"""Class that handles a *single* backup process defined by given
+	configuration (profile).
 	
 	:todo: The BackupManager should not does any GUI related tasks!
 	

@@ -1701,8 +1701,10 @@ class SBconfigGTK(GladeGnomeApp):
 		self.isConfigChanged()
 
 	def on_ex_addftype_clicked(self, *args):
-		"""
-		A dot separating filename and extension is added automatically.
+		"""Signal handler that is called when the user presses the
+		'Add filetype' exclude button.
+		
+		@note: A dot separating filename and extension is added automatically.
 		"""
 		_known_ftypes_dict = ConfigManagerStaticData.get_known_ftypes_dict()
 		dialog = self.widgets["ftypedialog"]
@@ -1710,25 +1712,32 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.hide()
 		if response == gtk.RESPONSE_OK:
 			if self.widgets["ftype_st"].get_active():
-				ftype = self.widgets["ftype_box"].get_model()[self.widgets["ftype_box"].get_active()][0]
+				ftype = self.widgets["ftype_box"].get_model()\
+									[self.widgets["ftype_box"].get_active()][0]
 			else:
 				ftype = self.widgets["ftype_custom_ex"].get_text()
 
-			r = ""
-			if self.configman.has_option("exclude", "regex") :
+			r = r""
+			if self.configman.has_option("exclude", "regex"):
 				r = self.configman.get("exclude", "regex")
-			ftype_regex = "\.%s" % ftype.strip()
-			r = Util.add_conf_entry(r, ftype_regex)
-			self.configman.set( "exclude", "regex", r )
-			
-			if ftype in _known_ftypes_dict:
-				self.ex_ftype.append( [_known_ftypes_dict[ftype], ftype] )
+			ftype_regex = r"\.%s" % ftype.strip()
+			_sep = "," 
+			if _sep in ftype_regex:				
+				_msg = _("The given expression contains unsupported characters ('%s'). Currently it is not possible to use these characters in exclude expressions.") % _sep
+				misc.show_warndialog(message_str=_msg,
+									parent=self.__get_application_widget(),
+									headline_str=_("Unsupported character"))
 			else:
-				self.ex_ftype.append( [_("Custom"), ftype] )
-			self.isConfigChanged()
-			
-		elif response == gtk.RESPONSE_CANCEL:
+				if not Util.has_conf_entry(r, ftype_regex):
+					r = Util.add_conf_entry(r, ftype_regex)
+					self.configman.set("exclude", "regex", r)
+					if ftype in _known_ftypes_dict:
+						self.ex_ftype.append([_known_ftypes_dict[ftype], ftype])
+					else:
+						self.ex_ftype.append([_("Custom"), ftype])			
+		else:
 			pass		                
+		self.isConfigChanged()
 
 	def on_ex_delftype_clicked(self, *args):
 		"""
@@ -1756,26 +1765,35 @@ class SBconfigGTK(GladeGnomeApp):
 		dialog.hide()
 		if response == gtk.RESPONSE_OK:
 			regex = self.widgets["regex_box"].get_text()
-			if Util.is_empty_regexp(regex):
+			_sep = "," 
+			if _sep in regex:				
+				_msg = _("The given expression contains unsupported characters ('%s'). Currently it is not possible to use these characters in exclude expressions.") % _sep
+				misc.show_warndialog(message_str=_msg,
+									parent=self.__get_application_widget(),
+									headline_str=_("Unsupported character"))
+
+			elif Util.is_empty_regexp(regex):
 				misc.show_errdialog(parent = self.__get_application_widget(),
 							message_str = \
 				_("Empty expression. Please enter a valid regular expression."))
 			else:
 				if Util.is_valid_regexp(regex):
-					r = ""
+					r = r""
 					if self.configman.has_option("exclude", "regex"):
-						r = self.configman.get( "exclude", "regex" )
-					r = Util.add_conf_entry(r, regex)
-					self.configman.set("exclude", "regex", r)					
-					self.ex_regex.append( [regex] )
-					self.isConfigChanged()
+						r = self.configman.get("exclude", "regex")
+					
+					if not Util.has_conf_entry(r, regex):
+						r = Util.add_conf_entry(r, regex)
+						self.configman.set("exclude", "regex", r)					
+						self.ex_regex.append( [regex] )
 				else:
 					misc.show_errdialog(parent = self.__get_application_widget(),
 							message_str = \
 								_("Provided regular expression is not valid."))
 
-		elif response == gtk.RESPONSE_CANCEL:
+		else:
 			pass
+		self.isConfigChanged()
 	
 	def on_ex_delregex_clicked(self, *args):
 		(store, iter) = self.ex_regextv.get_selection().get_selected()

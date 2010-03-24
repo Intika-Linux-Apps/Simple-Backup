@@ -340,39 +340,6 @@ def is_empty_regexp( aregex ):
 			_res = True
 	return _res
 
-def remove_conf_entry(confline, entry, separator = ","):
-	"""Removes the given entry from the given string. Entries in configurations
-	are separated by the specified token. Leading and trailing separators are
-	taken into account.
-	
-	@param confline:  the string from which the entry should be removed
-	@param entry:	  the string that is removed
-	@param separator: the token that separates the entries
-	
-	@type confline:	  String
-	@type entry:      String
-	@type separator:  String
-	
-	@return: the configuration line without the removed entry
-	@rtype:  String
-	
-	@raise TypeError: If one of the given parameters is not of string type
-	"""
-	if not isinstance(confline, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
-					    "Got %s instead." % (type(confline)))
-	if not isinstance(entry, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
-					    "Got %s instead." % (type(entry)))
-	if not isinstance(separator, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
-					    "Got %s instead." % (type(separator)))
-	_line = "%s%s%s" % (separator, confline, separator)
-	_mentry = "%s%s%s" % (separator, re.escape(entry), separator)
-	_line = re.sub(_mentry , separator, _line)
-	_line = _line.strip(separator)
-	return _line
-
 def add_conf_entry(confline, entry, separator = ","):
 	"""Appends the given entry to the given configuration line. Entries in
 	configurations are separated by specified token.
@@ -393,18 +360,59 @@ def add_conf_entry(confline, entry, separator = ","):
 	@todo: Review behaviour if the entry contains characters equal to the \
 			separator.
 	"""
+	__conf_entry_func_type_check(confline, entry, separator)
+	_strip_confline = confline.strip(separator)
+	if not has_conf_entry(confline, entry, separator):
+		_strip_entry = entry
+		_line = r"%s%s%s" % (_strip_confline, separator, _strip_entry)	
+		_line = _line.strip( separator )
+	else:
+		_line = _strip_confline
+	return _line
+
+def remove_conf_entry(confline, entry, separator = ","):
+	"""Removes the given entry from the given string. Entries in configurations
+	are separated by the specified token. Leading and trailing separators are
+	taken into account.
+	
+	@param confline:  the string from which the entry should be removed
+	@param entry:	  the string that is removed
+	@param separator: the token that separates the entries
+	
+	@type confline:	  String
+	@type entry:      String
+	@type separator:  String
+	
+	@return: the configuration line without the removed entry
+	@rtype:  String
+	
+	@raise TypeError: If one of the given parameters is not of string type
+	"""
+	__conf_entry_func_type_check(confline, entry, separator)
+	_line = r"%s%s%s" % (separator, confline, separator)
+	_mentry = r"%s%s%s" % (separator, re.escape(entry), separator)
+	_line = re.sub(_mentry , separator, _line)
+	_line = _line.strip(separator)
+	return _line
+
+def has_conf_entry(confline, entry, separator = ","):
+	__conf_entry_func_type_check(confline, entry, separator)
+	has_entry = False
+	conf_t = confline.split(separator)
+	for conf_e in conf_t:
+		if conf_e == entry:
+			has_entry = True
+			break
+	return has_entry
+
+def __conf_entry_func_type_check(confline, entry, separator):
 	if not isinstance(confline, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+		raise TypeError("Given parameter must be a string. "\
 					    "Got %s instead." % (type(confline)))
 	if not isinstance(entry, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+		raise TypeError("Given parameter must be a string. "\
 					    "Got %s instead." % (type(entry)))
 	if not isinstance(separator, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+		raise TypeError("Given parameter must be a string. "\
 					    "Got %s instead." % (type(separator)))
-#	_strip_entry = entry.strip()
-	_strip_entry = entry
-	_strip_confline = confline.strip(separator)
-	_line = "%s%s%s" % (_strip_confline, separator, _strip_entry)	
-	_line = _line.strip( separator )
-	return _line
+	return None

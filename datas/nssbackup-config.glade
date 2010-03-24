@@ -7,11 +7,13 @@
   <!-- interface-requires gnome 2.16 -->
   <!-- interface-naming-policy toplevel-contextual -->
   <widget class="GtkDialog" id="ftypedialog">
+    <property name="border_width">6</property>
     <property name="title" translatable="yes">Exclude file type</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
+    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox4">
         <property name="visible">True</property>
@@ -19,6 +21,7 @@
         <child>
           <widget class="GtkVBox" id="vbox18">
             <property name="visible">True</property>
+            <property name="border_width">6</property>
             <property name="orientation">vertical</property>
             <child>
               <widget class="GtkRadioButton" id="ftype_st">
@@ -39,6 +42,7 @@
             <child>
               <widget class="GtkComboBox" id="ftype_box">
                 <property name="visible">True</property>
+                <property name="active">0</property>
                 <property name="items">mp3
 avi
 mpeg
@@ -48,6 +52,8 @@ ogg
                 <signal name="changed" handler="on_ftype_st_box_changed"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -74,6 +80,7 @@ ogg
                 <child>
                   <widget class="GtkEntry" id="ftype_custom_ex">
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <signal name="changed" handler="on_ftype_custom_ex_changed"/>
                   </widget>
@@ -95,6 +102,9 @@ ogg
                 </child>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="padding">12</property>
                 <property name="position">2</property>
               </packing>
             </child>
@@ -131,7 +141,7 @@ ogg
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
-                <property name="receives_default">False</property>
+                <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
               </widget>
               <packing>
@@ -1086,7 +1096,7 @@ Please enter the new profile name and set the according checkbox in order to ena
                   <widget class="GtkToolButton" id="toolb_set_default_settings">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="tooltip" translatable="yes">Set default settings ...</property>
+                    <property name="tooltip" translatable="yes">Set default settings...</property>
                     <property name="label">Defaults</property>
                     <property name="stock_id">gtk-revert-to-saved</property>
                     <signal name="clicked" handler="on_menu_set_default_settings_activate"/>
@@ -1100,6 +1110,7 @@ Please enter the new profile name and set the according checkbox in order to ena
                   <widget class="GtkToolButton" id="reload">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="tooltip" translatable="yes">Reload configuration</property>
                     <property name="label">Reload</property>
                     <property name="stock_id">gtk-refresh</property>
                     <signal name="clicked" handler="on_reload_clicked"/>
@@ -1113,6 +1124,7 @@ Please enter the new profile name and set the according checkbox in order to ena
                   <widget class="GtkToolButton" id="saveButton">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="tooltip" translatable="yes">Save configuration</property>
                     <property name="label">Save</property>
                     <property name="stock_id">gtk-save</property>
                     <signal name="clicked" handler="on_save_clicked"/>
@@ -1135,6 +1147,7 @@ Please enter the new profile name and set the according checkbox in order to ena
                   <widget class="GtkToolButton" id="backup">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="tooltip" translatable="yes">Make a backup now</property>
                     <property name="label">Backup Now</property>
                     <property name="stock_id">gtk-harddisk</property>
                     <signal name="clicked" handler="on_backup_clicked"/>
@@ -1157,6 +1170,7 @@ Please enter the new profile name and set the according checkbox in order to ena
                   <widget class="GtkToolButton" id="prfManToolButton">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="tooltip" translatable="yes">Open the profile manager</property>
                     <property name="label" translatable="yes">Profiles</property>
                     <property name="stock_id">gtk-home</property>
                     <signal name="clicked" handler="on_prfManager_activate"/>
@@ -2562,8 +2576,8 @@ Expressions</property>
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                         <property name="action">select-folder</property>
-                                        <property name="create_folders">False</property>
                                         <property name="show_hidden">True</property>
+                                        <property name="create_folders">False</property>
                                         <property name="title" translatable="yes">Select the destination folder</property>
                                         <signal name="selection_changed" handler="on_dest_localpath_selection_changed"/>
                                       </widget>
