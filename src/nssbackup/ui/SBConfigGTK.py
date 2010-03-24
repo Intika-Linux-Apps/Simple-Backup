@@ -797,10 +797,10 @@ class SBconfigGTK(GladeGnomeApp):
 				 "sure the missing directory exists (e.g. by mounting "\
 				 "an external disk) or change the specified target "\
 				 "to an existing one.")
-						_message_str = "Backup target does not exist.\n\n"\
+						_message_str = _("Backup target does not exist.\n\n"\
 				 "Attention: The target will be set to the default "\
 				 "value. Check this on the destination settings page "\
-				 "before saving the configuration."
+				 "before saving the configuration.")
 						_headline_str = \
 						_("Unable to open backup target")
 
@@ -1321,7 +1321,7 @@ class SBconfigGTK(GladeGnomeApp):
 			try :
 				if not _fusefam.testFusePlugins(row[0]) :
 					dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, 
-											message_format="Test on '%s' didn't succeed !"% row[0])
+											message_format=_("Test on '%s' didn't succeed!") % row[0])
 					dialog.run()
 					dialog.destroy()
 				else :
@@ -1331,7 +1331,7 @@ class SBconfigGTK(GladeGnomeApp):
 					dialog.run()
 					dialog.destroy()
 		if n == len(self.remoteinc) :
-			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format="Test Succeeded !")
+			dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_CLOSE, message_format=_("Test was successful."))
 			dialog.run()
 			dialog.destroy()
 		else :
@@ -2209,7 +2209,7 @@ def _forbid_default_profile_removal(action):
 	not able to do the given action on the default profile.	
 	"""
 	info = _("You can't %s the Default Profile. Please use it if you "\
-			 "need only one profile." % action)
+			 "need only one profile.") % action
 	
 	dialog = gtk.MessageDialog(type=gtk.MESSAGE_INFO,
 					flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
