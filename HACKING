@@ -59,3 +59,15 @@ as follows:
 	python nssbackup-config-gui.py
 	python nssbackup-restore-gui.py
 	python nssbackupd.py
+	
+	
+Translations
+============
+
+First, some links related to translations using Launchpad/Rosetta:
+
+* http://blog.launchpad.net/general/trying-out-launchpad-translations
+* https://help.launchpad.net/Translations/YourProject
+* https://help.launchpad.net/Translations/YourProject/ImportingTranslations
+* https://help.launchpad.net/Translations/YourProject/ImportPolicy
+* https://help.launchpad.net/Translations/YourProject/Exports
