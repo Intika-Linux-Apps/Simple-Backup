@@ -161,28 +161,33 @@ ogg
     </child>
   </widget>
   <widget class="GtkDialog" id="regexdialog">
+    <property name="border_width">6</property>
     <property name="title" translatable="yes">Exclude by regex</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
+    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox5">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
         <child>
           <widget class="GtkVBox" id="vbox19">
             <property name="visible">True</property>
+            <property name="border_width">6</property>
             <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
             <child>
               <widget class="GtkLabel" id="label69">
                 <property name="visible">True</property>
-                <property name="xpad">5</property>
-                <property name="ypad">5</property>
+                <property name="xalign">0</property>
                 <property name="label" translatable="yes">Enter a regular expression.
 Files and directories matching this expression will be excluded from backup.</property>
-                <property name="justify">center</property>
                 <property name="wrap">True</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -198,6 +203,8 @@ Files and directories matching this expression will be excluded from backup.</pr
             </child>
           </widget>
           <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
             <property name="position">2</property>
           </packing>
         </child>
@@ -249,8 +256,6 @@ Files and directories matching this expression will be excluded from backup.</pr
     </child>
   </widget>
   <widget class="GtkDialog" id="remote_inc_dialog">
-    <property name="width_request">449</property>
-    <property name="height_request">120</property>
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Enter the remote target to include</property>
@@ -263,19 +268,24 @@ Files and directories matching this expression will be excluded from backup.</pr
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
+        <property name="spacing">6</property>
         <child>
           <widget class="GtkVBox" id="vbox10">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="border_width">6</property>
             <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
             <child>
               <widget class="GtkLabel" id="fusehelplabel">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="xalign">0</property>
                 <property name="label" translatable="yes">Choose a plugin to get the format</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -283,6 +293,7 @@ Files and directories matching this expression will be excluded from backup.</pr
               <widget class="GtkHBox" id="hbox27">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="spacing">6</property>
                 <child>
                   <widget class="GtkLabel" id="label53">
                     <property name="visible">True</property>
@@ -290,6 +301,8 @@ Files and directories matching this expression will be excluded from backup.</pr
                     <property name="label" translatable="yes">Choose your plugin :</property>
                   </widget>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -304,11 +317,15 @@ Files and directories matching this expression will be excluded from backup.</pr
                 </child>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
             <property name="position">1</property>
           </packing>
         </child>
@@ -316,6 +333,8 @@ Files and directories matching this expression will be excluded from backup.</pr
           <widget class="GtkHBox" id="hbox24">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="border_width">6</property>
+            <property name="spacing">6</property>
             <child>
               <widget class="GtkEntry" id="remote_inc_entry">
                 <property name="visible">True</property>
@@ -361,11 +380,15 @@ Files and directories matching this expression will be excluded from backup.</pr
                 </child>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </widget>
           <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
             <property name="position">2</property>
           </packing>
         </child>
