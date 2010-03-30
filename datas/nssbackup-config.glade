@@ -2599,8 +2599,6 @@ Expressions</property>
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                         <property name="action">select-folder</property>
-                                        <property name="show_hidden">True</property>
-                                        <property name="create_folders">False</property>
                                         <property name="title" translatable="yes">Select the destination folder</property>
                                         <signal name="selection_changed" handler="on_dest_localpath_selection_changed"/>
                                       </widget>
@@ -3401,7 +3399,6 @@ Error</property>
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                         <property name="action">select-folder</property>
-                                        <property name="create_folders">False</property>
                                         <signal name="selection_changed" handler="on_logfilechooser_selection_changed"/>
                                       </widget>
                                       <packing>
