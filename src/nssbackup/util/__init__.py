@@ -1,7 +1,7 @@
 #	NSsbackup - Miscellaneous utilities
 #
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import nssbackup
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.util import log
 from nssbackup.util import exceptions
-
 
 
 def nssb_copytree(src, dst, symlinks=False):
@@ -83,22 +82,43 @@ def nssb_copytree(src, dst, symlinks=False):
 	if errors:
 		raise shutil.Error, errors
 
-def nssb_move(src, dst):
+
+# this function is no longer used in series 0.2
+# consider removing it
+#def nssb_move(src, dst):
+#	"""
+#	mod of shutil.move that uses nssb_copytree
+#	"""	
+#	try:
+#		os.rename(src, dst)
+#	except OSError:
+#		if os.path.isdir(src):
+#			if shutil.destinsrc(src, dst):
+#				raise shutil.Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
+#			nssb_copytree(src, dst, symlinks=True)
+#			shutil.rmtree(src)
+#		else:
+#			shutil.copy2(src,dst)
+#			os.unlink(src)
+
+
+def force_nssb_move(src, dst):
+	"""Modified version of `shutil.move` that uses `nssb_copytree`
+	and even removes read-only files/directories.
 	"""
-	mod of shutil.move that uses nssb_copytree
-	"""
-	
 	try:
 		os.rename(src, dst)
 	except OSError:
 		if os.path.isdir(src):
 			if shutil.destinsrc(src, dst):
-				raise shutil.Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
+				raise shutil.Error("Cannot move a directory '%s' into itself "\
+								   "'%s'." % (src, dst))
 			nssb_copytree(src, dst, symlinks=True)
-			shutil.rmtree(src)
+			FAM.force_delete(src)
 		else:
 			shutil.copy2(src,dst)
-			os.unlink(src)
+			FAM.force_delete(src)
+
 			
 def nssb_copy(src, dst):
 	"""Customized copy routine that copies the fileobject and afterwards
@@ -119,7 +139,8 @@ def nssb_copy(src, dst):
 	except OSError:
 		raise exceptions.ChmodNotSupportedError(\
 						"Unable to change permissions of file '%s'." % prep_dst)
-		
+
+
 def _prepare_nssb_copy(src, dst):
 	"""Helper function that prepares the given paths for copying
 	using 'nssb_copy'.
@@ -223,7 +244,8 @@ def get_version_number():
 	vers = version_t[0]
 	# version-postfix is currently ignored
 	return vers
-							
+
+
 def launch(cmd, opts):
 	"""
 	launch a command and gets stdout and stderr
@@ -255,6 +277,7 @@ def launch(cmd, opts):
 	FAM.delete(errFile)
 	
 	return (outStr, errStr, retval)
+
 
 # defined in module 'tar'
 #def extract(sourcetgz, file, dest , bckupsuffix = None):
@@ -340,6 +363,7 @@ def is_empty_regexp( aregex ):
 			_res = True
 	return _res
 
+
 def add_conf_entry(confline, entry, separator = ","):
 	"""Appends the given entry to the given configuration line. Entries in
 	configurations are separated by specified token.
@@ -370,6 +394,7 @@ def add_conf_entry(confline, entry, separator = ","):
 		_line = _strip_confline
 	return _line
 
+
 def remove_conf_entry(confline, entry, separator = ","):
 	"""Removes the given entry from the given string. Entries in configurations
 	are separated by the specified token. Leading and trailing separators are
@@ -395,7 +420,11 @@ def remove_conf_entry(confline, entry, separator = ","):
 	_line = _line.strip(separator)
 	return _line
 
+
 def has_conf_entry(confline, entry, separator = ","):
+	"""Checks whether the given `confline` contains the given
+	entry.
+	"""
 	__conf_entry_func_type_check(confline, entry, separator)
 	has_entry = False
 	conf_t = confline.split(separator)
@@ -405,7 +434,11 @@ def has_conf_entry(confline, entry, separator = ","):
 			break
 	return has_entry
 
+
 def __conf_entry_func_type_check(confline, entry, separator):
+	"""Private helper function that does common type checking
+	in the `conf_entry_*` functions.
+	"""
 	if not isinstance(confline, types.StringTypes):
 		raise TypeError("Given parameter must be a string. "\
 					    "Got %s instead." % (type(confline)))
@@ -416,3 +449,71 @@ def __conf_entry_func_type_check(confline, entry, separator):
 		raise TypeError("Given parameter must be a string. "\
 					    "Got %s instead." % (type(separator)))
 	return None
+
+
+def _remove_dups(sequence):
+	"""Removes duplicate entries from the given list.
+	This is not the most efficient implementation, however it
+	provides safe behavior.
+	"""
+	if not isinstance(sequence, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(sequence))
+	
+	_dest = []
+	for val in sequence:
+		if val not in _dest:
+			_dest.append(val)
+	return _dest
+
+		
+def _list_union_no_dups_safe(source_a, source_b):
+	"""Merges the given lists into a single list not containing any
+	duplicate entries using the default way.
+	"""
+	if not isinstance(source_a, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(source_a))
+	if not isinstance(source_b, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(source_b))
+
+	_dest = _remove_dups(source_b)
+	for val_a in source_a:
+		if val_a not in _dest:
+			_dest.append(val_a)
+	return _dest
+
+
+def list_union(source_a, source_b):
+	"""Merges the given lists into a single list not containing any
+	duplicate entries in a very efficient way.
+	"""
+	# this functions uses sets in order to merge the lists
+	# doing so it is really fast compared to list operations
+	# however, this only works if the lists do not contain
+	# unhashable entries (such as other lists etc.)
+	# in this case the default algorithm is used
+	if not isinstance(source_a, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(source_a))
+	if not isinstance(source_b, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(source_b))
+		
+	_logger = log.LogFactory.getLogger()
+	fallback = False
+	try:
+		_set_a = set(source_a)
+		_set_b = set(source_b)
+	except TypeError:
+		_logger.info("Lists contain unhashable types. Falling back on default.")
+		fallback = True
+	
+	if fallback:
+		_dest = _list_union_no_dups_safe(source_a, source_b)
+	else:
+		_set_dest = _set_a.union(_set_b)
+		_dest = list(_set_dest)
+
+	return _dest

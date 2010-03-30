@@ -443,7 +443,6 @@ class Snapshot(object):
 		if not self.__isValidName(self.__name) :
 			raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
 		if  not FAM.exists( os.path.join(self.getPath(), "ver") ):
-			print "PATH TO 'VER' FILE: '%s'" % os.path.join(self.getPath(), "ver") 
 			raise NotValidSnapshotException (_("The mandatory 'ver' file doesn't exist in [%s]") % self.getName())
 		
 	def __isValidName(self, name ) :
@@ -464,7 +463,8 @@ class Snapshot(object):
 		FAM.writetofile(self.getPath()+os.sep+"format", formatInfos)
 
 	def commitverfile(self) :
-		" Commit ver file on the disk "
+		"""Commit ver file on the disk.
+		"""
 		if not self.getVersion():
 			self.setVersion()
 		FAM.writetofile(self.getPath()+os.sep +"ver", self.getVersion())

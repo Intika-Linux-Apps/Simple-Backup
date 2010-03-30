@@ -485,6 +485,7 @@ class BackupManager(PyNotifyMixin):
 						self.fullsize += os.lstat(path).st_size
 					
 		# End of Subroutines
+		########################################################################
 		
 		# Use this for getting the size limit 
 		self.fullsize = 0L
@@ -495,17 +496,17 @@ class BackupManager(PyNotifyMixin):
 		if self.__actualSnapshot.getExcludes() :
 			for p in self.__actualSnapshot.getExcludes():
 				if Util.is_empty_regexp(p):
-					self.logger.error(_("Empty regular expression found. "\
+					self.logger.warning(_("Empty regular expression found. "\
 										"Skipped."))
 				else:
 					if Util.is_valid_regexp(p):
 						p_compiled = re.compile(p)
 						rexclude.append(p_compiled)
 					else:
-						self.logger.error(_("Invalid regular expression ('%s')"\
+						self.logger.warning(_("Invalid regular expression ('%s')"\
 										" found. Skipped.") % p )
 							
-		# set the list to backup and to exclude
+		# set the list to backup (includes) and to exclude
 		self.logger.debug("set the list to backup and to exclude")
 		if self.config.has_section( "dirconfig" ):
 			if not len(self.config.items("dirconfig")) :

@@ -681,6 +681,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		if not isinstance(_result, Exception):
 			self.__restore_dialog.finish_sucess()
 		else:
+			self.logger.error(str(_result))
 			self.__restore_dialog.finish_failure( _result )
 		
 	def on_snpmanExpander_activate(self, *args):
@@ -761,12 +762,13 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 			self.historylisttreestore.clear()
 
 	def on_deleteButton_clicked(self, *args):
-		message = _("Are you sure that you want to definitely remove snapshot '%s' ?") % self.currentSnp
+		message = _("Are you sure that you want to remove snapshot '%s'?\n\nThis may take a while - be patient.") % self.currentSnp
 		dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=message)
 		response = dialog.run()
 		dialog.destroy()
 		if response == gtk.RESPONSE_YES:
-			try :
+			try:
+				self.logger.debug("Trying to remove snapshot '%s'" % self.currentSnp.getName())
 				self.snpman.removeSnapshot(self.currentSnp)
 			except Exception, e: 
 				self.logger.error(str(e))

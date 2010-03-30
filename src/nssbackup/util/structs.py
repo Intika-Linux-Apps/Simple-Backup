@@ -15,10 +15,11 @@
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from nssbackup.util.exceptions import CorruptedSBdictException,SBException
 import os
+import types
+from nssbackup.util.exceptions import CorruptedSBdictException,SBException
 
-class SBdict (dict) :
+class SBdict(dict) :
 	"""
 	This is a structure used by sbackup to store flist and fprops . 
 	The structure is in fact a tree meant to :
@@ -77,6 +78,9 @@ class SBdict (dict) :
 					self.__setitem__(key, value)
 			else :
 				raise Exception ("Not implemented yet")
+			
+	def __str__(self):
+		return str(self)
 	
 	def getSon(self, path) :
 		"""
@@ -338,4 +342,3 @@ class SBdict (dict) :
 			return True
 		else :
 			return self.hasParentDirIncluded(splited[0])
-		
