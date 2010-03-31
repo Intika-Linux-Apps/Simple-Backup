@@ -461,6 +461,7 @@ class BackupManager(PyNotifyMixin):
 					# content) only if option `followlinks` is set
 					if not self.__followlinks:
 						checkmore = False
+						self.fullsize += os.lstat(path).st_size
 				if checkmore:					
 					if FAM.is_dir(path):
 						# if it's a directory, enter inside
