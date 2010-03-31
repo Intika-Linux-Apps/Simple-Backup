@@ -79,8 +79,11 @@ class SBdict(dict) :
 			else :
 				raise Exception ("Not implemented yet")
 			
-	def __str__(self):
-		return str(self)
+#	def __str__(self):
+#		_out = []
+#		for _item in self:
+#			_out.append("%s" % _item)
+#		return "\n".join(_out)
 	
 	def getSon(self, path) :
 		"""
@@ -298,11 +301,12 @@ class SBdict(dict) :
 			_path.pop()
 			
 	def getEffectiveFileList(self,_path=None):
+		"""Iterator that returns the effective files list. Unlike
+		iterkeys, every sub path is not return??? (Don't understand)
+		A file is considered as contained in the effective file list
+		if `prop` is set.
 		"""
-		an Iterator that return the effective files list. Unlike iterkeys, every sub path is not return
-		a file is considered as effective if the prop is set.
-		"""
-		for file,prop in self.iteritems(_path):
+		for file, prop in self.iteritems(_path):
 			if prop is not None :
 				yield file 
 	

@@ -20,12 +20,29 @@
 @todo: Should get renamed and moved to package 'utils'.
 """
 
+import os.path
 import os
 import shutil
 import pickle
 import stat
 
 
+def __remove_trailing_sep(path):
+	spath = path.rstrip(os.sep)
+	return spath
+
+
+def is_link(path):
+	spath = __remove_trailing_sep(path)
+	res = os.path.islink(spath)
+	return res
+
+
+def is_dir(path):
+	res = os.path.isdir(path)
+	return res
+
+	
 def rename(src, dst):
 	os.rename(src, dst)
 		

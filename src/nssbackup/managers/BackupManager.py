@@ -453,19 +453,17 @@ class BackupManager(PyNotifyMixin):
 				# add to exclude list
 				if not self.__actualSnapshot.getIncludeFlist().hasFile(path):
 					self.__actualSnapshot.addToExcludeFlist(path)
-			else :
-				# add _file and then check if it's a dir to add the contents , We won't follow links by default
-				stop = False
-				if os.path.islink(path.rstrip(os.sep)) :
-					# we got a link, always backup links, then tar will follow it if 
-					# followlinks is set
-					self.logger.debug("backing up the link '%s' ! " % path)
+			else:
+				checkmore = True
+				if FAM.is_link(path):
+					self.logger.info("Symbolic link found: '%s'" % path)
+					# always backup links; tar will follow (backup the actual
+					# content) only if option `followlinks` is set
 					if not self.__followlinks:
-						stop = True
-				if not stop :
-					# if it's a directory
-					if os.path.isdir(path):
-						#enter inside
+						checkmore = False
+				if checkmore:					
+					if FAM.is_dir(path):
+						# if it's a directory, enter inside
 						# we remove the dir as an effective file of the exclude list
 						# This will prevent full exclusion of that directory
 						if self.__actualSnapshot.getExcludeFlist().hasFile(path):
@@ -473,16 +471,16 @@ class BackupManager(PyNotifyMixin):
 						try :
 							for contents in FAM.listdir(path) :
 								# contents is a path of a file or dir to include 
-								contents = os.path.normpath( os.sep.join([path,contents]) )
+								contents = os.path.normpath(os.path.join(path, contents))
 								# if the file is included precisely, don't force exclusion
-								checkForExclude(contents,not self.__actualSnapshot.getIncludeFlist().hasFile(path))
+								checkForExclude(contents, not self.__actualSnapshot.getIncludeFlist().hasFile(path))
 							
 						except OSError, e :
 							self.logger.warning(_("got an error with '%(file)s' : %(error)s") % {'file':path, 'error' : str(e)})
 							# Add to exclude file list
 							self.__actualSnapshot.addToExcludeFlist(path)
 					else:
-						self.fullsize += os.lstat(path).st_size
+						self.fullsize += os.stat(path).st_size
 					
 		# End of Subroutines
 		########################################################################
@@ -490,7 +488,7 @@ class BackupManager(PyNotifyMixin):
 		# Use this for getting the size limit 
 		self.fullsize = 0L
 		
-		# regexp to be used for excluding files from flist
+		# prepare Regular Expression used for excluding files from flist
 		self.logger.debug("getting exclude list for actual snapshot")
 		rexclude = []
 		if self.__actualSnapshot.getExcludes() :
@@ -518,14 +516,25 @@ class BackupManager(PyNotifyMixin):
 					elif int(v) == 0 :
 						self.__actualSnapshot.addToExcludeFlist(k)
 				# add the default excluded ones
-				for excl in ["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*",self.config.get("general","target")] :
+				for excl in ["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*",
+                             self.config.get("general","target")] :
 					self.__actualSnapshot.addToExcludeFlist(excl)
 		else :
-			self.logger.warning(_("No directories to backup !"))	
+			self.logger.warning(_("No directories to backup !"))
+		
+		# debug output
+		print ">>> IncludeFlist"
+		print self.__actualSnapshot.getIncludeFlist()
+		print ">>> ExcludeFlist"
+		print self.__actualSnapshot.getExcludeFlist()
+		print ">>> effective IncludeFlist"
+		for _itm in self.__actualSnapshot.getIncludeFlist().getEffectiveFileList(): 
+			print _itm
+		# end of debug output
 		
 		# We have now every thing we need , the rexclude, excludelist, includelist and already stored 
-		self.logger.debug("We have now every thing we need, starting the creation of the complete exclude list " )
-		
+		self.logger.debug("We have now every thing we need, starting the creation of the complete exclude list " )		
+		print "Every path in the effective include list is check for exclusion"
 		for incl in self.__actualSnapshot.getIncludeFlist().getEffectiveFileList():
 			# check into incl for file to exclude
 			checkForExclude(incl)
