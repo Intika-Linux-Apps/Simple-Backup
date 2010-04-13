@@ -1,27 +1,36 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+#	NSsbackup - unified file handling
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+"""
+:mod:`FileAccessManager` --- unified file handling
+====================================================================
 
-# Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
-
-"""Module contains common functions for unified file handling.
+.. module:: FileAccessManager
+   :synopsis: common functions for unified file handling
+.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
+.. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
 
 @todo: Should get renamed and moved to package 'utils'.
+
 """
 
 import os.path
-import os
 import shutil
 import pickle
 import stat
@@ -42,7 +51,20 @@ def is_dir(path):
 	res = os.path.isdir(path)
 	return res
 
+
+def normpath(*args):
+	"""Normalizes the given paths (i.e. concatenates them and removes trailing
+	separators).
 	
+	@todo: Consistent handling of `normpath` (Quote: os.path.normpath - It should be understood
+	that this may change the meaning of the path if it contains symbolic links!)
+	"""
+	_path = os.path.join(*args)
+	_path = __remove_trailing_sep(_path)
+#	_path = os.path.normpath(_path)
+	return _path
+	
+
 def rename(src, dst):
 	os.rename(src, dst)
 		
