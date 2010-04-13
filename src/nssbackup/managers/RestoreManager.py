@@ -18,7 +18,6 @@
 import tempfile
 import os
 import datetime
-import shutil
 from gettext import gettext as _
 
 from nssbackup.util.log import LogFactory

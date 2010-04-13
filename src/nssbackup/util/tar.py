@@ -1091,9 +1091,7 @@ class ProcSnapshotFile(SnapshotFileWrapper):
 		
 		@raise SBException: if the path isn't found in the snapshot file
 		"""
-#		print ">>> getContent - looking for: %s" % dirpath
 		for f in self.__snapshotFile.parseFormat2():
-#			print str(f[SnapshotFile.REC_DIRNAME])
 			if f[SnapshotFile.REC_DIRNAME].rstrip(os.sep) == dirpath.rstrip(os.sep) :
 				return f[SnapshotFile.REC_CONTENT]
 		raise SBException(_("Non existing directory : %s") % dirpath)

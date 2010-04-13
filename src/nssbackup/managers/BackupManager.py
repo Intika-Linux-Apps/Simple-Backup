@@ -28,11 +28,9 @@
 
 """
 
-
 from gettext import gettext as _
 import os
 import grp
-import signal
 import datetime
 import re
 import socket
@@ -818,7 +816,6 @@ class FileCollector(object):
 		"""Tests whether the given `path` is excluded by default. Currently the
 		path is excluded by default in the case it is the target directory. 
 		"""
-		# excude target
 		if path == self.__configuration.get_target_dir():
 			self.__logger.info(_("File '%(file)s' is backup's target directory.") % {'file' : path})
 			return True			
@@ -845,9 +842,7 @@ class FileCollector(object):
 		# if the file matches an exclude regexp, return true
 # TODO: Regex are applied to the full path. Add a choice to apply Regex only to files, directories etc.
 		for _regex in self.__excl_regex:
-#			print ">>> checking '%s'" % str(r.pattern)
 			_regex_res = _regex.search(path)
-#			print dir(_regex_res)
 			if _regex_res is not None:
 				self.__logger.info(_("File '%(file)s' matches regular expression '%(regex)s'.")\
 									% {'file' : path, 'regex' : str(_regex.pattern)})
@@ -885,28 +880,23 @@ class FileCollector(object):
 			   content) only if option `followlinks` is set. A link targeting a directory yields
 			   'islink=True' and 'isdir=True'. 
 		"""
-		print ">>>> _check_for_exclude: %s" % path
 		_excluded = False
 		_stop_checking = False
 
 		if self._is_excluded_by_force(path):
 			# force exclusion e.g. path is defined in includes list but does not exist/is not accessable
-			print ">>> File '%s' - is_excluded by FORCE" % path
 			self.__snapshot.addToExcludeFlist(path)
 			_excluded = True
 			
 		elif self._is_excluded_by_config(path):
-			print ">>> File '%s' - is_excluded returned True" % path
 			if not self.__snapshot.is_subpath_in_incl_filelist(path):
 				# add to exclude list, if not explicitly included; since paths can be nested,
 				# it is checked for sub-paths instead of full paths
-				print ">>> File is not in inclFlist"
 				self.__snapshot.addToExcludeFlist(path)
 				_excluded = True
 
 		if not _excluded:
 			# path was not excluded, so do further tests (stats, enter dir...)
-			print ">>> File was not excluded"
 			
 			if FAM.is_link(path):
 				self.__logger.info(_("Symbolic link found: '%s'.") % path)
@@ -916,35 +906,20 @@ class FileCollector(object):
 					self.__collect_stats.add_count()
 					
 			if not _stop_checking:	# i.e. `followlinks` is enabled
-#				print "further checking..."
 				if FAM.is_dir(path):
-#					print "path is dir"
 					# if it's a directory, enter inside
-					# we remove the dir as an effective file of the exclude list
-					# This will prevent full exclusion of that directory
-#					if self.__snapshot.is_path_in_excl_filelist(path): # is never true!!!
-# TODO: Refactor ...()[path][0]						
-#						self.__snapshot.getExcludeFlist()[path][0] = None
-#						self.__snapshot.disable_path_in_excl_filelist(path)
 					try:
 						for _dir_item in FAM.listdir(path) :
-							# contents is a path of a file or dir to include 
 							_dir_item = FAM.normpath(path, _dir_item)
-							# if the file is included precisely, don't force exclusion
-# TODO: Review!							
 							self._check_for_excludes(path=_dir_item)
-#										force_exclusion=(not self.__snapshot.is_path_in_incl_filelist(path)))
-						self.__collect_stats.add_count()
-#						print ">>> Increase file count (dir %s)" % path
+						self.__collect_stats.add_count()	# the directory `path`
 					except OSError, _exc:
 						self.__logger.warning(_("Error while checking directory '%(dir)s': %(error)s.")\
 												% {'dir' : path, 'error' : str(_exc)})
 						self.__snapshot.addToExcludeFlist(path)	# problems with `path` -> exclude it
 				else:
-#					print "path is NOT dir"
 					# it's a file or link target (in case of enabled `followlinks` option)
 					self.__collect_stats.add_count()
-#					print ">>> Increase file count (not dir %s)" % path
 					self.__cumulate_size(path)
 				
 	def __cumulate_size(self, path):
@@ -953,24 +928,19 @@ class FileCollector(object):
 		Files not contained in SNAR file are backuped in any case!
 		(e.g. a directory was added to the includes)
 		"""
-#		print ">>> __cumulate_size: %s" % path
-		_incl_file = False
-		
-		if self.__isfull:
+		_incl_file = False		
+		if self.__isfull:		# full snapshots do not have a base snar file
 			_incl_file = True
 		else:
-			# this question is necessary since full snapshot do not have a base snar file
-			ftime = max(self.__fstats.st_atime, self.__fstats.st_atime, self.__fstats.st_ctime)			
-#			print "in snar: %s" % (self.__actualBaseSnarDict[path])
+			ftime = max(self.__fstats.st_atime,
+						self.__fstats.st_atime,
+						self.__fstats.st_ctime)			
 			if path in self.__parent.get_base_snardict():
+# TODO: or should we use '>=' here?				
 				if ftime > self.__parent.get_base_backup_time():
-	# TODO: or should we use '>=' here?				
-					print "File '%s' was modified" % path
-					print "ftime: %s" % ftime
 					_incl_file = True
 			else:
-				_incl_file = True
-		
+				_incl_file = True		
 		if _incl_file:
 			self.__collect_stats.add_size(self.__fstats.st_size)
 		
@@ -1046,19 +1016,10 @@ class FileCollector(object):
 		
 		# We have now every thing we need , the rexclude, excludelist, includelist and already stored 
 		self.__logger.debug("Creation of the complete exclude list.")
-		print "Every entry in the effective include list (not nested) is being checked for exclusion."
-		# debug output
-#		for _incl in self.__snapshot.get_effective_incl_filelist():
-		for _incl in self.__snapshot.get_eff_incl_filelst_not_nested():
-			print _incl
-		print
-		###
 		
-#		for _incl in self.__snapshot.get_effective_incl_filelist():
 		# walk recursively into paths defined as includes (therefore don't call nested paths)
 		for _incl in self.__snapshot.get_eff_incl_filelst_not_nested():
 			_incl = FAM.normpath(_incl)
-			print "Eff: %s" % _incl
 			self._check_for_excludes(_incl)
 
 
@@ -1125,7 +1086,6 @@ class FileCollectorConfigFacade(object):
 		
 		@rtype: List
 		"""
-		print str(self.__dirconfig)
 		return self.__dirconfig
 	
 	def has_dirconfig_entries(self):

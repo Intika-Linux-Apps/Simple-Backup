@@ -565,35 +565,34 @@ class Snapshot(object):
 			raise SBException("includes.list and excludes.list shouldn't exist at this stage")
 		
 		# commit include.list.tmp
-		print "### includes.list.tmp:"
+#		print "### includes.list.tmp:"
 		fi = open(self.getIncludeFListFile()+".tmp","w")
 		for f in self.__includeFlist.get_eff_filelist_not_nested() :
-#		for f in self.__includeFlist.getEffectiveFileList() :
-			print f
+#			print f
 			fi.write(str(f) +"\n")
 		fi.close()
 		
 		# commit include.list
-		print "### includes.list:"
+#		print "### includes.list:"
 		fi = open(self.getIncludeFListFile(),"w")
 		for f in self.__includeFlist.getEffectiveFileList() :
-			print f
+#			print f
 			fi.write(str(f) +"\n")
 		fi.close()
 		
 		# commit exclude.list.tmp
-		print "### excludes.list.tmp:"
+#		print "### excludes.list.tmp:"
 		fe = open(self.getExcludeFListFile()+".tmp","w")
 		for f in self.__excludeFlist.getEffectiveFileList() :
-			print f
+#			print f
 			fe.write(str(f) +"\n")
 		fe.close()
 		
 		# commit exclude.list
-		print "### excludes.list:"		
+#		print "### excludes.list:"		
 		fe = open(self.getExcludeFListFile(),"w")
 		for f in self.__excludeFlist.getEffectiveFileList() :
-			print f
+#			print f
 			fe.write(str(f) +"\n")
 		fe.close()
 		

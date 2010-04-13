@@ -225,6 +225,8 @@ def getResource(resourceName, isFile=False):
 
 def get_version_number():
 	"""Returns the version number that is stored in according 'metainfo' file.
+	
+	@todo: Implement similar naming as CPython does (version, version_info).
 	"""
 	ver_line = "VERSION=n.a."
 	
