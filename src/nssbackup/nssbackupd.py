@@ -28,7 +28,6 @@
 
 """
 
-
 import os
 import os.path
 import traceback
@@ -40,6 +39,8 @@ import datetime
 import re
 from gettext import gettext as _
 
+# project imports
+from nssbackup import Infos
 from nssbackup.util import log
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.managers.ConfigManager import getUserConfDir
@@ -80,6 +81,7 @@ class NSsbackupd(PyNotifyMixin) :
 
 		# here the logger created for the default profile is used
 		self.logger			= log.LogFactory.getLogger(self.__profileName)
+		self.logger.debug("%s %s" % (Infos.NAME, Infos.VERSION))
 
 		# the currently used instance of the BackupManager
 		self.__bm				= None
@@ -201,12 +203,10 @@ class NSsbackupd(PyNotifyMixin) :
 	def run(self):
 		"""Actual main method to make backups using NSsbackup
 		
-		- checks for the user who called it
-		- if it's root, it makes a loop to run sbackup for all users that asked for it.
-	 	- if it's another user, launch BackupManager with the user configuration file
+		- launch BackupManager with the user configuration file
 		- catches all exceptions thrown and logs them (with stacktrace)
 		"""
-		self.__notify_errlist()
+		self.__notify_init_errors()
 		
 		for confm in self.__confm:
 			try:
@@ -243,8 +243,8 @@ class NSsbackupd(PyNotifyMixin) :
 			if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
 				self.__sendEmail()
 				
-	def __notify_errlist(self):
-		"""Errors that occured during the initialization process were stored
+	def __notify_init_errors(self):
+		"""Errors that occurred during the initialization process were stored
 		in an error list. This error list is showed to the user by this method.
 		"""
 		if len(self.__errors) > 0:
@@ -252,7 +252,7 @@ class NSsbackupd(PyNotifyMixin) :
 				self._notify_error(self.__profileName, errmsg)
 
 	def __log_errlist(self):
-		"""Errors that occured during the initialization process were stored
+		"""Errors that occurred during the initialization process were stored
 		in an error list. This error list is added to the current log.
 		"""
 		if len(self.__errors) > 0:

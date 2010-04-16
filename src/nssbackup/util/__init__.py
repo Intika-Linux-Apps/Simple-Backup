@@ -28,6 +28,7 @@
 
 """
 
+from gettext import gettext as _
 import os
 import subprocess
 import tempfile
@@ -35,6 +36,7 @@ import inspect
 import shutil
 import types
 import re
+import signal
 
 import nssbackup
 import nssbackup.managers.FileAccessManager as FAM
@@ -116,7 +118,7 @@ def force_nssb_move(src, dst):
 			nssb_copytree(src, dst, symlinks=True)
 			FAM.force_delete(src)
 		else:
-			shutil.copy2(src,dst)
+			shutil.copy2(src, dst)
 			FAM.force_delete(src)
 
 			
@@ -224,6 +226,8 @@ def getResource(resourceName, isFile=False):
 
 def get_version_number():
 	"""Returns the version number that is stored in according 'metainfo' file.
+	
+	@todo: Implement similar naming as CPython does (version, version_info).
 	"""
 	ver_line = "VERSION=n.a."
 	
@@ -257,7 +261,7 @@ def launch(cmd, opts):
 	"""
 	_logger = log.LogFactory.getLogger()
 	# Create output log file
-	outptr,outFile = tempfile.mkstemp(prefix="output_")
+	outptr, outFile = tempfile.mkstemp(prefix="output_")
 
 	# Create error log file
 	errptr, errFile = tempfile.mkstemp(prefix="error_")
@@ -325,7 +329,7 @@ def readlineNULSep(fd,fd1):
 		if _continue == 1 :
 			raise exceptions.SBException(\
 								"The length of flist and Fprops are not equals")
-		yield (currentline,currentline1)
+		yield (currentline, currentline1)
 
 
 def is_valid_regexp( aregex ):
@@ -517,3 +521,56 @@ def list_union(source_a, source_b):
 		_dest = list(_set_dest)
 
 	return _dest
+
+
+def get_humanreadable_size(size_in_bytes, binary_prefixes=False):
+	"""Converts given number into more readable values.
+	 
+	@todo: Implement sophisicated class for this!
+	@note: Have also a look at function `get_humanreadable_size_str`.
+	"""
+	factor = 1000
+	if binary_prefixes is True:
+		factor = 1024
+		
+	_mbytes = size_in_bytes / (factor*factor)
+	_kbytes = ( size_in_bytes % (factor*factor) ) / factor
+	_bytes = ( size_in_bytes % (factor*factor) ) % factor
+	
+	return (_mbytes, _kbytes, _bytes)
+
+
+def get_humanreadable_size_str(size_in_bytes, binary_prefixes=False):
+	"""Converts given number into readable string.
+	 
+	@todo: Implement sophisicated class for this!
+	"""
+	_mb, _kb, _byt = get_humanreadable_size(size_in_bytes=size_in_bytes, binary_prefixes=binary_prefixes)
+	if binary_prefixes is True:
+		_res = _("%d MiB %d KiB %d") % (_mb, _kb, _byt)
+	else:
+		_res = _("%d MB %d kB %d") % (_mb, _kb, _byt)
+	return _res
+
+
+def enable_timeout_alarm():
+	"""Helper method that enables timeout alarm handling.
+	
+	@todo: separate class? should we store the previous signal handler and restore it later? 
+	"""
+	# Set the signal handler
+	signal.signal(signal.SIGALRM, sigalarm_handler)
+
+
+def set_timeout_alarm(timeout):
+	"""Sets the timeout to the given value.
+	"""
+	signal.alarm(timeout)
+
+
+def sigalarm_handler(signum, stack_frame): #IGNORE:W0613
+	"""Signal handler that is connected to the SIGALRM signal.
+	
+	@raise TimeoutError: A `TimeoutError` exception is raised.
+	"""
+	raise exceptions.TimeoutError("Unable to open device.")

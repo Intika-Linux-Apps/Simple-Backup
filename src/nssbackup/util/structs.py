@@ -65,8 +65,11 @@ class SBdict(dict) :
 		 					'f4.txt' : [ 'props', None ] } ] } ] } ] } ] } ] 
 		 } ] } 
 	
-	We can save the memory for all subpathes but then, we might have a lost of speed when doing some search
-	( comparing to putting the whole file in a Dictionary )
+	We can save the memory for all subpathes but then, we might have a lost of speed when
+	doing some search (comparing to putting the whole file in a Dictionary).
+	
+	@note: And yes, this penalty in speed is notable!
+		   We should replace it or at least provide a faster alternative.
 	"""
 	def __init__(self, mapping=None):
 		if not mapping :
@@ -79,8 +82,11 @@ class SBdict(dict) :
 			else :
 				raise Exception ("Not implemented yet")
 			
-	def __str__(self):
-		return str(self)
+#	def __str__(self):
+#		_out = []
+#		for _item in self:
+#			_out.append("%s" % _item)
+#		return "\n".join(_out)
 	
 	def getSon(self, path) :
 		"""
@@ -223,9 +229,9 @@ class SBdict(dict) :
 			else : return False
 		
 	def iterkeys(self,_path=None) :
-		"""
-		an Iterator that gets recursively the full path
-		Should return fullpath
+		"""Returns an iterator that goes recursively through the full paths.
+		
+		Should return fullpath (means what?)
 		"""
 		if _path is None: # initialization
 			_path = []
@@ -241,9 +247,10 @@ class SBdict(dict) :
 			_path.pop()
 	
 	def iteritems(self,_path=None) :
-		"""
-		an Iterator that gets recursively the full path with its properties
-		Should return (fullpath, props)
+		"""Iterator that goes recursively through the whole dictionary and returns
+		paths and their properties. Every sub-path is considered.
+		
+		@return: (fullpath, props)
 		"""
 		if _path is None: # initialization
 			_path = []
@@ -297,27 +304,28 @@ class SBdict(dict) :
 		if len(_path) > 0 :
 			_path.pop()
 			
-	def getEffectiveFileList(self,_path=None):
+	def getEffectiveFileList(self, path=None):
+		"""Iterator that returns the effective files list. Effective means that all 'end-nodes' or
+		leafs of the tree are returned. Unlike method `iterkeys` are *not* all sub-paths returned.		
+		Paths are included in the effective list of files if their `props` are set (i.e. set to 0 or 1,
+		not set to None) since this is not true for sub-paths. Moreover, paths can be 'disabled' (i.e.
+		excluded from the effective list of files) by setting their `props` to None.
 		"""
-		an Iterator that return the effective files list. Unlike iterkeys, every sub path is not return
-		a file is considered as effective if the prop is set.
-		"""
-		for file,prop in self.iteritems(_path):
-			if prop is not None :
-				yield file 
+		for _file, _prop in self.iteritems(path):
+			if _prop is not None:
+				yield _file
 	
-	def getEffectiveFileListForTAR(self,_path=None):
+	def get_eff_filelist_not_nested(self, path=None):
 		"""
 		an Iterator that return the effective files list to give to TAR.
 		This means, some files won't appear because they are part of an included sub directory
 		"""
-		for file in self.getEffectiveFileList(_path):
-			if not self.hasParentDirIncluded(file) :
-				yield file
+		for _file in self.getEffectiveFileList(path):
+			if not self.hasParentDirIncluded(_file) :
+				yield _file
 	
 	def hasFile(self,_file):
-		"""
-		Checks if the SBdict has a file. Unlike has_key, this will not match subdirectories name
+		"""Checks if the SBdict has a file. Unlike has_key, this will not match subdirectories name
 		"""
 		if not self.has_key(_file) :
 			return False
@@ -327,18 +335,26 @@ class SBdict(dict) :
 			else :
 				return True
 			
-	def hasParentDirIncluded(self,path):
+	def contains_path(self, path):
+		"""Checks whether the given `path` is stored in this SBDict. Unlike `hasFile` this
+		will also match sub-directories. 
+		"""
+		if self.has_key(path) :
+			return True
+		return False
+		
+	def hasParentDirIncluded(self, path):
 		"""
 		Checks for a path if we have an effective parent dir
 		@param path: The path to check 
 		@type path: like /d/d1/d2
 		"""
-		if not path :
+		if not path:
 			return False
 		
-		splited = path.rsplit(os.sep,1)		
-		
-		if self.__getitem__(splited[0])[0] is not None :
+		splited = path.rsplit(os.sep, 1)
+		_basename = splited[0]
+		if self.__getitem__(_basename)[0] is not None:
 			return True
-		else :
-			return self.hasParentDirIncluded(splited[0])
+		else:
+			return self.hasParentDirIncluded(_basename)

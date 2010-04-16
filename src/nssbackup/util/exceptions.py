@@ -66,6 +66,10 @@ class FuseFAMException(SBException):
 
 	"""
 	
+class TimeoutError(SBException):
+	"""Thrown when an IO operation times out.
+	"""
+	
 class RebaseSnpException(SBException):
 	"""Thrown for rebase exception
 	

@@ -466,6 +466,58 @@ class ConfigManager(ConfigParser.ConfigParser):
 		defaults = self.__get_default_config_obj()
 		target = defaults.get_target()
 		return target
+	
+	def get_backup_target(self):
+		"""Returns the target option that is currently set. Purpose is to
+		hide the actual naming of options from external classes. 
+		"""
+		return self.get("general","target")
+	
+	def has_maxsize_limit(self):
+		"""Returns True if the 'maxsize' option is enabled (i.e. set to
+		any value greater than 0).
+		"""
+		_res = False
+		if self.get_maxsize_limit() > 0:
+			_res = True
+		return _res
+	
+	def get_maxsize_limit(self):
+		"""Returns the maximum file size limit. If the option is not set, 0 is returned.
+		"""
+		_section = "exclude"
+		_option = "maxsize"
+		_maxsize = 0
+		if self.has_option(_section, _option):
+			_val = int(self.get(_section, _option))
+			if _val > 0:
+				_maxsize = _val
+		return _maxsize
+	
+	def get_dirconfig(self):
+		"""Returns a list of pairs of (name, value) from the 'dirconfig' section.
+		If no values are set, None is returned.
+		"""
+		_section = "dirconfig"
+#		print ">>>> OPTIONS"
+#		print self.options(_section)
+		_res = None
+		if self.has_section(_section):
+			_items = self.items(_section)
+			if not len(_items):
+				pass
+			else:
+				_res = _items
+		return _res
+
+	def get_followlinks(self):
+		_section = "general"
+		_option = "followlinks"
+		_res = False
+		if self.has_option(_section, _option):
+			if str(self.get(_section, _option)) == "1":
+				_res = True
+		return _res
 				
 	def optionxform(self, option):
 		"""Default behaviour of ConfigParser is to set the option

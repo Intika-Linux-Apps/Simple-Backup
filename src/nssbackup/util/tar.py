@@ -39,6 +39,7 @@ from nssbackup.util import exceptions
 from datetime import datetime
 import time
 from nssbackup.managers import ConfigManager
+from nssbackup.managers import FileAccessManager as fam
 
 
 def getArchiveType(archive):
@@ -567,8 +568,8 @@ class SnapshotFile(object):
 
 	def __str__(self):
 		_str = [ "Snapshot file",
-				 " Header: %s" % self.header,
-				 " Version: %s" % self.version,
+				 " Header: %s" % self.getHeader(),
+				 " Version: %s" % self.getFormatVersion(),
 				 " file name: %s" % self.snpfile,
 				 " Content:"
 			   ]
@@ -791,6 +792,102 @@ class SnapshotFile(object):
 			result += dumpdir.getControl()+dumpdir.getFilename()+self.__SEP
 		
 		return result
+	
+	def get_time_of_backup(self):
+		"""Returns the time of the snapshot (as stored in the snapshot file)
+		in seconds since beginning of the epoch.
+		
+		@rtype: Float
+		"""
+		_header = self.getHeader()
+		_header_t = _header.split("\n")
+		assert len(_header_t) == 2
+		_time_t = _header_t[1].split(self.__SEP)
+		assert len(_time_t) > 1
+		_time = float("%s.%s" % (_time_t[0], _time_t[1]))
+		return _time
+				
+	def get_dict_format2(self):
+		"""Returns the content of the snapshot file as dictionary.
+		This provides a much faster way of accessing the content than
+		parsing the file on demand. The required RAM is moderate,
+		a 10GiB partition filled with files results in 6MiB dictonary.
+		
+		@warning: only compatible tar version 2 of Tar format
+		@note: Uses the same algorithm as method `parseFormat2` and is ~15% faster
+				than the high-level variant below.
+		"""
+		_snardict = {}
+			
+		fd = open(self.snpfile)
+		# skip header which is the first line and 2 entries separated with NULL in this case
+		l = fd.readline()
+		if l != "":
+			#Snarfile not empty
+			n = 0
+			while n < 2 :
+				c = fd.read(1)
+				if len(c) != 1:
+					raise SBException(_("The snarfile header is incomplete !"))
+				if c == '\0':
+					n += 1
+			
+			currentline = ""
+			last_c = ''			
+			c = fd.read(1)			
+			while c:
+				currentline += c
+				if c == '\0' and last_c == '\0' :
+					# we got a line
+					nfs, mtime_sec, mtime_nano, dev_no, i_no, _dirname,\
+						_content = currentline.lstrip("\0").split("\0", 6)
+					_snardict[_dirname] = Dumpdir.DIRECTORY
+					_content_t = _content.rstrip('\0').split('\0')
+					for _entry in _content_t:
+						_entry = _entry.strip("\0")
+						if _entry:
+							_epath = fam.normpath(_dirname, _entry[1:])
+							_snardict[_epath] = _entry[0]
+
+					currentline = ''
+					last_c = ''
+				else :
+					last_c = c
+				c = fd.read(1)
+			
+		fd.close
+		return _snardict
+
+#	def get_dict_format2(self):
+#		"""		
+#		@warning: only compatible tar version 2 of Tar format
+#
+#		more high-level programmed
+#		"""
+##		_dirdict = {}
+#		_snardict = {}
+#
+#		for _record in self.parseFormat2():
+##			print _record
+#			_dirname = _record[self.REC_DIRNAME]
+#			_content = _record[self.REC_CONTENT]
+##			if _dirname in _dirdict:
+##				raise ValueError("Directory is already contained.")
+##			_dirdict[_dirname] = _content
+#			
+#			_snardict[_dirname] = Dumpdir.DIRECTORY
+#			
+#			for _entry in _content:
+##				print "Type: %s name: '%s' control: '%s'" %(type(_entry),
+##														_entry.getFilename(),
+##														_entry.getControl())
+#				_epath = fam.normpath(_dirname, _entry.getFilename())
+#				_snardict[_epath] = _entry.getControl()
+#			
+#
+##		print "Dir dictionary:\n%s" % _dirdict  			
+##		print "Snar dictionary:\n%s" % _snardict  
+#		return _snardict
 
 
 class SnapshotFileWrapper(object):
@@ -910,6 +1007,14 @@ class ProcSnapshotFile(SnapshotFileWrapper):
 	def get_snapfile_path(self):
 		return self.__snapshotFile.get_filename()
 
+	def get_snapfile_obj(self):
+		"""Returns the wrapped instance of the snapshot file.
+		
+		@return: snapshot file object
+		@rtype: SnapshotFile
+		"""
+		return self.__snapshotFile
+
 	def hasPath(self,path):
 		"""
 		Checks if a path is included in the SNAR file
@@ -986,9 +1091,7 @@ class ProcSnapshotFile(SnapshotFileWrapper):
 		
 		@raise SBException: if the path isn't found in the snapshot file
 		"""
-#		print ">>> getContent - looking for: %s" % dirpath
 		for f in self.__snapshotFile.parseFormat2():
-#			print str(f[SnapshotFile.REC_DIRNAME])
 			if f[SnapshotFile.REC_DIRNAME].rstrip(os.sep) == dirpath.rstrip(os.sep) :
 				return f[SnapshotFile.REC_CONTENT]
 		raise SBException(_("Non existing directory : %s") % dirpath)

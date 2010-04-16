@@ -151,7 +151,7 @@ class FuseFAM(object):
 		# Close log handles
 		os.close(errptr)
 		os.close(outptr)
-		outStr, errStr = FAM.readfile(outFile), FAM.readfile(errFile)	
+		outStr, errStr = FAM.readfile(outFile), FAM.readfile(errFile)
 		FAM.delete(outFile)
 		FAM.delete(errFile)
 		if retval != 0 :

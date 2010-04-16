@@ -78,6 +78,8 @@ class Snapshot(object):
 		self.__followlinks = False
 		
 		self.__snarfile = None
+		
+		# explicitely defined include and exclude file lists; these lists are filled from the configuration
 		self.__includeFlist = SBdict()
 		self.__includeFlistFile = None # Str
 		self.__excludeFlist = SBdict()
@@ -126,12 +128,58 @@ class Snapshot(object):
 		return date
 	
 	def getIncludeFlist(self):
-		"""
-		get the Include file list
-		@rtype: list
+		"""Returns the list of files included into this snapshot.
+
+		@rtype: SBDict
 		"""
 		return self.__includeFlist
 	
+	def get_effective_incl_filelist(self):
+		"""Returns the *effective* list of files included into this snapshot.
+
+		@rtype: SBDict
+		"""
+		return self.__includeFlist.getEffectiveFileList()
+
+	def get_eff_incl_filelst_not_nested(self):
+		"""Returns the *effective* list of files included into this snapshot.
+
+		@rtype: SBDict
+		"""
+		return self.__includeFlist.get_eff_filelist_not_nested()
+		
+	def is_path_in_incl_filelist(self, path):
+		"""Checks whether the given `path` is contained in list of included files.
+		Only full paths (no sub-paths) are considered.
+		"""
+		return self.__includeFlist.hasFile(path)
+	
+	def is_subpath_in_incl_filelist(self, path):
+		"""Checks whether the given `path` is contained in list of included files.
+		Full paths as well as sub-paths are considered.
+		"""
+		return self.__includeFlist.contains_path(path)
+	
+	def is_path_in_excl_filelist(self, path):
+		"""Checks whether the given `path` is contained in list of excluded files.
+		Only full paths (no sub-paths) are considered.
+		"""
+		return self.__excludeFlist.hasFile(path)
+	
+	def disable_path_in_excl_filelist(self, path):
+		"""Searches for the given `path` in the list of excluded files and set
+		the properties to None. Sub-paths are also considered.
+		"""
+		if self.__excludeFlist.has_key(path):
+			self.__excludeFlist[path][0] = None
+
+	def disable_path_in_incl_filelist(self, path):
+		"""Searches for the given `path` in the list of included files and set
+		the properties to None. Sub-paths are also considered.
+		"""
+		if self.__includeFlist.has_key(path):
+			self.__includeFlist[path][0] = None
+		
 	def getExcludeFlist(self):
 		"""
 		get the Exclude file list
@@ -350,6 +398,9 @@ class Snapshot(object):
 		Add an item to be backup into the snapshot.
 		Usage :  addToIncludeFlist(item) where
 		- item is the item to be add (file, dir, or link)
+		
+		The `include flist` is of type `SBDict`, the according `props` for a single entry
+		is '1' for included items.
 		"""
 		self.__includeFlist[item] = "1"
 	
@@ -358,9 +409,23 @@ class Snapshot(object):
 		Add an item to not be backup into the snapshot.
 		Usage :  addToExcludeFlist(item) where
 		- item is the item to be add (file, dir, or link)
+
+		The `exclude flist` is of type `SBDict`, the according `props` for a single entry
+		is '0' for excluded items.
 		"""
 		self.__excludeFlist[item] = "0"
 	
+	def check_and_clean_flists(self):
+		"""Checks include and exclude flists for entries contained in both lists.
+		Entries stored in both lists are removed from the exclude list (include overrides
+		exclude).
+		
+		In theory it is impossible but what's in the case of manually written configuration files?
+		
+		@todo: Implement this method.
+		"""
+		pass
+		
 	# Setters	
 	def setFormat(self,cformat=None):
 		"""
@@ -500,26 +565,34 @@ class Snapshot(object):
 			raise SBException("includes.list and excludes.list shouldn't exist at this stage")
 		
 		# commit include.list.tmp
+#		print "### includes.list.tmp:"
 		fi = open(self.getIncludeFListFile()+".tmp","w")
-		for f in self.__includeFlist.getEffectiveFileListForTAR() :
+		for f in self.__includeFlist.get_eff_filelist_not_nested() :
+#			print f
 			fi.write(str(f) +"\n")
 		fi.close()
 		
 		# commit include.list
+#		print "### includes.list:"
 		fi = open(self.getIncludeFListFile(),"w")
 		for f in self.__includeFlist.getEffectiveFileList() :
+#			print f
 			fi.write(str(f) +"\n")
 		fi.close()
 		
 		# commit exclude.list.tmp
+#		print "### excludes.list.tmp:"
 		fe = open(self.getExcludeFListFile()+".tmp","w")
 		for f in self.__excludeFlist.getEffectiveFileList() :
+#			print f
 			fe.write(str(f) +"\n")
 		fe.close()
 		
 		# commit exclude.list
+#		print "### excludes.list:"		
 		fe = open(self.getExcludeFListFile(),"w")
 		for f in self.__excludeFlist.getEffectiveFileList() :
+#			print f
 			fe.write(str(f) +"\n")
 		fe.close()
 		
