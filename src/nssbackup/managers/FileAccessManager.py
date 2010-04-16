@@ -47,6 +47,16 @@ def is_link(path):
 	return res
 
 
+def get_link(path):
+	"""Returns the target of given link `path`. Relative links remain
+	unchanged (i.e. are not made absolute). 
+	"""
+	if not is_link(path):
+		raise ValueError("Given path is not a symbolic link.")
+	_res = os.readlink(path)
+	return _res
+
+
 def is_dir(path):
 	res = os.path.isdir(path)
 	return res

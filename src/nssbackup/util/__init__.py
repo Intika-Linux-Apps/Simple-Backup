@@ -28,6 +28,7 @@
 
 """
 
+from gettext import gettext as _
 import os
 import subprocess
 import tempfile
@@ -526,6 +527,7 @@ def get_humanreadable_size(size_in_bytes, binary_prefixes=False):
 	"""Converts given number into more readable values.
 	 
 	@todo: Implement sophisicated class for this!
+	@note: Have also a look at function `get_humanreadable_size_str`.
 	"""
 	factor = 1000
 	if binary_prefixes is True:
@@ -536,6 +538,19 @@ def get_humanreadable_size(size_in_bytes, binary_prefixes=False):
 	_bytes = ( size_in_bytes % (factor*factor) ) % factor
 	
 	return (_mbytes, _kbytes, _bytes)
+
+
+def get_humanreadable_size_str(size_in_bytes, binary_prefixes=False):
+	"""Converts given number into readable string.
+	 
+	@todo: Implement sophisicated class for this!
+	"""
+	_mb, _kb, _byt = get_humanreadable_size(size_in_bytes=size_in_bytes, binary_prefixes=binary_prefixes)
+	if binary_prefixes is True:
+		_res = _("%d MiB %d KiB %d") % (_mb, _kb, _byt)
+	else:
+		_res = _("%d MB %d kB %d") % (_mb, _kb, _byt)
+	return _res
 
 
 def enable_timeout_alarm():

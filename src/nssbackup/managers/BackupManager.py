@@ -384,20 +384,27 @@ class BackupManager(PyNotifyMixin):
 		_collector.collect_files()
 		_stats = _collector.get_stats()		
 		_snpsize = _stats.get_size_payload() + _stats.get_size_overhead(size_per_item=512)		
-		nfiles = _stats.get_file_count()
-				
-		# check for the available size
-		mib, kib, byt = Util.get_humanreadable_size(size_in_bytes=_snpsize, binary_prefixes=True) 
-		_snpsize_hr = "%d MiB %d KiB %d" % (mib, kib, byt)
-		self.logger.info(_("Maximum free size required is '%s'.") % _snpsize_hr)
-		self.logger.debug("Number of items to backup: %s" % nfiles)
 
 		vstat = os.statvfs(self.__actualSnapshot.getPath())
-		freespace = vstat.f_bavail * vstat.f_bsize
-		if freespace <= _snpsize:
+		_freespace = vstat.f_bavail * vstat.f_bsize
+		
+		_snpsize_hr = Util.get_humanreadable_size_str(size_in_bytes=_snpsize, binary_prefixes=True)
+		_freespace_hr = Util.get_humanreadable_size_str(size_in_bytes=_freespace, binary_prefixes=True)
+		self.logger.info(_("Maximum free size required is '%s'.") % _snpsize_hr)
+		self.logger.info(_("Available disk size is '%s'.") % _freespace_hr)
+		self.logger.info(_("Number of directories: %s.") % _stats.get_count_dirs())
+		self.logger.info(_("Number of symlinks: %s.") % _stats.get_count_symlinks())
+		self.logger.info(_("Total number of files: %s.") % _stats.get_count_files_total())
+		self.logger.info(_("Number of files included in snapshot: %s.") % _stats.get_count_files_incl())
+		self.logger.info(_("Number of new files (also included): %s.") % _stats.get_count_files_new())
+		self.logger.info(_("Number of files skipped in incremental snapshot: %s.") % _stats.get_count_files_skip())
+		self.logger.info(_("Number of items forced to be excluded: %s.") % _stats.get_count_items_excl_forced())
+		self.logger.info(_("Number of items to be excluded by config: %s.") % _stats.get_count_items_excl_config())
+		
+		if _freespace <= _snpsize:
 			raise exceptions.SBException(_("Not enough free space in the target directory for the "\
-										   "planned backup (%(freespace)d <= %(neededspace)s)")\
-										   % { 'freespace' : freespace, 'neededspace' : _snpsize_hr})
+										   "planned backup (%(freespace)d <= %(neededspace)s).")\
+										   % { 'freespace' : _freespace_hr, 'neededspace' : _snpsize_hr})
 
 	def __create_collector_obj(self):
 		"""Factory method that returns instance of `FileCollector`.
@@ -574,11 +581,30 @@ class FileCollectorStats(object):
 	* number of files being backuped.
 	"""
 	
-	def __init__(self):
+	def __init__(self, followlinks = False):
+		self.__followlinks = False
+		self.set_followlinks(followlinks)
 		# uncompressed size of snapshot (cummulative)
 		self.__size_in_bytes = 0L
-		self.__file_count = 0L
+		
+		self.__ndirs  = 0L
+		self.__nfiles = 0L
+		self.__nsymlinks = 0L
 
+		# for incremental counting (in case of full snapshot only `__nfile_incl` is used)
+		self.__nfiles_incl = 0L
+		self.__nfiles_skip = 0L
+		self.__nfiles_new = 0L
+
+		self.__nexcl_forced = 0L
+		self.__nexcl_config = 0L
+
+	def set_followlinks(self, followlinks):
+		if not isinstance(followlinks, types.BooleanType):
+			raise TypeError("Expected parameter of boolean type. "\
+							"Got %s instead." % type(followlinks))
+		self.__followlinks = followlinks
+		
 	def get_size_payload(self):
 		"""Returns the cumulated size of files being backuped in bytes.
 		Additional overhead due to storage etc. is not considered.
@@ -593,30 +619,97 @@ class FileCollectorStats(object):
 		if not isinstance(size_per_item, types.IntType):
 			raise TypeError("Expected parameter of integer type. "\
 							"Got %s instead." % type(size_per_item))
-		_overhead = self.__file_count * size_per_item
+		_overhead = (self.__ndirs + self.__nfiles_incl) * size_per_item
+		if not self.__followlinks:
+			_overhead += self.__nsymlinks * size_per_item
 		return _overhead
 	
-	def get_file_count(self):
+	def get_count_files_total(self):
 		"""Returns the number of files.
 		"""
-		return self.__file_count
+		return self.__nfiles
+
+	def get_count_files_incl(self):
+		"""Returns the number of files.
+		"""
+		return self.__nfiles_incl
+
+	def get_count_files_skip(self):
+		"""Returns the number of files.
+		"""
+		return self.__nfiles_skip
+
+	def get_count_files_new(self):
+		"""Returns the number of new included files.
+		"""
+		return self.__nfiles_new
+
+	def get_count_dirs(self):
+		"""Returns the number of files.
+		"""
+		return self.__ndirs
+
+	def get_count_symlinks(self):
+		"""Returns the number of files.
+		"""
+		return self.__nsymlinks
+
+	def get_count_items_excl_forced(self):
+		"""Returns the number of files.
+		"""
+		return self.__nexcl_forced
+
+	def get_count_items_excl_config(self):
+		"""Returns the number of files.
+		"""
+		return self.__nexcl_config
 	
 	def clear(self):
 		"""Clears collected data.
 		"""
-		self.__size_in_bytes = 0L
-		self.__file_count = 0L
+		self.__size_in_bytes = 0L		
+		self.__ndirs  = 0L
+		self.__nfiles = 0L
+		self.__nsymlinks = 0L
+		self.__nfiles_incl = 0L
+		self.__nfiles_skip = 0L
+		self.__nexcl_forced = 0L
+		self.__nexcl_config = 0L
+		self.__nfiles_new = 0L
 
 	def add_size(self, value):
 		"""The given value is added to the cumulated file size.
 		"""
 		self.__size_in_bytes += value
 		
-	def add_count(self):
+	def count_file(self):
 		"""The file counter is increased by 1.
 		"""
-		self.__file_count += 1
+		self.__nfiles += 1
+
+	def count_incl_file(self):
+		self.__nfiles_incl += 1
+
+	def count_new_file(self):
+		self.__nfiles_new += 1
 		
+	def count_skip_file(self):
+		self.__nfiles_skip += 1
+
+	def count_dir(self):
+		"""The file counter is increased by 1.
+		"""
+		self.__ndirs += 1
+		
+	def count_symlink(self):
+		self.__nsymlinks += 1
+		
+	def count_excl_forced(self):
+		self.__nexcl_forced += 1
+	
+	def count_excl_config(self):
+		self.__nexcl_config += 1
+
 		
 class FileCollectorParentSnapshotFacade(object):
 	"""Class that provides simplified access to attributes of the parent
@@ -624,6 +717,7 @@ class FileCollectorParentSnapshotFacade(object):
 	"""
 	
 	def __init__(self):
+		self.__logger = LogFactory.getLogger()
 		# snapshot file (snar) of current snapshot's parent (base snapshot)
 		# only set if the current one is incremental
 		self.__base_snar 		= None
@@ -650,6 +744,7 @@ class FileCollectorParentSnapshotFacade(object):
 		if not isinstance(backup_time, types.FloatType):
 			raise TypeError("Expected parameter of floar type. "\
 							"Got %s instead." % type(backup_time))
+		self.__logger.debug("Backup time of parent snapshot: %s" % backup_time)
 		self.__base_backup_time = backup_time		
 
 	def __set_base_snardict(self, snardict):
@@ -712,6 +807,7 @@ class FileCollector(object):
 							"Got %s instead." % type(snapshot))
 		self.__snapshot = snapshot
 		self.__set_isfull(isfull=snapshot.isfull())
+		self.__collect_stats.set_followlinks(followlinks=snapshot.isFollowLinks())
 
 	def set_configuration(self, configuration):
 		"""Sets the given object of type `FileCollectorConfigFacade`.
@@ -833,11 +929,12 @@ class FileCollector(object):
 		@return: True if the file has to be excluded, false if not
 		"""
 		#if the file is too big
-		if self.__fstats.st_size > self.__configuration.get_maxsize_limit():
-			self.__logger.info(_("File '%(file)s' exceeds maximum file size ( %(filesize)s > %(maxsize)s).")\
-								% {'file' : path, 'filesize' : str(self.__fstats.st_size),
-								   'maxsize' : str(self.__configuration.get_maxsize_limit())})
-			return True
+		if self.__configuration.is_maxsize_enable():
+			if self.__fstats.st_size > self.__configuration.get_maxsize_limit():
+				self.__logger.info(_("File '%(file)s' exceeds maximum file size ( %(filesize)s > %(maxsize)s).")\
+									% {'file' : path, 'filesize' : str(self.__fstats.st_size),
+									   'maxsize' : str(self.__configuration.get_maxsize_limit())})
+				return True
 		
 		# if the file matches an exclude regexp, return true
 # TODO: Regex are applied to the full path. Add a choice to apply Regex only to files, directories etc.
@@ -886,6 +983,7 @@ class FileCollector(object):
 		if self._is_excluded_by_force(path):
 			# force exclusion e.g. path is defined in includes list but does not exist/is not accessable
 			self.__snapshot.addToExcludeFlist(path)
+			self.__collect_stats.count_excl_forced()
 			_excluded = True
 			
 		elif self._is_excluded_by_config(path):
@@ -893,17 +991,18 @@ class FileCollector(object):
 				# add to exclude list, if not explicitly included; since paths can be nested,
 				# it is checked for sub-paths instead of full paths
 				self.__snapshot.addToExcludeFlist(path)
+				self.__collect_stats.count_excl_config()
 				_excluded = True
 
 		if not _excluded:
 			# path was not excluded, so do further tests (stats, enter dir...)
 			
-			if FAM.is_link(path):
-				self.__logger.info(_("Symbolic link found: '%s'.") % path)
+			if FAM.is_link(path):				
+				self.__logger.info(_("Symbolic link found: '%s' -> '%s'.") % (path, FAM.get_link(path)))
+				self.__collect_stats.count_symlink()
 				if not self.__snapshot.isFollowLinks():
 					# if `followlinks` is disabled, just count the link and finish
 					_stop_checking = True
-					self.__collect_stats.add_count()
 					
 			if not _stop_checking:	# i.e. `followlinks` is enabled
 				if FAM.is_dir(path):
@@ -912,14 +1011,15 @@ class FileCollector(object):
 						for _dir_item in FAM.listdir(path) :
 							_dir_item = FAM.normpath(path, _dir_item)
 							self._check_for_excludes(path=_dir_item)
-						self.__collect_stats.add_count()	# the directory `path`
+						self.__collect_stats.count_dir()	# the directory `path`
 					except OSError, _exc:
 						self.__logger.warning(_("Error while checking directory '%(dir)s': %(error)s.")\
 												% {'dir' : path, 'error' : str(_exc)})
 						self.__snapshot.addToExcludeFlist(path)	# problems with `path` -> exclude it
+						self.__collect_stats.count_excl_forced()
 				else:
-					# it's a file or link target (in case of enabled `followlinks` option)
-					self.__collect_stats.add_count()
+					# it's a file (may also a link target in case of enabled `followlinks` option)
+					self.__collect_stats.count_file()
 					self.__cumulate_size(path)
 				
 	def __cumulate_size(self, path):
@@ -932,17 +1032,25 @@ class FileCollector(object):
 		if self.__isfull:		# full snapshots do not have a base snar file
 			_incl_file = True
 		else:
-			ftime = max(self.__fstats.st_atime,
-						self.__fstats.st_atime,
+			# we don't look at the access time since this was even modified during the last backup 
+			ftime = max(self.__fstats.st_mtime,		 
 						self.__fstats.st_ctime)			
 			if path in self.__parent.get_base_snardict():
-# TODO: or should we use '>=' here?				
 				if ftime > self.__parent.get_base_backup_time():
+					self.__logger.debug("Delta=%s - %s: %s > %s" % ((ftime - self.__parent.get_base_backup_time()),
+																	 path, ftime,
+																	 self.__parent.get_base_backup_time()))
 					_incl_file = True
 			else:
-				_incl_file = True		
+				self.__logger.debug("%s: No included yet - included." % path)
+				self.__collect_stats.count_new_file()
+				_incl_file = True
+				
 		if _incl_file:
+			self.__collect_stats.count_incl_file()
 			self.__collect_stats.add_size(self.__fstats.st_size)
+		else:
+			self.__collect_stats.count_skip_file()
 		
 	def __prepare_excl_regex(self):
 		"""Prepares (i.e. compiles) Regular Expressions used for excluding files from flist.
