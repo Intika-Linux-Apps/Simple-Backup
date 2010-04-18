@@ -547,9 +547,13 @@ def get_humanreadable_size_str(size_in_bytes, binary_prefixes=False):
 	"""
 	_mb, _kb, _byt = get_humanreadable_size(size_in_bytes=size_in_bytes, binary_prefixes=binary_prefixes)
 	if binary_prefixes is True:
-		_res = _("%d MiB %d KiB %d") % (_mb, _kb, _byt)
+		_res = _("%(mb)d MiB %(kb)d KiB %(bytes)d") % {'mb' : _mb,
+													   'kb' : _kb,
+													   'bytes' : _byt}
 	else:
-		_res = _("%d MB %d kB %d") % (_mb, _kb, _byt)
+		_res = _("%(mb)d MB %(kb)d kB %(bytes)d") % {'mb' : _mb,
+													   'kb' : _kb,
+													   'bytes' : _byt}
 	return _res
 
 

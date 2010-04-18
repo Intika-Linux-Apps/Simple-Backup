@@ -1,16 +1,16 @@
-# Hungarian translation for nssbackup
-# Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
-# This file is distributed under the same license as the sbackup package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2007.
+# Occitan (post 1500) translation for nssbackup
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the nssbackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-04-18 02:44+0200\n"
-"PO-Revision-Date: 2010-03-25 01:02+0000\n"
-"Last-Translator: Vaci <v.gaabor@gmail.com>\n"
-"Language-Team: Hungarian <hu@li.org>\n"
+"PO-Revision-Date: 2010-03-19 15:14+0000\n"
+"Last-Translator: Cédric VALMARY (Per Tot en òc) <cvalmary@yahoo.fr>\n"
+"Language-Team: Occitan (post 1500) <oc@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -27,23 +27,18 @@ msgstr ""
 #: src/nssbackup/__init__.py:69
 msgid "translator-credits"
 msgstr ""
-"A fordítók listája\n"
-"\n"
 "Launchpad Contributions:\n"
-"  Andras Timar https://launchpad.net/~timar-fsf\n"
-"  Krasznecz Zoltán https://launchpad.net/~krasznecz-zoltan\n"
-"  Roth Róbert https://launchpad.net/~evfool\n"
-"  Vaci https://launchpad.net/~v-gaabor"
+"  Cédric VALMARY (Per Tot en òc) https://launchpad.net/~cvalmary"
 
 #: src/nssbackup/__init__.py:77 src/nssbackup/nssbackupd.py:110
 #, python-format
 msgid "NSsbackup Daemon <%(login)s@%(hostname)s>"
-msgstr ""
+msgstr "Demòni NSsbackup <%(login)s@%(hostname)s>"
 
 #: src/nssbackup/nssbackupd.py:114
 #, python-format
 msgid "[NSsbackup] [%(profile)s] Report of %(date)s"
-msgstr ""
+msgstr "[NSsbackup] [%(profile)s] Rapòrt del %(date)s"
 
 #: src/nssbackup/nssbackupd.py:121
 msgid "I didn't find the log file. Please set it up in nssbackup.conf "
@@ -66,7 +61,7 @@ msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:248
 msgid "BackupManager created "
-msgstr ""
+msgstr "Creacion del BackupManager "
 
 #: src/nssbackup/managers/BackupManager.py:265
 msgid "Starting backup Session"
@@ -79,7 +74,7 @@ msgstr ""
 #: src/nssbackup/managers/BackupManager.py:321
 #, python-format
 msgid "Starting snapshot %(name)s "
-msgstr ""
+msgstr "Començament de la salvament %(name)s "
 
 #: src/nssbackup/managers/BackupManager.py:329
 #, python-format
@@ -87,24 +82,28 @@ msgid "Setting Base to '%(value)s' "
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:339
+#, fuzzy
 msgid "Setting packages File."
-msgstr ""
+msgstr "Configuracion dels fichièrs dels paquets "
 
 #: src/nssbackup/managers/BackupManager.py:345
 msgid "Problem when setting the packages: "
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:349
+#, fuzzy
 msgid "Setting Excludes File."
-msgstr ""
+msgstr "Configuracion dels fichièrs dels paquets "
 
 #: src/nssbackup/managers/BackupManager.py:357
+#, fuzzy
 msgid "Setting compression format."
-msgstr ""
+msgstr "Configuracion del format de compression. "
 
 #: src/nssbackup/managers/BackupManager.py:362
+#, fuzzy
 msgid "Setting split size."
-msgstr ""
+msgstr "Configuracion de la talha del fraccionament."
 
 #: src/nssbackup/managers/BackupManager.py:369
 msgid "Option 'Follow symbolic links' is enabled."
@@ -184,7 +183,7 @@ msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:460
 msgid "Unable to change permissions for "
-msgstr ""
+msgstr "Impossible de cambiar las permissions per "
 
 #: src/nssbackup/managers/BackupManager.py:463
 msgid "Unable to find logfile to copy into snapshot."
@@ -205,21 +204,21 @@ msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:489
 msgid "Option 'target' is missing, aborting."
-msgstr ""
+msgstr "L'opcion 'target' es absenta. Abandon !"
 
 #: src/nssbackup/managers/BackupManager.py:493
 #, python-format
 msgid "Creating the target dir '%s'"
-msgstr ""
+msgstr "Creacion del repertòri cibla '%s'"
 
 #: src/nssbackup/managers/BackupManager.py:503
 msgid "Target not writeable: "
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:873
-#, fuzzy, python-format
+#, python-format
 msgid "File '%(file)s' does not exist."
-msgstr "A '%(target)s' célmappa nem létezik."
+msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:880
 #, python-format
@@ -275,11 +274,12 @@ msgstr ""
 #: src/nssbackup/managers/BackupManager.py:1072
 #, python-format
 msgid "Invalid regular expression ('%s')"
-msgstr "Érvénytelen reguláris kifejezés ('%s')"
+msgstr "Expression regulara invalida ('%s')"
 
 #: src/nssbackup/managers/BackupManager.py:1092
+#, fuzzy
 msgid "No directories to backup defined."
-msgstr ""
+msgstr "Pas cap de repertòri de salvar !"
 
 #: src/nssbackup/managers/ConfigManager.py:547
 #: src/nssbackup/managers/ConfigManager.py:582
@@ -301,7 +301,7 @@ msgstr ""
 #: src/nssbackup/managers/ConfigManager.py:734
 #, python-format
 msgid "The config file '%s' couldn't be read!"
-msgstr "A '%s' konfigurációs fájl nem olvasható!"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:763
 #, python-format
@@ -344,11 +344,11 @@ msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1202
 msgid "Default Profile"
-msgstr "Alapértelmezett Profil"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1203
 msgid "Unknown Profile"
-msgstr "Ismeretlen Profil"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1253
 msgid "Unlimited"
@@ -377,32 +377,32 @@ msgstr ""
 #: src/nssbackup/managers/ConfigManager.py:1259
 #: src/nssbackup/ui/SBConfigGTK.py:543 src/nssbackup/ui/SBConfigGTK.py:1737
 msgid "Custom"
-msgstr "Szokásos"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1261
 msgid "MP3 Music"
-msgstr "MP3 Zene"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1262
 msgid "AVI Video"
-msgstr "AVI Video"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1263
 #: src/nssbackup/managers/ConfigManager.py:1264
 msgid "MPEG Video"
-msgstr "MPEG Video"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1265
 msgid "Matrjoshka Video"
-msgstr "Matrjoshka Video"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1266
 msgid "OGG Multimedia container"
-msgstr "OGG Multimédia tároló"
+msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1267
 msgid "CD Images"
-msgstr "CD Képek"
+msgstr ""
 
 #: src/nssbackup/managers/FuseFAM.py:175
 msgid "Initializing FUSE File Access Manager."
@@ -411,12 +411,12 @@ msgstr ""
 #: src/nssbackup/managers/FuseFAM.py:202
 #, python-format
 msgid "Target directory '%(target)s' does not exist."
-msgstr "A '%(target)s' célmappa nem létezik."
+msgstr ""
 
 #: src/nssbackup/managers/RestoreManager.py:71
 #, python-format
 msgid "File '%s' not found in the backup snapshot files list"
-msgstr "A(z) „%s” fájl nem található a biztonsági mentés fájllistájában"
+msgstr ""
 
 #: src/nssbackup/managers/RestoreManager.py:73
 #, python-format
@@ -493,29 +493,29 @@ msgid "Cancelling pull of snapshot '%s'"
 msgstr ""
 
 #: src/nssbackup/managers/SnapshotManager.py:808
-#, python-format
+#, fuzzy, python-format
 msgid "Deleting snapshot: '%(snp)s'."
-msgstr ""
+msgstr "Començament de la salvament %(name)s "
 
 #: src/nssbackup/managers/UpgradeManager.py:167
 #, python-format
 msgid "Upgrading from v1.0 to v1.2: %s"
-msgstr "Frissítés v.1.0-ról v1.2-re: %s"
+msgstr ""
 
 #: src/nssbackup/managers/UpgradeManager.py:185
 #, python-format
 msgid "Upgrading to v1.3: %s"
-msgstr "Frissítés v1.3-ra: %s"
+msgstr ""
 
 #: src/nssbackup/managers/UpgradeManager.py:210
 #, python-format
 msgid "Upgrading to v1.4: %s"
-msgstr "Frissítés v1.4-re: %s"
+msgstr ""
 
 #: src/nssbackup/managers/UpgradeManager.py:224
 #, python-format
 msgid "Upgrading to v1.5: %s"
-msgstr "Frissítés v1.5-re: %s"
+msgstr ""
 
 #: src/nssbackup/managers/UpgradeManager.py:278
 #, python-format
@@ -675,23 +675,20 @@ msgstr ""
 #: src/nssbackup/ui/SBConfigGTK.py:997 src/nssbackup/ui/SBConfigGTK.py:1034
 msgid "Empty filename or path. Please enter a valid filename or path."
 msgstr ""
-"Üres fájlnév vagy elérési út. Kérem, adjon meg egy érvényes fájlnevet vagy "
-"elérési utat."
 
 #: src/nssbackup/ui/SBConfigGTK.py:1012 src/nssbackup/ui/SBConfigGTK.py:1778
 msgid "Empty expression. Please enter a valid regular expression."
-msgstr "Üres kifejezés. Kérem, adjon meg egy szabályos kifejezést."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1026 src/nssbackup/ui/SBConfigGTK.py:1792
 msgid "Provided regular expression is not valid."
 msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1043
-#, fuzzy
 msgid ""
 "It seems the path you entered does not exists. Do you want to add this "
 "incorrect path?"
-msgstr "Úgy tűnik, az elérési út nem létezik. Biztos ezt akarja használni ?"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1071
 msgid "Save configuration as..."
@@ -699,7 +696,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1134
 msgid "A backup run is initiated in the background. The process id is: "
-msgstr "A biztonsági mentés a háttérben fut. A folyamat azonosítója: "
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1191
 msgid "Include file..."
@@ -707,7 +704,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1198 src/nssbackup/ui/SBConfigGTK.py:1352
 msgid "All files"
-msgstr "Összes fájl"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1217
 msgid "Include folder..."
@@ -747,7 +744,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1637 src/nssbackup/ui/SBConfigGTK.py:1643
 msgid "Test mail settings"
-msgstr "E-mail beállítások tesztelése"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1638
 msgid "The test failed with following output:"
@@ -776,11 +773,11 @@ msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1886
 msgid "Test Succeeded !"
-msgstr "Teszt Sikeres !"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1892
 msgid "Target directory is writable."
-msgstr "A célkönyvtár írható."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1901
 msgid ""
@@ -810,7 +807,7 @@ msgstr ""
 #: src/nssbackup/ui/SBConfigGTK.py:2085 src/nssbackup/ui/SBConfigGTK.py:2113
 #: src/nssbackup/ui/SBConfigGTK.py:2136
 msgid "Please select a Profile !"
-msgstr "Kérem válasszon Profilt !"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:2092
 msgid "remove"
@@ -887,7 +884,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:132
 msgid "Path"
-msgstr "Elérési útvonal"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:137
 msgid "State"
@@ -899,11 +896,11 @@ msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:336
 msgid "Choose a source folder"
-msgstr "Válasszon forrásmappát"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:401 src/nssbackup/ui/SBRestoreGTK.py:439
 msgid "Loading ..."
-msgstr "Betöltés..."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:488
 msgid "NSsbackup restore error"
@@ -934,7 +931,7 @@ msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:575
 msgid "Select restore location"
-msgstr "Válasszon egy visszaállítási helyet"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:606
 msgid "Select revert location"
@@ -978,25 +975,25 @@ msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:797 src/nssbackup/ui/SBRestoreGTK.py:803
 msgid "<b>Restoring of selected files</b>"
-msgstr "<b>A kiválaszott fájlok visszaállítása</b>"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:798
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> is in progress."
-msgstr "<tt>'%s'</tt> visszaállítása folyatban."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:799
-#, fuzzy, python-format
+#, python-format
 msgid "Restoring of <tt>'%s'</tt> was successful."
-msgstr "<tt>'%s'</tt> visszaállítása sikeres."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:800
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Restoring of <tt>'%s'</tt> was not successful.\n"
 "\n"
 "The following error occurred:\n"
-msgstr "<tt>'%s'</tt> visszaállítása sikeres."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:804
 #, python-format
@@ -1006,11 +1003,11 @@ msgid ""
 msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:805
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
-msgstr "<tt>'%s'</tt> visszaállítása sikeres."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:806
 #, python-format
@@ -1031,17 +1028,17 @@ msgid "Reverting of <tt>'%s'</tt> is in progress.\n"
 msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:811
-#, fuzzy, python-format
+#, python-format
 msgid "Reverting of <tt>'%s'</tt> was successful."
-msgstr "<tt>'%s'</tt> visszaállítása sikeres."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:812
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Reverting of <tt>'%s'</tt> was not successful.\n"
 "\n"
 "The following error occurred:\n"
-msgstr "<tt>'%s'</tt> visszaállítása sikeres."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:816
 #, python-format
@@ -1051,11 +1048,11 @@ msgid ""
 msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:817
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
-msgstr "<tt>'%s'</tt> visszaállítása sikeres."
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:818
 #, python-format
@@ -1171,7 +1168,7 @@ msgstr ""
 
 #: src/nssbackup/util/tar.py:436
 msgid "Included"
-msgstr "Csatolva"
+msgstr ""
 
 #: src/nssbackup/util/tar.py:436
 msgid "Not changed"
@@ -1194,9 +1191,9 @@ msgid "Dumpdir inconsistancy : 'control' is empty"
 msgstr ""
 
 #: src/nssbackup/util/tar.py:567
-#, fuzzy, python-format
+#, python-format
 msgid "File '%s' does not exist."
-msgstr "'%s' nem létezik "
+msgstr ""
 
 #: src/nssbackup/util/tar.py:696 src/nssbackup/util/tar.py:732
 msgid "The snarfile header is incomplete."
@@ -1207,9 +1204,9 @@ msgid "A SnapshotFile is required"
 msgstr ""
 
 #: src/nssbackup/util/tar.py:1097
-#, fuzzy, python-format
+#, python-format
 msgid "Directory does not exist: %s."
-msgstr "A '%(target)s' célmappa nem létezik."
+msgstr ""
 
 #: datas/nssbackup-config.glade:11
 msgid "Exclude file type"
@@ -1376,7 +1373,7 @@ msgstr ""
 
 #: datas/nssbackup-config.glade:1353
 msgid " "
-msgstr " "
+msgstr ""
 
 #: datas/nssbackup-config.glade:1363 datas/nssbackup-config.glade:2431
 msgid "MiB"
@@ -1437,7 +1434,7 @@ msgstr ""
 
 #: datas/nssbackup-config.glade:1846
 msgid "Include"
-msgstr "Csatolás"
+msgstr ""
 
 #: datas/nssbackup-config.glade:2058
 msgid "Paths"
@@ -1643,7 +1640,7 @@ msgstr ""
 
 #: datas/nssbackup-config.glade:3596
 msgid "Use a username and password"
-msgstr "Használjon felhasználónevet és jelszót"
+msgstr ""
 
 #: datas/nssbackup-config.glade:3626
 msgid "Username"
@@ -1712,15 +1709,15 @@ msgstr ""
 
 #: datas/nssbackup-restore.glade:118
 msgid "Use the default directory : "
-msgstr "Az alapértelmezett mappa használata : "
+msgstr ""
 
 #: datas/nssbackup-restore.glade:131
 msgid "Use a custom directory : "
-msgstr "Egyéni mappa használata : "
+msgstr ""
 
 #: datas/nssbackup-restore.glade:217
 msgid "<b>Snapshots directory</b>"
-msgstr "<b>Pillanatképek könyvtár</b>"
+msgstr ""
 
 #: datas/nssbackup-restore.glade:261
 msgid ""
@@ -1786,7 +1783,7 @@ msgstr ""
 
 #: datas/nssbackup-restore.glade:906
 msgid "Delete the current snapshot ?"
-msgstr "Törli a jelenlegi pillanatképet?"
+msgstr ""
 
 #: datas/nssbackup-restore.glade:941
 msgid "Delete"
@@ -1794,7 +1791,7 @@ msgstr ""
 
 #: datas/nssbackup-restore.glade:974
 msgid "<b>Snapshot Management</b>"
-msgstr "<b>Pillanatkép Kezelő</b>"
+msgstr ""
 
 #: datas/nssbackup-restore.glade:1001
 msgid "<b>Export Management</b>"
@@ -1820,3 +1817,6 @@ msgid ""
 "\n"
 "Use simple-restore-gnome for more ease of use.\n"
 msgstr ""
+
+#~ msgid "No directory to backup !"
+#~ msgstr "Pas cap de repertòri de salvar !"

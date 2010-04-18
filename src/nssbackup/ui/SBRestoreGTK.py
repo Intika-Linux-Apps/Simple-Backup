@@ -106,7 +106,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 						 "application.")
 			self._show_errmessage( message_str = str(exc),
 					boxtitle = _("NSsbackup error"),
-					headline_str = _("An error occured during initialization:"),
+					headline_str = _("An error occurred during initialization:"),
 					secmsg_str = _sec_msg)
 			self.fusefam.terminate()
 			sys.exit(-1)
@@ -486,7 +486,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 			self.logger.error(traceback.format_exc())
 			self._show_errmessage( message_str = str(_items),
 					boxtitle = _("NSsbackup restore error"),
-					headline_str = _("An error occured "\
+					headline_str = _("An error occurred "\
 									 "while reading snapshot:"))
 			_items = None
 
@@ -532,7 +532,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		self.widgets['snpdetails'].set_sensitive(True)
 		
 		if snplist == []:
-			self.snplisttreestore.append( None, [_("No backups found for this day !"),None])
+			self.snplisttreestore.append( None, [_("No backups found for this day."),None])
 			self.widgets['snplist'].set_sensitive(False)
 		else:
 			self.widgets['snplist'].set_sensitive(True)
@@ -719,7 +719,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 			um.upgradeSnapshot(self.currentSnp)
 		except Exception, _exc:
 			_message_str = "While attempting to upgrade "\
-				 "snapshot the following error occured:\n"\
+				 "snapshot the following error occurred:\n"\
 				 "%s" % str(_exc)
 			_boxtitle = _("NSsbackup restoration error")
 			_headline_str =\
@@ -796,26 +796,26 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 	  { "restore"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Restoring of selected files</b>"),
 						 "msg_progress"    : _("Restoring of <tt>'%s'</tt> is in progress."),
-						 "msg_sucess"  	   : _("Restoring of <tt>'%s'</tt> was sucessful."),
-						 "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_sucess"  	   : _("Restoring of <tt>'%s'</tt> was successful."),
+						 "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not successful.\n\nThe following error occurred:\n") },
 						 
 		"restore_as" : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Restoring of selected files</b>"),
 						 "msg_progress"    : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
-						 "msg_sucess"      : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was sucessful."),
-						 "msg_failure"     : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_sucess"      : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was successful."),
+						 "msg_failure"     : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nThe following error occurred:\n") },
 						 
 		"revert"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Reverting selected files</b>"),
 						 "msg_progress"    : _("Reverting of <tt>'%s'</tt> is in progress.\n"),
-						 "msg_sucess"  	   : _("Reverting of <tt>'%s'</tt> was sucessful."),
-						 "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_sucess"  	   : _("Reverting of <tt>'%s'</tt> was successful."),
+						 "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not successful.\n\nThe following error occurred:\n") },
 
 		"revert_as"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Reverting selected files</b>"),
 						 "msg_progress"    : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
-						 "msg_sucess"      : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was sucessful."),
-						 "msg_failure"     : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_sucess"      : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was successful."),
+						 "msg_failure"     : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nThe following error occurred:\n") },
 	  }
 
 	def __init__(self, parent):
@@ -900,7 +900,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 		self._start_pulse()
 		
 	def finish_sucess(self):
-		"""Signals the sucessful finish of the restoration process.
+		"""Signals the successful finish of the restoration process.
 		
 		@return: None
 		"""

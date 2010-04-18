@@ -372,7 +372,7 @@ class BackupManager(PyNotifyMixin):
 
 		os.nice(20)					# Reduce the priority, so not to interfere with other processes
 		self.__fillSnapshot()					
-		self._notify_info(self.__profilename, _("File list ready, committing to disk"))				
+		self._notify_info(self.__profilename, _("File list ready, committing to disk."))				
 		self.__actualSnapshot.commit()
 		self.endSBsession()
 		
@@ -443,7 +443,7 @@ class BackupManager(PyNotifyMixin):
 		"""Remove lockfile.
 		"""
 		FAM.delete(self.__lockfile)
-		self.logger.info(_("Session of backup is finished (%s is removed) ")\
+		self.logger.info(_("Backup process finished (%s removed).")\
 														% self.__lockfile)
 
 	def __copylogfile(self):
@@ -476,10 +476,10 @@ class BackupManager(PyNotifyMixin):
 		self.__unsetlockfile()
 		self.__copylogfile()
 			
-		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER!"))
+		self.logger.info(_("Terminating FUSE File Access Manager."))
 		self.__fusefam.terminate()
 
-		self._notify_info(self.__profilename, _("Ending Backup Session."))
+		self._notify_info(self.__profilename, _("Backup process finished."))
 
 	def __checkTarget(self):
 		"""
@@ -998,7 +998,8 @@ class FileCollector(object):
 			# path was not excluded, so do further tests (stats, enter dir...)
 			
 			if FAM.is_link(path):				
-				self.__logger.info(_("Symbolic link found: '%s' -> '%s'.") % (path, FAM.get_link(path)))
+				self.__logger.info(_("Symbolic link found: '%(path)s' -> '%(ln_target)s'.")\
+								% {'path' : path, 'ln_target' : FAM.get_link(path)})
 				self.__collect_stats.count_symlink()
 				if not self.__snapshot.isFollowLinks():
 					# if `followlinks` is disabled, just count the link and finish

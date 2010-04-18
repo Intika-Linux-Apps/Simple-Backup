@@ -172,10 +172,10 @@ class FuseFAM(object):
 		@todo: For later releases: The distinction between local and remote
 			   sites must be improved in some way!  
 		"""
-		self.logger.info(_("Initializing FUSE FILE ACCESS MANAGER !"))
+		self.logger.info(_("Initializing FUSE File Access Manager."))
 		global __mountdir
 		if not self.__config : 
-			raise SBException("Can't launch initialize without a configManager")
+			raise SBException("Can't launch initialize without a configManager.")
 		
 		#sets the default mount dir 
 		if self.__config.has_option("general","mountdir") :
@@ -244,7 +244,7 @@ class FuseFAM(object):
 		"""
 		Unmount all nssbackup mounted dir.
 		"""
-		self.logger.info(_("Terminating FUSE FILE ACCESS MANAGER !"))
+		self.logger.info(_("Terminating FUSE File Access Manager."))
 		plugin_manager = PluginManager()
 		for src, dir in self.__mountedDirs.iteritems() :
 			if src is not os.sep :

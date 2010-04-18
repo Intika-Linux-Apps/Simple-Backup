@@ -1,20 +1,20 @@
-# Spanish translation for sbackup
+# Spanish translation for nssbackup
 # Copyright (c) (c) 2006 Canonical Ltd, and Rosetta Contributors 2006
 # This file is distributed under the same license as the sbackup package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2006.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: sbackup\n"
+"Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-24 17:41+0100\n"
-"PO-Revision-Date: 2009-09-19 08:31+0000\n"
+"POT-Creation-Date: 2010-04-18 02:44+0200\n"
+"PO-Revision-Date: 2010-03-29 05:46+0000\n"
 "Last-Translator: Paco Molinero <paco@byasl.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-01-23 18:24+0000\n"
+"X-Launchpad-Export-Date: 2010-04-17 03:47+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: src/nssbackup/__init__.py:54
@@ -30,30 +30,32 @@ msgstr ""
 "traductor-créditos\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Angel Abad https://launchpad.net/~angelabad\n"
+"  Bota https://launchpad.net/~ajapulido\n"
 "  DiegoJ https://launchpad.net/~diegojromerolopez\n"
-"  Feder Sáiz https://launchpad.net/~federsaiz\n"
+"  Feder Sáiz https://launchpad.net/~federsaiz-deactivatedaccount\n"
 "  Jaime https://launchpad.net/~jaimer1\n"
 "  Luis J. Claros https://launchpad.net/~luisj-claros\n"
 "  Paco Molinero https://launchpad.net/~franciscomol\n"
 "  juancarlospaco https://launchpad.net/~juancarlospaco"
 
-#: src/nssbackup/__init__.py:77 src/nssbackup/nssbackupd.py:108
+#: src/nssbackup/__init__.py:77 src/nssbackup/nssbackupd.py:110
 #, python-format
 msgid "NSsbackup Daemon <%(login)s@%(hostname)s>"
 msgstr "Demonio NSsbackup <%(login)s@%(hostname)s>"
 
-#: src/nssbackup/nssbackupd.py:112
+#: src/nssbackup/nssbackupd.py:114
 #, python-format
 msgid "[NSsbackup] [%(profile)s] Report of %(date)s"
 msgstr "[NSsbackup] [%(profile)s] Informe de %(date)s"
 
-#: src/nssbackup/nssbackupd.py:119
+#: src/nssbackup/nssbackupd.py:121
 msgid "I didn't find the log file. Please set it up in nssbackup.conf "
 msgstr ""
 "No encontré el archivo de registro. Por favor especifíquelo en nssbackup."
 "conf "
 
-#: src/nssbackup/nssbackupd.py:183
+#: src/nssbackup/nssbackupd.py:185
 msgid ""
 "Critical Error: No configuration file for the default profile was found!\n"
 "\n"
@@ -66,7 +68,7 @@ msgstr ""
 msgid "The following error(s) occurred before:"
 msgstr "Ocurrieron el/los siguiente(s) errores antes de:"
 
-#: src/nssbackup/managers/BackupManager.py:84
+#: src/nssbackup/managers/BackupManager.py:88
 msgid "there was a problem initializing the "
 msgstr "surgió un problema inicializando el "
 
@@ -74,165 +76,242 @@ msgstr "surgió un problema inicializando el "
 msgid "BackupManager created "
 msgstr "Se creó BackupManager "
 
-#: src/nssbackup/managers/BackupManager.py:254
+#: src/nssbackup/managers/BackupManager.py:265
 msgid "Starting backup Session"
 msgstr "Comenzando sesión de copia de seguridad"
 
-#: src/nssbackup/managers/BackupManager.py:275
+#: src/nssbackup/managers/BackupManager.py:286
 msgid "Failed to set the gid to 'admin' one :"
 msgstr "No se pudo establecer gid como usuario"
 
-#: src/nssbackup/managers/BackupManager.py:310
+#: src/nssbackup/managers/BackupManager.py:321
 #, python-format
 msgid "Starting snapshot %(name)s "
 msgstr "Comenzando creación de instantánea %(name)s "
 
-#: src/nssbackup/managers/BackupManager.py:318
+#: src/nssbackup/managers/BackupManager.py:329
 #, python-format
 msgid "Setting Base to '%(value)s' "
 msgstr "Establecer Base a '%(value)s' "
 
-#: src/nssbackup/managers/BackupManager.py:328
-msgid "Setting packages File "
+#: src/nssbackup/managers/BackupManager.py:339
+#, fuzzy
+msgid "Setting packages File."
 msgstr "Estableciendo archivo de paquetes "
 
-#: src/nssbackup/managers/BackupManager.py:334
-msgid "Problem when setting the packages : "
+#: src/nssbackup/managers/BackupManager.py:345
+#, fuzzy
+msgid "Problem when setting the packages: "
 msgstr "Problema al configurar los paquetes: "
 
-#: src/nssbackup/managers/BackupManager.py:337
-msgid "Setting Excludes File "
+#: src/nssbackup/managers/BackupManager.py:349
+#, fuzzy
+msgid "Setting Excludes File."
 msgstr "Estableciendo archivos excluidos "
 
-#: src/nssbackup/managers/BackupManager.py:345
-msgid "Setting compression format "
+#: src/nssbackup/managers/BackupManager.py:357
+#, fuzzy
+msgid "Setting compression format."
 msgstr "Estableciendo formato de compresión "
 
-#: src/nssbackup/managers/BackupManager.py:350
-msgid "Setting split size"
+#: src/nssbackup/managers/BackupManager.py:362
+#, fuzzy
+msgid "Setting split size."
 msgstr "Estableciendo tamaño de división"
 
-#: src/nssbackup/managers/BackupManager.py:357
-msgid "Setting follow symbolic links"
-msgstr "Estableciendo enlaces simbólicos"
-
-#: src/nssbackup/managers/BackupManager.py:366
+#: src/nssbackup/managers/BackupManager.py:369
 #, fuzzy
-msgid "File list ready, committing to disk"
-msgstr "Lista de archivos preparada, confirmando al disco"
+msgid "Option 'Follow symbolic links' is enabled."
+msgstr "Estableciendo seguimiento de enlaces simbólicos"
 
-#: src/nssbackup/managers/BackupManager.py:403
-#, python-format
-msgid "Target '%s' directory is excluded"
-msgstr "El directorio objetivo '%s' se excluye"
+#: src/nssbackup/managers/BackupManager.py:371
+#, fuzzy
+msgid "Option 'Follow symbolic links' is disabled."
+msgstr "Estableciendo seguimiento de enlaces simbólicos"
 
-#: src/nssbackup/managers/BackupManager.py:408
-#, python-format
-msgid "'%(file)s' doesn't exist, it has to be exclude "
-msgstr "El archivo '%(file)s' no existe, se tiene que excluir "
+#: src/nssbackup/managers/BackupManager.py:375
+#, fuzzy
+msgid "File list ready, committing to disk."
+msgstr "Lista de archivos preparada, enviando al disco"
 
-#: src/nssbackup/managers/BackupManager.py:414
+#: src/nssbackup/managers/BackupManager.py:393
 #, python-format
-msgid "Problem with '%(file)s' : %(error)s "
-msgstr "Problema con '%(file)s': %(error)s "
-
-#: src/nssbackup/managers/BackupManager.py:424
-#, python-format
-msgid ""
-"We don't have read access to '%(file)s', it has to be exclude : %(error)s "
-msgstr "No se tiene permisos de lectura a '%(file)s', se excluyen: %(error)s "
-
-#: src/nssbackup/managers/BackupManager.py:431
-#, python-format
-msgid ""
-"'%(file)s' size is higher than the specified one ( %(filesize)s > %(maxsize)"
-"s), it has to be exclude "
+msgid "Maximum free size required is '%s'."
 msgstr ""
-"El Tamaño de '%(file)s' es mayor que el especificado ( %(filesize)s > %"
-"(maxsize)s), ha de ser excluido. "
 
-#: src/nssbackup/managers/BackupManager.py:481
+#: src/nssbackup/managers/BackupManager.py:394
 #, python-format
-msgid "got an error with '%(file)s' : %(error)s"
-msgstr "Se ha tenido un error con '%(file)s': %(error)s"
-
-#: src/nssbackup/managers/BackupManager.py:498
-msgid "Empty regular expression found. "
-msgstr "Se encontró una expresión regular vacía. "
-
-#: src/nssbackup/managers/BackupManager.py:505
-#, python-format
-msgid "Invalid regular expression ('%s')"
-msgstr "Expresión regular no válida ('%s')"
-
-#: src/nssbackup/managers/BackupManager.py:512
-msgid "No directory to backup !"
-msgstr "¡No hay directorio para hacer una copia de seguridad!"
-
-#: src/nssbackup/managers/BackupManager.py:523
-msgid "No directories to backup !"
-msgstr "¡No hay directorios para hacer una copia de seguridad!"
-
-#: src/nssbackup/managers/BackupManager.py:540
-#, fuzzy, python-format
-msgid ""
-"Not enough free space in the target directory for the planned backup (%"
-"(freespace)d <= %(neededspace)s)"
+msgid "Available disk size is '%s'."
 msgstr ""
-"No hay suficiente espacio libre en el directorio objetivo para la copia de "
+
+#: src/nssbackup/managers/BackupManager.py:395
+#, python-format
+msgid "Number of directories: %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:396
+#, python-format
+msgid "Number of symlinks: %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:397
+#, python-format
+msgid "Total number of files: %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:398
+#, python-format
+msgid "Number of files included in snapshot: %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:399
+#, python-format
+msgid "Number of new files (also included): %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:400
+#, python-format
+msgid "Number of files skipped in incremental snapshot: %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:401
+#, python-format
+msgid "Number of items forced to be excluded: %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:402
+#, python-format
+msgid "Number of items to be excluded by config: %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:405
+#, fuzzy
+msgid "Not enough free space in the target directory for the "
+msgstr ""
+"No hay suficiente espacio en el directorio de destino para la copia de "
 "seguridad planeada (%(freespace)d <= %(neededspace)s)"
 
-#: src/nssbackup/managers/BackupManager.py:556
+#: src/nssbackup/managers/BackupManager.py:434
 #, python-format
 msgid "Another NSsbackup daemon already running (pid = %s )!"
 msgstr "¡Hay otro daemon de NSsbackup ejecutándose (pid = %s )!"
 
-#: src/nssbackup/managers/BackupManager.py:568
-#, python-format
-msgid "Session of backup is finished (%s is removed) "
+#: src/nssbackup/managers/BackupManager.py:446
+#, fuzzy, python-format
+msgid "Backup process finished (%s removed)."
 msgstr "La sesión de copia de seguridad ha terminado (%s se ha eliminado) "
 
-#: src/nssbackup/managers/BackupManager.py:582
+#: src/nssbackup/managers/BackupManager.py:460
 msgid "Unable to change permissions for "
 msgstr "No se ha podido cambiar los permisos a "
 
-#: src/nssbackup/managers/BackupManager.py:585
-#, fuzzy
+#: src/nssbackup/managers/BackupManager.py:463
 msgid "Unable to find logfile to copy into snapshot."
 msgstr ""
-"Incapaz de encontrar el archivo de registro para copiarlo en la instantánea"
+"Imposible encontrar el archivo de registro para copiar en la instananea."
 
-#: src/nssbackup/managers/BackupManager.py:587
+#: src/nssbackup/managers/BackupManager.py:465
 msgid "No snapshot to copy logfile."
 msgstr "No hay instantánea a la que copiar el archivo de registro."
 
-#: src/nssbackup/managers/BackupManager.py:601
-#, fuzzy
-msgid "Terminating FUSE FILE ACCESS MANAGER!"
-msgstr "¡Terminando el GESTOR DE ACCESO A ARCHIVOS FUSE!"
+#: src/nssbackup/managers/BackupManager.py:479
+#: src/nssbackup/managers/FuseFAM.py:247
+msgid "Terminating FUSE File Access Manager."
+msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:604
-#, fuzzy
-msgid "Ending Backup Session."
-msgstr "Finalizando la sesión de copia de seguridad"
+#: src/nssbackup/managers/BackupManager.py:482
+msgid "Backup process finished."
+msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:611
+#: src/nssbackup/managers/BackupManager.py:489
 msgid "Option 'target' is missing, aborting."
 msgstr "No se encuentra la opcion 'destino', abortando."
 
-#: src/nssbackup/managers/BackupManager.py:615
+#: src/nssbackup/managers/BackupManager.py:493
 #, python-format
 msgid "Creating the target dir '%s'"
 msgstr "Creando el directorio destino '%s'"
 
-#: src/nssbackup/managers/BackupManager.py:625
-#, fuzzy
+#: src/nssbackup/managers/BackupManager.py:503
 msgid "Target not writeable: "
-msgstr "No se puede escribir en el destino: "
+msgstr "No se pued escribir en el destino "
 
-#: src/nssbackup/managers/ConfigManager.py:495
-#: src/nssbackup/managers/ConfigManager.py:522
-#: src/nssbackup/managers/ConfigManager.py:530
+#: src/nssbackup/managers/BackupManager.py:873
+#, fuzzy, python-format
+msgid "File '%(file)s' does not exist."
+msgstr "No existe el directorio de destino '%(target)s'."
+
+#: src/nssbackup/managers/BackupManager.py:880
+#, python-format
+msgid "File '%(file)s' is not accessable with error '%(error)s'."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:894
+#, python-format
+msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:898
+#, python-format
+msgid ""
+"File '%(file)s' cannot be opened for read access with error '%(error)s'."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:916
+#, python-format
+msgid "File '%(file)s' is backup's target directory."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:934
+#, python-format
+msgid ""
+"File '%(file)s' exceeds maximum file size ( %(filesize)s > %(maxsize)s)."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:944
+#, python-format
+msgid "File '%(file)s' matches regular expression '%(regex)s'."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:950
+#, python-format
+msgid "File '%(file)s' found in defined exclude list."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:1001
+#, python-format
+msgid "Symbolic link found: '%(path)s' -> '%(ln_target)s'."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:1017
+#, python-format
+msgid "Error while checking directory '%(dir)s': %(error)s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:1065
+msgid "Empty regular expression found. "
+msgstr "Se encontró una expresión regular vacía. "
+
+#: src/nssbackup/managers/BackupManager.py:1072
+#, python-format
+msgid "Invalid regular expression ('%s')"
+msgstr "Expresión regular no válida ('%s')"
+
+#: src/nssbackup/managers/BackupManager.py:1092
+#, fuzzy
+msgid "No directories to backup defined."
+msgstr "¡ Faltan directorios para hacer copia de seguridad !"
+
+#: src/nssbackup/managers/ConfigManager.py:547
+#: src/nssbackup/managers/ConfigManager.py:582
+#, fuzzy, python-format
+msgid ""
+"Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r')."
+msgstr ""
+"No se ha podido evluar '%(parameter)s' como diccionario (el valor tiene = '%"
+"(value)r' )"
+
+#: src/nssbackup/managers/ConfigManager.py:574
 #, python-format
 msgid ""
 "Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )"
@@ -240,138 +319,128 @@ msgstr ""
 "No se ha podido evluar '%(parameter)s' como diccionario (el valor tiene = '%"
 "(value)r' )"
 
-#: src/nssbackup/managers/ConfigManager.py:546
-#, fuzzy
+#: src/nssbackup/managers/ConfigManager.py:598
 msgid "You must provide a dictionary."
-msgstr "Debe proporcionar un diccionario"
+msgstr "Debe proporcionar un diccionario."
 
-#: src/nssbackup/managers/ConfigManager.py:682
-#, fuzzy, python-format
+#: src/nssbackup/managers/ConfigManager.py:734
+#, python-format
 msgid "The config file '%s' couldn't be read!"
-msgstr "¡El archivo de configuración '%s' no se puede leer!"
+msgstr "No se puede leer el arhcivo de configuración '%s'!"
 
-#: src/nssbackup/managers/ConfigManager.py:711
+#: src/nssbackup/managers/ConfigManager.py:763
 #, python-format
 msgid "section [%(section)s] in '%(configfile)s' should not exist, aborting"
 msgstr ""
 "La sección [%(section)s] en '%(configfile)s' no debería existir, abortando"
 
-#: src/nssbackup/managers/ConfigManager.py:872
-#: src/nssbackup/managers/ConfigManager.py:885
+#: src/nssbackup/managers/ConfigManager.py:924
+#: src/nssbackup/managers/ConfigManager.py:937
 msgid "The config file is not set yet into this ConfigManager"
 msgstr "El archivo de configuración no está listo todavía en el ConfigManager"
 
-#: src/nssbackup/managers/ConfigManager.py:1055
+#: src/nssbackup/managers/ConfigManager.py:1107
 msgid "No receiver set."
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1057
-#, fuzzy
+#: src/nssbackup/managers/ConfigManager.py:1109
 msgid "No SMTP server set."
-msgstr "Establecer servidor SMTP"
-
-#: src/nssbackup/managers/ConfigManager.py:1061
-msgid ""
-"When setting a username (resp password), password (resp username) is "
-"mandatory"
-msgstr ""
-"Al asignar un nombre de usuario (resp. contraseña), se requiere una "
-"contraseña (resp. nombre de usuario)"
-
-#: src/nssbackup/managers/ConfigManager.py:1064
-msgid ""
-"SSL option (smtptls=1) is not set while a certificate and key file is "
-"given.\n"
-"Select SSL in order to use Certificate and Key"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1068
+#: src/nssbackup/managers/ConfigManager.py:1112
+msgid "Username set but no password specified."
+msgstr ""
+
+#: src/nssbackup/managers/ConfigManager.py:1115
+msgid "Password set but no username specified."
+msgstr ""
+
+#: src/nssbackup/managers/ConfigManager.py:1118
 msgid ""
-"When setting a ssl certificate (resp key), key (resp certificate) is "
-"mandatory"
+"A certificate and key file is given while SSL option (smtptls=1) is not "
+"set.\n"
+"Select SSL in order to use Certificate and Key."
+msgstr ""
+
+#: src/nssbackup/managers/ConfigManager.py:1122
+#, fuzzy
+msgid ""
+"When specifying a SSL certificate or key file, a key file resp. certificate "
+"is mandatory."
 msgstr ""
 "Al establecer el certificado SSL (resp. clave), se requiere una clave (resp. "
 "certificado)"
 
-#: src/nssbackup/managers/ConfigManager.py:1148
+#: src/nssbackup/managers/ConfigManager.py:1202
 msgid "Default Profile"
 msgstr "Perfil predeterminado"
 
-#: src/nssbackup/managers/ConfigManager.py:1149
+#: src/nssbackup/managers/ConfigManager.py:1203
 msgid "Unknown Profile"
 msgstr "Perfil desconocido"
 
-#: src/nssbackup/managers/ConfigManager.py:1199
+#: src/nssbackup/managers/ConfigManager.py:1253
 msgid "Unlimited"
 msgstr "Sin límite"
 
-#: src/nssbackup/managers/ConfigManager.py:1200
-#, fuzzy
+#: src/nssbackup/managers/ConfigManager.py:1254
 msgid "100 MiB"
-msgstr "100 MB"
+msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1201
-#, fuzzy
+#: src/nssbackup/managers/ConfigManager.py:1255
 msgid "250 MiB"
-msgstr "250 MB"
+msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1202
-#, fuzzy
+#: src/nssbackup/managers/ConfigManager.py:1256
 msgid "650 MiB"
-msgstr "650 MB"
+msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1203
-#, fuzzy
+#: src/nssbackup/managers/ConfigManager.py:1257
 msgid "2 GiB (FAT16)"
-msgstr "2 GB (FAT16)"
+msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1204
-#, fuzzy
+#: src/nssbackup/managers/ConfigManager.py:1258
 msgid "4 GiB (FAT32)"
-msgstr "4 GB (FAT32)"
+msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1205
+#: src/nssbackup/managers/ConfigManager.py:1259
 #: src/nssbackup/ui/SBConfigGTK.py:543 src/nssbackup/ui/SBConfigGTK.py:1737
 msgid "Custom"
 msgstr "Perzonalizado"
 
-#: src/nssbackup/managers/ConfigManager.py:1207
+#: src/nssbackup/managers/ConfigManager.py:1261
 msgid "MP3 Music"
 msgstr "Música MP3"
 
-#: src/nssbackup/managers/ConfigManager.py:1208
+#: src/nssbackup/managers/ConfigManager.py:1262
 msgid "AVI Video"
 msgstr "Video AVI"
 
-#: src/nssbackup/managers/ConfigManager.py:1209
-#: src/nssbackup/managers/ConfigManager.py:1210
+#: src/nssbackup/managers/ConfigManager.py:1263
+#: src/nssbackup/managers/ConfigManager.py:1264
 msgid "MPEG Video"
 msgstr "Video MPEG"
 
-#: src/nssbackup/managers/ConfigManager.py:1211
+#: src/nssbackup/managers/ConfigManager.py:1265
 msgid "Matrjoshka Video"
 msgstr "Video Matrjoshka"
 
-#: src/nssbackup/managers/ConfigManager.py:1212
+#: src/nssbackup/managers/ConfigManager.py:1266
 msgid "OGG Multimedia container"
 msgstr "Contenedor Multimedia OGG"
 
-#: src/nssbackup/managers/ConfigManager.py:1213
+#: src/nssbackup/managers/ConfigManager.py:1267
 msgid "CD Images"
 msgstr "Imágenes de CD"
 
 #: src/nssbackup/managers/FuseFAM.py:175
-msgid "Initializing FUSE FILE ACCESS MANAGER !"
-msgstr "¡Inicializando GESTOR DE ACCESO A ARCHIVOS FUSE!"
+msgid "Initializing FUSE File Access Manager."
+msgstr ""
 
 #: src/nssbackup/managers/FuseFAM.py:202
 #, python-format
 msgid "Target directory '%(target)s' does not exist."
-msgstr ""
-
-#: src/nssbackup/managers/FuseFAM.py:247
-msgid "Terminating FUSE FILE ACCESS MANAGER !"
-msgstr "¡Terminando el GESTOR DE ACCESO A ARCHIVOS FUSE!"
+msgstr "No existe el directorio de destino '%(target)s'."
 
 #: src/nssbackup/managers/RestoreManager.py:71
 #, python-format
@@ -390,16 +459,16 @@ msgstr ""
 "instantánea de respaldo [%(snapshotname)s], aun así, la aplicación no ha "
 "fallado"
 
-#: src/nssbackup/managers/SnapshotManager.py:90
+#: src/nssbackup/managers/SnapshotManager.py:91
 msgid "Invalid value of the target directory : "
 msgstr "Valor no válido de directorio objetivo: "
 
-#: src/nssbackup/managers/SnapshotManager.py:113
+#: src/nssbackup/managers/SnapshotManager.py:114
 #, python-format
 msgid "Snapshot '%s' not found "
 msgstr "No se ha encontrado la instantánea '%s' "
 
-#: src/nssbackup/managers/SnapshotManager.py:174
+#: src/nssbackup/managers/SnapshotManager.py:171
 #, python-format
 msgid ""
 "Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s "
@@ -407,23 +476,23 @@ msgstr ""
 "'%(name)s' no es una instantánea válida debido a la convención en los "
 "nombres: %(error_cause)s "
 
-#: src/nssbackup/managers/SnapshotManager.py:176
+#: src/nssbackup/managers/SnapshotManager.py:173
 #, python-format
 msgid "Got a non valid snapshot '%(name)s' , removing : %(error_cause)s "
 msgstr "La instantánea «%(name)s» no es válida, eliminando: %(error_cause)s "
 
-#: src/nssbackup/managers/SnapshotManager.py:261
+#: src/nssbackup/managers/SnapshotManager.py:256
 #, python-format
 msgid "No need to rebase a full snapshot '%s'"
 msgstr "No hay necesidad de rehacer un snapshot completo '%s'"
 
-#: src/nssbackup/managers/SnapshotManager.py:263
+#: src/nssbackup/managers/SnapshotManager.py:258
 #, python-format
 msgid ""
 "'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken "
 msgstr "'%(snapshotToRebase)s'  no tiene un archivo 'base', puede estar roto "
 
-#: src/nssbackup/managers/SnapshotManager.py:269
+#: src/nssbackup/managers/SnapshotManager.py:264
 #, python-format
 msgid ""
 "Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
@@ -432,40 +501,39 @@ msgstr ""
 "No se puede rehacer un snapshot en uno mas nuevo : '%(snapshotToRebase)s' <= "
 "'%(NewBaseSnapshot)s' "
 
-#: src/nssbackup/managers/SnapshotManager.py:277
+#: src/nssbackup/managers/SnapshotManager.py:272
 #, python-format
 msgid "Rebasing '%(current)s' on '%(base)s'"
 msgstr ""
 
-#: src/nssbackup/managers/SnapshotManager.py:465
-#, python-format
-msgid "Got an exception when Pulling '%s' : "
-msgstr ""
+#: src/nssbackup/managers/SnapshotManager.py:504
+#, fuzzy, python-format
+msgid "An error occurred when pulling snapshot '%s'."
+msgstr "Ha ocurrido un error al leer la instantánea:"
 
-#: src/nssbackup/managers/SnapshotManager.py:497 src/nssbackup/util/tar.py:691
-#: src/nssbackup/util/tar.py:727
+#: src/nssbackup/managers/SnapshotManager.py:543 src/nssbackup/util/tar.py:831
 msgid "The snarfile header is incomplete !"
 msgstr "¡La cabecera del archivo SNAR no está completa!"
 
-#: src/nssbackup/managers/SnapshotManager.py:629
-#, python-format
-msgid "Snapshot '%s' is a full . Can't rebase on older snapshot"
-msgstr ""
+#: src/nssbackup/managers/SnapshotManager.py:681
+#, fuzzy, python-format
+msgid "Base of snapshot '%s' is not set."
+msgstr "El nombre de la instantánea '%s' no coincide con los requerimientos"
 
-#: src/nssbackup/managers/SnapshotManager.py:662
+#: src/nssbackup/managers/SnapshotManager.py:718
 #, python-format
 msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full"
 msgstr ""
 
-#: src/nssbackup/managers/SnapshotManager.py:696
+#: src/nssbackup/managers/SnapshotManager.py:759
 #, python-format
 msgid "Cancelling pull of snapshot '%s'"
 msgstr ""
 
-#: src/nssbackup/managers/SnapshotManager.py:732
-#, python-format
-msgid "Deleting '%(snp)s' for purge !"
-msgstr "Borrando '%(snp)s' para purgar !"
+#: src/nssbackup/managers/SnapshotManager.py:808
+#, fuzzy, python-format
+msgid "Deleting snapshot: '%(snp)s'."
+msgstr "Comenzando creación de instantánea %(name)s "
 
 #: src/nssbackup/managers/UpgradeManager.py:167
 #, python-format
@@ -488,8 +556,8 @@ msgid "Upgrading to v1.5: %s"
 msgstr "Actualizando a v1.5: %s"
 
 #: src/nssbackup/managers/UpgradeManager.py:278
-#, python-format
-msgid "The SNAR file alredy exist for snapshot '%s', I'll not overide it"
+#, fuzzy, python-format
+msgid "The SNAR file already exist for snapshot '%s'. It is not overwritten."
 msgstr ""
 "El archivo SNAR ya existe para la instantánea '%s', no se sobrescribirá"
 
@@ -519,7 +587,8 @@ msgid "Couldn't mount '%(server)s' into '%(mountpoint)s' : %(error)s"
 msgstr "No se ha podido montar '%(server)s' en '%(mountpoint)s': %(error)s"
 
 #: src/nssbackup/plugins/ftpFuseFAM.py:128
-msgid "FTP schema is like : ftp://user:pass@server/anything"
+#, fuzzy
+msgid "FTP schema is: ftp://user:pass@server/anything"
 msgstr "El esquema de una dirección FTP es: ftp://user:pass@server/anything"
 
 #: src/nssbackup/plugins/ftpFuseFAM.py:175
@@ -532,13 +601,11 @@ msgstr ""
 "s' (se requiere '/' después del nombre del servidor)"
 
 #: src/nssbackup/plugins/sftpFuseFAM.py:101
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Couldn't found external application 'curlftpfs' needed for handling of sftp "
 "sites: %s"
 msgstr ""
-"No se pudo encontrar la aplicación externa 'curlftpfs' requerida para tratar "
-"con sitios FTP: %s"
 
 #: src/nssbackup/plugins/sftpFuseFAM.py:126
 msgid "SFTP schema is like : sftp://user:pass@server/anything"
@@ -570,20 +637,15 @@ msgid ""
 msgstr ""
 
 #: src/nssbackup/plugins/sshFuseFAM.py:118
-#, fuzzy
 msgid "SSH schema is like : ssh://user:pass@example.com:33/home/user/backup/"
 msgstr ""
-"El esquema de una dirección SSH es: ssh://user:pass@example.com/home/usuario/"
-"copiaDeSeguridad"
 
 #: src/nssbackup/plugins/sshFuseFAM.py:134
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
 "s' (The '/' after server is mandatory)"
 msgstr ""
-"Error de concordancia del esquema 'ssh://user:pass@server/anything' con '%"
-"s' (se requiere '/' después del nombre del servidor)"
 
 #: src/nssbackup/ui/SBConfigGTK.py:99
 msgid "Scheduled backups are available for Administrator users only."
@@ -607,15 +669,13 @@ msgid "Profile Name"
 msgstr "Nombre del perfil"
 
 #: src/nssbackup/ui/SBConfigGTK.py:549
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Invalid or empty regular expression ('%s') found in configuration. Removed."
 msgstr ""
-"Se ha encontrad una expresión regular no válida ('%s') en la configuración. "
-"Eliminada."
 
 #: src/nssbackup/ui/SBConfigGTK.py:558
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Invalid or empty regular expressions found\n"
 "in configuration file:\n"
@@ -624,12 +684,6 @@ msgid ""
 "These expressions are not used and were\n"
 "removed from the configuration."
 msgstr ""
-"Expresión regular no válida encontrada\n"
-"en archivo de configuración:\n"
-"'%s'\n"
-"\n"
-"Estas expresiones no se usan y se han\n"
-"eliminado de la configuración."
 
 #: src/nssbackup/ui/SBConfigGTK.py:796
 msgid ""
@@ -649,14 +703,13 @@ msgid ""
 msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:805
-#, fuzzy
 msgid "Unable to open backup target"
-msgstr "No se ha podido crear la copia de seguridad objetivo"
+msgstr "Incapaz de abrir el destino de la copia de seguridad"
 
 #: src/nssbackup/ui/SBConfigGTK.py:874
-#, fuzzy, python-format
+#, python-format
 msgid "Current profile: %s"
-msgstr "Editando perfil: %s "
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:876
 #, python-format
@@ -686,17 +739,17 @@ msgid "Provided regular expression is not valid."
 msgstr "La expresión regular proporcionada no es válida."
 
 #: src/nssbackup/ui/SBConfigGTK.py:1043
+#, fuzzy
 msgid ""
-"It seems the path you entered does not exists. Do you want to add this wrong "
-"path?"
+"It seems the path you entered does not exists. Do you want to add this "
+"incorrect path?"
 msgstr ""
 "Parece que la ruta que ingresó no existe. ¿Desea agregar esta ruta "
 "incorrecta?"
 
 #: src/nssbackup/ui/SBConfigGTK.py:1071
-#, fuzzy
 msgid "Save configuration as..."
-msgstr "Guarda la configuración..."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1134
 msgid "A backup run is initiated in the background. The process id is: "
@@ -705,28 +758,25 @@ msgstr ""
 "proceso es: "
 
 #: src/nssbackup/ui/SBConfigGTK.py:1191
-#, fuzzy
 msgid "Include file..."
-msgstr "Incluir fichero ..."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1198 src/nssbackup/ui/SBConfigGTK.py:1352
 msgid "All files"
 msgstr "Todos los ficheros"
 
 #: src/nssbackup/ui/SBConfigGTK.py:1217
-#, fuzzy
 msgid "Include folder..."
-msgstr "Incluir directorio ..."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1324
-#, fuzzy, python-format
+#, python-format
 msgid "Test on '%s' didn't succeed!"
-msgstr "¡'%d' test(s) no tuvo/tuvieron éxito!"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1334
-#, fuzzy
 msgid "Test was successful."
-msgstr "La restauración de <tt>'%s'</tt> fue un éxito."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1339
 #, python-format
@@ -734,14 +784,12 @@ msgid "'%d' test(s) didn't succeed !"
 msgstr "¡'%d' test(s) no tuvo/tuvieron éxito!"
 
 #: src/nssbackup/ui/SBConfigGTK.py:1345
-#, fuzzy
 msgid "Exclude file..."
-msgstr "Excluir directorio ..."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1367
-#, fuzzy
 msgid "Exclude folder..."
-msgstr "Excluir directorio ..."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1628
 msgid "Configuration has changed"
@@ -762,9 +810,8 @@ msgid "The test failed with following output:"
 msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1644
-#, fuzzy
 msgid "The test was successful."
-msgstr "La restauración de <tt>'%s'</tt> fue un éxito."
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:1726 src/nssbackup/ui/SBConfigGTK.py:1770
 #, python-format
@@ -802,18 +849,14 @@ msgstr ""
 "escritura en él presionando el botón \"Test\" de la derecha."
 
 #: src/nssbackup/ui/SBConfigGTK.py:2049
-#, fuzzy
 msgid ""
 "The given name of the new profile is empty. Please enter a valid profile "
 "name."
 msgstr ""
-"Nombre de archivo o ruta vacia. Por favor ingrese un nombre de fichero o "
-"ruta válida."
 
 #: src/nssbackup/ui/SBConfigGTK.py:2051 src/nssbackup/ui/SBConfigGTK.py:2059
-#, fuzzy
 msgid "Profile name not valid"
-msgstr "Nombre del perfil: "
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:2057
 msgid ""
@@ -830,17 +873,16 @@ msgid "Please select a Profile !"
 msgstr "¡Por favor, seleccione un perfil!"
 
 #: src/nssbackup/ui/SBConfigGTK.py:2092
-#, fuzzy
 msgid "remove"
-msgstr "gtk-remove"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:2094
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "You are trying to remove a profile. You will not be able to restore it .\n"
 " If you are not sure of what you are doing, please use the 'enable|disable' "
 "functionality.\n"
-" <b>Are you sure to want to delete the '%(name)s' profile ?</b> "
+" <b>Are you sure to want to delete the '%(name)s' profile?</b> "
 msgstr ""
 "Está intentando eliminar un perfil. No podrá restaurarlo.\n"
 " Si no está seguro de lo que está haciendo, por varo, use la habilidad de "
@@ -848,9 +890,8 @@ msgstr ""
 " <b>¿Está usted seguro de que desea eliminar el perfil '%(name)s'?</b> "
 
 #: src/nssbackup/ui/SBConfigGTK.py:2143
-#, fuzzy
 msgid "disable"
-msgstr "Activar"
+msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:2172
 #, python-format
@@ -901,7 +942,8 @@ msgid "NSsbackup error"
 msgstr "Error de NSsbackup"
 
 #: src/nssbackup/ui/SBRestoreGTK.py:109
-msgid "An error occured during initialization:"
+#, fuzzy
+msgid "An error occurred during initialization:"
 msgstr "Ha ocurrido un error durante la inicialización:"
 
 #: src/nssbackup/ui/SBRestoreGTK.py:122 src/nssbackup/ui/SBRestoreGTK.py:142
@@ -937,7 +979,8 @@ msgid "NSsbackup restore error"
 msgstr "Error de restauración de NSsbackup"
 
 #: src/nssbackup/ui/SBRestoreGTK.py:489
-msgid "An error occured while reading snapshot:"
+#, fuzzy
+msgid "An error occurred while reading snapshot:"
 msgstr "Ha ocurrido un error al leer la instantánea:"
 
 #: src/nssbackup/ui/SBRestoreGTK.py:495
@@ -949,7 +992,8 @@ msgid "Reading backup snapshot..."
 msgstr "Preparando instantánea de copia de seguridad..."
 
 #: src/nssbackup/ui/SBRestoreGTK.py:535
-msgid "No backups found for this day !"
+#, fuzzy
+msgid "No backups found for this day."
 msgstr "¡No se encontraron copias de este día!"
 
 #: src/nssbackup/ui/SBRestoreGTK.py:548
@@ -970,66 +1014,69 @@ msgstr "Seleccione la ubicación para la restauración"
 msgid "Select revert location"
 msgstr "Seleccionar ubicación de reversión"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:695
+#: src/nssbackup/ui/SBRestoreGTK.py:696
 #, python-format
 msgid "Actual base : <b>%s</b>"
 msgstr "Base actual : <b>%s</b>"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:705
+#: src/nssbackup/ui/SBRestoreGTK.py:706
 msgid "The version of the snapshot is greater than the supported one!"
 msgstr "¡La versión de la instantánea es mayor que la soportada!"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:723
+#: src/nssbackup/ui/SBRestoreGTK.py:724
 msgid "NSsbackup restoration error"
 msgstr "Error de restauración de NSsbackup"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:725
+#: src/nssbackup/ui/SBRestoreGTK.py:726
 msgid "Unable to upgrade snapshot"
 msgstr "No se pudo actualizar la instantánea"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:747
+#: src/nssbackup/ui/SBRestoreGTK.py:748
 #, python-format
 msgid "Do you really want to rebase '%(current)s' on '%(base)s' ?"
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:764
-#, python-format
-msgid "Are you sure that you want to definitely remove snapshot '%s' ?"
+#: src/nssbackup/ui/SBRestoreGTK.py:765
+#, fuzzy, python-format
+msgid ""
+"Are you sure that you want to remove snapshot '%s'?\n"
+"\n"
+"This may take a while - be patient."
 msgstr ""
 "¿Está seguro de que desea eliminar definitivamente la instantánea '%s'?"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:794 src/nssbackup/ui/SBRestoreGTK.py:800
-#: src/nssbackup/ui/SBRestoreGTK.py:806 src/nssbackup/ui/SBRestoreGTK.py:812
-#: datas/nssbackup-restore.glade:1067
+#: src/nssbackup/ui/SBRestoreGTK.py:796 src/nssbackup/ui/SBRestoreGTK.py:802
+#: src/nssbackup/ui/SBRestoreGTK.py:808 src/nssbackup/ui/SBRestoreGTK.py:814
+#: datas/nssbackup-restore.glade:1066
 msgid "NSsbackup restoration"
 msgstr "Restauración de NSsbackup"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:795 src/nssbackup/ui/SBRestoreGTK.py:801
+#: src/nssbackup/ui/SBRestoreGTK.py:797 src/nssbackup/ui/SBRestoreGTK.py:803
 msgid "<b>Restoring of selected files</b>"
 msgstr "<b>Restauración de archivos seleccionados</b>"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:796
+#: src/nssbackup/ui/SBRestoreGTK.py:798
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> is in progress."
 msgstr "La restauración de <tt>'%s'</tt> se está realizando."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:797
-#, python-format
-msgid "Restoring of <tt>'%s'</tt> was sucessful."
+#: src/nssbackup/ui/SBRestoreGTK.py:799
+#, fuzzy, python-format
+msgid "Restoring of <tt>'%s'</tt> was successful."
 msgstr "La restauración de <tt>'%s'</tt> fue un éxito."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:798
-#, python-format
+#: src/nssbackup/ui/SBRestoreGTK.py:800
+#, fuzzy, python-format
 msgid ""
-"Restoring of <tt>'%s'</tt> was not sucessful.\n"
+"Restoring of <tt>'%s'</tt> was not successful.\n"
 "\n"
-"The following error occured:\n"
+"The following error occurred:\n"
 msgstr ""
 "La restauración de <tt>'%s'</tt> no fue un éxito.\n"
 "\n"
 "Ocurrió el siguiente error:\n"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:802
+#: src/nssbackup/ui/SBRestoreGTK.py:804
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
@@ -1038,90 +1085,98 @@ msgstr ""
 "La restauración de <tt>'%(source)s'</tt>\n"
 "a <tt>'%(dirname)s'</tt> se está realizando."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:803
-#, python-format
+#: src/nssbackup/ui/SBRestoreGTK.py:805
+#, fuzzy, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
-"to <tt>'%(dirname)s'</tt> was sucessful."
+"to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
 "La restauración de <tt>'%(source)s'</tt>\n"
 "a <tt>'%(dirname)s'</tt> ha sido un éxito."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:804
-#, python-format
+#: src/nssbackup/ui/SBRestoreGTK.py:806
+#, fuzzy, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
-"to <tt>'%(dirname)s'</tt> was not sucessful.\n"
+"to <tt>'%(dirname)s'</tt> was not successful.\n"
 "\n"
-"The following error occured:\n"
+"The following error occurred:\n"
 msgstr ""
 "La restauración de <tt>'%(source)s'</tt>\n"
 "a <tt>'%(dirname)s'</tt> no ha terminado con éxito.\n"
 "\n"
 "Ha ocurrido el siguiente error:\n"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:807 src/nssbackup/ui/SBRestoreGTK.py:813
+#: src/nssbackup/ui/SBRestoreGTK.py:809 src/nssbackup/ui/SBRestoreGTK.py:815
 msgid "<b>Reverting selected files</b>"
 msgstr "<b>Revertiendo archivos seleccionados</b>"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:808
+#: src/nssbackup/ui/SBRestoreGTK.py:810
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> is in progress.\n"
 msgstr "La reversión de <tt>'%s'</tt> se está realizando.\n"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:809
-#, python-format
-msgid "Reverting of <tt>'%s'</tt> was sucessful."
+#: src/nssbackup/ui/SBRestoreGTK.py:811
+#, fuzzy, python-format
+msgid "Reverting of <tt>'%s'</tt> was successful."
 msgstr "La reversión de <tt>'%s'</tt> ha sido un éxito."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:810
-#, python-format
+#: src/nssbackup/ui/SBRestoreGTK.py:812
+#, fuzzy, python-format
 msgid ""
-"Reverting of <tt>'%s'</tt> was not sucessful.\n"
+"Reverting of <tt>'%s'</tt> was not successful.\n"
 "\n"
-"The following error occured:\n"
+"The following error occurred:\n"
 msgstr ""
 "La reversión de <tt>'%s'</tt> no ha sido un éxito.\n"
 "\n"
 "Ocurrió el siguiente error:\n"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:814
+#: src/nssbackup/ui/SBRestoreGTK.py:816
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> is in progress."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:815
-#, python-format
+#: src/nssbackup/ui/SBRestoreGTK.py:817
+#, fuzzy, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
-"to <tt>'%(dirname)s'</tt> was sucessful."
+"to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
+"La restauración de <tt>'%(source)s'</tt>\n"
+"a <tt>'%(dirname)s'</tt> ha sido un éxito."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:816
-#, python-format
+#: src/nssbackup/ui/SBRestoreGTK.py:818
+#, fuzzy, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
-"to <tt>'%(dirname)s'</tt> was not sucessful.\n"
+"to <tt>'%(dirname)s'</tt> was not successful.\n"
 "\n"
-"The following error occured:\n"
+"The following error occurred:\n"
 msgstr ""
+"La restauración de <tt>'%(source)s'</tt>\n"
+"a <tt>'%(dirname)s'</tt> no ha terminado con éxito.\n"
+"\n"
+"Ha ocurrido el siguiente error:\n"
 
-#: src/nssbackup/util/Snapshot.py:112
-msgid "Snapshot is inconsistant : __name is not set "
+#: src/nssbackup/util/Snapshot.py:114
+#, fuzzy
+msgid "Snapshot is inconsistent: __name is not set "
 msgstr "La instantánea es inconsistente: __nombre no se ha establecido "
 
-#: src/nssbackup/util/Snapshot.py:123
+#: src/nssbackup/util/Snapshot.py:125
 #, python-format
 msgid "Name of snapshot '%s' doesn't match requirement"
 msgstr "El nombre de la instantánea '%s' no coincide con los requerimientos"
 
-#: src/nssbackup/util/Snapshot.py:171
-msgid "Snapshot is inconsistant : __snapshotpath is not set "
+#: src/nssbackup/util/Snapshot.py:219
+#, fuzzy
+msgid "Snapshot is inconsistent: __snapshotpath is not set "
 msgstr "La instantánea es inconsistente: __snapshotpath no se ha establecido "
 
-#: src/nssbackup/util/Snapshot.py:245
+#: src/nssbackup/util/Snapshot.py:293
 #, python-format
 msgid ""
 "The snapshot compression format is supposed to be '%s' but the corresponding "
@@ -1130,114 +1185,144 @@ msgstr ""
 "Se supone que el formato de compresión de la instantánea es '%s' pero no se "
 "encontró el archivo con un nombre correcto"
 
-#: src/nssbackup/util/Snapshot.py:269
-#, python-format
+#: src/nssbackup/util/Snapshot.py:317
+#, fuzzy, python-format
 msgid ""
-"%(file)s doesn't contain valid value ! Ignoring incomplete or non-backup "
+"%(file)s doesn't contain valid value. Ignoring incomplete or non-backup "
 "directory. "
 msgstr ""
 "¡%(file)s no contiene un valor válido! Se ignora el directorio incompleto o "
 "que no es de copia de seguridad. "
 
-#: src/nssbackup/util/Snapshot.py:380 src/nssbackup/util/Snapshot.py:444
+#: src/nssbackup/util/Snapshot.py:445 src/nssbackup/util/Snapshot.py:509
 #, python-format
 msgid "Name of Snapshot not valid : %s"
 msgstr "Nombre de instantánea no válido: %s"
 
-#: src/nssbackup/util/Snapshot.py:398
+#: src/nssbackup/util/Snapshot.py:463
 #, python-format
 msgid "Name of base not valid : %s"
 msgstr "Nonbre de base no valido : %s"
 
-#: src/nssbackup/util/Snapshot.py:447
-#, python-format
-msgid "The mandatory 'ver' file doesn't exist in [%s]"
+#: src/nssbackup/util/Snapshot.py:511
+#, fuzzy, python-format
+msgid "The mandatory 'ver' file doesn't exist in [%s]."
 msgstr "El archivo requerido 'ver' no existe en [%s]"
 
-#: src/nssbackup/util/Snapshot.py:486
-msgid "Base name must be set for inc backup !"
+#: src/nssbackup/util/Snapshot.py:551
+#, fuzzy
+msgid "Base name must be set for incremental backup."
 msgstr "Se debe configurar el nombre base para un backup incremental!"
 
-#: src/nssbackup/util/tar.py:87 src/nssbackup/util/tar.py:134
-#: src/nssbackup/util/tar.py:174 src/nssbackup/util/tar.py:208
-msgid "Invalid Archive type"
+#: src/nssbackup/util/__init__.py:550
+#, python-format
+msgid "%(mb)d MiB %(kb)d KiB %(bytes)d"
+msgstr ""
+
+#: src/nssbackup/util/__init__.py:554
+#, python-format
+msgid "%(mb)d MB %(kb)d kB %(bytes)d"
+msgstr ""
+
+#: src/nssbackup/util/tar.py:88 src/nssbackup/util/tar.py:140
+#: src/nssbackup/util/tar.py:181
+#, fuzzy
+msgid "Invalid archive type."
 msgstr "Tipo de archivo no válido"
 
-#: src/nssbackup/util/tar.py:277
+#: src/nssbackup/util/tar.py:260
+#, fuzzy
 msgid ""
-"For the moment split functionality is not compatible with compress option ! "
+"For the moment split functionality is not compatible with compress option."
 msgstr ""
 "¡La opción de dividir no es compatible con la de comprimir por el momento! "
 
-#: src/nssbackup/util/tar.py:287
-msgid "Launching TAR to make Inc backup "
+#: src/nssbackup/util/tar.py:271
+#, fuzzy
+msgid "Launching TAR to make incremental backup."
 msgstr "Ejecutando TAR para hacer copia de seguridad incremental "
 
-#: src/nssbackup/util/tar.py:306
-msgid "Unable to find the SNAR file to make an Incremental backup"
+#: src/nssbackup/util/tar.py:290
+#, fuzzy
+msgid "Unable to find the SNAR file to make an incremental backup."
 msgstr ""
 "No se pudo encontrar el archivo SNAR para hacer una copia de seguridad "
 "incremental"
 
-#: src/nssbackup/util/tar.py:307
-msgid "Falling back to full backup"
+#: src/nssbackup/util/tar.py:291
+#, fuzzy
+msgid "Falling back to full backup."
 msgstr "Falló al realizar una copia de seguridad completa"
 
-#: src/nssbackup/util/tar.py:328 src/nssbackup/util/tar.py:376
+#: src/nssbackup/util/tar.py:312 src/nssbackup/util/tar.py:361
 #, python-format
 msgid "Unable to change permissions for file '%s'."
 msgstr "No se pudieron cambiar los permisos del archivo '%s'"
 
-#: src/nssbackup/util/tar.py:333 src/nssbackup/util/tar.py:382
+#: src/nssbackup/util/tar.py:317
 msgid "TAR sent a warning when making the backup : "
 msgstr ""
 
-#: src/nssbackup/util/tar.py:336 src/nssbackup/util/tar.py:337
-#: src/nssbackup/util/tar.py:385 src/nssbackup/util/tar.py:386
+#: src/nssbackup/util/tar.py:320 src/nssbackup/util/tar.py:321
 msgid "Couldn't make a proper backup : "
 msgstr "No se pudo hacer una copia correcta: "
 
-#: src/nssbackup/util/tar.py:346
-msgid "Launching TAR to make a Full backup "
+#: src/nssbackup/util/tar.py:331
+#, fuzzy
+msgid "Launching TAR to make a full backup."
 msgstr "Ejecutando TAR para hacer una copia total "
 
-#: src/nssbackup/util/tar.py:445
+#: src/nssbackup/util/tar.py:367
+msgid "TAR returned a warning during the backup process: "
+msgstr ""
+
+#: src/nssbackup/util/tar.py:370 src/nssbackup/util/tar.py:371
+#, fuzzy
+msgid "Couldn't make a proper backup: "
+msgstr "No se pudo hacer una copia correcta: "
+
+#: src/nssbackup/util/tar.py:436
 msgid "Included"
 msgstr "Incluido"
 
-#: src/nssbackup/util/tar.py:445
+#: src/nssbackup/util/tar.py:436
 msgid "Not changed"
 msgstr "Sin cambios"
 
-#: src/nssbackup/util/tar.py:445
+#: src/nssbackup/util/tar.py:436
 msgid "Directory"
 msgstr "Directorio"
 
-#: src/nssbackup/util/tar.py:473
+#: src/nssbackup/util/tar.py:464
 msgid "Line must be a string"
 msgstr "La línea ha de ser una cadena"
 
-#: src/nssbackup/util/tar.py:489
+#: src/nssbackup/util/tar.py:480
 msgid "Dumpdir inconsistancy : 'filename' is empty"
 msgstr "Directorio de Dump inconsistente : 'filename' esta vacio"
 
-#: src/nssbackup/util/tar.py:502
+#: src/nssbackup/util/tar.py:493
 msgid "Dumpdir inconsistancy : 'control' is empty"
 msgstr "Directorio de Dump inconsistente : 'control' esta vacio"
 
-#: src/nssbackup/util/tar.py:574
-#, python-format
-msgid "'%s' doesn't exist "
+#: src/nssbackup/util/tar.py:567
+#, fuzzy, python-format
+msgid "File '%s' does not exist."
 msgstr "'%s' no existe "
 
-#: src/nssbackup/util/tar.py:890
+#: src/nssbackup/util/tar.py:696 src/nssbackup/util/tar.py:732
+#, fuzzy
+msgid "The snarfile header is incomplete."
+msgstr "¡La cabecera del archivo SNAR no está completa!"
+
+#: src/nssbackup/util/tar.py:997
 msgid "A SnapshotFile is required"
 msgstr "Se requiere un archivo de instantánea"
 
-#: src/nssbackup/util/tar.py:979
-#, python-format
-msgid "Non existing directory : %s"
-msgstr "Directorio no existente: %s"
+#: src/nssbackup/util/tar.py:1097
+#, fuzzy, python-format
+msgid "Directory does not exist: %s."
+msgstr "No existe el directorio de destino '%(target)s'."
 
 #: datas/nssbackup-config.glade:11
 msgid "Exclude file type"
@@ -1255,11 +1340,11 @@ msgstr "Tipos de archivo personalizados definidos con "
 msgid "file extension"
 msgstr "extensión de archivo"
 
-#: datas/nssbackup-config.glade:164
+#: datas/nssbackup-config.glade:165
 msgid "Exclude by regex"
 msgstr "Excluir por expresión regular"
 
-#: datas/nssbackup-config.glade:180
+#: datas/nssbackup-config.glade:184
 msgid ""
 "Enter a regular expression.\n"
 "Files and directories matching this expression will be excluded from backup."
@@ -1268,24 +1353,23 @@ msgstr ""
 "Los archivos y directorios que concuerden con esta expresión serán excluidos "
 "de la copia de respaldo."
 
-#: datas/nssbackup-config.glade:256
+#: datas/nssbackup-config.glade:261
 msgid "Enter the remote target to include"
 msgstr "Introduce el objetivo remoto a incluir"
 
-#: datas/nssbackup-config.glade:276
+#: datas/nssbackup-config.glade:284
 msgid "Choose a plugin to get the format"
 msgstr "Elija un complemento para obtener el formato"
 
-#: datas/nssbackup-config.glade:290
+#: datas/nssbackup-config.glade:301
 msgid "Choose your plugin :"
 msgstr "Elija su complemento:"
 
-#: datas/nssbackup-config.glade:354
+#: datas/nssbackup-config.glade:373
 msgid "Check"
 msgstr "Verificar"
 
-#: datas/nssbackup-config.glade:465
-#, fuzzy
+#: datas/nssbackup-config.glade:488
 msgid ""
 "<b>Save changed configuration?</b>\n"
 "\n"
@@ -1294,28 +1378,24 @@ msgid ""
 "\n"
 "Do you want to save the configuration now?"
 msgstr ""
-"La configuración ha cambiado.\n"
-"Si quiere usar la nueva configuración, debe guardarla. \n"
-"¿Desea guardarla?"
 
-#: datas/nssbackup-config.glade:557
-#, fuzzy
+#: datas/nssbackup-config.glade:580
 msgid "Configuration Profile Manager"
-msgstr "<b>Perfiles de configuración</b>"
+msgstr ""
 
-#: datas/nssbackup-config.glade:581
+#: datas/nssbackup-config.glade:604
 msgid ""
-"This dialog helps you to manage your configuration profiles. You can set up "
-"a number of configuration profile that will be run by NSsbackup when it "
-"starts the backup. Thanks to this you can configure backup of different "
+"This dialogue helps you to manage your configuration profiles. You can set "
+"up a number of configuration profiles that will be run by NSsbackup when it "
+"starts the backup. Thanks to this you can configure backups of different "
 "kinds to different places."
 msgstr ""
 
-#: datas/nssbackup-config.glade:601
+#: datas/nssbackup-config.glade:624
 msgid "<b>Configuration profiles</b>"
 msgstr "<b>Perfiles de configuración</b>"
 
-#: datas/nssbackup-config.glade:778
+#: datas/nssbackup-config.glade:801
 msgid ""
 "<b>Add new profile</b>\n"
 "\n"
@@ -1323,76 +1403,67 @@ msgid ""
 "enable resp. disable it."
 msgstr ""
 
-#: datas/nssbackup-config.glade:804
-#, fuzzy
+#: datas/nssbackup-config.glade:827
 msgid "Profile name"
-msgstr "Nombre del perfil"
+msgstr ""
 
-#: datas/nssbackup-config.glade:830
-#, fuzzy
+#: datas/nssbackup-config.glade:853
 msgid "Enabled"
-msgstr "Activar"
+msgstr ""
 
-#: datas/nssbackup-config.glade:909
+#: datas/nssbackup-config.glade:932
 msgid "Not So Simple Backup Suite"
 msgstr ""
 
-#: datas/nssbackup-config.glade:927
+#: datas/nssbackup-config.glade:950
 msgid "_File"
 msgstr "_Archivo"
 
-#: datas/nssbackup-config.glade:946
-#, fuzzy
+#: datas/nssbackup-config.glade:969
 msgid "Save as..."
-msgstr "Revertir como..."
+msgstr ""
 
-#: datas/nssbackup-config.glade:984
+#: datas/nssbackup-config.glade:1007
 msgid "_Tools"
 msgstr "_Herramientas"
 
-#: datas/nssbackup-config.glade:992 datas/nssbackup-config.glade:1099
-#, fuzzy
+#: datas/nssbackup-config.glade:1015 datas/nssbackup-config.glade:1122
 msgid "Set default settings..."
-msgstr "Comprobar las configuraciones de correo-e"
+msgstr ""
 
-#: datas/nssbackup-config.glade:1013
-#, fuzzy
+#: datas/nssbackup-config.glade:1036
 msgid "Profile Manager..."
-msgstr "Gestor de perfiles"
+msgstr ""
 
-#: datas/nssbackup-config.glade:1034
+#: datas/nssbackup-config.glade:1057
 msgid "_Help"
 msgstr "_Ayuda"
 
-#: datas/nssbackup-config.glade:1042
+#: datas/nssbackup-config.glade:1065
 msgid "_View all help topics"
 msgstr ""
 
-#: datas/nssbackup-config.glade:1113
-#, fuzzy
+#: datas/nssbackup-config.glade:1136
 msgid "Reload configuration"
-msgstr "Guarda la configuración..."
-
-#: datas/nssbackup-config.glade:1127
-#, fuzzy
-msgid "Save configuration"
-msgstr "Guarda la configuración..."
+msgstr ""
 
 #: datas/nssbackup-config.glade:1150
-#, fuzzy
-msgid "Make a backup now"
-msgstr "Solo copias de respaldo manuales"
+msgid "Save configuration"
+msgstr ""
 
 #: datas/nssbackup-config.glade:1173
-#, fuzzy
-msgid "Open the profile manager"
-msgstr "Gestor de perfiles"
+msgid "Make a backup now"
+msgstr ""
 
-#: datas/nssbackup-config.glade:1174
+#: datas/nssbackup-config.glade:1196
+msgid "Open the profile manager"
+msgstr ""
+
+#: datas/nssbackup-config.glade:1197
 msgid "Profiles"
 msgstr "Perfiles"
 
-#: datas/nssbackup-config.glade:1213
+#: datas/nssbackup-config.glade:1236
 msgid ""
 "none\n"
 "gzip\n"
@@ -1402,7 +1473,7 @@ msgstr ""
 "gzip\n"
 "bzip2"
 
-#: datas/nssbackup-config.glade:1231
+#: datas/nssbackup-config.glade:1254
 msgid ""
 "Choose the compression format that you want to apply.\n"
 "Default is <b>gzip</b>."
@@ -1410,180 +1481,166 @@ msgstr ""
 "Elija el formato de compresión a aplicar.\n"
 "Por defecto, se usa <b>gzip</b>."
 
-#: datas/nssbackup-config.glade:1290
+#: datas/nssbackup-config.glade:1313
 msgid "Do a full backup at least once every"
 msgstr "Realizar una copia de respaldo completa al menos una vez cada"
 
-#: datas/nssbackup-config.glade:1299
+#: datas/nssbackup-config.glade:1322
 msgid ""
 "Unless a set number of days has passed since the last full backup, "
 "incremental backups will be done."
 msgstr ""
 
-#: datas/nssbackup-config.glade:1315 datas/nssbackup-config.glade:3103
+#: datas/nssbackup-config.glade:1338 datas/nssbackup-config.glade:3124
 msgid "days"
 msgstr "días"
 
-#: datas/nssbackup-config.glade:1330
+#: datas/nssbackup-config.glade:1353
 msgid " "
-msgstr ""
+msgstr " "
 
-#: datas/nssbackup-config.glade:1340 datas/nssbackup-config.glade:2408
+#: datas/nssbackup-config.glade:1363 datas/nssbackup-config.glade:2431
 msgid "MiB"
 msgstr ""
 
-#: datas/nssbackup-config.glade:1364
+#: datas/nssbackup-config.glade:1387
 msgid ""
 "You can split the snapshot to make backup on some filesystem that doesn't "
 "support large files. This functionality can not be used if the backup is "
 "compressed."
 msgstr ""
 
-#: datas/nssbackup-config.glade:1366
+#: datas/nssbackup-config.glade:1389
 msgid ""
 "Split the backup archive into small pieces (value in MiB).\n"
 "<b>Important note:</b> This functionality is not compatible with compressed "
 "backups!"
 msgstr ""
 
-#: datas/nssbackup-config.glade:1402 datas/nssbackup-config.glade:2710
-#: datas/nssbackup-config.glade:2948 datas/nssbackup-config.glade:3201
-#: datas/nssbackup-config.glade:3960
-#, fuzzy
+#: datas/nssbackup-config.glade:1425 datas/nssbackup-config.glade:2731
+#: datas/nssbackup-config.glade:2969 datas/nssbackup-config.glade:3222
+#: datas/nssbackup-config.glade:3979
 msgid "Help"
-msgstr "_Ayuda"
+msgstr ""
 
-#: datas/nssbackup-config.glade:1406 datas/nssbackup-config.glade:2715
-#, fuzzy
+#: datas/nssbackup-config.glade:1429 datas/nssbackup-config.glade:2736
 msgid "Show help topic about configuration GUI."
-msgstr "Guarda la configuración..."
+msgstr ""
 
-#: datas/nssbackup-config.glade:1439
+#: datas/nssbackup-config.glade:1462
 msgid "General"
 msgstr "General"
 
-#: datas/nssbackup-config.glade:1461
-#, fuzzy
+#: datas/nssbackup-config.glade:1484
 msgid "<b>Local files and directories</b>"
-msgstr "Directorio de archivos de registro"
+msgstr ""
 
-#: datas/nssbackup-config.glade:1537 datas/nssbackup-config.glade:1901
-#: datas/nssbackup-config.glade:2107 datas/nssbackup-config.glade:2266
-#, fuzzy
+#: datas/nssbackup-config.glade:1560 datas/nssbackup-config.glade:1924
+#: datas/nssbackup-config.glade:2130 datas/nssbackup-config.glade:2289
 msgid "Remove"
-msgstr "gtk-remove"
+msgstr ""
 
-#: datas/nssbackup-config.glade:1587 datas/nssbackup-config.glade:1951
+#: datas/nssbackup-config.glade:1610 datas/nssbackup-config.glade:1974
 msgid "Add File"
 msgstr "Añadir archivo"
 
-#: datas/nssbackup-config.glade:1638 datas/nssbackup-config.glade:2002
+#: datas/nssbackup-config.glade:1661 datas/nssbackup-config.glade:2025
 msgid "Add Directory"
 msgstr "Añadir directorio"
 
-#: datas/nssbackup-config.glade:1687
-#, fuzzy
+#: datas/nssbackup-config.glade:1710
 msgid "<b>Remote paths</b>"
-msgstr "<b>Opciones generales</b>"
+msgstr ""
 
-#: datas/nssbackup-config.glade:1738
+#: datas/nssbackup-config.glade:1761
 msgid "Test remote paths"
 msgstr ""
 
-#: datas/nssbackup-config.glade:1823
+#: datas/nssbackup-config.glade:1846
 msgid "Include"
 msgstr "Incluir"
 
-#: datas/nssbackup-config.glade:2035
+#: datas/nssbackup-config.glade:2058
 msgid "Paths"
 msgstr "Rutas"
 
-#: datas/nssbackup-config.glade:2158 datas/nssbackup-config.glade:2317
+#: datas/nssbackup-config.glade:2181 datas/nssbackup-config.glade:2340
 msgid "Add"
 msgstr ""
 
-#: datas/nssbackup-config.glade:2193
+#: datas/nssbackup-config.glade:2216
 msgid "File types"
 msgstr "Tipos de archivo"
 
-#: datas/nssbackup-config.glade:2352
-#, fuzzy
+#: datas/nssbackup-config.glade:2375
 msgid ""
 "Regular\n"
 "Expressions"
-msgstr "Expresión regular no válida ('%s')"
+msgstr ""
 
-#: datas/nssbackup-config.glade:2374
-#, fuzzy
+#: datas/nssbackup-config.glade:2397
 msgid "Do not backup files bigger than"
-msgstr "No respaldar archivos mayores a "
+msgstr ""
 
-#: datas/nssbackup-config.glade:2429
-#, fuzzy
+#: datas/nssbackup-config.glade:2452
 msgid "Follow symbolic links"
-msgstr "Seguir enlaces simbólicos "
+msgstr ""
 
-#: datas/nssbackup-config.glade:2458
+#: datas/nssbackup-config.glade:2481
 msgid "Others"
 msgstr "Otros"
 
-#: datas/nssbackup-config.glade:2475
+#: datas/nssbackup-config.glade:2498
 msgid "Exclude"
 msgstr "Excluir"
 
-#: datas/nssbackup-config.glade:2499
-#, fuzzy
+#: datas/nssbackup-config.glade:2522
 msgid "Use default backup directory"
-msgstr "Usar directorio de respaldo por defecto (%s)"
+msgstr ""
 
-#: datas/nssbackup-config.glade:2524
+#: datas/nssbackup-config.glade:2547
 msgid "/var/backup"
 msgstr ""
 
-#: datas/nssbackup-config.glade:2551
+#: datas/nssbackup-config.glade:2574
 msgid "Use custom local backup directory"
 msgstr "Use directorio local de copia de respaldo personalizado"
 
-#: datas/nssbackup-config.glade:2581
+#: datas/nssbackup-config.glade:2602
 msgid "Select the destination folder"
 msgstr "Seleccione el directorio de destino"
 
-#: datas/nssbackup-config.glade:2608
+#: datas/nssbackup-config.glade:2629
 msgid "Use a remote directory (SSH or FTP)"
 msgstr "Use un directorio remoto (SSH o FTP)"
 
-#: datas/nssbackup-config.glade:2649
+#: datas/nssbackup-config.glade:2670
 msgid "ssh://username:password@example.com/remote/dir/"
 msgstr "ssh://usuario:contraseña@ejemplo.com:/directorio/remoto"
 
-#: datas/nssbackup-config.glade:2662
+#: datas/nssbackup-config.glade:2683
 msgid "Test"
 msgstr "Prueba"
 
-#: datas/nssbackup-config.glade:2755
-#, fuzzy
+#: datas/nssbackup-config.glade:2776
 msgid ""
-"<i>The selected destination is not writeable with current permissions. The "
-"backups can not be written there.</i>"
+"<i>The selected destination is not writeable with current permissions. "
+"Backups cannot be stored there.</i>"
 msgstr ""
-"<i>No es posible escribir en el destino seleccionado con los permisos "
-"actuales.\n"
-"Los respaldos no pueden ser escritos allí.</i>"
 
-#: datas/nssbackup-config.glade:2787
+#: datas/nssbackup-config.glade:2808
 msgid "Destination"
 msgstr "Destino"
 
-#: datas/nssbackup-config.glade:2809
+#: datas/nssbackup-config.glade:2830
 msgid "_No scheduled backups"
 msgstr ""
 
-#: datas/nssbackup-config.glade:2826
-#, fuzzy
+#: datas/nssbackup-config.glade:2847
 msgid "_Simple"
-msgstr "_Archivo"
+msgstr ""
 
-#: datas/nssbackup-config.glade:2831
+#: datas/nssbackup-config.glade:2852
 msgid ""
 "This option will make nssbackup make a backup not at a precise time but when "
 "the computer is up. "
@@ -1591,74 +1648,56 @@ msgstr ""
 "Esta opción hará que nssbackup haga un backup cuando se encienda el "
 "ordenador y no en un momento preciso. "
 
-#: datas/nssbackup-config.glade:2845
-#, fuzzy
+#: datas/nssbackup-config.glade:2866
 msgid "_Custom"
-msgstr "Perzonalizado"
+msgstr ""
 
-#: datas/nssbackup-config.glade:2865
-#, fuzzy
+#: datas/nssbackup-config.glade:2886
 msgid "Do backups"
-msgstr "Realizar respaldos "
+msgstr ""
 
-#: datas/nssbackup-config.glade:2882
-#, fuzzy
+#: datas/nssbackup-config.glade:2903
 msgid "Cron time definition"
-msgstr "Definición de tiempo cron personalzado: "
+msgstr ""
 
-#: datas/nssbackup-config.glade:2918
-#, fuzzy
+#: datas/nssbackup-config.glade:2939
 msgid ""
 "hourly\n"
 "daily\n"
 "weekly\n"
 "monthly"
 msgstr ""
-"nunca\n"
-"horario\n"
-"diario\n"
-"semanal\n"
-"mensual\n"
-"personalizado"
 
-#: datas/nssbackup-config.glade:2952
+#: datas/nssbackup-config.glade:2973
 msgid "Show help topic about scheduled backups."
 msgstr ""
 
-#: datas/nssbackup-config.glade:2990
-#, fuzzy
+#: datas/nssbackup-config.glade:3011
 msgid ""
 "<small>You can configure scheduled (i.e. automated) backups either simply by "
 "choosing an interval or precisely by a custom cron definition. See \"man 5 "
 "crontab\" for cron time definition format.</small>"
 msgstr ""
-"<small>Puede configurar cuan frecuentemente empezar la ejecución de un "
-"proceso de respaldo y cuando hacerlo.\n"
-"A menos que un número determinado de días hayan pasado desde el último "
-"proceso completado, se harán respaldos incrementales.\n"
-"Vea \"man 5 crontab\" por la definición de tiempo en cron.</small>"
 
-#: datas/nssbackup-config.glade:3022
+#: datas/nssbackup-config.glade:3043
 msgid "Schedule"
 msgstr ""
 
-#: datas/nssbackup-config.glade:3042
+#: datas/nssbackup-config.glade:3063
 msgid "Enable purging of old and incomplete backups"
 msgstr "Habilitar el purgado de respaldos antiguos e incompletos"
 
-#: datas/nssbackup-config.glade:3071
-#, fuzzy
-msgid "Simple cutoff: Erase all backups older than"
-msgstr "Límite simple: Borrar todas las copias de respaldo anteriores a "
+#: datas/nssbackup-config.glade:3092
+msgid "Simple cut-off: Erase all backups older than"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3128
+#: datas/nssbackup-config.glade:3149
 msgid "Logarithmic"
 msgstr "Logarítmico"
 
-#: datas/nssbackup-config.glade:3154
-#, fuzzy
+#: datas/nssbackup-config.glade:3175
 msgid ""
-"<small>Keep progressivelly less backups into the past:\n"
+"<small>Keep progressively less backups into the past:\n"
 "Keep all backups from yesterday.\n"
 "Keep one backup per day from last week.\n"
 "Keep one backup per week from last month.\n"
@@ -1666,19 +1705,12 @@ msgid ""
 "Keep one backup per year further into past.\n"
 "Erase all other backups.</small>"
 msgstr ""
-"<small>Mantener progresivamente menos copias de respaldo en el pasado:\n"
-"Mantener todas las copias de respaldo de ayer.\n"
-"Mantener una copia de respaldo por día desde la última semana.\n"
-"Mantener una copia de respaldo por semana desde el último mes.\n"
-"Mantener una copia de respaldo por mes desde el último año.\n"
-"Mantener una copia de respaldo por año mas atras en el pasado.\n"
-"Borrar todos las demás copias de respaldo.</small>\n"
 
-#: datas/nssbackup-config.glade:3206
+#: datas/nssbackup-config.glade:3227
 msgid "Show help topic about purging of backups."
 msgstr ""
 
-#: datas/nssbackup-config.glade:3244
+#: datas/nssbackup-config.glade:3265
 msgid ""
 "<small>Note: Additionally all incomplete and irrecoverable backups will be "
 "erased as long as there is a complete backup snapshot made later on.</small>"
@@ -1687,126 +1719,116 @@ msgstr ""
 "irrecuperables serán borradas cuando exista una copia de respaldo completa "
 "hecha posteriormente.</small>"
 
-#: datas/nssbackup-config.glade:3276
+#: datas/nssbackup-config.glade:3297
 msgid "Purging"
 msgstr "Purgando"
 
-#: datas/nssbackup-config.glade:3278
+#: datas/nssbackup-config.glade:3299
 msgid "Cleaning old backups"
 msgstr "Limpiando copias de respaldo antiguas"
 
-#: datas/nssbackup-config.glade:3303
+#: datas/nssbackup-config.glade:3324
 msgid "<b>Logging</b>"
 msgstr ""
 
-#: datas/nssbackup-config.glade:3328
+#: datas/nssbackup-config.glade:3349
 msgid "Debug is just for debbuging purpose.Info is the recommended setting"
 msgstr ""
 "Debug es justamente para propositos de debbuging.Info es la configuracion "
 "recomendada"
 
-#: datas/nssbackup-config.glade:3330
-#, fuzzy
+#: datas/nssbackup-config.glade:3351
 msgid "Log level"
-msgstr "Nivel de registro:"
-
-#: datas/nssbackup-config.glade:3342
-msgid ""
-"Debug is just for debbuging purpose\n"
-"Info is the recommended setting"
 msgstr ""
-"Debug es para propositos de debbuging\n"
-"Info es la configuracion recomendada"
 
-#: datas/nssbackup-config.glade:3369
+#: datas/nssbackup-config.glade:3363
+#, fuzzy
+msgid "Debug is just for debbuging purpose. Info is the recommended setting."
+msgstr ""
+"Debug es justamente para propositos de debbuging.Info es la configuracion "
+"recomendada"
+
+#: datas/nssbackup-config.glade:3389
 msgid "Log file directory"
 msgstr "Directorio de archivos de registro"
 
-#: datas/nssbackup-config.glade:3417
-#, fuzzy
+#: datas/nssbackup-config.glade:3436
 msgid "<b>Report by mail</b>"
-msgstr "Informar por correo-e"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3448
-#, fuzzy
+#: datas/nssbackup-config.glade:3467
 msgid "From"
-msgstr "De:"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3459
-#, fuzzy
+#: datas/nssbackup-config.glade:3478
 msgid "SMTP server"
-msgstr "Establecer servidor SMTP"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3473
-#, fuzzy
+#: datas/nssbackup-config.glade:3492
 msgid "Port"
-msgstr "Puerto SMTP:"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3489
-#, fuzzy
+#: datas/nssbackup-config.glade:3508
 msgid "To"
-msgstr "A:"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3577
+#: datas/nssbackup-config.glade:3596
 msgid "Use a username and password"
 msgstr "Usar nombre de usuario y contraseña"
 
-#: datas/nssbackup-config.glade:3607
+#: datas/nssbackup-config.glade:3626
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: datas/nssbackup-config.glade:3639
+#: datas/nssbackup-config.glade:3658
 msgid "Password"
 msgstr "Contraseña"
 
-#: datas/nssbackup-config.glade:3684
-#, fuzzy
+#: datas/nssbackup-config.glade:3703
 msgid "Use secure connection"
-msgstr "Usar conexión segura"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3715
-#, fuzzy
+#: datas/nssbackup-config.glade:3734
 msgid "Choose a certificate file"
-msgstr "Elija un directorio de origen"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3729
+#: datas/nssbackup-config.glade:3748
 msgid "Key"
 msgstr "Clave"
 
-#: datas/nssbackup-config.glade:3745
+#: datas/nssbackup-config.glade:3764
 msgid "Certificate"
 msgstr "Certificado"
 
-#: datas/nssbackup-config.glade:3759
-#, fuzzy
+#: datas/nssbackup-config.glade:3778
 msgid "Choose a key file"
-msgstr "Elija un directorio de origen"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3831
-#, fuzzy
+#: datas/nssbackup-config.glade:3850
 msgid "Test _mail settings"
-msgstr "Comprobar las configuraciones de correo-e"
+msgstr ""
 
-#: datas/nssbackup-config.glade:3872
+#: datas/nssbackup-config.glade:3891
 msgid "Report"
 msgstr "Informe"
 
-#: datas/nssbackup-config.glade:3911
+#: datas/nssbackup-config.glade:3930
 msgid "Warning"
 msgstr ""
 
-#: datas/nssbackup-config.glade:3964
+#: datas/nssbackup-config.glade:3983
 msgid "Show help topic about default values."
 msgstr ""
 
-#: datas/nssbackup-config.glade:3997
+#: datas/nssbackup-config.glade:4016
 msgid "_Set"
 msgstr ""
 
 #: datas/nssbackup-restore.glade:26
+#, fuzzy
 msgid ""
-"<b>Using this windows you can manage your backups, restore them, revert an "
-"existing directory to a previous state ...</b>"
+"<b>Using this window you can manage your backups, restore them, revert an "
+"existing directory to a previous state...</b>"
 msgstr ""
 "<b>Usando estas ventanas puede gestionar sus copias de seguridad, "
 "restaurarlas, revertir un directorio a su estado anterior...</b>"
@@ -1839,79 +1861,79 @@ msgstr "<b>Directorio de instantáneas</b>"
 
 #: datas/nssbackup-restore.glade:261
 msgid ""
-"The backups availibily dates have been marked <b>bold</b>. \n"
-"Select them to retrieve the backup list for that date."
+"Dates for which backups have been found are printed <b>bold</b>. Select a "
+"date to retrieve the list of backups for that date."
 msgstr ""
 
-#: datas/nssbackup-restore.glade:326
+#: datas/nssbackup-restore.glade:325
 msgid "<b>Available backups</b>"
 msgstr "<b>Copias de seguridad disponibles</b>"
 
-#: datas/nssbackup-restore.glade:409
+#: datas/nssbackup-restore.glade:408
 msgid "<b>Snapshot details</b>"
 msgstr "<b>Detalles de instantáneas</b>"
 
-#: datas/nssbackup-restore.glade:463
+#: datas/nssbackup-restore.glade:462
 msgid "Restore As"
 msgstr "Restaurar como"
 
-#: datas/nssbackup-restore.glade:508
+#: datas/nssbackup-restore.glade:507
 msgid "Restore"
 msgstr "Restaurar"
 
-#: datas/nssbackup-restore.glade:549
+#: datas/nssbackup-restore.glade:548
 msgid "Revert As"
 msgstr "Revertir como"
 
-#: datas/nssbackup-restore.glade:596
+#: datas/nssbackup-restore.glade:595
 msgid "Revert"
 msgstr "Revertir"
 
-#: datas/nssbackup-restore.glade:627
+#: datas/nssbackup-restore.glade:626
 msgid "<b>Restoration Management</b>"
 msgstr "<b>Gestión de restauraciones</b>"
 
-#: datas/nssbackup-restore.glade:663
+#: datas/nssbackup-restore.glade:662
 msgid "Choose to upgrade your snapshot if needed."
 msgstr "Elija actualizar su instantánea si lo necesita."
 
-#: datas/nssbackup-restore.glade:700
+#: datas/nssbackup-restore.glade:699
 msgid "Upgrade"
 msgstr "Actualizar"
 
-#: datas/nssbackup-restore.glade:746
+#: datas/nssbackup-restore.glade:745
 msgid "Actual base :"
 msgstr "Base actual :"
 
-#: datas/nssbackup-restore.glade:782
+#: datas/nssbackup-restore.glade:781
 msgid "Rebase"
 msgstr ""
 
-#: datas/nssbackup-restore.glade:808
+#: datas/nssbackup-restore.glade:807
 msgid "Select a snapshot and change its base to another snapshot."
 msgstr "Seleccione una instantánea y cambie su base a otra instantánea."
 
-#: datas/nssbackup-restore.glade:833
+#: datas/nssbackup-restore.glade:832
 msgid "Select a snapshot on this list to rebase on it."
 msgstr ""
 
-#: datas/nssbackup-restore.glade:867
+#: datas/nssbackup-restore.glade:866
 msgid "<b>Snapshot History</b>"
 msgstr "<b>Historial de instantáneas</b>"
 
-#: datas/nssbackup-restore.glade:907
+#: datas/nssbackup-restore.glade:906
 msgid "Delete the current snapshot ?"
 msgstr "¿Eliminar instantánea actual?"
 
-#: datas/nssbackup-restore.glade:942
+#: datas/nssbackup-restore.glade:941
 msgid "Delete"
 msgstr "Eliminar"
 
-#: datas/nssbackup-restore.glade:975
+#: datas/nssbackup-restore.glade:974
 msgid "<b>Snapshot Management</b>"
 msgstr "<b>Gestión de instantáneas</b>"
 
-#: datas/nssbackup-restore.glade:1002
+#: datas/nssbackup-restore.glade:1001
 msgid "<b>Export Management</b>"
 msgstr "<b>Gestión de exportaciones</b>"
 
@@ -1946,12 +1968,8 @@ msgstr ""
 "\n"
 "Utilice simple-restore-gnome para mayor facilidad de uso.\n"
 
-#, fuzzy
-#~ msgid "Set default settings ..."
-#~ msgstr "Comprobar las configuraciones de correo-e"
-
-#~ msgid "Regex"
-#~ msgstr "Expresión regular"
+#~ msgid "No directory to backup !"
+#~ msgstr "¡ Falta directorio para copia de seguridad !"
 
 #~ msgid "Set the reciever of this mail"
 #~ msgstr "Establecer receptor de este correo"
@@ -1961,63 +1979,67 @@ msgstr ""
 #~ "Seleccione la opción de SSL (smtptls=1) para poder usar certificado y "
 #~ "clave"
 
-#~ msgid "Use default backup directory (/var/backup)"
-#~ msgstr "Use directorio de respaldo por defecto (/var/backup)"
-
-#~ msgid "NSsbackup configuration error"
-#~ msgstr "Error en la configuración de NSsbackup"
-
 #~ msgid "Save to file ..."
 #~ msgstr "Guardar al archivo..."
 
-#~ msgid "gtk-yes"
-#~ msgstr "gtk-yes"
+#~ msgid "Target '%s' directory is excluded"
+#~ msgstr "El directorio objetivo '%s' se excluye"
 
-#~ msgid "gtk-no"
-#~ msgstr "gtk-no"
+#~ msgid "'%(file)s' doesn't exist, it has to be exclude "
+#~ msgstr "El archivo '%(file)s' no existe, se tiene que excluir "
 
-#~ msgid "gtk-add"
-#~ msgstr "gtk-add"
-
-#~ msgid "gtk-remove"
-#~ msgstr "gtk-remove"
-
-#~ msgid "gtk-edit"
-#~ msgstr "gtk-edit"
-
-#~ msgid "gtk-close"
-#~ msgstr "gtk-close"
+#~ msgid "Problem with '%(file)s' : %(error)s "
+#~ msgstr "Problema con '%(file)s': %(error)s "
 
 #~ msgid ""
-#~ "Please enter the new profile name in the <b>Profile name</b> entry and "
-#~ "check the <b>Enable</b> checkbox to enable it."
+#~ "We don't have read access to '%(file)s', it has to be exclude : %(error)s "
 #~ msgstr ""
-#~ "Por favor, introduzca el nuevo nombre de perfil en la entrada de "
-#~ "<b>Nombre de perfil</b> y compruebe que está activada la opción de "
-#~ "<b>Activar</b> para habilitarlo."
+#~ "No se tiene permisos de lectura a '%(file)s', se excluyen: %(error)s "
 
-#~ msgid "gtk-cancel"
-#~ msgstr "gtk-cancel"
+#~ msgid ""
+#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > %"
+#~ "(maxsize)s), it has to be exclude "
+#~ msgstr ""
+#~ "El Tamaño de '%(file)s' es mayor que el especificado ( %(filesize)s > %"
+#~ "(maxsize)s), ha de ser excluido. "
 
-#~ msgid "gtk-ok"
-#~ msgstr "gtk-ok"
+#~ msgid "got an error with '%(file)s' : %(error)s"
+#~ msgstr "Ha ocurrido un error con '%(file)s' : %(error)s"
+
+#~ msgid "Ending Backup Session."
+#~ msgstr "Finalizando la Sesion de la Copia de Seguridad."
+
+#~ msgid ""
+#~ "When setting a username (resp password), password (resp username) is "
+#~ "mandatory"
+#~ msgstr ""
+#~ "Al asignar un nombre de usuario (resp. contraseña), se requiere una "
+#~ "contraseña (resp. nombre de usuario)"
+
+#~ msgid "Initializing FUSE FILE ACCESS MANAGER !"
+#~ msgstr "¡Inicializando GESTOR DE ACCESO A ARCHIVOS FUSE!"
+
+#~ msgid "Terminating FUSE FILE ACCESS MANAGER !"
+#~ msgstr "¡Terminando el GESTOR DE ACCESO A ARCHIVOS FUSE!"
+
+#~ msgid "Deleting '%(snp)s' for purge !"
+#~ msgstr "Borrando '%(snp)s' para purgar !"
+
+#~ msgid "Non existing directory : %s"
+#~ msgstr "Directorio no existente: %s"
+
+#~ msgid ""
+#~ "Debug is just for debbuging purpose\n"
+#~ "Info is the recommended setting"
+#~ msgstr ""
+#~ "Debug es para propositos de debbuging\n"
+#~ "Info es la configuracion recomendada"
+
+#~ msgid "Use default backup directory (/var/backup)"
+#~ msgstr "Use directorio de respaldo por defecto (/var/backup)"
 
 #~ msgid "Use recommended backup settings"
 #~ msgstr "Usar parámetros de copia de respaldo recomendados"
-
-#, fuzzy
-#~ msgid ""
-#~ "<small>Do standard backups.Defaults: daily incremental and weekly full "
-#~ "backup to /var/backup of all user files, /etc, /usr/local and /var. \n"
-#~ "Multimedia files, temporary files and files larger than 100 MiB are "
-#~ "excluded.</small>"
-#~ msgstr ""
-#~ "<small>Realizar copias de respaldo estandar.\n"
-#~ "Por defecto: incrementales diarios y copias de respaldo completas "
-#~ "semanales en /var/backup de todos los archivos de usuario, /etc, /usr/"
-#~ "local y /var.\n"
-#~ "Los archivos multimedia, temporales y mayores a 100 Mb serán excluidos.</"
-#~ "small>"
 
 #~ msgid "Use custom backup settings"
 #~ msgstr "Usar ajustes de copia de respaldo personalizados"
@@ -2036,17 +2058,11 @@ msgstr ""
 #~ "<small>No realizar copias de respaldo de sus datos automáticamente. Nota: "
 #~ "esto no previene la realización de copias de respaldo manuales.</small>"
 
-#~ msgid "Add a remote source"
-#~ msgstr "Añadir una fuente remota"
+#~ msgid "Regex"
+#~ msgstr "Expresión regular"
 
-#~ msgid "Test all"
-#~ msgstr "Comprobar todo"
-
-#~ msgid "simply"
-#~ msgstr "simplemente"
-
-#~ msgid "precisely"
-#~ msgstr "precisamente"
+#~ msgid "Mb"
+#~ msgstr "Mb"
 
 #~ msgid "at:"
 #~ msgstr "en"
@@ -2063,26 +2079,6 @@ msgstr ""
 #~ msgid "Minute"
 #~ msgstr "Minuto"
 
-#~ msgid "Time (for admins only)"
-#~ msgstr "Tiempo (sólo para administradores)"
-
-#~ msgid "Log settings"
-#~ msgstr "Configuración del registro"
-
-#, fuzzy
-#~ msgid "server :"
-#~ msgstr "Servidor SMTP:"
-
-#, fuzzy
-#~ msgid "SMTP :"
-#~ msgstr "Puerto SMTP:"
-
-#~ msgid "Parameters"
-#~ msgstr "Parámetros"
-
-#~ msgid "Security"
-#~ msgstr "Seguridad"
-
 #~ msgid "This is a user friendly backup solution for common desktop needs."
 #~ msgstr ""
 #~ "Esta es una solución amigable de copia de seguridad para el usuario medio."
@@ -2090,5 +2086,61 @@ msgstr ""
 #~ msgid "Unable to open target directory.\n"
 #~ msgstr "No se pudo abrir el directorio objetivo.\n"
 
-#~ msgid "Mb"
-#~ msgstr "Mb"
+#~ msgid "NSsbackup configuration error"
+#~ msgstr "Error en la configuración de NSsbackup"
+
+#~ msgid ""
+#~ "Please enter the new profile name in the <b>Profile name</b> entry and "
+#~ "check the <b>Enable</b> checkbox to enable it."
+#~ msgstr ""
+#~ "Por favor, introduzca el nuevo nombre de perfil en la entrada de "
+#~ "<b>Nombre de perfil</b> y compruebe que está activada la opción de "
+#~ "<b>Activar</b> para habilitarlo."
+
+#~ msgid "gtk-no"
+#~ msgstr "gtk-no"
+
+#~ msgid "gtk-yes"
+#~ msgstr "gtk-yes"
+
+#~ msgid "gtk-remove"
+#~ msgstr "gtk-remove"
+
+#~ msgid "gtk-add"
+#~ msgstr "gtk-add"
+
+#~ msgid "gtk-close"
+#~ msgstr "gtk-close"
+
+#~ msgid "gtk-edit"
+#~ msgstr "gtk-edit"
+
+#~ msgid "gtk-ok"
+#~ msgstr "gtk-ok"
+
+#~ msgid "gtk-cancel"
+#~ msgstr "gtk-cancel"
+
+#~ msgid "Time (for admins only)"
+#~ msgstr "Tiempo (sólo para administradores)"
+
+#~ msgid "Test all"
+#~ msgstr "Comprobar todo"
+
+#~ msgid "Add a remote source"
+#~ msgstr "Añadir una fuente remota"
+
+#~ msgid "precisely"
+#~ msgstr "precisamente"
+
+#~ msgid "simply"
+#~ msgstr "simplemente"
+
+#~ msgid "Log settings"
+#~ msgstr "Configuración del registro"
+
+#~ msgid "Security"
+#~ msgstr "Seguridad"
+
+#~ msgid "Parameters"
+#~ msgstr "Parámetros"

@@ -1040,7 +1040,7 @@ class SBconfigGTK(GladeGnomeApp):
 			dialog = gtk.MessageDialog(type=gtk.MESSAGE_QUESTION,
 						flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
 						buttons=gtk.BUTTONS_YES_NO,
-						message_format=_("It seems the path you entered does not exists. Do you want to add this wrong path?"))
+						message_format=_("It seems the path you entered does not exists. Do you want to add this incorrect path?"))
 			response = dialog.run()
 			dialog.destroy()
 			if response == gtk.RESPONSE_NO:
@@ -2091,7 +2091,7 @@ class SBconfigGTK(GladeGnomeApp):
 		if prfName == ConfigManagerStaticData.get_default_profilename():
 			_forbid_default_profile_removal(_("remove"))
 		else :
-			warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n <b>Are you sure to want to delete the '%(name)s' profile ?</b> " % {'name': prfName})
+			warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n <b>Are you sure to want to delete the '%(name)s' profile?</b> " % {'name': prfName})
 			
 			dialog = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_YES_NO)
 			dialog.set_markup(warning)

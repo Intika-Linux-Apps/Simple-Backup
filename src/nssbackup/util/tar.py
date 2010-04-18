@@ -85,7 +85,7 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize=None):
 	elif archType == "bzip2" :
 		options.insert(1,"--bzip2")
 	else :
-		raise SBException (_("Invalid Archive type"))
+		raise SBException (_("Invalid archive type."))
 		
 	if os.getuid() == 0 :
 		options.append("--same-owner")
@@ -101,7 +101,7 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize=None):
 	
 	options.extend(['--file='+sourcear,file])
 	
-	LogFactory.getLogger().debug("Launching TAR with options: %s" % options)
+	LogFactory.getLogger().debug("Launching TAR with options: %s." % options)
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
 		LogFactory.getLogger().debug("output was: " + outStr)
@@ -137,7 +137,7 @@ def extract2(sourcear, fileslist, dest, bckupsuffix=None, additionalOpts=None):
 	elif archType == "bzip2" :
 		options.insert(1,"--bzip2")
 	else :
-		raise SBException (_("Invalid Archive type"))
+		raise SBException (_("Invalid archive type."))
 		
 	if os.getuid() == 0:
 		options.append("--same-owner")
@@ -178,7 +178,7 @@ def appendToTarFile(desttar, fileslist, workingdir, additionalOpts):
 	elif archType == "bzip2" :
 		options.insert(1,"--bzip2")
 	else :
-		raise SBException (_("Invalid Archive type"))
+		raise SBException (_("Invalid archive type."))
 		
 	if additionalOpts and type(additionalOpts) == list :
 		options.extend(additionalOpts)
@@ -231,7 +231,7 @@ def __prepareTarCommonOpts(snapshot):
 	elif snapshot.getFormat() == "none":
 		pass
 	else :
-		LogFactory.getLogger().debug("Defaulting to gzip ! ")
+		LogFactory.getLogger().debug("Setting compression to default 'gzip'.")
 		options.insert(1,"--gzip")
 		archivename+=".gz"
 	
@@ -257,7 +257,7 @@ def __addSplitOpts(snapshot, options, size):
 	@raise SBException: if the snapshot format is other than none
 	"""
 	if snapshot.getFormat() != "none" :
-		raise SBException(_("For the moment split functionality is not compatible with compress option ! "))
+		raise SBException(_("For the moment split functionality is not compatible with compress option."))
 	options.extend(["-L "+ str(size) , "-F "+ Util.getResource("multipleTarScript")])
 	return options
 
@@ -268,7 +268,7 @@ def makeTarIncBackup(snapshot):
 	@param snapshot: the snapshot in which to make the backup
 	@raise SBException: if there was a problem with tar
 	"""
-	LogFactory.getLogger().info(_("Launching TAR to make Inc backup "))
+	LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
@@ -287,8 +287,8 @@ def makeTarIncBackup(snapshot):
 	
 	# For an INC backup the base SNAR file should exists
 	if not os.path.exists( base_snarfile ) :
-		LogFactory.getLogger().error(_("Unable to find the SNAR file to make an Incremental backup"))
-		LogFactory.getLogger().error(_("Falling back to full backup"))
+		LogFactory.getLogger().error(_("Unable to find the SNAR file to make an incremental backup."))
+		LogFactory.getLogger().error(_("Falling back to full backup."))
 		makeTarFullBackup(snapshot)
 	else:
 		shutil.copy( base_snarfile, tmp_snarfile )		
@@ -328,7 +328,7 @@ def makeTarFullBackup(snapshot):
 
 	@raise SBException: if there was a problem with tar
 	"""
-	LogFactory.getLogger().info(_("Launching TAR to make a Full backup "))
+	LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
@@ -364,11 +364,11 @@ def makeTarFullBackup(snapshot):
 
 	if retVal == 1 :
 		# list-incremental is not compatible with ignore failed read
-		LogFactory.getLogger().warning(_("TAR sent a warning when making the backup : ") + errStr )
+		LogFactory.getLogger().warning(_("TAR returned a warning during the backup process: ") + errStr )
 	elif retVal != 0 :
 		# list-incremental is not compatible with ignore failed read
-		LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
-		raise SBException(_("Couldn't make a proper backup : ") + errStr )
+		LogFactory.getLogger().error(_("Couldn't make a proper backup: ") + errStr )
+		raise SBException(_("Couldn't make a proper backup: ") + errStr )
 
 	
 def get_dumpdir_from_list(lst_dumpdirs, filename):
@@ -386,12 +386,12 @@ def get_dumpdir_from_list(lst_dumpdirs, filename):
 	_res = None
 
 	if not isinstance(lst_dumpdirs, list):
-		raise TypeError("Given list of dumpdirs must be of type list! Got %s "\
+		raise TypeError("Given list of dumpdirs must be of type list. Got %s "\
 					    "instead." % type(lst_dumpdirs))
 	for _ddir in lst_dumpdirs:
 		if not isinstance(_ddir, Dumpdir):
 			raise TypeError("Element in list of dumpdirs must be of type "\
-							"Dumpdir! Got %s instead." % type(_ddir))
+							"Dumpdir. Got %s instead." % type(_ddir))
 
 		if _ddir.getFilename() == filename:
 			_res = _ddir
@@ -464,7 +464,7 @@ class Dumpdir(object):
 			raise TypeError(_("Line must be a string"))
 		line = line.strip("\0")
 		if len(line) < 2:
-			raise ValueError("Line must contain 2 characters at minimum!")
+			raise ValueError("Line must contain 2 characters at minimum.")
 		self.control = line[0]
 		self.filename = line[1:]
 
@@ -564,7 +564,7 @@ class SnapshotFile(object):
 				fd = open(self.snpfile, 'a+')
 				fd.close()
 			else :
-				raise SBException(_("'%s' doesn't exist ") % filename)
+				raise SBException(_("File '%s' does not exist.") % filename)
 
 	def __str__(self):
 		_str = [ "Snapshot file",
@@ -693,7 +693,7 @@ class SnapshotFile(object):
 			while n < 2 :
 				c = fd.read(1)
 				if len(c) != 1:
-					raise SBException(_("The snarfile header is incomplete !"))
+					raise SBException(_("The snarfile header is incomplete."))
 				if c == '\0' : n += 1
 			
 			currentline=""
@@ -729,7 +729,7 @@ class SnapshotFile(object):
 			while n < 2 :
 				c = fd.read(1)
 				if len(c) != 1:
-					raise SBException(_("The snarfile header is incomplete !"))
+					raise SBException(_("The snarfile header is incomplete."))
 				if c == '\0' : n += 1
 				header += c
 		else :
@@ -788,7 +788,7 @@ class SnapshotFile(object):
 		for dumpdir in contentList:
 			if not isinstance(dumpdir, Dumpdir):
 				raise TypeError("Contentlist must contain elements of type "\
-							    "'Dumdir'! Got %s instead." % type(dumpdir))
+							    "'Dumdir'. Got %s instead." % type(dumpdir))
 			result += dumpdir.getControl()+dumpdir.getFilename()+self.__SEP
 		
 		return result
@@ -1094,7 +1094,7 @@ class ProcSnapshotFile(SnapshotFileWrapper):
 		for f in self.__snapshotFile.parseFormat2():
 			if f[SnapshotFile.REC_DIRNAME].rstrip(os.sep) == dirpath.rstrip(os.sep) :
 				return f[SnapshotFile.REC_CONTENT]
-		raise SBException(_("Non existing directory : %s") % dirpath)
+		raise SBException(_("Directory does not exist: %s.") % dirpath)
 			
 	def getFirstItems(self):
 		"""

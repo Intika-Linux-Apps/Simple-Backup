@@ -36,7 +36,7 @@ PYTHON=`which python`
 #
 # available languages UI
 #
-PO=ar bg ca cs de en_GB es fr gl he hu id it lv ms nb nl pl pt pt_BR ru sv tr uk zh_CN zh_TW
+PO=ar bg ca cs de en_GB es fi fr gl he hu id it lv ms nb nl oc pl pt pt_BR ru sv tr uk zh_CN zh_TW
 
 #
 # available languages Help/Manual
@@ -159,11 +159,11 @@ po-dir:
 	set -e; for lang in $(PO); do mkdir -p po/$$lang/LC_MESSAGES/ ; done
 
 po-data: po-dir
-	set -e; for lang in $(PO); do msgfmt po/nssbackup-$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
+	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 	
 po-gen:
 	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.desktop scripts/*.py
-	set -e; for lang in $(PO); do msgmerge -U po/nssbackup-$$lang.po po/nssbackup.pot; done
+	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/nssbackup.pot; done
 
 # Purpose of this target is to print some informational data
 show-infos:

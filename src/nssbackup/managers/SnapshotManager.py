@@ -990,7 +990,7 @@ class SnapshotManager(object):
 			purge = 0
 		if purge > 0:
 			self.logger.info("Simple purge - remove all backups older "\
-							 "then %s days" % purge)
+							 "then %s days." % purge)
 			snapshots = self.get_snapshots()
 			for snp in snapshots:
 				self.logger.debug("Checking snapshot '%s' for simple purge!" % snp)
@@ -1000,7 +1000,7 @@ class SnapshotManager(object):
 															date['day']) ).days
 				if age > purge:
 					self.logger.debug("Snapshot '%s' is older than %s days "\
-									  "-> will be removed!" % (snp, purge))
+									  "-> will be removed." % (snp, purge))
 					try:
 						self.removeSnapshot(snp)
 					except RemoveFullSnpForbidden, exc:

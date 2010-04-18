@@ -601,7 +601,7 @@ Do you want to save the configuration now?</property>
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">This dialog helps you to manage your configuration profiles. You can set up a number of configuration profile that will be run by NSsbackup when it starts the backup. Thanks to this you can configure backup of different kinds to different places.</property>
+                <property name="label" translatable="yes">This dialogue helps you to manage your configuration profiles. You can set up a number of configuration profiles that will be run by NSsbackup when it starts the backup. Thanks to this you can configure backups of different kinds to different places.</property>
                 <property name="use_markup">True</property>
                 <property name="wrap">True</property>
                 <property name="width_chars">0</property>
@@ -2773,7 +2773,7 @@ Expressions</property>
                                 <property name="no_show_all">True</property>
                                 <property name="xpad">5</property>
                                 <property name="ypad">5</property>
-                                <property name="label" translatable="yes">&lt;i&gt;The selected destination is not writeable with current permissions. The backups can not be written there.&lt;/i&gt;</property>
+                                <property name="label" translatable="yes">&lt;i&gt;The selected destination is not writeable with current permissions. Backups cannot be stored there.&lt;/i&gt;</property>
                                 <property name="use_markup">True</property>
                                 <property name="justify">center</property>
                                 <property name="wrap">True</property>
@@ -3089,7 +3089,7 @@ monthly</property>
                                     <property name="spacing">6</property>
                                     <child>
                                       <widget class="GtkRadioButton" id="purgeradiobutton">
-                                        <property name="label" translatable="yes">Simple cutoff: Erase all backups older than</property>
+                                        <property name="label" translatable="yes">Simple cut-off: Erase all backups older than</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -3172,7 +3172,7 @@ monthly</property>
                                     <child>
                                       <widget class="GtkLabel" id="purgelabel2">
                                         <property name="visible">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;Keep progressivelly less backups into the past:
+                                        <property name="label" translatable="yes">&lt;small&gt;Keep progressively less backups into the past:
 Keep all backups from yesterday.
 Keep one backup per day from last week.
 Keep one backup per week from last month.
@@ -3360,8 +3360,7 @@ Erase all other backups.&lt;/small&gt;</property>
                                         <property name="visible">True</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip" translatable="yes">Debug is just for debbuging purpose
-Info is the recommended setting</property>
+                                        <property name="tooltip" translatable="yes">Debug is just for debbuging purpose. Info is the recommended setting.</property>
                                         <property name="items">Debug
 Info
 Warning

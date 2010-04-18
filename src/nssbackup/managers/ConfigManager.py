@@ -544,8 +544,8 @@ class ConfigManager(ConfigParser.ConfigParser):
 				if type(remotes) == str :
 					remotes = eval(remotes)
 				if type(remotes) != dict :
-					raise SBException(_("Couldn't evaluate '%(parameter)s' as "\
-							"a dictionary (value got = '%(value)r' )") \
+					raise SBException(_("Unable to evaluate '%(parameter)s' as "\
+							"a dictionary (value got = '%(value)r').") \
 							% {'parameter': remotes,'value': type(remotes)})
 				if not remotes.has_key(option) :
 					# then it wasn't for us , fall back on the parent
@@ -579,7 +579,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 			if type(remotes) == str :
 				remotes = eval(remotes)
 			if type(remotes) != dict :
-				raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': remotes,'value': type(remotes)})
+				raise SBException(_("Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r').") % {'parameter': remotes,'value': type(remotes)})
 			return remotes
 		else :
 			#fall back in parent behaviour
@@ -1101,23 +1101,25 @@ class ConfigManager(ConfigParser.ConfigParser):
 		@raise SBException: the error message why it didn't run
 		
 		@todo: Not the right place for this kind of functionality?!?
-		
+		@todo: Implement specific `MailError` exception.
 		"""
 		if not self.has_option("report", "to"):
 			raise SBException (_("No receiver set."))
 		if not self.has_option("report","smtpserver") :
 			raise SBException (_("No SMTP server set."))
 		
-		if (self.has_option("report","smtpuser") and not self.has_option("report","smtppassword") ) \
-			or (not self.has_option("report","smtpuser") and self.has_option("report","smtppassword") ) :
-			raise SBException (_("When setting a username (resp password), password (resp username) is mandatory"))
+		if (self.has_option("report","smtpuser") and not self.has_option("report","smtppassword")):
+			raise SBException (_("Username set but no password specified."))
+		
+		if (not self.has_option("report","smtpuser") and self.has_option("report","smtppassword")):
+			raise SBException (_("Password set but no username specified."))
 		
 		if not self.has_option("report", "smtptls") and (self.has_option("report", "smtpcert") or self.has_option("report","smtpkey)") ) :
-			raise SBException (_("SSL option (smtptls=1) is not set while a certificate and key file is given.\nSelect SSL in order to use Certificate and Key"))
+			raise SBException (_("A certificate and key file is given while SSL option (smtptls=1) is not set.\nSelect SSL in order to use Certificate and Key."))
 		
 		if self.has_option("report", "smtptls") and ((self.has_option("report","smtpcert") and not self.has_option("report","smtpkey") ) \
 			or (not self.has_option("report","smtpcert") and self.has_option("report","smtpkey") ) ):
-			raise SBException (_("When setting a ssl certificate (resp key), key (resp certificate) is mandatory"))
+			raise SBException (_("When specifying a SSL certificate or key file, a key file resp. certificate is mandatory."))
 		
 		try :
 			server = smtplib.SMTP()

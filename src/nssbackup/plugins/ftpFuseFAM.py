@@ -125,7 +125,7 @@ class ftpFuseFAM (pluginFAM)  :
 	def getdoc(self):
 		"""Returns a short documentation of this plugin.
 		"""
-		doc = _("FTP schema is like : ftp://user:pass@server/anything") 
+		doc = _("FTP schema is: ftp://user:pass@server/anything") 
 		return doc
 
 	def checkifmounted(self,source, mountbase):

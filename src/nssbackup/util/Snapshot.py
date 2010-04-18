@@ -111,7 +111,7 @@ class Snapshot(object):
 	def getName(self) :
 		" return the name of the snapshot (ie the dir name)"
 		if not self.__name : 
-			raise SBException(_("Snapshot is inconsistant : __name is not set "))
+			raise SBException(_("Snapshot is inconsistent: __name is not set "))
 		else :
 			return self.__name
 
@@ -216,7 +216,7 @@ class Snapshot(object):
 	def getPath(self) :
 		"return the complete path of the snapshot"
 		if not self.__snapshotpath : 
-			raise SBException(_("Snapshot is inconsistant : __snapshotpath is not set "))
+			raise SBException(_("Snapshot is inconsistent: __snapshotpath is not set "))
 		else :
 			return self.__snapshotpath
 	
@@ -244,7 +244,7 @@ class Snapshot(object):
 				if self.isfull():
 					raise AssertionError("Assertion failed when retrieving "\
 							"snapshot's base: A full backup ('%s') should not "\
-							"have a base file!" % self)
+							"have a base file." % self)
 				self.__base = FAM.readfile(basefile).strip()
 		return self.__base
 	
@@ -314,7 +314,7 @@ class Snapshot(object):
 					int(ver[2])
 				except Exception:
 					FAM.delete(self.getPath()+os.sep +"ver")
-					raise SBException (_("%(file)s doesn't contain valid value ! Ignoring incomplete or non-backup directory. ") % {"file" : self.getPath()+ os.sep +"ver"})
+					raise SBException (_("%(file)s doesn't contain valid value. Ignoring incomplete or non-backup directory. ") % {"file" : self.getPath()+ os.sep +"ver"})
 				self.__version = ver[:3]
 				return self.__version
 	
@@ -458,7 +458,7 @@ class Snapshot(object):
 		if self.isfull():
 			self.__base = None
 			self.__baseSnapshot = None
-			raise SBException("Base cannot be set for full snapshot!")
+			raise SBException("Base cannot be set for full snapshot.")
 		if not self.__isValidName(baseName) :
 			raise SBException (_("Name of base not valid : %s") % self.__name)
 		# set the name and clean the baseSnapshot
@@ -508,7 +508,7 @@ class Snapshot(object):
 		if not self.__isValidName(self.__name) :
 			raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
 		if  not FAM.exists( os.path.join(self.getPath(), "ver") ):
-			raise NotValidSnapshotException (_("The mandatory 'ver' file doesn't exist in [%s]") % self.getName())
+			raise NotValidSnapshotException (_("The mandatory 'ver' file doesn't exist in [%s].") % self.getName())
 		
 	def __isValidName(self, name ) :
 		" Check if the snapshot name is valid "
@@ -542,13 +542,13 @@ class Snapshot(object):
 		"""
 		if self.isfull():
 			self.logger.debug("WARNING: Attempt of committing base file for "\
-							  "full snapshot '%s'!" % self.getName())
+							  "full snapshot '%s'." % self.getName())
 		else:	
 			if self.getBase() :
 				FAM.writetofile(self.getPath()+os.sep +"base", self.getBase())
 			else:
 			# base file was not found or base wasn't set. It MUST be full backup
-				raise SBException(_("Base name must be set for inc backup !"))
+				raise SBException(_("Base name must be set for incremental backup."))
 		
 	def commitexcludefile(self):
 		"""

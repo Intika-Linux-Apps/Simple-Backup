@@ -275,7 +275,7 @@ class UpgradeManager(object):
 		self.statusNumber = 0.90
 		self.logger.info("Creating the SNAR file ")
 		if os.path.exists(snapshot.getSnarFile()) :
-			self.logger.warning(_("The SNAR file alredy exist for snapshot '%s', I'll not overide it") % str(snapshot))
+			self.logger.warning(_("The SNAR file already exist for snapshot '%s'. It is not overwritten.") % str(snapshot))
 		else :
 			snarfileinfo = snapshot.getSnapshotFileInfos(writeFlag=True)
 			if not isEmpty :
