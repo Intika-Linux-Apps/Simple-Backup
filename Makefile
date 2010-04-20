@@ -25,13 +25,13 @@
 # grab name and current version
 #
 METAFILE="METAINFO"
-VERSION=`grep "^VERSION=" $(METAFILE)|cut -d "=" -f 2 -`
-PKGNAME=`grep "^PKGNAME=" $(METAFILE)|cut -d "=" -f 2 -`
+VERSION=$(shell grep "^VERSION=" $(METAFILE)|cut -d "=" -f 2 -)
+PKGNAME=$(shell grep "^PKGNAME=" $(METAFILE)|cut -d "=" -f 2 -)
 
 #
-# retrieve used version of Python interpreter
+# retrieve used version of Python interpreter/path to Python interpreter
 #
-PYTHON=`which python`
+PYTHON=$(shell which python)
 
 #
 # available languages UI
@@ -54,13 +54,17 @@ SBIN=$(DESTDIR)/sbin
 
 SETUP.PY_OPTS=--root=/
 
+# should we add layout option always?
 UbuntuVersion=$(shell lsb_release -rs)
 # if we use jaunty or karmic
 ifneq (,$(findstring 9.04,$(UbuntuVersion)))
-    LAYOUT="--install-layout=deb"
+    LAYOUT=--install-layout=deb
 endif
 ifneq (,$(findstring 9.10,$(UbuntuVersion)))
-    LAYOUT="--install-layout=deb"
+    LAYOUT=--install-layout=deb
+endif
+ifneq (,$(findstring 10.04,$(UbuntuVersion)))
+    LAYOUT=--install-layout=deb
 endif
 
 	
@@ -77,7 +81,7 @@ install: install-po install-help install-bin install-sbin install-package
 fill-templates:
 	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/ressources.in > src/nssbackup/ressources
 	set -e; sed s+@version@+$(VERSION)+ setup.py.in > setup.py.tmp
-	set -e; sed s+@pkgname@+$(PKGNAME)+ setup.py.in > setup.py
+	set -e; sed s+@pkgname@+$(PKGNAME)+ setup.py.tmp > setup.py
 	set -e; sed s+@version@+$(VERSION)+ src/nssbackup/metainfo.in > src/nssbackup/metainfo.tmp
 	set -e; sed s+@pkgname@+$(PKGNAME)+ src/nssbackup/metainfo.tmp > src/nssbackup/metainfo
 	rm -f src/nssbackup/metainfo.tmp

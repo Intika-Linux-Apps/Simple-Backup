@@ -20,6 +20,8 @@ python-setuptools
 pyGTK (>= 2.10)
 
 * On Ubuntu:
+  sudo apt-get install gettext
+  
   sudo apt-get install python-notify fuse-utils python-gnome python-glade\
                        python-gtk
 

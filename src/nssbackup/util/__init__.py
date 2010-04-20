@@ -191,7 +191,7 @@ def _prepare_nssb_copy(src, dst):
 	return retval
 	
 
-def getResource(resourceName, isFile=False):
+def __get_resource(resource_name, is_file=False):
 	"""Looks for certain resources installed by nssbackup.
 	The installation script writes into the 'resources' file where
 	the files/resources are being stored.
@@ -203,25 +203,47 @@ def getResource(resourceName, isFile=False):
 	@note: The file 'ressources' is required to be located in the
 			root directory of the nssbackup package. 
 	"""
+	_rsrc_file = "ressources"
+#	print "Debug: Looking for '%s' (isFile=%s)" % (resourceName, isFile)
 	tmp = inspect.getabsfile(nssbackup)
-	resfile = file(os.sep.join([os.path.dirname(tmp), "ressources"]), "r")
+	resfile = file(os.path.join(os.path.dirname(tmp), _rsrc_file), "r")
 	resfilelines = resfile.readlines()
 	resfile.close()
 	
 	for _dir in resfilelines:
 		_dir = _dir.strip()
-		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
+#		print "Debug: Searching in directory '%s'" % _dir
 		if os.path.exists(_dir) and os.path.isdir(_dir):
-			if _dir.endswith(resourceName) and not isFile:
-				return _dir
-			
+			# only directories stored in resource file are considered 
+			if _dir.endswith(resource_name):
+				if not is_file:
+#					print "Debug: Directory found in '%s'" % _dir
+					return _dir
+				
 			_flist = os.listdir(_dir)
-			#LogFactory.getLogger().debug("File list is :" + str(list))
-			for _file in _flist :
-				if _file == resourceName:
-					return os.path.normpath(os.sep.join([_dir, resourceName]))
+#			print "Debug: directory listing is :" + str(_flist)
+			for _item in _flist:
+				_path = os.path.join(_dir, resource_name)
+				if os.path.exists(_path) and _path.endswith(resource_name):
+					if os.path.isdir(_path):
+						if not is_file:
+#							print "Debug: Directory found in '%s'" % _path
+							return _path
+					else:
+						if is_file:
+#							print "Debug: File found in '%s'" % _path
+							return _path
+
 	raise exceptions.SBException(\
-				"'%s' hasn't been found in the ressource list"% resourceName)
+				"'%s' hasn't been found in the ressource list"% resource_name)
+
+
+def get_resource_file(resource_name):
+	return __get_resource(resource_name, is_file=True)
+
+
+def get_resource_dir(resource_name):
+	return __get_resource(resource_name, is_file=False)
 
 
 def get_version_number():

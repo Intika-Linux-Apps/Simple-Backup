@@ -446,7 +446,6 @@ Files and directories matching this expression will be excluded from backup.</pr
     <property name="border_width">6</property>
     <property name="modal">True</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">nssbackup-conf.png</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
@@ -579,7 +578,6 @@ Do you want to save the configuration now?</property>
     <property name="border_width">6</property>
     <property name="title" translatable="yes">Configuration Profile Manager</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">nssbackup-conf.png</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">nssbackupConfApp</property>
     <property name="has_separator">False</property>
@@ -775,7 +773,6 @@ Do you want to save the configuration now?</property>
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">6</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">nssbackup-conf.png</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="transient_for">ProfileManagerDialog</property>
@@ -930,7 +927,6 @@ Please enter the new profile name and set the according checkbox in order to ena
   <widget class="GnomeApp" id="nssbackupConfApp">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="title" translatable="yes">Not So Simple Backup Suite</property>
-    <property name="icon">nssbackup-conf.png</property>
     <signal name="destroy" handler="on_nssbackupConfApp_destroy"/>
     <signal name="delete_event" handler="on_nssbackupConfApp_delete_event"/>
     <child internal-child="dock">
@@ -3931,7 +3927,6 @@ Error</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">nssbackup-conf.png</property>
     <property name="type_hint">dialog</property>
     <property name="urgency_hint">True</property>
     <property name="has_separator">False</property>

@@ -1,7 +1,7 @@
 #	NSsbackup - snapshot handling
 #
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ class PyNotifyMixin(object):
 		notif = None
 		if self.__pynotif_avail:
 			message = message.replace("<", "&lt;")
-			ico = Util.getResource("nssbackup32x32.png")
+			ico = Util.get_resource_file("nssbackup32x32.png")
 			try:
 				notif = self.__pynotif_mod.Notification(
 								"NSsbackup [%s]" % profilename, message, ico)
@@ -201,7 +201,7 @@ class PyNotifyMixin(object):
 		"""
 		if self.__pynotif_avail:
 			message = message.replace("<", "&lt;")
-			ico = Util.getResource("nssbackup32x32.png")
+			ico = Util.get_resource_file("nssbackup32x32.png")
 			try:
 				self.__notif.update(
 								"NSsbackup [%s]" % profilename, message, ico)

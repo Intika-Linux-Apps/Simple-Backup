@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation; either version 2 of the License, or
@@ -13,12 +16,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-# Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
+
 
 import gettext, sys
 from nssbackup.ui.SBConfigGTK import main
-from nssbackup.util import getResource
+from nssbackup.util import get_resource_dir
 import gtk
 
 #----------------------------------------------------------------------
@@ -26,7 +28,7 @@ import gtk
 if __name__ == '__main__':
 	# i18n init
 	application = 'nssbackup'
-	locale_dir = getResource('locale')
+	locale_dir = get_resource_dir('locale')
     
 	gettext.bindtextdomain(application, locale_dir)
 	gettext.textdomain(application)

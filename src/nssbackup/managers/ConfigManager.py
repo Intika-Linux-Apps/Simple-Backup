@@ -1197,7 +1197,7 @@ class ConfigManagerStaticData(object):
 	__cronheader = "SHELL=/bin/bash \n"\
 		"PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n"
 		
-	__schedule_script_file = Util.getResource("nssbackup", isFile = True)
+	__schedule_script_file = Util.get_resource_file("nssbackup")
 
 	__default_profilename = _("Default Profile")
 	__unknown_profilename = _("Unknown Profile")

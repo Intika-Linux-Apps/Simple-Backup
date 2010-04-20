@@ -191,7 +191,7 @@ class SBconfigGTK(GladeGnomeApp):
 		self._fill_widgets_from_config(probe_fs = True)
 
 	def _init_ui(self):		
-		filename = Util.getResource('nssbackup-config.glade')		
+		filename = Util.get_resource_file('nssbackup-config.glade')		
 		widget_list = [
 			'nssbackupConfApp',
 			'toolbar',
@@ -450,7 +450,7 @@ class SBconfigGTK(GladeGnomeApp):
 		top_window = 'nssbackupConfApp'
 		GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window,
 														widget_list, handlers)
-		self.widgets['nssbackupConfApp'].set_icon_from_file(Util.getResource("nssbackup-conf.png"))
+		self.widgets['nssbackupConfApp'].set_icon_from_file(Util.get_resource_file("nssbackup-conf.png"))
 
 
 	def isConfigChanged(self, force_the_change = False):
@@ -1095,7 +1095,7 @@ class SBconfigGTK(GladeGnomeApp):
 		about.set_translator_credits(Infos.TRANSLATORS)
 		about.set_authors(Infos.AUTHORS)
 		about.set_website(Infos.WEBSITE)
-		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.getResource("nssbackup-conf.png")))
+		about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.get_resource_file("nssbackup-conf.png")))
 		about.run()
 		about.destroy()
 

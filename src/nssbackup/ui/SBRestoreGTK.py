@@ -163,7 +163,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
 
 	def init(self, parent = None):
-		_gladefile = Util.getResource('nssbackup-restore.glade')
+		_gladefile = Util.get_resource_file('nssbackup-restore.glade')
 
 		_wdgt_lst = [
 			'restorewindow',
@@ -230,7 +230,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 							  handlers = _hdls, root = _top_win_name,
 							  parent = parent, pull_down_dict=None )
 		self.set_top_window( self.widgets[_top_win_name] )
-		self.top_window.set_icon_from_file(Util.getResource("nssbackup-restore.png"))
+		self.top_window.set_icon_from_file(Util.get_resource_file("nssbackup-restore.png"))
 
 	def __init_statusbar(self):
 		"""Initializes the statusbar, i.e. gets the context (here
@@ -830,7 +830,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 		self._init_pulse()
 		
 	def init(self, parent):
-		_gladefile = Util.getResource('nssbackup-restore.glade')
+		_gladefile = Util.get_resource_file('nssbackup-restore.glade')
 
 		_wdgt_lst = [
 			'restoreDialog',
@@ -852,7 +852,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 							  parent = parent, pull_down_dict = None )
 		self.set_top_window( self.widgets[_top_win_name] )
 		self.top_window.set_icon_from_file(\
-									Util.getResource("nssbackup-restore.png"))
+									Util.get_resource_file("nssbackup-restore.png"))
 		
 	def _on_button_close_clicked(self, *args):
 		"""Event handler for clicking the close button.

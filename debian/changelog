@@ -1,16 +1,23 @@
 nssbackup (0.2-0~rc9-ppa1) karmic; urgency=high
 
-  * [FIX] LP Bug #526544: cron servicefile was not found
+  * [FIX] LP Bug #330387: cosmetic errors (typos and spelling).
+          Thanks to ciaran.mooney.
+  * [FIX] LP Bug #503597: prediction of required space in case of incremental
+          snapshots
+  * [FIX] LP Bug #526544: cron service file was not found
   * [FIX] LP Bug #512007: add fuse allow_other option to ssh plugin
   * [FIX] LP Bug #382753: NSSBackup doesn't exclude folders with special
           characters
+  * [FIX] problems related to the removal of snapshots containing read-only
+          files fixed
+  * [FIX] re-base issues fixed
   * [FIX] not translatable strings added
   * [FIX] avoid definition of exclude expressions containing a comma
           (delimiter in config) from GUI
-  * [FIX] avoid multiple definition of exclude expressions (filetypes, regex)
+  * [FIX] avoid multiple definition of exclude expressions (file types, regex)
   * [FIX] enable 'Save as...' of configuration always
   * [FIX] default backup target is created if it does not exist
-  * [FIX] unified behaviour on close (using the menu, the window close button
+  * [FIX] unified behavior on close (using the menu, the window close button
           etc.)
   * [FIX] added check before test mail settings
   * [FIX] split size corrected (1 GiB = 1024 MiB)
@@ -27,10 +34,10 @@ nssbackup (0.2-0~rc9-ppa1) karmic; urgency=high
   * [FIX] moved max. incr. interval in configuration GUI to main page
   * [FIX] Scheduling only for default-profiles
   * [FIX] some issues with Scheduling fixed (removal, updating)
-  * [Change] add info to statusbar when running in 'Administrator mode'
+  * [Change] add info to status bar when running in 'Administrator mode'
   * [Change] unified storage of name and version of package (in file METAINFO)
   * [Change] added possibility to cancel the closing if config has changed
-  * [Change] behaviour changed for 'Add profile' when entering non-valid
+  * [Change] behavior changed for 'Add profile' when entering non-valid
              names - dialog remains open
   * [Change] Removal of the 'main' options from the general page. Each setup
              is now considered as custom setup that was started from a default
@@ -39,7 +46,7 @@ nssbackup (0.2-0~rc9-ppa1) karmic; urgency=high
   * [Change] schedule page simplified (precise option removed)
   * [Enhancement] Help implemented
  
- -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 25 Mar 2010 17:41:23 +0100
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Tue, 20 Apr 2010 12:35:39 +0200
 
 nssbackup (0.2-0~rc8-ppa1) hardy; urgency=low
 

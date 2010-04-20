@@ -97,7 +97,7 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize=None):
 		options.append("--suffix="+bckupsuffix)
 	
 	if splitsize :
-		options.extend(["-L "+ str(splitsize) , "-F "+ Util.getResource("multipleTarScript")])
+		options.extend(["-L "+ str(splitsize) , "-F "+ Util.get_resource_file("multipleTarScript")])
 	
 	options.extend(['--file='+sourcear,file])
 	
@@ -258,7 +258,7 @@ def __addSplitOpts(snapshot, options, size):
 	"""
 	if snapshot.getFormat() != "none" :
 		raise SBException(_("For the moment split functionality is not compatible with compress option."))
-	options.extend(["-L "+ str(size) , "-F "+ Util.getResource("multipleTarScript")])
+	options.extend(["-L "+ str(size) , "-F "+ Util.get_resource_file("multipleTarScript")])
 	return options
 
 
