@@ -162,7 +162,7 @@ rm -rf "$EXPORTDESTDIR/.pydevproject"
 rm -rf "$EXPORTDESTDIR/.project"
 rm -rf "$EXPORTDESTDIR/.settings"
 rm -rf "$EXPORTDESTDIR/setup.py"
-rm -rf "$EXPORTDESTDIR/src/nssbackup/ressources"
+rm -rf "$EXPORTDESTDIR/src/nssbackup/resources"
 rm -rf "$EXPORTDESTDIR/src/nssbackup/metainfo"
 
 # 'tests', 'tools', and 'doc' are removed; later re-add 'doc' when build

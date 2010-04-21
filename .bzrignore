@@ -1,4 +1,3 @@
-./src/nssbackup/ressources
 ./build
 ./setup.py
 ./po/ar
@@ -8,6 +7,7 @@
 ./po/de
 ./po/en_GB
 ./po/es
+./po/fi
 ./po/fr
 ./po/gl
 ./po/he
@@ -19,6 +19,7 @@
 ./po/nb
 ./po/nl
 ./po/ms
+./po/oc
 ./po/lv
 ./po/sv
 ./po/tr
@@ -31,6 +32,5 @@
 ./po/pt_BR
 ./po/ru
 ./src/nssbackup.egg-info
-metainfo
-fi
-oc
+./src/nssbackup/metainfo
+./src/nssbackup/resources

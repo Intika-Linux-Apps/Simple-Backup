@@ -79,7 +79,7 @@ install: install-po install-help install-bin install-sbin install-package
 	chmod +x $(DATADIR)/nssbackup/nssbackup
 
 fill-templates:
-	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/ressources.in > src/nssbackup/ressources
+	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/resources.in > src/nssbackup/resources
 	set -e; sed s+@version@+$(VERSION)+ setup.py.in > setup.py.tmp
 	set -e; sed s+@pkgname@+$(PKGNAME)+ setup.py.tmp > setup.py
 	set -e; sed s+@version@+$(VERSION)+ src/nssbackup/metainfo.in > src/nssbackup/metainfo.tmp
@@ -155,7 +155,8 @@ clean:
 	set -e; find . -name '*~' -exec rm -f '{}' \;
 	set -e; find . -name '*.bak' -exec rm -f '{}' \;
 	rm -rf build dist setup.py
-	rm -f src/nssbackup/ressources
+	rm -f src/nssbackup/resources
+	rm -f src/nssbackup/metainfo
 	rm -rf src/nssbackup.egg-info
 	set -e; for lang in $(PO); do rm -rf po/$$lang ; done
 	

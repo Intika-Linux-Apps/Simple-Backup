@@ -122,7 +122,9 @@ def copyfile(src, dest ):
 
 
 def exists(  uri ):
-	" checks if the given uri exists "
+	"""checks if the given uri exists.
+	@todo: Add check `os.path.exists()`.
+	"""
 	return os.access( uri, os.F_OK )
 
 

@@ -28,6 +28,9 @@
 
 """
 
+_RSRC_FILE = "resources"
+
+
 from gettext import gettext as _
 import os
 import subprocess
@@ -200,13 +203,12 @@ def __get_resource(resource_name, is_file=False):
 	@param resourceName: the ressource name, as complete as possible
 	@param isFile: flag whether the resource looked up is a file
 	
-	@note: The file 'ressources' is required to be located in the
+	@note: The resources file is required to be located in the
 			root directory of the nssbackup package. 
 	"""
-	_rsrc_file = "ressources"
 #	print "Debug: Looking for '%s' (isFile=%s)" % (resourceName, isFile)
 	tmp = inspect.getabsfile(nssbackup)
-	resfile = file(os.path.join(os.path.dirname(tmp), _rsrc_file), "r")
+	resfile = file(os.path.join(os.path.dirname(tmp), _RSRC_FILE), "r")
 	resfilelines = resfile.readlines()
 	resfile.close()
 	

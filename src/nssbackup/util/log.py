@@ -19,7 +19,6 @@
 
 import logging
 import os.path
-import os
 import nssbackup.managers.FileAccessManager as FAM
 
 
@@ -34,8 +33,9 @@ class LogFactory(object):
 	created_loggers = []
 	
 	#create formatter
-	formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s:"\
-								  "%(funcName)s(%(lineno)d) - %(message)s")
+	formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
+	debug_formatter = logging.Formatter("%(asctime)s - %(levelname)s in "\
+						"%(module)s.%(funcName)s(%(lineno)d): %(message)s")
 	
 	def __init__(self):
 		pass
@@ -66,9 +66,13 @@ class LogFactory(object):
 		To avoid the overwriting of previous settings, the names of
 		already created loggers are stored.
 		"""
-		if not name :
+		if not name:
 			name = "NSsbackup"
-		
+
+		_formatter = LogFactory.formatter
+		if level == logging.DEBUG:
+			_formatter = LogFactory.debug_formatter
+			
 		#create logger
 		LogFactory.logger = logging.getLogger(name)
 		if name in LogFactory.created_loggers:
@@ -76,12 +80,11 @@ class LogFactory(object):
 		else:
 			LogFactory.created_loggers.append( name )
 			LogFactory.logger.setLevel(level)
-			#create console handler and set level to debug
+			
+			#create console handler and set level and formatter
 			ch = logging.StreamHandler()
 			ch.setLevel(level)
-			#add formatter to ch
-			ch.setFormatter(LogFactory.formatter)
-			#add ch to logger
+			ch.setFormatter(_formatter)
 			LogFactory.logger.addHandler(ch)
 			
 			if logfile:
@@ -98,7 +101,7 @@ class LogFactory(object):
 					FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
 				ch1 = logging.FileHandler(logfile)
 				ch1.setLevel(level)
-				ch1.setFormatter(LogFactory.formatter)
+				ch1.setFormatter(_formatter)
 				LogFactory.logger.addHandler(ch1)
 		return LogFactory.logger
 

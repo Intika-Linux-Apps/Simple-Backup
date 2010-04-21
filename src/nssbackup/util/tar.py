@@ -312,13 +312,7 @@ def makeTarIncBackup(snapshot):
 			LogFactory.getLogger().warning(_("Unable to change permissions for "\
 									  "file '%s'.") % snarfile )
 		os.remove( tmp_snarfile )
-		if retVal == 1 :
-			# list-incremental is not compatible with ignore failed read
-			LogFactory.getLogger().warning(_("TAR sent a warning when making the backup : ") + errStr )
-		elif retVal != 0 :
-			# list-incremental is not compatible with ignore failed read
-			LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
-			raise SBException(_("Couldn't make a proper backup : ") + errStr )
+		__finish_backup(retVal, errStr)
 		
 
 def makeTarFullBackup(snapshot):
@@ -361,14 +355,22 @@ def makeTarFullBackup(snapshot):
 		LogFactory.getLogger().warning(_("Unable to change permissions for "\
 									  "file '%s'.") % snarfile )
 	os.remove( tmp_snarfile )
+	__finish_backup(retVal, errStr)
 
-	if retVal == 1 :
+
+def __finish_backup(exitcode, error_str):
+	_logger = LogFactory.getLogger() 
+	if exitcode == 0:
+		_logger.info(_("TAR finished successful."))
+	elif exitcode == 1:
 		# list-incremental is not compatible with ignore failed read
-		LogFactory.getLogger().warning(_("TAR returned a warning during the backup process: ") + errStr )
-	elif retVal != 0 :
+		_logger.warning(_("TAR returned a warning during the backup process: "\
+						  "%s") % error_str)
+	else:
 		# list-incremental is not compatible with ignore failed read
-		LogFactory.getLogger().error(_("Couldn't make a proper backup: ") + errStr )
-		raise SBException(_("Couldn't make a proper backup: ") + errStr )
+		_errmsg = _("TAR aborted. Unable to make a proper backup: %s") % error_str 
+		_logger.error(_errmsg)
+		raise SBException(_errmsg)
 
 	
 def get_dumpdir_from_list(lst_dumpdirs, filename):

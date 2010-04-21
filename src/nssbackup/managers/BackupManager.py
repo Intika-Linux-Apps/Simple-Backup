@@ -245,7 +245,7 @@ class BackupManager(PyNotifyMixin):
 		self.__fusefam		= FuseFAM(self.config)
 		
 		PyNotifyMixin.__init__(self, self.logger)
-		self.logger.info(_("BackupManager created "))
+		self.logger.debug("Instance of BackupManager created.")
 		
 	def makeBackup(self ):
 		"""Runs the whole backup process:
@@ -262,7 +262,7 @@ class BackupManager(PyNotifyMixin):
 			writes everything into the snapshot directory).
 		9. release lock
 		"""
-		_msg = _("Starting backup Session")
+		_msg = _("Backup process is being started.")
 		self._notify_info(self.__profilename, _msg)
 		self.logger.info(_msg)
 		
@@ -443,8 +443,7 @@ class BackupManager(PyNotifyMixin):
 		"""Remove lockfile.
 		"""
 		FAM.delete(self.__lockfile)
-		self.logger.info(_("Backup process finished (%s removed).")\
-														% self.__lockfile)
+		self.logger.debug("Lock file '%s' removed."	% self.__lockfile)
 
 	def __copylogfile(self):
 		# destination for copying the logfile
@@ -474,12 +473,12 @@ class BackupManager(PyNotifyMixin):
 		successful or not.
 		"""
 		self.__unsetlockfile()
-		self.__copylogfile()
-			
-		self.logger.info(_("Terminating FUSE File Access Manager."))
+		self.__copylogfile()			
 		self.__fusefam.terminate()
-
-		self._notify_info(self.__profilename, _("Backup process finished."))
+		
+		_msg = _("Backup process finished.")
+		self._notify_info(self.__profilename, _msg)
+		self.logger.info(_msg)
 
 	def __checkTarget(self):
 		"""

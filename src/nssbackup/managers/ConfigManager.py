@@ -320,11 +320,11 @@ class ConfigManager(ConfigParser.ConfigParser):
 			self.validateConfigFileOpts()
 
 		if _conffile_used:
-			self.logger.info("ConfigManager created from config file '%s'."\
+			self.logger.info(_("Profile settings are being read from file '%s'.")\
 							  % self.conffile)
 		else :
-			self.logger.info("ConfigManager created with default values. "\
-							 "Config file set to '%s'." % self.conffile)
+			self.logger.info(_("Profile settings are being set to default values. "\
+							 "Configuration file is set to '%s'.") % self.conffile)
 			
 	def __str__(self):
 		retval = []
@@ -707,13 +707,15 @@ class ConfigManager(ConfigParser.ConfigParser):
 			else :
 				self.logger = LogFactory.getLogger(self.getProfileName(), logf)
 
-			self.logger.debug("Log output for [%s] is directed to file '%s'" % (self.getProfileName(), logf))
+			self.logger.info(_("Log output for [%s] is directed to file '%s'.")\
+							    % (self.getProfileName(), logf))
 				
 		# if no file is specified, use the logger's default (no log file)
 		else:
 # TODO: Raise an assertion exception if no log section was found ?!
 			self.logger = LogFactory.getLogger(self.getProfileName())
-			self.logger.debug("Log output for [%s] is not directed to any file" % (self.getProfileName()))
+			self.logger.info(_("Log output for [%s] is not directed into a file.")\
+							    % (self.getProfileName()))
 
 	def read(self, filename=None ):
 		"""Reads the configuration file and returns its content. Moreover it
@@ -826,8 +828,8 @@ class ConfigManager(ConfigParser.ConfigParser):
 				and not self.has_option("schedule", "anacron")):
 			
 			# no entry in configuration found, look at Cron/Anacron directly
-			self.logger.warning("Config file doesn't have schedule infos, "\
-								"probing from filesystem.")
+			self.logger.info(_("No schedule defined in configuration file. "\
+								"Probing from filesystem."))
 			#hourly
 			if os.path.exists("/etc/cron.hourly/nssbackup"):
 				self.logger.debug("Anacron hourly has been found")
@@ -1015,7 +1017,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 			fld = FAM.openfile(self.conffile, True)			
 		self.write(fld)
 		fld.close()
-		if configfile is None:
+		if configfile is None and os.geteuid() == 0:
 			self.__write_schedule()
 	
 	def __write_schedule(self):

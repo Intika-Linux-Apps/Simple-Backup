@@ -50,10 +50,16 @@ as follows:
 
 	declare -x PYTHONPATH="/Path-to-development/0.2/src:"$PYTHONPATH
 
-2. Create a file `ressources` with appropriate content and place it in the
-   package's top level directory. This file is used to locate certain files.
-  
-2. Move to the source directory to run the application you wish
+2. Manually create a file `resources` with appropriate content based on the
+   template file `resources.in` and place it in the package's top level
+   directory (src/nssbackup). This file is usually created during installation
+   and therefore it is required to tweak it by hand for development.
+ 
+3. Analogous to step 2) create a file `metainfo` with appropriate content based
+   on the template file `metainfo.in` and place it in the package's top level
+   directory (src/nssbackup).
+   
+4. Go to the source directory to run the application you wish
 	
 	cd /Path-to-development/0.2/src
 	python nssbackup-config-gui.py
