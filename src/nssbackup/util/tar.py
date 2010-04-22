@@ -361,7 +361,7 @@ def makeTarFullBackup(snapshot):
 def __finish_backup(exitcode, error_str):
 	_logger = LogFactory.getLogger() 
 	if exitcode == 0:
-		_logger.info(_("TAR finished successful."))
+		_logger.info(_("TAR has been finished successfully."))
 	elif exitcode == 1:
 		# list-incremental is not compatible with ignore failed read
 		_logger.warning(_("TAR returned a warning during the backup process: "\

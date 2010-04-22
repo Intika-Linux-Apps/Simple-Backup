@@ -48,6 +48,7 @@ from nssbackup.util.log import LogFactory
 from nssbackup.util import exceptions
 
 from nssbackup.util.tar import SnapshotFile
+from nssbackup.util.tar import Dumpdir
 
 
 class PyNotifyMixin(object):
@@ -1028,6 +1029,7 @@ class FileCollector(object):
 		Files not contained in SNAR file are backuped in any case!
 		(e.g. a directory was added to the includes)
 		"""
+#		self.__logger.debug("%s" % path)
 		_incl_file = False		
 		if self.__isfull:		# full snapshots do not have a base snar file
 			_incl_file = True
@@ -1036,13 +1038,18 @@ class FileCollector(object):
 			ftime = max(self.__fstats.st_mtime,		 
 						self.__fstats.st_ctime)			
 			if path in self.__parent.get_base_snardict():
+#				self.__logger.debug("%s: is in snapshot file." % path)
+#				_sentry = self.__parent.get_base_snardict()[path]
+#				self.__logger.debug("Entry: %s" % _sentry)
+#				if _sentry == Dumpdir.INCLUDED:
 				if ftime > self.__parent.get_base_backup_time():
 					self.__logger.debug("Delta=%s - %s: %s > %s" % ((ftime - self.__parent.get_base_backup_time()),
 																	 path, ftime,
 																	 self.__parent.get_base_backup_time()))
 					_incl_file = True
+					
 			else:
-				self.__logger.debug("%s: No included yet - included." % path)
+				self.__logger.debug("%s: No yet included - included." % path)
 				self.__collect_stats.count_new_file()
 				_incl_file = True
 				

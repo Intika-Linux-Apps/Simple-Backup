@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 #
-Name=NSsbackup Restoration
-Name[de]=NSsbackup Wiederherstellung
+Name=NSsbackup-Restoration
+Name[de]=NSsbackup-Wiederherstellung
 Name[pt_BR]=Restauração de Backup
 Name[es]=Restauración de copia de seguridad
 Name[ja]=バックアップの復元
@@ -18,9 +18,10 @@ GenericName[fr_FR]=Utilitaire de restauration
 GenericName[de]=Backup Wiederherstellung
 GenericName[es]=Herramienta de restauración
 #
-Exec=nssbackup-restore-gui
+Exec=@prefix@/bin/nssbackup-restore-gui
 #
 Terminal=false
 Categories=Utility;
 StartupNotify=false
 Icon=nssbackup-restore
+X-Ubuntu-Gettext-Domain=nssbackup

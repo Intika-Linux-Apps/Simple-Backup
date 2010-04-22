@@ -87,7 +87,7 @@ class GladeGnomeApp(object):
 		except:
 			search_path = './'
 		
-		gnome.program_init(app_name,app_version)
+		gnome.program_init(app_name, app_version)
 		
 		fname = search_file(filename, search_path)
 		self.xml = gtk.glade.XML(fname,domain='nssbackup')

@@ -707,11 +707,13 @@ class ConfigManager(ConfigParser.ConfigParser):
 			else :
 				self.logger = LogFactory.getLogger(self.getProfileName(), logf)
 
-			self.logger.info(_("Log output for [%s] is directed to file '%s'.")\
-							    % (self.getProfileName(), logf))
-				
-		# if no file is specified, use the logger's default (no log file)
+			self.logger.info(_("Log output for [%(profile)s] is directed to "\
+							   "file '%(file)s'.")\
+							   % {'profile' : self.getProfileName(),
+								  'file': logf})
+
 		else:
+		# if no file is specified, use the logger's default (no log file)
 # TODO: Raise an assertion exception if no log section was found ?!
 			self.logger = LogFactory.getLogger(self.getProfileName())
 			self.logger.info(_("Log output for [%s] is not directed into a file.")\
