@@ -91,7 +91,7 @@ def __add_write_permission(path, recursive = True):
 	if os.path.isdir(path) and recursive is True:
 		for _entry in os.listdir(path):
 			_entrypath = os.path.join(path, _entry)		
-			if os.path.isdir(_entrypath):
+			if os.path.isdir(_entrypath)  and not os.path.islink(_entrypath):
 				__add_write_permission(_entrypath)		
 			else:
 				__add_write_permission(path, recursive=False)
@@ -100,12 +100,11 @@ def __add_write_permission(path, recursive = True):
 def delete(uri):
 	"""Deletes given file or directory (recursive).
 	"""
-	if os.path.isdir(uri):
+	if os.path.isdir(uri) and not os.path.islink(uri):
 		shutil.rmtree(uri, ignore_errors=False)	#, onerror=_onerror)
-		return True
 	else:
 		os.unlink(uri)
-		return True
+	return True
 
 
 def force_delete(path):

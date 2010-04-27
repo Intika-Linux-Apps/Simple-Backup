@@ -74,7 +74,8 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize=None):
 	"""
 	# strip leading sep
 	file = file.lstrip(os.sep)
-	
+	# tar option  -p, --same-permissions, --preserve-permissions:
+	# ignore umask when extracting files (the default for root)
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
 	archType = getArchiveType(sourcear)
