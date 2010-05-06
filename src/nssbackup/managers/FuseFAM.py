@@ -154,6 +154,7 @@ class FuseFAM(object):
 		outStr, errStr = FAM.readfile(outFile), FAM.readfile(errFile)
 		FAM.delete(outFile)
 		FAM.delete(errFile)
+		self.logger.debug("fusermount output: %s\n%s" % (outStr, errStr))
 		if retval != 0 :
 			raise SBException("Couldn't unmount '%s' : %s" %  (mounteddir,errStr))
 		

@@ -29,7 +29,9 @@
 #
 # Usage:
 #   execute this script from the root directory of the branch
-#   using the command './tools/release.sh tarball|source|binary'
+#   using the command './tools/release.sh tarball|source-with-orig|
+#                                         source-no-orig|update|binary|
+#                                         print-paths'
 #
 ################################################################################
 
@@ -38,9 +40,11 @@ STARTPWD=$PWD
 #
 # grab current version
 #
+changelog=$STARTPWD"/debian/changelog"
 METAINFO=$STARTPWD"/tools/metainfo.sh"
 source $METAINFO
 APP=$PKGNAME
+version_pack=$(grep "^$PKGNAME ($VERFULL" $changelog|cut -d "(" -f 2 -|cut -d ")" -f 1 -)
 
 echo "-------------------------------------------------------"
 echo "Packaging tool for "$APP
@@ -48,22 +52,42 @@ echo "-------------------------------------------------------"; echo
 
 case "$1" in
     tarball)
-        echo "Building release tarball."
+        echo "Builds release tarball."
     ;;
-    source)
-        echo "Building release tarball and source package."
+    source-with-orig)
+        echo "Builds source package."
+        echo "Using this option you can create an intitial release within a"
+        echo "source version. In this case the .orig tar is uploaded."
+    ;;
+    source-no-orig)
+        echo "Builds source package."
+        echo "Using this option you can create an (updated) release within the"
+        echo "same source version. The .orig tar is not created."
+    ;;
+    update)
+        echo "Builds an updated source package."
+        echo "An .orig tarball from the tarball directory is used."
+        echo "Using this option you can create an updated release within the"
+        echo "same source version. The .orig tar is not uploaded in that"
+        echo "case but the existing .orig tar from the initial release is"
+        echo "used."
     ;;
     binary)
-        echo "Building release tarball and binary packages."
-        echo "Publishing debs in local ppa."
+        echo "Builds binary packages and publishes debs in local ppa."
+    ;;
+    print-paths)
+        echo "Outputs paths being used and exits."
     ;;
     *)
         echo "ERROR: Called with unknown or missing argument $1" >&2
         echo "Usage:"
-        echo "'./tools/release.sh tarball' - builds release tarball"
-        echo "'./tools/release.sh source'  - builds tarball and source package"
-        echo "'./tools/release.sh binary'  - builds tarball, source and binary package"
-        echo "                               and publishs debs in local ppa."
+        echo "'./tools/release.sh tarball'          - builds release tarball"
+        echo "'./tools/release.sh source_with_orig' - builds source package"
+        echo "'./tools/release.sh source_no_orig'   - builds source package"
+        echo "'./tools/release.sh update'           - updates source package"
+        echo "'./tools/release.sh binary'           - builds source and binary"
+        echo "                                        package and publishs debs"
+        echo "                                        in local ppa."
         echo
         exit 1
     ;;
@@ -76,7 +100,7 @@ esac
 PRE=$STARTPWD
 SRC=$PRE
 
-REL_DESTAPPDIR="$APP-$VERFULL"
+REL_DESTAPPDIR="$APP-$version_pack"
 
 REL_PACKDIR="../packaging"
 REL_LOCALPPA="$REL_PACKDIR/localppa"
@@ -93,12 +117,12 @@ TARBALLDIR="$PRE/$REL_TARBALLDIR"
 #
 # directories for this particular version
 #
-DESTDIR=$PACKDIR"/"$VERFULL
+DESTDIR=$PACKDIR"/"$version_pack
 EXPORTDESTDIR=$DESTDIR"/"$REL_DESTAPPDIR
 DEBIANDIR="$EXPORTDESTDIR/$REL_DEBIANDIR"
 
 TAREXT=".tar.gz"
-TARNAME=$APP"_"$VERFULL
+TARNAME=$APP"_"$version_pack
 ORIGTARNAME="$TARNAME.orig"
 TARNAME="$TARNAME$TAREXT"
 ORIGTARNAME="$ORIGTARNAME$TAREXT"
@@ -107,10 +131,11 @@ echo "Make sure your debian/CHANGELOG is up-to-date!"; echo
 
 echo "Summary of parameters"
 echo "  package: "$APP
-echo "  building version: "$VERFULL
+echo "  building version: "$version_pack
+echo "    full : "$VERFULL
 echo "    major: "$VERNUMMAJOR
 echo "    minor: "$VERNUMMINOR
-echo "    post:  "$VERPOST; echo
+echo "    post : "$VERPOST; echo
 echo "  source path: $SRC"
 echo "  packaging path: $PACKDIR"
 echo "  destination: "$DESTDIR
@@ -118,6 +143,12 @@ echo "  export path: $EXPORTDESTDIR"
 echo "  tarball path: $TARBALLDIR"
 echo "  local ppa: "$LOCALPPA
 echo "  tar names: $TARNAME and $ORIGTARNAME"
+
+case "$1" in
+    print-paths)
+      exit 0
+    ;;
+esac
 
 echo; echo "creating directories"
 if [ -d $PACKDIR ]; then
@@ -164,6 +195,10 @@ rm -rf "$EXPORTDESTDIR/.settings"
 rm -rf "$EXPORTDESTDIR/setup.py"
 rm -rf "$EXPORTDESTDIR/src/nssbackup/resources"
 rm -rf "$EXPORTDESTDIR/src/nssbackup/metainfo"
+rm -rf "$EXPORTDESTDIR/datas/nssbackup-config-su.desktop"
+rm -rf "$EXPORTDESTDIR/datas/nssbackup-config.desktop"
+rm -rf "$EXPORTDESTDIR/datas/nssbackup-restore-su.desktop"
+rm -rf "$EXPORTDESTDIR/datas/nssbackup-restore.desktop"
 
 # 'tests', 'tools', and 'doc' are removed; later re-add 'doc' when build
 rm -rf "$EXPORTDESTDIR/tests"
@@ -177,51 +212,73 @@ rm -rf "$DEBIANDIR/.pydevproject"
 rm -rf "$DEBIANDIR/.project"
 rm -rf "$DEBIANDIR/.settings"
 
-#echo "Debian: $DEBIANDIR"
-#echo "Destdir: $DESTDIR"
-
 # remove the Debian specific directory temporarely from the exported source
 mv -f "$DEBIANDIR" "$DESTDIR"
 
-##############################################################################
-echo; echo "creating tarballs "
-tar -czf $TARNAME $REL_DESTAPPDIR
-cp $TARNAME $ORIGTARNAME
-#tar -czf $ORIGTARNAME $REL_DESTAPPDIR
-
-mv -f $TARNAME $TARBALLDIR
-echo "Release tarball '$TARNAME' created in '$TARBALLDIR'"
-
-#
-# ensure we are in $DESTDIR
-# we move the Debian directory back into the exported source in order
-# to build the deb packages
-#
-mv -f $REL_DEBIANDIR $EXPORTDESTDIR
-
-cd $EXPORTDESTDIR
-echo; echo "Working directory changed to "$PWD
-
 case "$1" in
     tarball)
-#        echo; echo "Removing source folder "$EXPORTDESTDIR
-#        rm -rf $EXPORTDESTDIR
+        echo; echo "creating tarball"
+        tar -czf $TARNAME $REL_DESTAPPDIR
+        mv -f $TARNAME $TARBALLDIR
+        echo "Release tarball '$TARNAME' created in '$TARBALLDIR'"
     ;;
 
-    source)
+    source-with-orig)
         echo; echo "building source package"
-        debuild -S --lintian-opts --color always
+        tar -czf $ORIGTARNAME $REL_DESTAPPDIR
 
-#        echo; echo "Removing source folder "$EXPORTDESTDIR
-#        rm -rf $EXPORTDESTDIR
+        # we move the Debian directory back into the exported source in order
+        # to build the deb packages
+        mv -f $REL_DEBIANDIR $EXPORTDESTDIR
+
+        cd $EXPORTDESTDIR
+        echo; echo "Working directory changed to "$PWD
+
+        debuild -S --lintian-opts --color always
     ;;
+
+    source-no-orig)
+        echo; echo "building source package"
+        rm -f "$ORIGTARNAME"
+
+        # we move the Debian directory back into the exported source in order
+        # to build the deb packages
+        mv -f $REL_DEBIANDIR $EXPORTDESTDIR
+
+        cd $EXPORTDESTDIR
+        echo; echo "Working directory changed to "$PWD
+
+        debuild -S -sd --lintian-opts --color always
+    ;;
+    
+    update)
+        echo; echo "updating source package"
+        cp "$TARBALLDIR/$ORIGTARNAME" .
+        echo ".orig tarball '$ORIGTARNAME' copied from '$TARBALLDIR'"
+
+        # we move the Debian directory back into the exported source in order
+        # to build the deb packages
+        mv -f $REL_DEBIANDIR $EXPORTDESTDIR
+
+        cd $EXPORTDESTDIR
+        echo; echo "Working directory changed to "$PWD
+
+        debuild -S -sd --lintian-opts --color always
+    ;;
+    
 
     binary)
         echo; echo "building binary packages"
-        debuild --lintian-opts --color always
+        tar -czf $ORIGTARNAME $REL_DESTAPPDIR
 
-#        echo; echo "Removing source folder "$EXPORTDESTDIR
-#        rm -rf $EXPORTDESTDIR
+        # we move the Debian directory back into the exported source in order
+        # to build the deb packages
+        mv -f $REL_DEBIANDIR $EXPORTDESTDIR
+
+        cd $EXPORTDESTDIR
+        echo; echo "Working directory changed to "$PWD
+
+        debuild --lintian-opts --color always
 
         echo; echo "Publishing debs in local repository "$LOCALPPA
         cd $DESTDIR

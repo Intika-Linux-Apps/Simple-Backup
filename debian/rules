@@ -18,10 +18,13 @@ export DH_OPTIONS
 UbuntuVersion=$(shell lsb_release -rs)
 # if we use jaunty
 ifneq (,$(findstring 9.04,$(UbuntuVersion)))
-    LAYOUT="--install-layout=deb"
+    LAYOUT=--install-layout=deb
 endif
 ifneq (,$(findstring 9.10,$(UbuntuVersion)))
-    LAYOUT="--install-layout=deb"
+    LAYOUT=--install-layout=deb
+endif
+ifneq (,$(findstring 10.04,$(UbuntuVersion)))
+    LAYOUT=--install-layout=deb
 endif
 
 clean:

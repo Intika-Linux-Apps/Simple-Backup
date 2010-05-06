@@ -1,4 +1,4 @@
-nssbackup (0.2-0~rc9-ppa1) karmic; urgency=high
+nssbackup (0.2-0~rc9-ppa1~lucid1) lucid; urgency=high
 
   * [FIX] LP Bug #330387: cosmetic errors (typos and spelling).
           Thanks to ciaran.mooney.
@@ -46,7 +46,7 @@ nssbackup (0.2-0~rc9-ppa1) karmic; urgency=high
   * [Change] schedule page simplified (precise option removed)
   * [Enhancement] Help implemented
  
- -- Jean-Peer Lorenz <peer.loz@gmx.net>  Tue, 20 Apr 2010 12:35:39 +0200
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Wed, 05 May 2010 17:07:45 +0200
 
 nssbackup (0.2-0~rc8-ppa1) hardy; urgency=low
 

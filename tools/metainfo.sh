@@ -37,11 +37,11 @@ if [ ! -e $METAFILE ]; then
 #  echo "Found file '"$METAFILE"' contains:"; cat $METAFILE; echo; echo
 fi
 
-VERFULL=`grep "^VERSION=" $METAFILE|cut -d "=" -f 2 -`
-VERNUM=`echo $VERFULL|cut -d "~" -f 1 -`
-VERPOST=`echo $VERFULL|cut -d "~" -f 2 -`
-VERNUMMAJOR=`echo $VERNUM|cut -d "-" -f 1 -`
-VERNUMMINOR=`echo $VERNUM|cut -d "-" -f 2 -`
+VERFULL=$(grep "^VERSION=" $METAFILE|cut -d "=" -f 2 -)
+VERNUM=$(echo $VERFULL|cut -d "~" -f 1 -)
+VERPOST=$(echo $VERFULL|cut -d "~" -f 2 -)
+VERNUMMAJOR=$(echo $VERNUM|cut -d "-" -f 1 -)
+VERNUMMINOR=$(echo $VERNUM|cut -d "-" -f 2 -)
 
-PKGNAME=`grep "^PKGNAME=" $METAFILE|cut -d "=" -f 2 -`
+PKGNAME=$(grep "^PKGNAME=" $METAFILE|cut -d "=" -f 2 -)
 
