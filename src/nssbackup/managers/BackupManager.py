@@ -404,7 +404,7 @@ class BackupManager(PyNotifyMixin):
 		
 		if _freespace <= _snpsize:
 			raise exceptions.SBException(_("Not enough free space in the target directory for the "\
-										   "planned backup (%(freespace)d <= %(neededspace)s).")\
+										   "planned backup (%(freespace)s <= %(neededspace)s).")\
 										   % { 'freespace' : _freespace_hr, 'neededspace' : _snpsize_hr})
 
 	def __create_collector_obj(self):
