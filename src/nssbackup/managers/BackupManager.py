@@ -792,6 +792,8 @@ class FileCollector(object):
 		self.__exists_func		= None
 		self.__stat_func		= None
 		self.__fstats 			= None
+		self.__fislink			= None
+		self.__fisdir			= None
 		# list of Regular Expressions defining exclusion rules
 		self.__excl_regex 		= []
 # TODO: put list of compiled regex into `Snapshot` (i.e. compile them when setting the excludes). 
@@ -869,17 +871,24 @@ class FileCollector(object):
 		"""Tests whether the given `path` can be accessed (i.e. exists and is readable).
 		"""
 		# return true if the file doesn't exist
-		if not self.__exists_func(path):
-			self.__logger.warning(_("File '%(file)s' does not exist.") % {'file' : path})
+		try:
+			if not self.__exists_func(path):
+				self.__logger.warning(_("File '%(file)s' does not exist.") % {'file' : path})
+				return True
+		except OSError:
 			return True
 		
 		# get the stats, If not possible, the file has to be exclude, return True
 		try:
 			self.__fstats = self.__stat_func(path)
+			self.__fisdir = FAM.is_dir(path)
+			self.__fislink = FAM.is_link(path)
 		except Exception, _exc:	#IGNORE:W0703
 			self.__logger.warning(_("File '%(file)s' is not accessable with error '%(error)s'.")\
 									% {'file' : path, 'error' : str(_exc)})
 			self.__fstats = None
+			self.__fisdir = None
+			self.__fislink = None
 			return True
 
 		# refuse a file if we don't have read access
@@ -915,6 +924,17 @@ class FileCollector(object):
 		if path == self.__configuration.get_target_dir():
 			self.__logger.info(_("File '%(file)s' is backup's target directory.") % {'file' : path})
 			return True			
+		return False
+	
+	def __is_circular_symlink(self, path):
+		if self.__fislink:
+			if self.__snapshot.isFollowLinks():
+				ln_target = FAM.get_link_abs(path)	
+				if path.startswith(ln_target):
+					self.__logger.info(_("Symbolic link '%(path)s' -> '%(ln_target)s' is a circular symlink.")\
+								% {'path' : path, 'ln_target' : ln_target})
+					return True		
+		#test passed
 		return False
 
 	def _is_excluded_by_config(self, path):
@@ -964,6 +984,8 @@ class FileCollector(object):
 			_res = True
 		elif self.__is_not_accessable(path) is True:
 			_res = True
+		elif self.__is_circular_symlink(path) is True:
+			_res = True
 		return _res
 		
 	def _check_for_excludes(self, path): #, force_exclusion=False):
@@ -995,18 +1017,17 @@ class FileCollector(object):
 				_excluded = True
 
 		if not _excluded:
-			# path was not excluded, so do further tests (stats, enter dir...)
-			
-			if FAM.is_link(path):				
+			# path was not excluded, so do further tests (stats, enter dir...)			
+			if self.__fislink:
 				self.__logger.info(_("Symbolic link found: '%(path)s' -> '%(ln_target)s'.")\
 								% {'path' : path, 'ln_target' : FAM.get_link(path)})
 				self.__collect_stats.count_symlink()
 				if not self.__snapshot.isFollowLinks():
-					# if `followlinks` is disabled, just count the link and finish
+					# if `followlinks` is *disabled*, just count the link and finish
 					_stop_checking = True
 					
 			if not _stop_checking:	# i.e. `followlinks` is enabled
-				if FAM.is_dir(path):
+				if self.__fisdir:
 					# if it's a directory, enter inside
 					try:
 						for _dir_item in FAM.listdir(path) :

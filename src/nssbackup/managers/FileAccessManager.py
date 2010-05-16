@@ -57,6 +57,19 @@ def get_link(path):
 	return _res
 
 
+def get_link_abs(path):
+	"""Returns the absolute target of given link `path`. Relative links are
+	modified (i.e. are made absolute). 
+	"""
+	_ln_target = get_link(path)
+	if os.path.isabs(_ln_target):
+		_res = _ln_target
+	else:
+		_res = os.path.join(os.path.dirname(path), _ln_target)
+	_res = os.path.abspath(_res)
+	return _res
+
+
 def is_dir(path):
 	res = os.path.isdir(path)
 	return res
