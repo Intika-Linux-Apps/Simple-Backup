@@ -347,7 +347,9 @@ def makeTarFullBackup(snapshot):
 	options.append( "--listed-incremental="+tmp_snarfile )
 
 	outStr, errStr, retVal = Util.launch("tar", options)
-	LogFactory.getLogger().debug("TAR Output : " + outStr)
+	LogFactory.getLogger().debug("TAR exitcode: %s" % retVal)
+	LogFactory.getLogger().debug("TAR Output: " + outStr)
+	LogFactory.getLogger().debug("TAR Errors: " + errStr)
 
 	# and move the temporary snarfile into the backup directory
 	try:

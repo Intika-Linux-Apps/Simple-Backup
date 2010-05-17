@@ -48,7 +48,6 @@ from nssbackup.util.log import LogFactory
 from nssbackup.util import exceptions
 
 from nssbackup.util.tar import SnapshotFile
-from nssbackup.util.tar import Dumpdir
 
 
 class PyNotifyMixin(object):
@@ -84,13 +83,13 @@ class PyNotifyMixin(object):
 			self.__pynotif_mod = pynotify
 			if self.__pynotif_mod.init("NSsbackup"):
 				self.__pynotif_avail = True
+				self.__logger.debug("Module 'pynotify' was sucessfully initialized.")
 			else:
 				self.__pynotif_avail = False	# yes, this is insane!
-				self.__logger.warning(_("there was a problem initializing the "\
-									    "pynotify module"))
+				self.__logger.warning(_("Initialization of module 'pynotify' failed."))
 		except ImportError, exc:
 			self.__pynotif_avail = False
-			self.__logger.warning(str(exc))
+			self.__logger.warning(_("Import of module 'pynotify' failed with error: %s.") % str(exc))
 		
 	def _notify_info(self, profilename, message):
 		"""Shows up a pop-up window to inform the user. The notification
@@ -112,8 +111,8 @@ class PyNotifyMixin(object):
 					self.__notif.show()
 				except gobject.GError, exc:
 					# Connection to notification-daemon failed 
-					self.logger.warning("Connection to notification-daemon "\
-										"failed: " + str(exc))
+					self.logger.warning(_("Connection to notification-daemon "\
+										"failed: %s.") % str(exc))
 
 	def _notify_warning(self, profilename, message):
 		"""Shows up a pop-up window to inform the user. The notification
@@ -157,8 +156,8 @@ class PyNotifyMixin(object):
 					notif.show()
 				except gobject.GError, exc:
 					# Connection to notification-daemon failed 
-					self.logger.warning("Connection to notification-daemon "\
-										"failed: " + str(exc))
+					self.logger.warning(_("Connection to notification-daemon "\
+										"failed: %s.") % str(exc))
 
 	def __get_notification(self, profilename, message):
 		"""Returns a notification object but does not display it. The
@@ -185,8 +184,8 @@ class PyNotifyMixin(object):
 								"NSsbackup [%s]" % profilename, message, ico)
 			except gobject.GError, exc:
 				# Connection to notification-daemon failed 
-				self.logger.warning("Connection to notification-daemon "\
-									"failed: " + str(exc))
+				self.logger.warning(_("Connection to notification-daemon "\
+									"failed: %s.") % str(exc))
 				notif = None
 		return notif
 
@@ -208,8 +207,8 @@ class PyNotifyMixin(object):
 								"NSsbackup [%s]" % profilename, message, ico)
 			except gobject.GError, exc:
 				# Connection to notification-daemon failed 
-				self.logger.warning("Connection to notification-daemon "\
-									"failed: " + str(exc))
+				self.logger.warning(_("Connection to notification-daemon "\
+									"failed: %s.") % str(exc))
 				self.__notif = None
 				
 				
@@ -907,14 +906,13 @@ class FileCollector(object):
 			self.__logger.warning(_("File '%(file)s' cannot be opened for read access with error '%(error)s'.")\
 									% {'file': path, 'error' : str(_exc)})
 			_res = True
-		finally:
-			Util.set_timeout_alarm(timeout=0)
+
+		Util.set_timeout_alarm(timeout=0)
 			# when file does not exist, the `open` fails and variable `fdscr` is not defined here
 #			try:
 #				os.close(fdscr)
 #			except OSError:
-#				pass
-			
+#				pass	
 		return _res
 
 	def __is_excluded_by_default(self, path):
@@ -1060,9 +1058,6 @@ class FileCollector(object):
 						self.__fstats.st_ctime)			
 			if path in self.__parent.get_base_snardict():
 #				self.__logger.debug("%s: is in snapshot file." % path)
-#				_sentry = self.__parent.get_base_snardict()[path]
-#				self.__logger.debug("Entry: %s" % _sentry)
-#				if _sentry == Dumpdir.INCLUDED:
 				if ftime > self.__parent.get_base_backup_time():
 					self.__logger.debug("Delta=%s - %s: %s > %s" % ((ftime - self.__parent.get_base_backup_time()),
 																	 path, ftime,

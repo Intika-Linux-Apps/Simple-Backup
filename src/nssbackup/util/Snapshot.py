@@ -384,7 +384,8 @@ class Snapshot(object):
 
 	def commit (self) :
 		"Commit the snapshot infos ( write to the disk )"
-		self.commitbasefile()
+		if not self.isfull():
+			self.commitbasefile()
 		self.commitFormatfile()
 		self.commitexcludefile()
 		self.commitpackagefile()
