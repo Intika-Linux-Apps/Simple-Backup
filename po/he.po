@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-22 13:46+0200\n"
+"POT-Creation-Date: 2010-05-17 21:30+0200\n"
 "PO-Revision-Date: 2010-03-25 00:59+0000\n"
 "Last-Translator: itzik_b <itzik_b@012.net.il>\n"
 "Language-Team: Hebrew <he@li.org>\n"
@@ -56,209 +56,226 @@ msgid "The following error(s) occurred before:"
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:89
-msgid "there was a problem initializing the "
+msgid "Initialization of module 'pynotify' failed."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:266
+#: src/nssbackup/managers/BackupManager.py:92
+#, python-format
+msgid "Import of module 'pynotify' failed with error: %s."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:114
+#: src/nssbackup/managers/BackupManager.py:159
+#: src/nssbackup/managers/BackupManager.py:187
+#: src/nssbackup/managers/BackupManager.py:210
+msgid "Connection to notification-daemon "
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:265
 msgid "Backup process is being started."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:287
+#: src/nssbackup/managers/BackupManager.py:286
 msgid "Failed to set the gid to 'admin' one :"
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:322
+#: src/nssbackup/managers/BackupManager.py:321
 #, python-format
 msgid "Starting snapshot %(name)s "
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:330
+#: src/nssbackup/managers/BackupManager.py:329
 #, python-format
 msgid "Setting Base to '%(value)s' "
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:340
+#: src/nssbackup/managers/BackupManager.py:339
 msgid "Setting packages File."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:346
+#: src/nssbackup/managers/BackupManager.py:345
 msgid "Problem when setting the packages: "
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:350
+#: src/nssbackup/managers/BackupManager.py:349
 msgid "Setting Excludes File."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:358
+#: src/nssbackup/managers/BackupManager.py:357
 msgid "Setting compression format."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:363
+#: src/nssbackup/managers/BackupManager.py:362
 msgid "Setting split size."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:370
+#: src/nssbackup/managers/BackupManager.py:369
 msgid "Option 'Follow symbolic links' is enabled."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:372
+#: src/nssbackup/managers/BackupManager.py:371
 msgid "Option 'Follow symbolic links' is disabled."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:376
+#: src/nssbackup/managers/BackupManager.py:375
 msgid "File list ready, committing to disk."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:394
+#: src/nssbackup/managers/BackupManager.py:393
 #, python-format
 msgid "Maximum free size required is '%s'."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:395
+#: src/nssbackup/managers/BackupManager.py:394
 #, python-format
 msgid "Available disk size is '%s'."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:396
+#: src/nssbackup/managers/BackupManager.py:395
 #, python-format
 msgid "Number of directories: %s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:397
+#: src/nssbackup/managers/BackupManager.py:396
 #, python-format
 msgid "Number of symlinks: %s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:398
+#: src/nssbackup/managers/BackupManager.py:397
 #, python-format
 msgid "Total number of files: %s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:399
+#: src/nssbackup/managers/BackupManager.py:398
 #, python-format
 msgid "Number of files included in snapshot: %s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:400
+#: src/nssbackup/managers/BackupManager.py:399
 #, python-format
 msgid "Number of new files (also included): %s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:401
+#: src/nssbackup/managers/BackupManager.py:400
 #, python-format
 msgid "Number of files skipped in incremental snapshot: %s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:402
+#: src/nssbackup/managers/BackupManager.py:401
 #, python-format
 msgid "Number of items forced to be excluded: %s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:403
+#: src/nssbackup/managers/BackupManager.py:402
 #, python-format
 msgid "Number of items to be excluded by config: %s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:406
+#: src/nssbackup/managers/BackupManager.py:405
 msgid "Not enough free space in the target directory for the "
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:435
+#: src/nssbackup/managers/BackupManager.py:434
 #, python-format
 msgid "Another NSsbackup daemon already running (pid = %s )!"
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:460
+#: src/nssbackup/managers/BackupManager.py:459
 msgid "Unable to change permissions for "
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:463
+#: src/nssbackup/managers/BackupManager.py:462
 msgid "Unable to find logfile to copy into snapshot."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:465
+#: src/nssbackup/managers/BackupManager.py:464
 msgid "No snapshot to copy logfile."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:480
+#: src/nssbackup/managers/BackupManager.py:479
 msgid "Backup process finished."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:489
+#: src/nssbackup/managers/BackupManager.py:488
 msgid "Option 'target' is missing, aborting."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:493
+#: src/nssbackup/managers/BackupManager.py:492
 #, python-format
 msgid "Creating the target dir '%s'"
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:503
+#: src/nssbackup/managers/BackupManager.py:502
 msgid "Target not writeable: "
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:873
+#: src/nssbackup/managers/BackupManager.py:875
 #, python-format
 msgid "File '%(file)s' does not exist."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:880
+#: src/nssbackup/managers/BackupManager.py:886
 #, python-format
 msgid "File '%(file)s' is not accessable with error '%(error)s'."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:894
+#: src/nssbackup/managers/BackupManager.py:902
 #, python-format
 msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:898
+#: src/nssbackup/managers/BackupManager.py:906
 #, python-format
 msgid ""
 "File '%(file)s' cannot be opened for read access with error '%(error)s'."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:916
+#: src/nssbackup/managers/BackupManager.py:923
 #, python-format
 msgid "File '%(file)s' is backup's target directory."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:934
+#: src/nssbackup/managers/BackupManager.py:932
+#, python-format
+msgid "Symbolic link '%(path)s' -> '%(ln_target)s' is a circular symlink."
+msgstr ""
+
+#: src/nssbackup/managers/BackupManager.py:952
 #, python-format
 msgid ""
 "File '%(file)s' exceeds maximum file size ( %(filesize)s > %(maxsize)s)."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:944
+#: src/nssbackup/managers/BackupManager.py:962
 #, python-format
 msgid "File '%(file)s' matches regular expression '%(regex)s'."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:950
+#: src/nssbackup/managers/BackupManager.py:968
 #, python-format
 msgid "File '%(file)s' found in defined exclude list."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:1001
+#: src/nssbackup/managers/BackupManager.py:1020
 #, python-format
 msgid "Symbolic link found: '%(path)s' -> '%(ln_target)s'."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:1017
+#: src/nssbackup/managers/BackupManager.py:1036
 #, python-format
 msgid "Error while checking directory '%(dir)s': %(error)s."
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:1071
+#: src/nssbackup/managers/BackupManager.py:1087
 msgid "Empty regular expression found. "
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:1078
+#: src/nssbackup/managers/BackupManager.py:1094
 #, python-format
 msgid "Invalid regular expression ('%s')"
 msgstr ""
 
-#: src/nssbackup/managers/BackupManager.py:1098
+#: src/nssbackup/managers/BackupManager.py:1114
 msgid "No directories to backup defined."
 msgstr ""
 
@@ -320,107 +337,107 @@ msgstr ""
 msgid "The config file is not set yet into this ConfigManager"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1111
+#: src/nssbackup/managers/ConfigManager.py:1110
 msgid "No receiver set."
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1113
+#: src/nssbackup/managers/ConfigManager.py:1112
 msgid "No SMTP server set."
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1116
+#: src/nssbackup/managers/ConfigManager.py:1115
 msgid "Username set but no password specified."
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1119
+#: src/nssbackup/managers/ConfigManager.py:1118
 msgid "Password set but no username specified."
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1122
+#: src/nssbackup/managers/ConfigManager.py:1121
 msgid ""
 "A certificate and key file is given while SSL option (smtptls=1) is not "
 "set.\n"
 "Select SSL in order to use Certificate and Key."
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1126
+#: src/nssbackup/managers/ConfigManager.py:1125
 msgid ""
 "When specifying a SSL certificate or key file, a key file resp. certificate "
 "is mandatory."
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1206
+#: src/nssbackup/managers/ConfigManager.py:1205
 msgid "Default Profile"
 msgstr "פרופיל ברירת מחדל"
 
-#: src/nssbackup/managers/ConfigManager.py:1207
+#: src/nssbackup/managers/ConfigManager.py:1206
 msgid "Unknown Profile"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1257
+#: src/nssbackup/managers/ConfigManager.py:1256
 msgid "Unlimited"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1258
+#: src/nssbackup/managers/ConfigManager.py:1257
 msgid "100 MiB"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1259
+#: src/nssbackup/managers/ConfigManager.py:1258
 msgid "250 MiB"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1260
+#: src/nssbackup/managers/ConfigManager.py:1259
 msgid "650 MiB"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1261
+#: src/nssbackup/managers/ConfigManager.py:1260
 msgid "2 GiB (FAT16)"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1262
+#: src/nssbackup/managers/ConfigManager.py:1261
 msgid "4 GiB (FAT32)"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1263
+#: src/nssbackup/managers/ConfigManager.py:1262
 #: src/nssbackup/ui/SBConfigGTK.py:543 src/nssbackup/ui/SBConfigGTK.py:1737
 msgid "Custom"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1265
+#: src/nssbackup/managers/ConfigManager.py:1264
 msgid "MP3 Music"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1266
+#: src/nssbackup/managers/ConfigManager.py:1265
 msgid "AVI Video"
 msgstr ""
 
+#: src/nssbackup/managers/ConfigManager.py:1266
 #: src/nssbackup/managers/ConfigManager.py:1267
-#: src/nssbackup/managers/ConfigManager.py:1268
 msgid "MPEG Video"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1269
+#: src/nssbackup/managers/ConfigManager.py:1268
 msgid "Matrjoshka Video"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1270
+#: src/nssbackup/managers/ConfigManager.py:1269
 msgid "OGG Multimedia container"
 msgstr ""
 
-#: src/nssbackup/managers/ConfigManager.py:1271
+#: src/nssbackup/managers/ConfigManager.py:1270
 msgid "CD Images"
 msgstr ""
 
-#: src/nssbackup/managers/FuseFAM.py:175
+#: src/nssbackup/managers/FuseFAM.py:176
 msgid "Initializing FUSE File Access Manager."
 msgstr ""
 
-#: src/nssbackup/managers/FuseFAM.py:202
+#: src/nssbackup/managers/FuseFAM.py:203
 #, python-format
 msgid "Target directory '%(target)s' does not exist."
 msgstr ""
 
-#: src/nssbackup/managers/FuseFAM.py:247
+#: src/nssbackup/managers/FuseFAM.py:248
 msgid "Terminating FUSE File Access Manager."
 msgstr ""
 
@@ -484,7 +501,7 @@ msgstr ""
 msgid "An error occurred when pulling snapshot '%s'."
 msgstr ""
 
-#: src/nssbackup/managers/SnapshotManager.py:543 src/nssbackup/util/tar.py:833
+#: src/nssbackup/managers/SnapshotManager.py:543 src/nssbackup/util/tar.py:836
 msgid "The snarfile header is incomplete !"
 msgstr ""
 
@@ -1101,22 +1118,22 @@ msgid ""
 "directory. "
 msgstr ""
 
-#: src/nssbackup/util/Snapshot.py:445 src/nssbackup/util/Snapshot.py:509
+#: src/nssbackup/util/Snapshot.py:446 src/nssbackup/util/Snapshot.py:510
 #, python-format
 msgid "Name of Snapshot not valid : %s"
 msgstr ""
 
-#: src/nssbackup/util/Snapshot.py:463
+#: src/nssbackup/util/Snapshot.py:464
 #, python-format
 msgid "Name of base not valid : %s"
 msgstr ""
 
-#: src/nssbackup/util/Snapshot.py:511
+#: src/nssbackup/util/Snapshot.py:512
 #, python-format
 msgid "The mandatory 'ver' file doesn't exist in [%s]."
 msgstr ""
 
-#: src/nssbackup/util/Snapshot.py:551
+#: src/nssbackup/util/Snapshot.py:552
 msgid "Base name must be set for incremental backup."
 msgstr ""
 
@@ -1130,89 +1147,89 @@ msgstr ""
 msgid "%(mb)d MB %(kb)d kB %(bytes)d"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:88 src/nssbackup/util/tar.py:140
-#: src/nssbackup/util/tar.py:181
+#: src/nssbackup/util/tar.py:89 src/nssbackup/util/tar.py:141
+#: src/nssbackup/util/tar.py:182
 msgid "Invalid archive type."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:260
+#: src/nssbackup/util/tar.py:261
 msgid ""
 "For the moment split functionality is not compatible with compress option."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:271
+#: src/nssbackup/util/tar.py:272
 msgid "Launching TAR to make incremental backup."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:290
+#: src/nssbackup/util/tar.py:291
 msgid "Unable to find the SNAR file to make an incremental backup."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:291
+#: src/nssbackup/util/tar.py:292
 msgid "Falling back to full backup."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:312 src/nssbackup/util/tar.py:355
+#: src/nssbackup/util/tar.py:313 src/nssbackup/util/tar.py:358
 #, python-format
 msgid "Unable to change permissions for file '%s'."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:325
+#: src/nssbackup/util/tar.py:326
 msgid "Launching TAR to make a full backup."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:364
+#: src/nssbackup/util/tar.py:367
 msgid "TAR has been finished successfully."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:367
+#: src/nssbackup/util/tar.py:370
 #, python-format
 msgid "TAR returned a warning during the backup process: %s"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:371
+#: src/nssbackup/util/tar.py:374
 #, python-format
 msgid "TAR aborted. Unable to make a proper backup: %s"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:438
+#: src/nssbackup/util/tar.py:441
 msgid "Included"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:438
+#: src/nssbackup/util/tar.py:441
 msgid "Not changed"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:438
+#: src/nssbackup/util/tar.py:441
 msgid "Directory"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:466
+#: src/nssbackup/util/tar.py:469
 msgid "Line must be a string"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:482
+#: src/nssbackup/util/tar.py:485
 msgid "Dumpdir inconsistancy : 'filename' is empty"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:495
+#: src/nssbackup/util/tar.py:498
 msgid "Dumpdir inconsistancy : 'control' is empty"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:569
+#: src/nssbackup/util/tar.py:572
 #, python-format
 msgid "File '%s' does not exist."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:698 src/nssbackup/util/tar.py:734
+#: src/nssbackup/util/tar.py:701 src/nssbackup/util/tar.py:737
 msgid "The snarfile header is incomplete."
 msgstr ""
 
-#: src/nssbackup/util/tar.py:999
+#: src/nssbackup/util/tar.py:1002
 msgid "A SnapshotFile is required"
 msgstr ""
 
-#: src/nssbackup/util/tar.py:1099
+#: src/nssbackup/util/tar.py:1102
 #, python-format
 msgid "Directory does not exist: %s."
 msgstr ""
