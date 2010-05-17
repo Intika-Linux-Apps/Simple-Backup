@@ -1,3 +1,53 @@
+nssbackup (0.2-0~rc9-ppa1~lucid1) lucid; urgency=high
+
+  * [FIX] LP Bug #330387: cosmetic errors (typos and spelling).
+          Thanks to ciaran.mooney.
+  * [FIX] LP Bug #503597: prediction of required space in case of incremental
+          snapshots
+  * [FIX] LP Bug #526544: cron service file was not found
+  * [FIX] LP Bug #512007: add fuse allow_other option to ssh plugin
+  * [FIX] LP Bug #382753: NSSBackup doesn't exclude folders with special
+          characters
+  * [FIX] problems related to the removal of snapshots containing read-only
+          files fixed
+  * [FIX] re-base issues fixed
+  * [FIX] not translatable strings added
+  * [FIX] avoid definition of exclude expressions containing a comma
+          (delimiter in config) from GUI
+  * [FIX] avoid multiple definition of exclude expressions (file types, regex)
+  * [FIX] enable 'Save as...' of configuration always
+  * [FIX] default backup target is created if it does not exist
+  * [FIX] unified behavior on close (using the menu, the window close button
+          etc.)
+  * [FIX] added check before test mail settings
+  * [FIX] split size corrected (1 GiB = 1024 MiB)
+  * [FIX] Application of Gnome HIG to the configuration GUI
+  * [FIX] place nssbackup (admin mode) in Gnome main menu under
+          Applications->System instead of the System->Settings tool
+          (see http://library.gnome.org/devel/menu-spec/)
+  * [FIX] set Freedesktop base directory if missing (required for Help/yelp
+          in some shells)
+  * [FIX] improve startup behaviour from Gnome main menu
+  * [FIX] minor issues with Scheduling fixed (removal, updating)
+  * [FIX] make the backup splitting configuration language independent
+  * [FIX] when the log level is set to ERROR, the config gui couldn't start.
+  * [FIX] moved max. incr. interval in configuration GUI to main page
+  * [FIX] Scheduling only for default-profiles
+  * [FIX] some issues with Scheduling fixed (removal, updating)
+  * [Change] add info to status bar when running in 'Administrator mode'
+  * [Change] unified storage of name and version of package (in file METAINFO)
+  * [Change] added possibility to cancel the closing if config has changed
+  * [Change] behavior changed for 'Add profile' when entering non-valid
+             names - dialog remains open
+  * [Change] Removal of the 'main' options from the general page. Each setup
+             is now considered as custom setup that was started from a default
+             configuration. Menu entry is added in order to restore default
+             values configuration (works with profiles) if a user wants to.
+  * [Change] schedule page simplified (precise option removed)
+  * [Enhancement] Help implemented
+ 
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Wed, 05 May 2010 17:07:45 +0200
+
 nssbackup (0.2-0~rc8-ppa1) hardy; urgency=low
 
   * Update translation. Added RU translation.
@@ -10,7 +60,7 @@ nssbackup (0.2-0~rc8-ppa1) hardy; urgency=low
   * [FIX] LP #425101: show the default profile on the profile UI
   * [FIX] LP #346285: backup destination is not created; backup is aborted if the target does not exist.
   * [FIX] Makefile wasn't working on Jaunty (introduced dep on lsb-release)
-  * [FIX] Creates the logfile parent directory is it doesn't exist.
+  * [FIX] Creates the logfile parent directory if it doesn't exist.
 
  -- Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>  Sat, 23 Jan 2010 22:19:01 +0100
 

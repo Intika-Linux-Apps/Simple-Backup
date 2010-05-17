@@ -18,12 +18,12 @@
 import tempfile
 import os
 import datetime
-import shutil
 from gettext import gettext as _
 
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.SnapshotManager import SnapshotManager
+import FileAccessManager as FAM
 import nssbackup.util as Util
 import nssbackup.util.tar as Tar
 
@@ -58,9 +58,9 @@ class RestoreManager(object):
 		@param backupFlag: Set to false to make no backup when restoring (default = True)
 		@param failOnNotFound: set to False if we don't want to fail if a file is not found (default is True)
 		"""
-		if not snapshot :
+		if not snapshot:
 			raise SBException("Please provide a Snapshot")
-		if not _file :
+		if not _file:
 			raise SBException("Please provide a File/directory")
 		
 		_file = os.sep+_file.lstrip(os.sep)
@@ -83,14 +83,21 @@ class RestoreManager(object):
 			if os.path.isdir(target):
 				# the target is a dir 	
 				#create a temp file , extract inside then move the content
-				tmpdir = tempfile.mkdtemp(dir=target,prefix='nssbackup-restore_')
+				tmpdir = tempfile.mkdtemp(dir=target,
+										  prefix='nssbackup-restore_')
 				
-				Tar.extract( snapshot.getArchive(), _file, tmpdir, bckupsuffix=suffix, splitsize=snapshot.getSplitedSize() )
+				Tar.extract(snapshot.getArchive(),
+							_file,
+							tmpdir,
+							bckupsuffix=suffix,
+							splitsize=snapshot.getSplitedSize())
+				
 				if os.path.exists(target+os.sep+ os.path.basename(_file))  and backupFlag :
-					Util.nssb_move(target+os.sep+ os.path.basename(_file), target+os.sep+ os.path.basename(_file)+suffix)
-				Util.nssb_move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
-				shutil.rmtree(tmpdir)
+					Util.force_nssb_move(target+os.sep+ os.path.basename(_file),
+								   target+os.sep+ os.path.basename(_file)+suffix)
 				
+				Util.force_nssb_move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
+				FAM.force_delete(tmpdir)
 			else:
 				#the target is a file
 				parent = os.path.dirname(target)
@@ -126,6 +133,7 @@ class RestoreManager(object):
 		@param dir: directory to clean up
 		@param suffix: the suffix of backuped files
 		"""
+		pass
 		
 	
 	def revertAs(self,snapshot, dir, targetdir):

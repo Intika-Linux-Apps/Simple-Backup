@@ -29,29 +29,51 @@ Summary of style guide
 * Top level functions and classes are separated by 2 lines, method definitions
   within classes by a single line
 
-  
-http://blog.melhase.net/files/epp-chapter-10.pdf
+See also: http://blog.melhase.net/files/epp-chapter-10.pdf
 
 
 How to run from source code
 ---------------------------
 
-(It is not recommended to install NSsbackup for productive use and to code on it
-beside at the same time.)
-
+Attention: For the current version, it is not recommended to install NSsbackup
+for productive use and to code on it beside at the same time.
 
 The reason is that there are 2 packages for import in
 that case, it might occur name conflicts: in your development environment and
 in the Python site-packages directory.
+
+If you know what you are doing you can run development code for testing
+as follows:
 
 1. Add your development directory to the Python path. Do this in a shell, so
    it does not affect the whole system! You can use the following commands:
 
 	declare -x PYTHONPATH="/Path-to-development/0.2/src:"$PYTHONPATH
 
-2. Move to the source directory to run the application
+2. Manually create a file `resources` with appropriate content based on the
+   template file `resources.in` and place it in the package's top level
+   directory (src/nssbackup). This file is usually created during installation
+   and therefore it is required to tweak it by hand for development.
+ 
+3. Analogous to step 2) create a file `metainfo` with appropriate content based
+   on the template file `metainfo.in` and place it in the package's top level
+   directory (src/nssbackup).
+   
+4. Go to the source directory to run the application you wish
 	
 	cd /Path-to-development/0.2/src
 	python nssbackup-config-gui.py
 	python nssbackup-restore-gui.py
 	python nssbackupd.py
+	
+	
+Translations
+============
+
+First, some links related to translations using Launchpad/Rosetta:
+
+* http://blog.launchpad.net/general/trying-out-launchpad-translations
+* https://help.launchpad.net/Translations/YourProject
+* https://help.launchpad.net/Translations/YourProject/ImportingTranslations
+* https://help.launchpad.net/Translations/YourProject/ImportPolicy
+* https://help.launchpad.net/Translations/YourProject/Exports

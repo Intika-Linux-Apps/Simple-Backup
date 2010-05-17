@@ -1,0 +1,29 @@
+[Desktop Entry]
+Type=Application
+#
+Name=NSsbackup-Configuration
+Name[fr]=Configurateur de la NSsbackup
+Name[de]=NSsbackup-Einstellungen
+Name[pt_BR]=Configuração do Backup
+Name[es]=Configuración de NSsbackup
+Name[ja]=バックアップの設定
+#
+Comment=NSsbackup configuration tool for admins. Requires superuser rights.
+Comment[de]=NSsbackup Konfiguration für Administratoren. Erfordert Superuser-Rechte.
+Comment[pt_BR]=Configure como seus backups são feitos. Requires superuser rights.
+Comment[es]=Configuración de NSsbackup para administradores. Requiere privilegios de superusuario.
+Comment[ja]=バックアップの設定・実行ツールを起動します
+#
+GenericName=Backup configuration tool
+GenericName[de]=Backup Einstellungen
+GenericName[es]=Herramienta de copia de seguridad
+#
+Exec=gksu --description @prefix@/share/applications/nssbackup-config-su.desktop @prefix@/bin/nssbackup-config-gui
+#
+Terminal=false
+Categories=GTK;GNOME;System;
+StartupNotify=false
+Icon=nssbackup-conf
+#
+X-KDE-SubstituteUID=true
+X-Ubuntu-Gettext-Domain=nssbackup

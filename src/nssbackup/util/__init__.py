@@ -1,7 +1,7 @@
 #	NSsbackup - Miscellaneous utilities
 #
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@
 
 """
 
+_RSRC_FILE = "resources"
+
+
+from gettext import gettext as _
 import os
 import subprocess
 import tempfile
@@ -35,12 +39,12 @@ import inspect
 import shutil
 import types
 import re
+import signal
 
 import nssbackup
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.util import log
 from nssbackup.util import exceptions
-
 
 
 def nssb_copytree(src, dst, symlinks=False):
@@ -83,22 +87,43 @@ def nssb_copytree(src, dst, symlinks=False):
 	if errors:
 		raise shutil.Error, errors
 
-def nssb_move(src, dst):
+
+# this function is no longer used in series 0.2
+# consider removing it
+#def nssb_move(src, dst):
+#	"""
+#	mod of shutil.move that uses nssb_copytree
+#	"""	
+#	try:
+#		os.rename(src, dst)
+#	except OSError:
+#		if os.path.isdir(src):
+#			if shutil.destinsrc(src, dst):
+#				raise shutil.Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
+#			nssb_copytree(src, dst, symlinks=True)
+#			shutil.rmtree(src)
+#		else:
+#			shutil.copy2(src,dst)
+#			os.unlink(src)
+
+
+def force_nssb_move(src, dst):
+	"""Modified version of `shutil.move` that uses `nssb_copytree`
+	and even removes read-only files/directories.
 	"""
-	mod of shutil.move that uses nssb_copytree
-	"""
-	
 	try:
 		os.rename(src, dst)
 	except OSError:
 		if os.path.isdir(src):
 			if shutil.destinsrc(src, dst):
-				raise shutil.Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
+				raise shutil.Error("Cannot move a directory '%s' into itself "\
+								   "'%s'." % (src, dst))
 			nssb_copytree(src, dst, symlinks=True)
-			shutil.rmtree(src)
+			FAM.force_delete(src)
 		else:
-			shutil.copy2(src,dst)
-			os.unlink(src)
+			shutil.copy2(src, dst)
+			FAM.force_delete(src)
+
 			
 def nssb_copy(src, dst):
 	"""Customized copy routine that copies the fileobject and afterwards
@@ -119,7 +144,8 @@ def nssb_copy(src, dst):
 	except OSError:
 		raise exceptions.ChmodNotSupportedError(\
 						"Unable to change permissions of file '%s'." % prep_dst)
-		
+
+
 def _prepare_nssb_copy(src, dst):
 	"""Helper function that prepares the given paths for copying
 	using 'nssb_copy'.
@@ -168,7 +194,7 @@ def _prepare_nssb_copy(src, dst):
 	return retval
 	
 
-def getResource(resourceName, isFile=False):
+def __get_resource(resource_name, is_file=False):
 	"""Looks for certain resources installed by nssbackup.
 	The installation script writes into the 'resources' file where
 	the files/resources are being stored.
@@ -177,30 +203,77 @@ def getResource(resourceName, isFile=False):
 	@param resourceName: the ressource name, as complete as possible
 	@param isFile: flag whether the resource looked up is a file
 	
-	@note: The file 'ressources' is required to be located in the
+	@note: The resources file is required to be located in the
 			root directory of the nssbackup package. 
 	"""
+#	print "Debug: Looking for '%s' (isFile=%s)" % (resourceName, isFile)
 	tmp = inspect.getabsfile(nssbackup)
-	resfile = open(os.sep.join([os.path.dirname(tmp), "ressources"]))
+	resfile = file(os.path.join(os.path.dirname(tmp), _RSRC_FILE), "r")
+	resfilelines = resfile.readlines()
+	resfile.close()
 	
-	for _dir in resfile.readlines():
+	for _dir in resfilelines:
 		_dir = _dir.strip()
-		#LogFactory.getLogger().debug("Searching in directory '%s'" % dir)
+#		print "Debug: Searching in directory '%s'" % _dir
 		if os.path.exists(_dir) and os.path.isdir(_dir):
-			if _dir.endswith(resourceName) and not isFile:
-				return _dir
-			
+			# only directories stored in resource file are considered 
+			if _dir.endswith(resource_name):
+				if not is_file:
+#					print "Debug: Directory found in '%s'" % _dir
+					return _dir
+				
 			_flist = os.listdir(_dir)
-			#LogFactory.getLogger().debug("File list is :" + str(list))
-			for _file in _flist :
-				if _file == resourceName:
-					return os.path.normpath(os.sep.join([_dir, resourceName]))
-#	devvalue = os.path.dirname(tmp)+"/../../datas/"
-#	if os.path.exists(devvalue + resourceName) :
-#		return os.path.normpath(devvalue + resourceName)
+#			print "Debug: directory listing is :" + str(_flist)
+			for _item in _flist:
+				_path = os.path.join(_dir, resource_name)
+				if os.path.exists(_path) and _path.endswith(resource_name):
+					if os.path.isdir(_path):
+						if not is_file:
+#							print "Debug: Directory found in '%s'" % _path
+							return _path
+					else:
+						if is_file:
+#							print "Debug: File found in '%s'" % _path
+							return _path
+
 	raise exceptions.SBException(\
-				"'%s' hasn't been found in the ressource list"% resourceName)
-					
+				"'%s' hasn't been found in the ressource list"% resource_name)
+
+
+def get_resource_file(resource_name):
+	return __get_resource(resource_name, is_file=True)
+
+
+def get_resource_dir(resource_name):
+	return __get_resource(resource_name, is_file=False)
+
+
+def get_version_number():
+	"""Returns the version number that is stored in according 'metainfo' file.
+	
+	@todo: Implement similar naming as CPython does (version, version_info).
+	"""
+	ver_line = "VERSION=n.a."
+	
+	tmp = inspect.getabsfile(nssbackup)
+	resfile = file(os.sep.join([os.path.dirname(tmp), "metainfo"]), "r")
+	resfilelines = resfile.readlines()
+	resfile.close()
+	
+	for _line in resfilelines:
+		_line = _line.strip()		
+		if _line.startswith("VERSION="):
+			ver_line = _line
+		
+	versfull_t = ver_line.split("=")
+	versfull = versfull_t[1]
+
+	version_t = versfull.split("~")
+	vers = version_t[0]
+	# version-postfix is currently ignored
+	return vers
+
+
 def launch(cmd, opts):
 	"""
 	launch a command and gets stdout and stderr
@@ -212,7 +285,7 @@ def launch(cmd, opts):
 	"""
 	_logger = log.LogFactory.getLogger()
 	# Create output log file
-	outptr,outFile = tempfile.mkstemp(prefix="output_")
+	outptr, outFile = tempfile.mkstemp(prefix="output_")
 
 	# Create error log file
 	errptr, errFile = tempfile.mkstemp(prefix="error_")
@@ -232,6 +305,7 @@ def launch(cmd, opts):
 	FAM.delete(errFile)
 	
 	return (outStr, errStr, retval)
+
 
 # defined in module 'tar'
 #def extract(sourcetgz, file, dest , bckupsuffix = None):
@@ -279,7 +353,7 @@ def readlineNULSep(fd,fd1):
 		if _continue == 1 :
 			raise exceptions.SBException(\
 								"The length of flist and Fprops are not equals")
-		yield (currentline,currentline1)
+		yield (currentline, currentline1)
 
 
 def is_valid_regexp( aregex ):
@@ -317,38 +391,6 @@ def is_empty_regexp( aregex ):
 			_res = True
 	return _res
 
-def remove_conf_entry(confline, entry, separator = ","):
-	"""Removes the given entry from the given string. Entries in configurations
-	are separated by the specified token. Leading and trailing separators are
-	taken into account.
-	
-	@param confline:  the string from which the entry should be removed
-	@param entry:	  the string that is removed
-	@param separator: the token that separates the entries
-	
-	@type confline:	  String
-	@type entry:      String
-	@type separator:  String
-	
-	@return: the configuration line without the removed entry
-	@rtype:  String
-	
-	@raise TypeError: If one of the given parameters is not of string type
-	"""
-	if not isinstance(confline, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
-					    "Got %s instead." % (type(confline)))
-	if not isinstance(entry, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
-					    "Got %s instead." % (type(entry)))
-	if not isinstance(separator, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
-					    "Got %s instead." % (type(separator)))
-	_line = "%s%s%s" % (separator, confline, separator)
-	_mentry = "%s%s%s" % (separator, re.escape(entry), separator)
-	_line = re.sub(_mentry , separator, _line)
-	_line = _line.strip(separator)
-	return _line
 
 def add_conf_entry(confline, entry, separator = ","):
 	"""Appends the given entry to the given configuration line. Entries in
@@ -370,18 +412,193 @@ def add_conf_entry(confline, entry, separator = ","):
 	@todo: Review behaviour if the entry contains characters equal to the \
 			separator.
 	"""
+	__conf_entry_func_type_check(confline, entry, separator)
+	_strip_confline = confline.strip(separator)
+	if not has_conf_entry(confline, entry, separator):
+		_strip_entry = entry
+		_line = r"%s%s%s" % (_strip_confline, separator, _strip_entry)	
+		_line = _line.strip( separator )
+	else:
+		_line = _strip_confline
+	return _line
+
+
+def remove_conf_entry(confline, entry, separator = ","):
+	"""Removes the given entry from the given string. Entries in configurations
+	are separated by the specified token. Leading and trailing separators are
+	taken into account.
+	
+	@param confline:  the string from which the entry should be removed
+	@param entry:	  the string that is removed
+	@param separator: the token that separates the entries
+	
+	@type confline:	  String
+	@type entry:      String
+	@type separator:  String
+	
+	@return: the configuration line without the removed entry
+	@rtype:  String
+	
+	@raise TypeError: If one of the given parameters is not of string type
+	"""
+	__conf_entry_func_type_check(confline, entry, separator)
+	_line = r"%s%s%s" % (separator, confline, separator)
+	_mentry = r"%s%s%s" % (separator, re.escape(entry), separator)
+	_line = re.sub(_mentry , separator, _line)
+	_line = _line.strip(separator)
+	return _line
+
+
+def has_conf_entry(confline, entry, separator = ","):
+	"""Checks whether the given `confline` contains the given
+	entry.
+	"""
+	__conf_entry_func_type_check(confline, entry, separator)
+	has_entry = False
+	conf_t = confline.split(separator)
+	for conf_e in conf_t:
+		if conf_e == entry:
+			has_entry = True
+			break
+	return has_entry
+
+
+def __conf_entry_func_type_check(confline, entry, separator):
+	"""Private helper function that does common type checking
+	in the `conf_entry_*` functions.
+	"""
 	if not isinstance(confline, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+		raise TypeError("Given parameter must be a string. "\
 					    "Got %s instead." % (type(confline)))
 	if not isinstance(entry, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+		raise TypeError("Given parameter must be a string. "\
 					    "Got %s instead." % (type(entry)))
 	if not isinstance(separator, types.StringTypes):
-		raise TypeError("remove_conf_entry: Given parameter must be a string. "\
+		raise TypeError("Given parameter must be a string. "\
 					    "Got %s instead." % (type(separator)))
-#	_strip_entry = entry.strip()
-	_strip_entry = entry
-	_strip_confline = confline.strip(separator)
-	_line = "%s%s%s" % (_strip_confline, separator, _strip_entry)	
-	_line = _line.strip( separator )
-	return _line
+	return None
+
+
+def _remove_dups(sequence):
+	"""Removes duplicate entries from the given list.
+	This is not the most efficient implementation, however it
+	provides safe behavior.
+	"""
+	if not isinstance(sequence, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(sequence))
+	
+	_dest = []
+	for val in sequence:
+		if val not in _dest:
+			_dest.append(val)
+	return _dest
+
+		
+def _list_union_no_dups_safe(source_a, source_b):
+	"""Merges the given lists into a single list not containing any
+	duplicate entries using the default way.
+	"""
+	if not isinstance(source_a, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(source_a))
+	if not isinstance(source_b, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(source_b))
+
+	_dest = _remove_dups(source_b)
+	for val_a in source_a:
+		if val_a not in _dest:
+			_dest.append(val_a)
+	return _dest
+
+
+def list_union(source_a, source_b):
+	"""Merges the given lists into a single list not containing any
+	duplicate entries in a very efficient way.
+	"""
+	# this functions uses sets in order to merge the lists
+	# doing so it is really fast compared to list operations
+	# however, this only works if the lists do not contain
+	# unhashable entries (such as other lists etc.)
+	# in this case the default algorithm is used
+	if not isinstance(source_a, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(source_a))
+	if not isinstance(source_b, types.ListType):
+		raise TypeError("Expected parameter of type 'list'. Got '%s' instead."\
+						% type(source_b))
+		
+	_logger = log.LogFactory.getLogger()
+	fallback = False
+	try:
+		_set_a = set(source_a)
+		_set_b = set(source_b)
+	except TypeError:
+		_logger.info("Lists contain unhashable types. Falling back on default.")
+		fallback = True
+	
+	if fallback:
+		_dest = _list_union_no_dups_safe(source_a, source_b)
+	else:
+		_set_dest = _set_a.union(_set_b)
+		_dest = list(_set_dest)
+
+	return _dest
+
+
+def get_humanreadable_size(size_in_bytes, binary_prefixes=False):
+	"""Converts given number into more readable values.
+	 
+	@todo: Implement sophisicated class for this!
+	@note: Have also a look at function `get_humanreadable_size_str`.
+	"""
+	factor = 1000
+	if binary_prefixes is True:
+		factor = 1024
+		
+	_mbytes = size_in_bytes / (factor*factor)
+	_kbytes = ( size_in_bytes % (factor*factor) ) / factor
+	_bytes = ( size_in_bytes % (factor*factor) ) % factor
+	
+	return (_mbytes, _kbytes, _bytes)
+
+
+def get_humanreadable_size_str(size_in_bytes, binary_prefixes=False):
+	"""Converts given number into readable string.
+	 
+	@todo: Implement sophisicated class for this!
+	"""
+	_mb, _kb, _byt = get_humanreadable_size(size_in_bytes=size_in_bytes, binary_prefixes=binary_prefixes)
+	if binary_prefixes is True:
+		_res = _("%(mb)d MiB %(kb)d KiB %(bytes)d") % {'mb' : _mb,
+													   'kb' : _kb,
+													   'bytes' : _byt}
+	else:
+		_res = _("%(mb)d MB %(kb)d kB %(bytes)d") % {'mb' : _mb,
+													   'kb' : _kb,
+													   'bytes' : _byt}
+	return _res
+
+
+def enable_timeout_alarm():
+	"""Helper method that enables timeout alarm handling.
+	
+	@todo: separate class? should we store the previous signal handler and restore it later? 
+	"""
+	# Set the signal handler
+	signal.signal(signal.SIGALRM, sigalarm_handler)
+
+
+def set_timeout_alarm(timeout):
+	"""Sets the timeout to the given value.
+	"""
+	signal.alarm(timeout)
+
+
+def sigalarm_handler(signum, stack_frame): #IGNORE:W0613
+	"""Signal handler that is connected to the SIGALRM signal.
+	
+	@raise TimeoutError: A `TimeoutError` exception is raised.
+	"""
+	raise exceptions.TimeoutError("Unable to open device.")

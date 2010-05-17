@@ -108,7 +108,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 						 "application.")
 			self._show_errmessage( message_str = str(exc),
 					boxtitle = _("NSsbackup error"),
-					headline_str = _("An error occured during initialization:"),
+					headline_str = _("An error occurred during initialization:"),
 					secmsg_str = _sec_msg)
 			self.fusefam.terminate()
 			sys.exit(-1)
@@ -165,7 +165,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
 
 	def init(self, parent = None):
-		_gladefile = Util.getResource('nssbackup-restore.glade')
+		_gladefile = Util.get_resource_file('nssbackup-restore.glade')
 
 		_wdgt_lst = [
 			'restorewindow',
@@ -232,7 +232,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 							  handlers = _hdls, root = _top_win_name,
 							  parent = parent, pull_down_dict=None )
 		self.set_top_window( self.widgets[_top_win_name] )
-		self.top_window.set_icon_from_file(Util.getResource("nssbackup-restore.png"))
+		self.top_window.set_icon_from_file(Util.get_resource_file("nssbackup-restore.png"))
 
 	def __init_statusbar(self):
 		"""Initializes the statusbar, i.e. gets the context (here
@@ -488,7 +488,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 			self.logger.error(traceback.format_exc())
 			self._show_errmessage( message_str = str(_items),
 					boxtitle = _("NSsbackup restore error"),
-					headline_str = _("An error occured "\
+					headline_str = _("An error occurred "\
 									 "while reading snapshot:"))
 			_items = None
 
@@ -534,7 +534,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		self.widgets['snpdetails'].set_sensitive(True)
 		
 		if snplist == []:
-			self.snplisttreestore.append( None, [_("No backups found for this day !"),None])
+			self.snplisttreestore.append( None, [_("No backups found for this day."),None])
 			self.widgets['snplist'].set_sensitive(False)
 		else:
 			self.widgets['snplist'].set_sensitive(True)
@@ -683,6 +683,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		if not isinstance(_result, Exception):
 			self.__restore_dialog.finish_sucess()
 		else:
+			self.logger.error(str(_result))
 			self.__restore_dialog.finish_failure( _result )
 		
 	def on_snpmanExpander_activate(self, *args):
@@ -720,7 +721,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 			um.upgradeSnapshot(self.currentSnp)
 		except Exception, _exc:
 			_message_str = "While attempting to upgrade "\
-				 "snapshot the following error occured:\n"\
+				 "snapshot the following error occurred:\n"\
 				 "%s" % str(_exc)
 			_boxtitle = _("NSsbackup restoration error")
 			_headline_str =\
@@ -763,12 +764,13 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 			self.historylisttreestore.clear()
 
 	def on_deleteButton_clicked(self, *args):
-		message = _("Are you sure that you want to definitely remove snapshot '%s' ?") % self.currentSnp
+		message = _("Are you sure that you want to remove snapshot '%s'?\n\nThis may take a while - be patient.") % self.currentSnp
 		dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=message)
 		response = dialog.run()
 		dialog.destroy()
 		if response == gtk.RESPONSE_YES:
-			try :
+			try:
+				self.logger.debug("Trying to remove snapshot '%s'" % self.currentSnp.getName())
 				self.snpman.removeSnapshot(self.currentSnp)
 			except Exception, e: 
 				self.logger.error(str(e))
@@ -796,26 +798,26 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 	  { "restore"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Restoring of selected files</b>"),
 						 "msg_progress"    : _("Restoring of <tt>'%s'</tt> is in progress."),
-						 "msg_sucess"  	   : _("Restoring of <tt>'%s'</tt> was sucessful."),
-						 "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_sucess"  	   : _("Restoring of <tt>'%s'</tt> was successful."),
+						 "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not successful.\n\nThe following error occurred:\n") },
 						 
 		"restore_as" : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Restoring of selected files</b>"),
 						 "msg_progress"    : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
-						 "msg_sucess"      : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was sucessful."),
-						 "msg_failure"     : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_sucess"      : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was successful."),
+						 "msg_failure"     : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nThe following error occurred:\n") },
 						 
 		"revert"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Reverting selected files</b>"),
 						 "msg_progress"    : _("Reverting of <tt>'%s'</tt> is in progress.\n"),
-						 "msg_sucess"  	   : _("Reverting of <tt>'%s'</tt> was sucessful."),
-						 "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_sucess"  	   : _("Reverting of <tt>'%s'</tt> was successful."),
+						 "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not successful.\n\nThe following error occurred:\n") },
 
 		"revert_as"	 : { "dialog_titletxt" : _("NSsbackup restoration"),
 						 "msg_headline"    : _("<b>Reverting selected files</b>"),
 						 "msg_progress"    : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
-						 "msg_sucess"      : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was sucessful."),
-						 "msg_failure"     : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not sucessful.\n\nThe following error occured:\n") },
+						 "msg_sucess"      : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was successful."),
+						 "msg_failure"     : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nThe following error occurred:\n") },
 	  }
 
 	def __init__(self, parent):
@@ -830,7 +832,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 		self._init_pulse()
 		
 	def init(self, parent):
-		_gladefile = Util.getResource('nssbackup-restore.glade')
+		_gladefile = Util.get_resource_file('nssbackup-restore.glade')
 
 		_wdgt_lst = [
 			'restoreDialog',
@@ -852,7 +854,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 							  parent = parent, pull_down_dict = None )
 		self.set_top_window( self.widgets[_top_win_name] )
 		self.top_window.set_icon_from_file(\
-									Util.getResource("nssbackup-restore.png"))
+									Util.get_resource_file("nssbackup-restore.png"))
 		
 	def _on_button_close_clicked(self, *args):
 		"""Event handler for clicking the close button.
@@ -900,7 +902,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 		self._start_pulse()
 		
 	def finish_sucess(self):
-		"""Signals the sucessful finish of the restoration process.
+		"""Signals the successful finish of the restoration process.
 		
 		@return: None
 		"""

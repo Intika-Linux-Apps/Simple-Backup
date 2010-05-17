@@ -41,16 +41,18 @@ import re
 import subprocess
 import optparse
 
+# project imports
 from nssbackup import Infos
 from nssbackup.util import log
+import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.managers.ConfigManager import getUserConfDir
+from nssbackup.managers.ConfigManager import ConfigManager
+from nssbackup.managers.BackupManager import BackupManager
 from nssbackup.util import getResource
 from nssbackup.util import dbus_support
 from nssbackup.util import state
-import nssbackup.managers.FileAccessManager as FAM
-from nssbackup.managers.ConfigManager import ConfigManager
 from nssbackup.managers.ConfigManager import ConfigurationFileHandler
 from nssbackup.managers.ConfigManager import ConfigStaticData
-from nssbackup.managers.BackupManager import BackupManager
 
     
 class NSsbackupd(object):
@@ -92,6 +94,7 @@ class NSsbackupd(object):
 
         # here the logger created for the default profile is used
         self.logger            = log.LogFactory.getLogger(self.__profilename)
+        self.logger.debug("%s %s" % (Infos.NAME, Infos.VERSION))
 
         # the currently used instance of the BackupManager
         self.__bm                = None
@@ -135,129 +138,6 @@ class NSsbackupd(object):
         if os.getuid() == 0:
             self.__super_user = True
             
-    def __retrieve_confm(self, force_conffile):
-        """Factory method that retrieves the appropriate configuration managers
-        for the existing profiles. Super-user rights are taken into account.
-        The created configuration managers are stored in member variable
-        'self.__confm'.
-        
-        :todo: Place the path names in class `ConfigStaticData`.
-        
-        """
-        self.__confm = []
-
-        # default profile config file and the config directory is determined
-        conffile_hdl = ConfigurationFileHandler()
-        if force_conffile is None:
-            conffile = conffile_hdl.get_conffile()
-        else:
-            conffile = force_conffile
-        confdir = conffile_hdl.get_profilesdir(conffile)
-
-        print "ConfigFile to use: `%s`, dir: `%s`" % (conffile, confdir)
-        # create config manager for the default profile and set as current
-        if os.path.exists( conffile ):
-            confm = ConfigManager( conffile )
-            self.__profilename = confm.getProfileName()
-            # store the created ConfigManager in a collection
-            self.__confm.append( confm )
-        else:
-            errmsg = _("Critical Error: No configuration file for the default "\
-                       "profile was found!\n\nNow continue processing "\
-                       "remaining profiles.")
-            self.__errors.append(errmsg)
-
-        # Now search for alternate configuration files
-        # They are located in (configdir)/nssbackup.d/
-        
-# TODO: replace this with 'get_profiles' from ConfigManager.py
-        if os.path.exists(confdir) and os.path.isdir(confdir):
-            cregex = re.compile(self.__confFilesRE)
-            cfiles = os.listdir( confdir )
-            for cfil in cfiles:
-                cfil_fullpath = os.path.join( confdir, cfil )
-                if os.path.isfile( cfil_fullpath ):
-                    mres = cregex.match( cfil )
-                    if mres:    # if filename matches, create manager and add it
-                        confm = ConfigManager( cfil_fullpath )
-                        self.__confm.append( confm )
-
-
-    def run(self):
-        """Actual main method to make backups using NSsbackup
-        
-        - checks for the user who called it
-        - if it's root, it makes a loop to run sbackup for all users that asked for it.
-         - if it's another user, launch BackupManager with the user configuration file
-        - catches all exceptions thrown and logs them (with stacktrace)
-
-        :todo: Add a commandline option and a config option whether to use dbus!
-        
-        """
-        
-        self.__notify_errlist()
-
-        for confm in self.__confm:
-            try:
-                self.__profilename     = confm.getProfileName()
-                self.logger            = log.LogFactory.getLogger(self.__profilename)
-                
-                self.__state.set_profilename(self.__profilename)
-
-                self.__bm              = BackupManager(confm, self.__state)
-                self.__log_errlist()
-                self.__bm.makeBackup()
-            except Exception, exc:
-                self.__on_error(exc)
-            finally:
-                self.__onFinish()
-
-        self.__terminate_notifiers()
-
-    def __on_error(self, error):
-        """Handles errors that occurs during backup process.
-        
-        """
-        self.logger.error(str(error))
-        self.logger.error(traceback.format_exc())
-
-        try:
-            self.__state.set_recent_error(error)
-            self.__state.set_state('error')
-        except Exception, err2:
-            self.logger.warning(str(err2))
-        
-        if self.__bm:
-            self.__bm.endSBsession()
-
-    def __onFinish(self):
-        """Method that is finally called after backup process.
-        """
-        if self.__bm and self.__bm.config :
-            # send the mail
-            if self.__bm.config.has_section("report") and\
-               self.__bm.config.has_option("report","to") :
-                self.__sendEmail()
-                
-    def __notify_errlist(self):
-        """Errors that occured during the initialization process were stored
-        in an error list. This error list is showed to the user by this method.
-        """
-        if len(self.__errors) > 0:
-            for errmsg in self.__errors:
-                self.__state.set_recent_error(errmsg)
-                self.__state.set_state('error')
-                
-    def __log_errlist(self):
-        """Errors that occurred during the initialization process
-        were stored in an error list. The full list of errors is
-        added to the current log.
-        
-        """
-        if len(self.__errors) > 0:
-            self.logger.info(_("The following error(s) occurred before:"))
-            for errmsg in self.__errors:
-                self.logger.error(errmsg.replace("\n", " "))
                 
     def __sendEmail(self):
         """Checks if the sent of emails is set in the config file 
@@ -325,6 +205,126 @@ class NSsbackupd(object):
         # send and close connection
         server.sendmail(_from, _to, msg.as_string())
         server.close()
+
+    def __retrieve_confm(self, force_conffile):
+        """Factory method that retrieves the appropriate configuration managers
+        for the existing profiles. Super-user rights are taken into account.
+        The created configuration managers are stored in member variable
+        'self.__confm'.
+        
+        :todo: Place the path names in class `ConfigStaticData`.
+        
+        """
+        self.__confm = []
+
+        # default profile config file and the config directory is determined
+        conffile_hdl = ConfigurationFileHandler()
+        if force_conffile is None:
+            conffile = conffile_hdl.get_conffile()
+        else:
+            conffile = force_conffile
+        confdir = conffile_hdl.get_profilesdir(conffile)
+
+        print "ConfigFile to use: `%s`, dir: `%s`" % (conffile, confdir)
+        # create config manager for the default profile and set as current
+        if os.path.exists( conffile ):
+            confm = ConfigManager( conffile )
+            self.__profilename = confm.getProfileName()
+            # store the created ConfigManager in a collection
+            self.__confm.append( confm )
+        else:
+            errmsg = _("Critical Error: No configuration file for the default "\
+                       "profile was found!\n\nNow continue processing "\
+                       "remaining profiles.")
+            self.__errors.append(errmsg)
+
+        # Now search for alternate configuration files
+        # They are located in (configdir)/nssbackup.d/
+        
+# TODO: replace this with 'get_profiles' from ConfigManager.py
+        if os.path.exists(confdir) and os.path.isdir(confdir):
+            cregex = re.compile(self.__confFilesRE)
+            cfiles = os.listdir( confdir )
+            for cfil in cfiles:
+                cfil_fullpath = os.path.join( confdir, cfil )
+                if os.path.isfile( cfil_fullpath ):
+                    mres = cregex.match( cfil )
+                    if mres:    # if filename matches, create manager and add it
+                        confm = ConfigManager( cfil_fullpath )
+                        self.__confm.append( confm )
+
+    def run(self):
+        """Actual main method to make backups using NSsbackup
+        
+        - launch BackupManager with the user configuration file
+        - catches all exceptions thrown and logs them (with stacktrace)
+
+        :todo: Add a commandline option and a config option whether to use dbus!
+        
+        """
+        self.__notify_init_errors()
+
+        for confm in self.__confm:
+            try:
+                self.__profilename     = confm.getProfileName()
+                self.logger            = log.LogFactory.getLogger(self.__profilename)
+                
+                self.__state.set_profilename(self.__profilename)
+
+                self.__bm              = BackupManager(confm, self.__state)
+                self.__log_errlist()
+                self.__bm.makeBackup()
+            except Exception, exc:
+                self.__on_error(exc)
+            finally:
+                self.__onFinish()
+
+        self.__terminate_notifiers()
+
+    def __on_error(self, error):
+        """Handles errors that occurs during backup process.
+        
+        """
+        self.logger.error(str(error))
+        self.logger.error(traceback.format_exc())
+
+        try:
+            self.__state.set_recent_error(error)
+            self.__state.set_state('error')
+        except Exception, err2:
+            self.logger.warning(str(err2))
+        
+        if self.__bm:
+            self.__bm.endSBsession()
+
+    def __onFinish(self):
+        """Method that is finally called after backup process.
+        """
+        if self.__bm and self.__bm.config :
+            # send the mail
+            if self.__bm.config.has_section("report") and\
+               self.__bm.config.has_option("report","to") :
+                self.__sendEmail()
+                
+    def __notify_init_errors(self):
+        """Errors that occurred during the initialization process were stored
+        in an error list. This error list is showed to the user by this method.
+        """
+        if len(self.__errors) > 0:
+            for errmsg in self.__errors:
+                self.__state.set_recent_error(errmsg)
+                self.__state.set_state('error')
+                
+    def __log_errlist(self):
+        """Errors that occurred during the initialization process
+        were stored in an error list. The full list of errors is
+        added to the current log.
+        
+        """
+        if len(self.__errors) > 0:
+            self.logger.info(_("The following error(s) occurred before:"))
+            for errmsg in self.__errors:
+                self.logger.error(errmsg.replace("\n", " "))
                 
                 
 

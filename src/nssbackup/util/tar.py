@@ -40,7 +40,7 @@ from datetime import datetime
 import time
 from nssbackup.managers import ConfigManager
 from nssbackup.managers.ConfigManager import ConfigurationFileHandler
-
+from nssbackup.managers import FileAccessManager as fam
 
 def getArchiveType(archive):
 	"""Determines the type of an archive by its mime type.
@@ -74,7 +74,8 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize=None):
 	"""
 	# strip leading sep
 	file = file.lstrip(os.sep)
-	
+	# tar option  -p, --same-permissions, --preserve-permissions:
+	# ignore umask when extracting files (the default for root)
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
 	archType = getArchiveType(sourcear)
@@ -85,7 +86,7 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize=None):
 	elif archType == "bzip2" :
 		options.insert(1,"--bzip2")
 	else :
-		raise SBException (_("Invalid Archive type"))
+		raise SBException (_("Invalid archive type."))
 		
 	if os.getuid() == 0 :
 		options.append("--same-owner")
@@ -97,31 +98,36 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize=None):
 		options.append("--suffix="+bckupsuffix)
 	
 	if splitsize :
-		options.extend(["-L "+ str(splitsize) , "-F "+ Util.getResource("multipleTarScript")])
+		options.extend(["-L "+ str(splitsize) , "-F "+ Util.get_resource_file("multipleTarScript")])
 	
 	options.extend(['--file='+sourcear,file])
 	
-	LogFactory.getLogger().debug("Launching TAR with options : %s" % options)
+	LogFactory.getLogger().debug("Launching TAR with options: %s." % options)
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
-		LogFactory.getLogger().debug("output was : " + outStr)
-		raise SBException("Error when extracting : " + errStr )
-	LogFactory.getLogger().debug("output was : " + outStr)
+		LogFactory.getLogger().debug("output was: " + outStr)
+		raise SBException("Error when extracting: " + errStr )
+	if outStr.strip() == "":
+		outStr = "(nothing)"
+	LogFactory.getLogger().debug("output was: " + outStr)
 	
-def extract2(sourcear, fileslist, dest, bckupsuffix = None,additionalOpts=None ):
-	"""
-	Extract the files listed in the 'fileslist' file to dest. This method 
+
+# extract2 is currently (series 0.2) only used in SnapshotManager.makeTmpTAR
+def extract2(sourcear, fileslist, dest, bckupsuffix=None, additionalOpts=None):
+	"""Extract the files listed in the 'fileslist' file to dest. This method 
 	has been created to optimize the time spent by giving to tar a complete 
-	list of file to extract. Use this if ever you have to extract more than 1 dir .
+	list of file to extract.
+	
+	Use this if ever you have to extract more than 1 dir .
+	
 	@param sourcear:
 	@param fileslist: a path to the file containing the list
 	@param dest: destination
 	@param bckupsuffix: 
-	@param additionalOpts: a list of aption to add
+	@param additionalOpts: a list of options to add
 	"""
 	# tar option  -p, --same-permissions, --preserve-permissions:
 	# ignore umask when extracting files (the default for root)
-
 	options = ["-xp", "--ignore-failed-read", '--backup=existing']
 	
 	archType = getArchiveType(sourcear)
@@ -132,34 +138,40 @@ def extract2(sourcear, fileslist, dest, bckupsuffix = None,additionalOpts=None )
 	elif archType == "bzip2" :
 		options.insert(1,"--bzip2")
 	else :
-		raise SBException (_("Invalid Archive type"))
+		raise SBException (_("Invalid archive type."))
 		
-	if os.getuid() == 0 :
+	if os.getuid() == 0:
 		options.append("--same-owner")
-	if dest :
+		
+	if dest:
 		options.append( "--directory="+dest )
-	else : 
+	else: 
 		options.append( "--directory="+os.sep )
-	if bckupsuffix :
+	
+	if bckupsuffix:
 		options.append("--suffix="+bckupsuffix)
 	
-	if additionalOpts and type(additionalOpts) == list :
+	if additionalOpts and type(additionalOpts) == list:
 		options.extend(additionalOpts)
 		
-	options.extend(['--file='+sourcear,'--null','--files-from='+os.path.normpath(fileslist)])
+	options.extend(['--file='+sourcear,'--null',
+					'--files-from='+os.path.normpath(fileslist)])
 	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
 		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	LogFactory.getLogger().debug("output was : " + outStr)
+	if outStr.strip() == "":
+		outStr = "(nothing)"
+	LogFactory.getLogger().debug("output was: " + outStr)
 
-def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
+
+def appendToTarFile(desttar, fileslist, workingdir, additionalOpts):
 	"""
 	@param desttar: The tar file to wich append
-	@param fileOrDir: The file or directory to append, can be a list of files too
-	@type fileOrDir: str or list
-	@param workingDir: the dir to move in before appending the dir ( usefun for relative paths)
+	@param fileslist The files to append, can be a list of files too
+	@type fileslist: list
+	@param workingdir: the dir to move in before appending the dir ( usefun for relative paths)
 	@param additionalOpts: a list of additional option to append (will be append before changing the working dir)
 	"""
 	options = ["--append", "--ignore-failed-read"]
@@ -172,7 +184,7 @@ def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	elif archType == "bzip2" :
 		options.insert(1,"--bzip2")
 	else :
-		raise SBException (_("Invalid Archive type"))
+		raise SBException (_("Invalid archive type."))
 		
 	if additionalOpts and type(additionalOpts) == list :
 		options.extend(additionalOpts)
@@ -181,46 +193,21 @@ def appendToTarFile(desttar, fileOrDir, workingdir=None,additionalOpts=None ):
 	
 	if workingdir:
 		options.append("--directory="+workingdir)
-	
-	if type(fileOrDir) is str:
-		options.append(fileOrDir)
-	elif type(fileOrDir) is list :
-		options.extend(fileOrDir)
-	
-	outStr, errStr, retval = Util.launch("tar", options)
-	if retval != 0 :
-		LogFactory.getLogger().debug("output was : " + outStr)
-		raise SBException("Error when extracting : " + errStr )
-	LogFactory.getLogger().debug("output was : " + outStr)
+				
+	options.append('--files-from='+os.path.normpath(fileslist))
 
-def appendToTarFile2(desttar, fileslist, additionalOpts=None ):
-	"""
-	"""
-	options = ["--append", "--ignore-failed-read"]
-	
-	archType = getArchiveType(desttar)
-	if archType =="tar" :
-		pass
-	elif archType == "gzip" :
-		options.insert(1,"--gzip")
-	elif archType == "bzip2" :
-		options.insert(1,"--bzip2")
-	else :
-		raise SBException (_("Invalid Archive type"))
-		
-	if additionalOpts and type(additionalOpts) == list :
-		options.extend(additionalOpts)
-		
-	options.extend(['--file='+desttar,'--null','--files-from='+os.path.normpath(fileslist)])
-	
 	outStr, errStr, retval = Util.launch("tar", options)
 	if retval != 0 :
 		LogFactory.getLogger().debug("output was : " + outStr)
 		raise SBException("Error when extracting : " + errStr )
-	LogFactory.getLogger().debug("output was : " + outStr)
+	if outStr.strip() == "":
+		outStr = "(nothing)"
+	LogFactory.getLogger().debug("output was: " + outStr)
+
 
 def __prepareTarCommonOpts(snapshot):
-	"""Prepare the options to fill tar in.
+	"""Prepares common TAR options used when full or incremental
+	backups are being made.  
 	
 	:param snapshot: The snapshot to fill in
 	:return: a list of options to be use to launch tar
@@ -250,7 +237,7 @@ def __prepareTarCommonOpts(snapshot):
 	elif snapshot.getFormat() == "none":
 		pass
 	else :
-		LogFactory.getLogger().debug("Defaulting to gzip ! ")
+		LogFactory.getLogger().debug("Setting compression to default 'gzip'.")
 		options.insert(1,"--gzip")
 		archivename+=".gz"
 	
@@ -261,6 +248,7 @@ def __prepareTarCommonOpts(snapshot):
 	LogFactory.getLogger().debug("Common TAR options : " + str(options))
 	
 	return options 
+	
 	
 def __addSplitOpts(snapshot, options, size):
 	"""
@@ -275,9 +263,10 @@ def __addSplitOpts(snapshot, options, size):
 	@raise SBException: if the snapshot format is other than none
 	"""
 	if snapshot.getFormat() != "none" :
-		raise SBException(_("For the moment split functionality is not compatible with compress option ! "))
-	options.extend(["-L "+ str(size) , "-F "+ Util.getResource("multipleTarScript")])
+		raise SBException(_("For the moment split functionality is not compatible with compress option."))
+	options.extend(["-L "+ str(size) , "-F "+ Util.get_resource_file("multipleTarScript")])
 	return options
+
 
 def makeTarIncBackup(snapshot):
 	"""
@@ -285,7 +274,7 @@ def makeTarIncBackup(snapshot):
 	@param snapshot: the snapshot in which to make the backup
 	@raise SBException: if there was a problem with tar
 	"""
-	LogFactory.getLogger().info(_("Launching TAR to make Inc backup "))
+	LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
@@ -304,8 +293,8 @@ def makeTarIncBackup(snapshot):
 	
 	# For an INC backup the base SNAR file should exists
 	if not os.path.exists( base_snarfile ) :
-		LogFactory.getLogger().error(_("Unable to find the SNAR file to make an Incremental backup"))
-		LogFactory.getLogger().error(_("Falling back to full backup"))
+		LogFactory.getLogger().error(_("Unable to find the SNAR file to make an incremental backup."))
+		LogFactory.getLogger().error(_("Falling back to full backup."))
 		makeTarFullBackup(snapshot)
 	else:
 		shutil.copy( base_snarfile, tmp_snarfile )		
@@ -329,22 +318,17 @@ def makeTarIncBackup(snapshot):
 			LogFactory.getLogger().warning(_("Unable to change permissions for "\
 									  "file '%s'.") % snarfile )
 		os.remove( tmp_snarfile )
-		if retVal == 1 :
-			# list-incremental is not compatible with ignore failed read
-			LogFactory.getLogger().warning(_("TAR sent a warning when making the backup : ") + errStr )
-		elif retVal != 0 :
-			# list-incremental is not compatible with ignore failed read
-			LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
-			raise SBException(_("Couldn't make a proper backup : ") + errStr )
+		__finish_backup(retVal, errStr)
 		
 
 def makeTarFullBackup(snapshot):
-	"""
-	Launch a TAR full backup
+	"""Convenience function that launches TAR to create a full backup.
+
 	@param snapshot: the snapshot in which to make the backup
+
 	@raise SBException: if there was a problem with tar
 	"""
-	LogFactory.getLogger().info(_("Launching TAR to make a Full backup "))
+	LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 	
 	options = __prepareTarCommonOpts(snapshot)
 	
@@ -368,7 +352,9 @@ def makeTarFullBackup(snapshot):
 	options.append( "--listed-incremental="+tmp_snarfile )
 
 	outStr, errStr, retVal = Util.launch("tar", options)
-	LogFactory.getLogger().debug("TAR Output : " + outStr)
+	LogFactory.getLogger().debug("TAR exitcode: %s" % retVal)
+	LogFactory.getLogger().debug("TAR Output: " + outStr)
+	LogFactory.getLogger().debug("TAR Errors: " + errStr)
 
 	# and move the temporary snarfile into the backup directory
 	try:
@@ -377,14 +363,22 @@ def makeTarFullBackup(snapshot):
 		LogFactory.getLogger().warning(_("Unable to change permissions for "\
 									  "file '%s'.") % snarfile )
 	os.remove( tmp_snarfile )
+	__finish_backup(retVal, errStr)
 
-	if retVal == 1 :
+
+def __finish_backup(exitcode, error_str):
+	_logger = LogFactory.getLogger() 
+	if exitcode == 0:
+		_logger.info(_("TAR has been finished successfully."))
+	elif exitcode == 1:
 		# list-incremental is not compatible with ignore failed read
-		LogFactory.getLogger().warning(_("TAR sent a warning when making the backup : ") + errStr )
-	elif retVal != 0 :
+		_logger.warning(_("TAR returned a warning during the backup process: "\
+						  "%s") % error_str)
+	else:
 		# list-incremental is not compatible with ignore failed read
-		LogFactory.getLogger().error(_("Couldn't make a proper backup : ") + errStr )
-		raise SBException(_("Couldn't make a proper backup : ") + errStr )
+		_errmsg = _("TAR aborted. Unable to make a proper backup: %s") % error_str 
+		_logger.error(_errmsg)
+		raise SBException(_errmsg)
 
 	
 def get_dumpdir_from_list(lst_dumpdirs, filename):
@@ -393,15 +387,21 @@ def get_dumpdir_from_list(lst_dumpdirs, filename):
 	
 	@raise SBExcetion: if filename couldn't be found in list  
 	"""
+#	print ">>> get_dumpdir_from_list"
+#	print "  Looking for: %s" % filename
+#	print "  List of dumpdirs:"
+#	for _ddir in lst_dumpdirs:
+#		print "    %s" % _ddir
+		
 	_res = None
 
 	if not isinstance(lst_dumpdirs, list):
-		raise TypeError("Given list of dumpdirs must be of type list! Got %s "\
+		raise TypeError("Given list of dumpdirs must be of type list. Got %s "\
 					    "instead." % type(lst_dumpdirs))
 	for _ddir in lst_dumpdirs:
 		if not isinstance(_ddir, Dumpdir):
 			raise TypeError("Element in list of dumpdirs must be of type "\
-							"Dumpdir! Got %s instead." % type(_ddir))
+							"Dumpdir. Got %s instead." % type(_ddir))
 
 		if _ddir.getFilename() == filename:
 			_res = _ddir
@@ -474,7 +474,7 @@ class Dumpdir(object):
 			raise TypeError(_("Line must be a string"))
 		line = line.strip("\0")
 		if len(line) < 2:
-			raise ValueError("Line must contain 2 characters at minimum!")
+			raise ValueError("Line must contain 2 characters at minimum.")
 		self.control = line[0]
 		self.filename = line[1:]
 
@@ -531,7 +531,9 @@ class SnapshotFile(object):
 	For displaying the content of an incremental backup manually use:
 	tar --bzip --list --incremental --verbose --verbose --file files.tar.bz2
 
-	@see: http://www.gnu.org/software/tar/manual/html_chapter/Tar-Internals.html#SEC172
+	@see: http://www.gnu.org/software/tar/manual/html_chapter/Tar-Internals.html#SEC177
+	
+	@attention: Only snapshot files in `format 2` are supported.
 	
 	@todo: Rename into 'DirectoryFile' or 'SnapshotDirectoryFile' since it only
 	       collects directories!
@@ -571,7 +573,19 @@ class SnapshotFile(object):
 				fd = open(self.snpfile, 'a+')
 				fd.close()
 			else :
-				raise SBException(_("'%s' doesn't exist ") % filename)
+				raise SBException(_("File '%s' does not exist.") % filename)
+
+	def __str__(self):
+		_str = [ "Snapshot file",
+				 " Header: %s" % self.getHeader(),
+				 " Version: %s" % self.getFormatVersion(),
+				 " file name: %s" % self.snpfile,
+				 " Content:"
+			   ]
+		for _item in self.parseFormat2():
+			_str.append("  %s" % _item)
+			
+		return "\n".join(_str)
 
 	def get_filename(self):
 		return self.snpfile
@@ -688,7 +702,7 @@ class SnapshotFile(object):
 			while n < 2 :
 				c = fd.read(1)
 				if len(c) != 1:
-					raise SBException(_("The snarfile header is incomplete !"))
+					raise SBException(_("The snarfile header is incomplete."))
 				if c == '\0' : n += 1
 			
 			currentline=""
@@ -724,7 +738,7 @@ class SnapshotFile(object):
 			while n < 2 :
 				c = fd.read(1)
 				if len(c) != 1:
-					raise SBException(_("The snarfile header is incomplete !"))
+					raise SBException(_("The snarfile header is incomplete."))
 				if c == '\0' : n += 1
 				header += c
 		else :
@@ -783,13 +797,113 @@ class SnapshotFile(object):
 		for dumpdir in contentList:
 			if not isinstance(dumpdir, Dumpdir):
 				raise TypeError("Contentlist must contain elements of type "\
-							    "'Dumdir'! Got %s instead." % type(dumpdir))
+							    "'Dumdir'. Got %s instead." % type(dumpdir))
 			result += dumpdir.getControl()+dumpdir.getFilename()+self.__SEP
 		
 		return result
+	
+	def get_time_of_backup(self):
+		"""Returns the time of the snapshot (as stored in the snapshot file)
+		in seconds since beginning of the epoch.
+		
+		@rtype: Float
+		"""
+		_header = self.getHeader()
+		_header_t = _header.split("\n")
+		assert len(_header_t) == 2
+		_time_t = _header_t[1].split(self.__SEP)
+		assert len(_time_t) > 1
+		_time = float("%s.%s" % (_time_t[0], _time_t[1]))
+		return _time
+				
+	def get_dict_format2(self):
+		"""Returns the content of the snapshot file as dictionary.
+		This provides a much faster way of accessing the content than
+		parsing the file on demand. The required RAM is moderate,
+		a 10GiB partition filled with files results in 6MiB dictonary.
+		
+		@warning: only compatible tar version 2 of Tar format
+		@note: Uses the same algorithm as method `parseFormat2` and is ~15% faster
+				than the high-level variant below.
+		"""
+		_snardict = {}
+			
+		fd = open(self.snpfile)
+		# skip header which is the first line and 2 entries separated with NULL in this case
+		l = fd.readline()
+		if l != "":
+			#Snarfile not empty
+			n = 0
+			while n < 2 :
+				c = fd.read(1)
+				if len(c) != 1:
+					raise SBException(_("The snarfile header is incomplete !"))
+				if c == '\0':
+					n += 1
+			
+			currentline = ""
+			last_c = ''			
+			c = fd.read(1)			
+			while c:
+				currentline += c
+				if c == '\0' and last_c == '\0' :
+					# we got a line
+					nfs, mtime_sec, mtime_nano, dev_no, i_no, _dirname,\
+						_content = currentline.lstrip("\0").split("\0", 6)
+					_snardict[_dirname] = Dumpdir.DIRECTORY
+					_content_t = _content.rstrip('\0').split('\0')
+					for _entry in _content_t:
+						_entry = _entry.strip("\0")
+						if _entry:
+							_epath = fam.normpath(_dirname, _entry[1:])
+							_snardict[_epath] = _entry[0]
+
+					currentline = ''
+					last_c = ''
+				else :
+					last_c = c
+				c = fd.read(1)
+			
+		fd.close
+		return _snardict
+
+#	def get_dict_format2(self):
+#		"""		
+#		@warning: only compatible tar version 2 of Tar format
+#
+#		more high-level programmed
+#		"""
+##		_dirdict = {}
+#		_snardict = {}
+#
+#		for _record in self.parseFormat2():
+##			print _record
+#			_dirname = _record[self.REC_DIRNAME]
+#			_content = _record[self.REC_CONTENT]
+##			if _dirname in _dirdict:
+##				raise ValueError("Directory is already contained.")
+##			_dirdict[_dirname] = _content
+#			
+#			_snardict[_dirname] = Dumpdir.DIRECTORY
+#			
+#			for _entry in _content:
+##				print "Type: %s name: '%s' control: '%s'" %(type(_entry),
+##														_entry.getFilename(),
+##														_entry.getControl())
+#				_epath = fam.normpath(_dirname, _entry.getFilename())
+#				_snardict[_epath] = _entry.getControl()
+#			
+#
+##		print "Dir dictionary:\n%s" % _dirdict  			
+##		print "Snar dictionary:\n%s" % _snardict  
+#		return _snardict
 
 
 class SnapshotFileWrapper(object):
+	"""Something like an Interface class.
+	
+	@todo: Review/Implement
+	"""
 	def __init__(self):
 		pass
 	
@@ -801,6 +915,8 @@ class MemSnapshotFile(SnapshotFileWrapper, SBdict):
 	"""
 	This is a representation in memory of a simplified SNAR file. The used structure is an SBDict.
 	The "prop" value is the content of the directory. wich is a list of L{Dumpdir}
+	
+	@note: In the series 0.2 implementation this variant is not used.
 	"""
 		
 	def __init__(self, snapshotFile):
@@ -893,8 +1009,20 @@ class ProcSnapshotFile(SnapshotFileWrapper):
 		
 		self.__snapshotFile = snapshotFile
 		
+	def __str__(self):
+		_str = "Snar file: '%s'" % self.__snapshotFile
+		return _str
+		
 	def get_snapfile_path(self):
 		return self.__snapshotFile.get_filename()
+
+	def get_snapfile_obj(self):
+		"""Returns the wrapped instance of the snapshot file.
+		
+		@return: snapshot file object
+		@rtype: SnapshotFile
+		"""
+		return self.__snapshotFile
 
 	def hasPath(self,path):
 		"""
@@ -973,10 +1101,9 @@ class ProcSnapshotFile(SnapshotFileWrapper):
 		@raise SBException: if the path isn't found in the snapshot file
 		"""
 		for f in self.__snapshotFile.parseFormat2():
-#			if f[-2].rstrip(os.sep) == dirpath.rstrip(os.sep) :
 			if f[SnapshotFile.REC_DIRNAME].rstrip(os.sep) == dirpath.rstrip(os.sep) :
 				return f[SnapshotFile.REC_CONTENT]
-		raise SBException(_("Non existing directory : %s") % dirpath)
+		raise SBException(_("Directory does not exist: %s.") % dirpath)
 			
 	def getFirstItems(self):
 		"""

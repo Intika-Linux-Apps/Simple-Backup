@@ -1,0 +1,13 @@
+#
+# General datas
+#
+# Format:
+#   VERSION=version number
+#   PKGNAME=name of the application/package
+#
+# Attention:
+#   Use exactly the prescribed format. Additional spaces are not allowed.
+#
+VERSION=0.2-0~rc9
+PKGNAME=nssbackup
+

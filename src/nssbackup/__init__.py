@@ -33,6 +33,9 @@ import os
 import socket
 from gettext import gettext as _
 
+from nssbackup import util
+
+
 class Infos(object):
 	"""Collects general informations about NSsbackup.
 	
@@ -46,7 +49,7 @@ class Infos(object):
 	
 	NAME = "Not So Simple Backup Suite"
 	
-	VERSION = "0.2-0"
+	VERSION = util.get_version_number()
 	
 	DESCRIPTION = _("This is a user friendly backup solution for common "\
 					"desktop needs. If you want to help by submitting bugs, "\

@@ -14,10 +14,10 @@
 
 # Authors :
 #	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+#   Jean-Peer Lorenz <peer.loz@gmx.net>
 
 
 import unittest
-import os
 from nssbackup.util.structs import SBdict
 
 
@@ -80,5 +80,18 @@ class TestSBdict(unittest.TestCase):
 		self.assertFalse(self.sbd.hasFile("/home/usr1/usr2/test/dir/test/de"))
 		self.assertTrue(self.sbd.has_key("/home/usr1/usr2/test/dir/test/de"))
 		
-suite = unittest.TestLoader().loadTestsFromTestCase(TestSBdict)
-unittest.TextTestRunner(verbosity=2).run(suite)
+
+def suite():
+	"""Returns a test suite containing all test cases from this module.
+	"""
+	_loader = unittest.TestLoader().loadTestsFromTestCase
+	_suite = unittest.TestSuite()
+	_suite.addTests(
+		[
+		 _loader(TestSBdict),
+		])
+	return _suite
+
+
+if __name__ == "__main__":	
+	unittest.TextTestRunner(verbosity=2).run(suite())
