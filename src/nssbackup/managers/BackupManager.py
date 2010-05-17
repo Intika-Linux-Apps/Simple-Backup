@@ -324,7 +324,7 @@ class BackupManager(PyNotifyMixin):
 		# Set the base file
 		if base :
 			if self.__actualSnapshot.isfull():
-				self.logger.info("Base is not set for full snapshot")
+				self.logger.debug("Base is not being set for this full snapshot.")
 			else:
 				self.logger.info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
 				self.__actualSnapshot.setBase(base.getName())

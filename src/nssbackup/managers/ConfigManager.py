@@ -1074,14 +1074,13 @@ class ConfigManager(ConfigParser.ConfigParser):
 		the file used to setup CRON (precise setting). 
 		"""
 		_cronheader = ConfigManagerStaticData.get_cronheader()
-		_cronline = self.get("schedule", "cron")
+		_cronexpr = self.get("schedule", "cron")
 		_cronuser = self.__schedules_user
 		_execline = "if [ -x '%s' ]; then %s; fi;" % (self.__servicefile,
 													  self.__servicefile)
-						
-		_content = "%s\n%s\t%s\t%s" % (_cronheader, _cronline,
-									   _cronuser, _execline)
-		print "Content: '%s'" % _content
+		# Note: cron requires a newline at the end of the file
+		_content = "%s\n%s\t%s\t%s\n" % (_cronheader, _cronexpr,
+									     _cronuser, _execline)
 		return _content
 			
 	def __erase_services(self):
