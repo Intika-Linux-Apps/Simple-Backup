@@ -42,6 +42,7 @@ from gettext import gettext as _
 # project imports
 from nssbackup import Infos
 from nssbackup.util import log
+from nssbackup.util import exceptions
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.managers.ConfigManager import getUserConfDir
 from nssbackup.managers.ConfigManager import ConfigManager
@@ -72,7 +73,7 @@ class NSsbackupd(PyNotifyMixin) :
 		self.__errors			= []
 		self.__super_user		= False
 		self.__check_for_superuser()
-		
+				
 		# collection of all config managers
 		self.__confm			= []
 		# the name of the currently processed profile
@@ -215,26 +216,40 @@ class NSsbackupd(PyNotifyMixin) :
 				self.__bm 			= BackupManager( confm )
 				self.__log_errlist()
 				self.__bm.makeBackup()
-			except Exception, e:
-				self.__onError(e)
-			finally:
-				self.__onFinish()
+				self.__bm.endSBsession()
+			except exceptions.InstanceRunningError, exc:
+				self.__on_already_running(exc)
+			except Exception, exc:
+				self.__onError(exc)
+				
+			self.__onFinish()
+
+	def __on_already_running(self, error):
+		"""Handler for the case a backup process is already running.
+		Fuse is not initialized yet.
+		"""
+		try:
+			_msg = "Backup is not being started.\n%s" % (str(error))
+			self.logger.warning(_msg)
+			self._notify_warning(self.__profileName, _msg)
+		except Exception, exc:
+			self.logger.error("Exception in error handling code:\n%s" % str(exc))
+			self.logger.error(traceback.format_exc())
 
 	def __onError(self, e):
 		"""Handles errors that occurs during backup process.
 		"""
-		self.logger.error(str(e))
-		self.logger.error(traceback.format_exc())
-
 		try:
-			n_body = "An error occured: '%s'" % (str(e))
+			n_body = _("An error occured during the backup:\n%s") % (str(e))
+			self.logger.error(n_body)
+			self.logger.debug(traceback.format_exc())
 			self._notify_error(self.__profileName, n_body)
-		except Exception, e1:
-			self.logger.warning(str(e1))
+			if self.__bm:
+				self.__bm.endSBsession()
+		except Exception, exc:
+			self.logger.error("Exception in error handling code:\n%s" % str(exc))
+			self.logger.error(traceback.format_exc())
 		
-		if self.__bm:
-			self.__bm.endSBsession()
-
 	def __onFinish(self):
 		"""Method that is finally called after backup process.
 		"""

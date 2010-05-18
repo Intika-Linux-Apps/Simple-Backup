@@ -262,12 +262,11 @@ class BackupManager(PyNotifyMixin):
 			writes everything into the snapshot directory).
 		9. release lock
 		"""
+		self.__setlockfile()
+
 		_msg = _("Backup process is being started.")
 		self._notify_info(self.__profilename, _msg)
 		self.logger.info(_msg)
-		
-		# set the lockfile
-		self.__setlockfile()
 		
 		try:
 			self.__fusefam.initialize()
@@ -374,7 +373,6 @@ class BackupManager(PyNotifyMixin):
 		self.__fillSnapshot()					
 		self._notify_info(self.__profilename, _("File list ready, committing to disk."))				
 		self.__actualSnapshot.commit()
-		self.endSBsession()
 		
 	def __fillSnapshot(self):
 		"""Fill snapshot's include and exclude lists and retrieve some information
@@ -419,6 +417,8 @@ class BackupManager(PyNotifyMixin):
 				
 	def __setlockfile(self):
 		"""Set the lockfile.
+		
+		@todo: Lock file should be created and removed in daemon!
 		"""
 		if self.config.has_option("general", "lockfile") :
 			self.__lockfile = self.config.get("general", "lockfile")
@@ -430,21 +430,28 @@ class BackupManager(PyNotifyMixin):
 		if FAM.exists(self.__lockfile) :
 			# the lockfile exists, is it valid ?
 			last_sb_pid = FAM.readfile(self.__lockfile)
-			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read()) ) :
-				raise exceptions.SBException(_("Another NSsbackup daemon already running (pid = %s )!") % last_sb_pid )
-			else :
-				FAM.delete(self.__lockfile)
+			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and\
+				"nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read())):
+					raise exceptions.InstanceRunningError(\
+					_("Another instance of '(not so) Simple Backup' is already running (process id: %s).")\
+					  % last_sb_pid )
+			else:
+				self.logger.info(_("Invalid lock file found. Is being removed."))
+				self.__unsetlockfile()
 		
 		FAM.writetofile(self.__lockfile, str(os.getpid()))
-		self.logger.debug("Created lockfile at '%s' with info '%s'"\
+		self.logger.debug("Created lockfile at '%s' with info '%s'."\
 						  % (self.__lockfile, str(os.getpid()) ))
 		
 	def __unsetlockfile(self):
 		"""Remove lockfile.
 		"""
-		FAM.delete(self.__lockfile)
-		self.logger.debug("Lock file '%s' removed."	% self.__lockfile)
-
+		try:
+			FAM.delete(self.__lockfile)
+			self.logger.debug("Lock file '%s' removed."	% self.__lockfile)
+		except OSError, _exc:
+			self.logger.error(_("Unable to remove lock file: %s" % str(_exc)))
+			
 	def __copylogfile(self):
 		# destination for copying the logfile
 		if self.__actualSnapshot:

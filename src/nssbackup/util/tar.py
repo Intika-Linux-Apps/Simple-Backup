@@ -371,8 +371,8 @@ def __finish_backup(exitcode, error_str):
 						  "%s") % error_str)
 	else:
 		# list-incremental is not compatible with ignore failed read
-		_errmsg = _("TAR aborted. Unable to make a proper backup: %s") % error_str 
-		_logger.error(_errmsg)
+		_errmsg = _("Unable to make a proper backup. TAR was terminated.") 
+		_logger.error("%s\n%s" % (_errmsg, error_str))
 		raise SBException(_errmsg)
 
 	
