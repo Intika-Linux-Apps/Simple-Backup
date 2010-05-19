@@ -111,8 +111,7 @@ class PyNotifyMixin(object):
 					self.__notif.show()
 				except gobject.GError, exc:
 					# Connection to notification-daemon failed 
-					self.logger.warning(_("Connection to notification-daemon "\
-										"failed: %s.") % str(exc))
+					self.logger.warning(_("Connection to notification-daemon failed: %s.") % str(exc))
 
 	def _notify_warning(self, profilename, message):
 		"""Shows up a pop-up window to inform the user. The notification
@@ -156,8 +155,7 @@ class PyNotifyMixin(object):
 					notif.show()
 				except gobject.GError, exc:
 					# Connection to notification-daemon failed 
-					self.logger.warning(_("Connection to notification-daemon "\
-										"failed: %s.") % str(exc))
+					self.logger.warning(_("Connection to notification-daemon failed: %s.") % str(exc))
 
 	def __get_notification(self, profilename, message):
 		"""Returns a notification object but does not display it. The
@@ -181,11 +179,10 @@ class PyNotifyMixin(object):
 			ico = Util.get_resource_file("nssbackup32x32.png")
 			try:
 				notif = self.__pynotif_mod.Notification(
-								"NSsbackup [%s]" % profilename, message, ico)
+					"(Not So) Simple Backup\n[%s]" % profilename, message, ico)
 			except gobject.GError, exc:
 				# Connection to notification-daemon failed 
-				self.logger.warning(_("Connection to notification-daemon "\
-									"failed: %s.") % str(exc))
+				self.logger.warning(_("Connection to notification-daemon failed: %s.") % str(exc))
 				notif = None
 		return notif
 
@@ -204,11 +201,10 @@ class PyNotifyMixin(object):
 			ico = Util.get_resource_file("nssbackup32x32.png")
 			try:
 				self.__notif.update(
-								"NSsbackup [%s]" % profilename, message, ico)
+					"(Not So) Simple Backup\n[%s]" % profilename, message, ico)
 			except gobject.GError, exc:
 				# Connection to notification-daemon failed 
-				self.logger.warning(_("Connection to notification-daemon "\
-									"failed: %s.") % str(exc))
+				self.logger.warning(_("Connection to notification-daemon failed: %s.") % str(exc))
 				self.__notif = None
 				
 				
@@ -300,8 +296,7 @@ class BackupManager(PyNotifyMixin):
 			self.logger.warning(str(exc))
 
 		if needupgrade:
-			_msg = "There are snapshots with old snapshot format."\
-				   " Please upgrade them if you want to use them."
+			_msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using '(Not So) Simple Backup-Restoration' if you want to use them.")
 			self._notify_warning(self.__profilename, _msg)
 			self.logger.warning(_msg)
 		
@@ -317,7 +312,7 @@ class BackupManager(PyNotifyMixin):
 		
 		# Create a new snapshot
 		self.__actualSnapshot = Snapshot(snppath)
-		self.logger.info(_("Starting snapshot %(name)s ")
+		self.logger.info(_("Snapshot '%(name)s' is being made.")
 						 % {'name' :str(self.__actualSnapshot)})
 		
 		# Set the base file
@@ -325,7 +320,7 @@ class BackupManager(PyNotifyMixin):
 			if self.__actualSnapshot.isfull():
 				self.logger.debug("Base is not being set for this full snapshot.")
 			else:
-				self.logger.info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
+				self.logger.info(_("Setting Base to '%(value)s'.") % {'value' : str(base)})
 				self.__actualSnapshot.setBase(base.getName())
 		del base
 
@@ -341,7 +336,7 @@ class BackupManager(PyNotifyMixin):
 				s.close()
 				self.__actualSnapshot.setPackages(pkg)
 			except Exception, _exc:
-				self.logger.warning(_("Problem when setting the packages: ") + str(_exc))
+				self.logger.warning(_("Problem when setting the packages list: ") + str(_exc))
 		
 		# set Excludes
 # TODO: improve handling of Regex containing ',' (delimiter); currently this will crash
@@ -400,8 +395,7 @@ class BackupManager(PyNotifyMixin):
 		self.logger.info(_("Number of items to be excluded by config: %s.") % _stats.get_count_items_excl_config())
 		
 		if _freespace <= _snpsize:
-			raise exceptions.SBException(_("Not enough free space in the target directory for the "\
-										   "planned backup (%(freespace)s <= %(neededspace)s).")\
+			raise exceptions.SBException(_("Not enough free space in the target directory for the planned backup (%(freespace)s <= %(neededspace)s).")\
 										   % { 'freespace' : _freespace_hr, 'neededspace' : _snpsize_hr})
 
 	def __create_collector_obj(self):
@@ -433,7 +427,7 @@ class BackupManager(PyNotifyMixin):
 			if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and\
 				"nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read())):
 					raise exceptions.InstanceRunningError(\
-					_("Another instance of '(not so) Simple Backup' is already running (process id: %s).")\
+					_("Another instance of '(Not So) Simple Backup' is already running (process id: %s).")\
 					  % last_sb_pid )
 			else:
 				self.logger.info(_("Invalid lock file found. Is being removed."))
@@ -463,8 +457,8 @@ class BackupManager(PyNotifyMixin):
 				try:
 					Util.nssb_copy( self.config.get("log","file"), logf_target )
 				except exceptions.ChmodNotSupportedError:
-					self.logger.warning(_("Unable to change permissions for "\
-										  "file '%s'.") % logf_target )
+					self.logger.warning(_("Unable to change permissions for file '%s'.")\
+									% logf_target )
 			else :
 				self.logger.warning(_("Unable to find logfile to copy into snapshot."))
 		else:
@@ -972,7 +966,7 @@ class FileCollector(object):
 				
 		# if the file is in exclude list, return true
 		if self.__snapshot.is_path_in_excl_filelist(path):
-			self.__logger.info(_("File '%(file)s' found in defined exclude list.") % {'file' : path})
+			self.__logger.info(_("Path '%(file)s' defined in excludes list.") % {'file' : path})
 			return True		
 		#all tests passed
 		return False
@@ -1024,7 +1018,7 @@ class FileCollector(object):
 		if not _excluded:
 			# path was not excluded, so do further tests (stats, enter dir...)			
 			if self.__fislink:
-				self.__logger.info(_("Symbolic link found: '%(path)s' -> '%(ln_target)s'.")\
+				self.__logger.debug("Symbolic link found: '%(path)s' -> '%(ln_target)s'."\
 								% {'path' : path, 'ln_target' : FAM.get_link(path)})
 				self.__collect_stats.count_symlink()
 				if not self.__snapshot.isFollowLinks():
@@ -1091,15 +1085,13 @@ class FileCollector(object):
 		if _snp_excl:
 			for _regex in _snp_excl:
 				if Util.is_empty_regexp(_regex):
-					self.__logger.warning(_("Empty regular expression found. "\
-										"Skipped."))
+					self.__logger.warning(_("Empty regular expression found. Skipped."))
 				else:
 					if Util.is_valid_regexp(_regex):
 						_regex_c = re.compile(_regex)
 						_rexclude.append(_regex_c)
 					else:
-						self.__logger.warning(_("Invalid regular expression ('%s')"\
-										" found. Skipped.") % _regex)
+						self.__logger.warning(_("Invalid regular expression ('%s') found. Skipped.") % _regex)
 		self.__excl_regex = _rexclude
 
 	def __prepare_explicit_flists(self):

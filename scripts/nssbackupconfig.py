@@ -344,7 +344,7 @@ class UpgradeApplication(object):
 		
 		"""
 		print "-"*60
-		print "NSsbackup %s upgrade tool" % nssbackup.Infos.VERSION
+		print "(Not So) Simple Backup %s upgrade tool" % nssbackup.Infos.VERSION
 		print "-"*60
 		
 		if os.getuid() != 0:

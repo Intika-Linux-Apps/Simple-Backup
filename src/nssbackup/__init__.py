@@ -51,9 +51,7 @@ class Infos(object):
 	
 	VERSION = util.get_version_number()
 	
-	DESCRIPTION = _("This is a user friendly backup solution for common "\
-					"desktop needs. If you want to help by submitting bugs, "\
-					"by translating or anything else please visit our website.")
+	DESCRIPTION = _("This is a user friendly backup solution for common desktop needs. If you want to help by submitting bugs, by translating or anything else please visit our website.")
 	
 	WEBSITE = "https://launchpad.net/nssbackup/"
 

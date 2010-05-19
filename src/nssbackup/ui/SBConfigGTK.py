@@ -546,20 +546,15 @@ class SBconfigGTK(GladeGnomeApp):
 							self.ex_regex.append( [i] )
 						else:
 							r = Util.remove_conf_entry(r, i)
-							self.logger.warning(_("Invalid or empty regular "\
-										"expression ('%s') found in "\
-										"configuration. Removed.") % i )
+							self.logger.warning(_("Invalid or empty regular expression ('%s') found in configuration. Removed.") % i )
 							_invalid_regex_found = True
 							_invalid_regex = "%s, %s" % (_invalid_regex, i)
 
 		if _invalid_regex_found:
 			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
-			_msg = _("Invalid or empty regular expressions found\n"\
-					 "in configuration file:\n"\
-					 "'%s'\n\nThese expressions are not used and were\n"\
-					 "removed from the "\
-					 "configuration.") % (_invalid_regex.lstrip(","))
+			_msg = _("Invalid or empty regular expressions found\nin configuration file:\n'%s'\n\nThese expressions are not used and were\nremoved from the configuration.")\
+				% (_invalid_regex.lstrip(","))
 			gobject.idle_add(misc.show_errdialog, _msg,
 							 self.__get_application_widget())
 
@@ -793,14 +788,8 @@ class SBconfigGTK(GladeGnomeApp):
 						self.__set_config_target_to_default()
 						self.__set_target_option("default")
 						
-						_sec_msg = _("Please make "\
-				 "sure the missing directory exists (e.g. by mounting "\
-				 "an external disk) or change the specified target "\
-				 "to an existing one.")
-						_message_str = _("Backup target does not exist.\n\n"\
-				 "Attention: The target will be set to the default "\
-				 "value. Check this on the destination settings page "\
-				 "before saving the configuration.")
+						_sec_msg = _("Please make sure the missing directory exists (e.g. by mounting an external disk) or change the specified target to an existing one.")
+						_message_str = _("Backup target does not exist.\n\nAttention: The target will be set to the default value. Check this on the destination settings page before saving the configuration.")
 						_headline_str = \
 						_("Unable to open backup target")
 
@@ -1131,9 +1120,7 @@ class SBconfigGTK(GladeGnomeApp):
 				dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL | \
 									gtk.DIALOG_DESTROY_WITH_PARENT,
 									buttons=gtk.BUTTONS_CLOSE,
-									message_format=_("A backup run is "\
-									"initiated in the background. The process "\
-									"id is: ")+str(pid)+".")
+									message_format=_("A backup run is initiated in the background.\nThe process id is: %s.") % str(pid))
 				dialog.run()
 				dialog.destroy()
 			except Exception, e:
@@ -1626,9 +1613,7 @@ class SBconfigGTK(GladeGnomeApp):
 		if self.isConfigChanged(force_the_change = False) is True:
 			misc.show_infodialog(parent = self.__get_application_widget(),
 					headline_str = _("Configuration has changed"),
-					message_str = _("There are unsaved modifications. Please "\
-					"save the configuration or revert these changes before "\
-					"testing the mail settings."))
+					message_str = _("There are unsaved modifications. Please save the configuration or revert these changes before testing the mail settings."))
 		else:
 			try :
 				testmail_res = self.configman.testMail()
@@ -1870,8 +1855,7 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_dest_remote_changed(self, *args):
 		_icon = self.widgets["dest_remote_light"]
 		_icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
-		_icon.set_tooltip_text(_("Please test writability of the target "\
-						"directory by pressing \"Test\" button on the right."))
+		_icon.set_tooltip_text(_("Please test writability of the target directory by pressing \"Test\" button on the right."))
 		
 		self.configman.set("general", "target",
 							self.widgets['dest_remote'].get_text())
@@ -1898,9 +1882,7 @@ class SBconfigGTK(GladeGnomeApp):
 
 				_icon.set_from_stock(gtk.STOCK_DIALOG_ERROR,
 									 gtk.ICON_SIZE_MENU)
-				_icon.set_tooltip_text(_("Please change target directory "\
-								"and test writability of the target directory "\
-								"by pressing \"Test\" button on the right."))
+				_icon.set_tooltip_text(_("Please change target directory and test writability of the target directory by pressing \"Test\" button on the right."))
 
 				self.widgets["dest_unusable"].show()
 	
@@ -2046,16 +2028,14 @@ class SBconfigGTK(GladeGnomeApp):
 				if not prfName or prfName is '':
 					misc.show_warndialog(
 						parent=self.widgets["ProfileManagerDialog"],
-						message_str=_("The given name of the new profile "\
-						"is empty. Please enter a valid profile name."),
+						message_str=_("The given name of the new profile is empty. Please enter a valid profile name."),
 						headline_str=_("Profile name not valid"))
 					continue
 				
 				if os.path.exists(prfConf) or os.path.exists(prfConfDisabled):
 					misc.show_warndialog(
 						parent=self.widgets["ProfileManagerDialog"],
-						message_str=_("The given name of the new profile "\
-						"already exists. Please enter another name."),
+						message_str=_("The given name of the new profile already exists. Please enter another name."),
 						headline_str=_("Profile name not valid"),
 						secmsg_str=_("Renaming of profiles is not supported."))
 					continue
@@ -2091,7 +2071,7 @@ class SBconfigGTK(GladeGnomeApp):
 		if prfName == ConfigManagerStaticData.get_default_profilename():
 			_forbid_default_profile_removal(_("remove"))
 		else :
-			warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n <b>Are you sure to want to delete the '%(name)s' profile?</b> " % {'name': prfName})
+			warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n<b>Are you sure to want to delete the '%(name)s' profile?</b>") % {'name': prfName}
 			
 			dialog = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons=gtk.BUTTONS_YES_NO)
 			dialog.set_markup(warning)
@@ -2169,12 +2149,7 @@ class SBconfigGTK(GladeGnomeApp):
 		label = self.widgets["label_dialog_default_settings_content"]
 		btn_cancel = self.widgets['btn_cancel_default_settings'] 
 
-		txt = _("<big><b>Set default values for current profile?</b></big>\n"\
-				"This will restore the default values for the profile "\
-				"currently edited: '%s'.\n\n"\
-				"These predefined settings are recommended for most users. "\
-				"Check whether they are appropriate for your use before saving"\
-				" the changed configuration.") % self.configman.getProfileName()
+		txt = _("<big><b>Set default values for current profile?</b></big>\nThis will restore the default values for the profile currently edited: '%s'.\n\nThese predefined settings are recommended for most users. Check whether they are appropriate for your use before saving the changed configuration.") % self.configman.getProfileName()
 
 		label.set_line_wrap(True)
 		label.set_markup(txt)
@@ -2208,8 +2183,7 @@ def _forbid_default_profile_removal(action):
 	"""Helper function that shows an info box which states that we are
 	not able to do the given action on the default profile.	
 	"""
-	info = _("You can't %s the Default Profile. Please use it if you "\
-			 "need only one profile.") % action
+	info = _("You can't %s the Default Profile. Please use it if you need only one profile.") % action
 	
 	dialog = gtk.MessageDialog(type=gtk.MESSAGE_INFO,
 					flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,

@@ -200,8 +200,8 @@ class FuseFAM(object):
 		if self.__config.has_option("general","target"):
 			if self.__config.get("general","target").startswith(os.sep) :   # this assumes absolute paths
 				if not os.path.exists(self.__config.get("general","target")) :
-					raise exceptions.FuseFAMException(_("Target directory "\
-								"'%(target)s' does not exist.")% {"target" : self.__config.get("general","target")} )
+					raise exceptions.FuseFAMException(_("Target directory '%(target)s' does not exist.")\
+										% {"target" : self.__config.get("general","target")} )
 			else: # this means remote target
 				self.__mount(self.__config.get("general","target"))
 

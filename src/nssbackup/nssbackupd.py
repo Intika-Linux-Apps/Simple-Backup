@@ -119,8 +119,7 @@ class NSsbackupd(PyNotifyMixin) :
 		if FAM.exists( logf ):
 			_content = FAM.readfile( logf )
 		else :
-			_content = _("I didn't find the log file. Please set it up in "\
-						 "nssbackup.conf ")
+			_content = _("No path to log file specified. Please set it in the configuration.")
 		
 		server = smtplib.SMTP()
 		msg = MIMEMultipart()
@@ -183,9 +182,7 @@ class NSsbackupd(PyNotifyMixin) :
 			# store the created ConfigManager in a collection
 			self.__confm.append( confm )
 		else:
-			errmsg = _("Critical Error: No configuration file for the default "\
-					   "profile was found!\n\nNow continue processing "\
-					   "remaining profiles.")
+			errmsg = _("Critical Error: No configuration file for the default profile was found!\n\nNow continue processing remaining profiles.")
 			self.__errors.append(errmsg)
 
 		# Now search for alternate configuration files

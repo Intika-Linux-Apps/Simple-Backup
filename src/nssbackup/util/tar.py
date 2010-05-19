@@ -310,8 +310,8 @@ def makeTarIncBackup(snapshot):
 		try:
 			Util.nssb_copy( tmp_snarfile, snarfile )
 		except exceptions.ChmodNotSupportedError:
-			LogFactory.getLogger().warning(_("Unable to change permissions for "\
-									  "file '%s'.") % snarfile )
+			LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
+										% snarfile )
 		os.remove( tmp_snarfile )
 		__finish_backup(retVal, errStr)
 		
@@ -355,8 +355,8 @@ def makeTarFullBackup(snapshot):
 	try:
 		Util.nssb_copy( tmp_snarfile, snarfile )
 	except exceptions.ChmodNotSupportedError:
-		LogFactory.getLogger().warning(_("Unable to change permissions for "\
-									  "file '%s'.") % snarfile )
+		LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
+									% snarfile )
 	os.remove( tmp_snarfile )
 	__finish_backup(retVal, errStr)
 
@@ -367,8 +367,8 @@ def __finish_backup(exitcode, error_str):
 		_logger.info(_("TAR has been finished successfully."))
 	elif exitcode == 1:
 		# list-incremental is not compatible with ignore failed read
-		_logger.warning(_("TAR returned a warning during the backup process: "\
-						  "%s") % error_str)
+		_logger.warning(_("TAR returned a warning during the backup process: %s")\
+					% error_str)
 	else:
 		# list-incremental is not compatible with ignore failed read
 		_errmsg = _("Unable to make a proper backup. TAR was terminated.") 

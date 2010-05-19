@@ -323,8 +323,8 @@ class ConfigManager(ConfigParser.ConfigParser):
 			self.logger.info(_("Profile settings are being read from file '%s'.")\
 							  % self.conffile)
 		else :
-			self.logger.info(_("Profile settings are being set to default values. "\
-							 "Configuration file is set to '%s'.") % self.conffile)
+			self.logger.info(_("Profile settings are being set to default values. Configuration file is set to '%s'.")\
+							% self.conffile)
 			
 	def __str__(self):
 		retval = []
@@ -544,8 +544,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 				if type(remotes) == str :
 					remotes = eval(remotes)
 				if type(remotes) != dict :
-					raise SBException(_("Unable to evaluate '%(parameter)s' as "\
-							"a dictionary (value got = '%(value)r').") \
+					raise SBException(_("Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r').")\
 							% {'parameter': remotes,'value': type(remotes)})
 				if not remotes.has_key(option) :
 					# then it wasn't for us , fall back on the parent
@@ -707,8 +706,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 			else :
 				self.logger = LogFactory.getLogger(self.getProfileName(), logf)
 
-			self.logger.info(_("Log output for [%(profile)s] is directed to "\
-							   "file '%(file)s'.")\
+			self.logger.info(_("Log output for [%(profile)s] is directed to file '%(file)s'.")\
 							   % {'profile' : self.getProfileName(),
 								  'file': logf})
 
@@ -830,8 +828,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 				and not self.has_option("schedule", "anacron")):
 			
 			# no entry in configuration found, look at Cron/Anacron directly
-			self.logger.info(_("No schedule defined in configuration file. "\
-								"Probing from filesystem."))
+			self.logger.info(_("No schedule defined in configuration file. Probing from filesystem."))
 			#hourly
 			if os.path.exists("/etc/cron.hourly/nssbackup"):
 				self.logger.debug("Anacron hourly has been found")
@@ -925,8 +922,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 			return self.__profileName
 		
 		if not self.conffile: 
-			raise SBException(_("The config file is not set yet into this "\
-							    "ConfigManager"))
+			raise SBException(_("The config file is not set yet into this ConfigManager"))
 		self.__profileName = get_profilename(self.conffile)
 		return self.__profileName
 	
@@ -938,8 +934,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 		"""
 		if not self.conffile: 
-			raise SBException(_("The config file is not set yet into this "\
-							    "ConfigManager"))
+			raise SBException(_("The config file is not set yet into this ConfigManager"))
 		is_default = is_default_profile(self.conffile)
 		return is_default
 		
