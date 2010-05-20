@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-20 01:03+0200\n"
+"POT-Creation-Date: 2010-05-21 00:58+0200\n"
 "PO-Revision-Date: 2010-03-25 02:06+0000\n"
 "Last-Translator: Daniel Nylander <yeager@ubuntu.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -428,7 +428,7 @@ msgid "4 GiB (FAT32)"
 msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1257
-#: src/nssbackup/ui/SBConfigGTK.py:543 src/nssbackup/ui/SBConfigGTK.py:1722
+#: src/nssbackup/ui/SBConfigGTK.py:546 src/nssbackup/ui/SBConfigGTK.py:1726
 msgid "Custom"
 msgstr "Anpassad"
 
@@ -676,13 +676,13 @@ msgstr ""
 msgid "Profile Name"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:549
+#: src/nssbackup/ui/SBConfigGTK.py:552
 #, python-format
 msgid ""
 "Invalid or empty regular expression ('%s') found in configuration. Removed."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:556
+#: src/nssbackup/ui/SBConfigGTK.py:559
 #, python-format
 msgid ""
 "Invalid or empty regular expressions found\n"
@@ -693,13 +693,13 @@ msgid ""
 "removed from the configuration."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:791
+#: src/nssbackup/ui/SBConfigGTK.py:794
 msgid ""
 "Please make sure the missing directory exists (e.g. by mounting an external "
 "disk) or change the specified target to an existing one."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:792
+#: src/nssbackup/ui/SBConfigGTK.py:795
 msgid ""
 "Backup target does not exist.\n"
 "\n"
@@ -707,42 +707,42 @@ msgid ""
 "destination settings page before saving the configuration."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:794
+#: src/nssbackup/ui/SBConfigGTK.py:797
 msgid "Unable to open backup target"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:863
+#: src/nssbackup/ui/SBConfigGTK.py:866
 #, python-format
 msgid "Current profile: %s"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:865
+#: src/nssbackup/ui/SBConfigGTK.py:868
 #, python-format
 msgid "%s   (Administrator mode)"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:958
+#: src/nssbackup/ui/SBConfigGTK.py:961
 msgid "Already included item !"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:973
+#: src/nssbackup/ui/SBConfigGTK.py:976
 msgid "Already excluded item !"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:986 src/nssbackup/ui/SBConfigGTK.py:1023
+#: src/nssbackup/ui/SBConfigGTK.py:989 src/nssbackup/ui/SBConfigGTK.py:1026
 msgid "Empty filename or path. Please enter a valid filename or path."
 msgstr ""
 "Blankt filnamn eller sökväg. Ange ett giltigt filnamn eller en giltig sökväg"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1001 src/nssbackup/ui/SBConfigGTK.py:1763
+#: src/nssbackup/ui/SBConfigGTK.py:1004 src/nssbackup/ui/SBConfigGTK.py:1767
 msgid "Empty expression. Please enter a valid regular expression."
 msgstr "Blankt uttryck. Ange ett giltigt reguljärt uttryck."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1015 src/nssbackup/ui/SBConfigGTK.py:1777
+#: src/nssbackup/ui/SBConfigGTK.py:1018 src/nssbackup/ui/SBConfigGTK.py:1781
 msgid "Provided regular expression is not valid."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1032
+#: src/nssbackup/ui/SBConfigGTK.py:1035
 #, fuzzy
 msgid ""
 "It seems the path you entered does not exists. Do you want to add this "
@@ -751,85 +751,85 @@ msgstr ""
 "Sökvägen du angav verkar inte finnas. Vill du lägga till denna felaktiga "
 "sökväg?"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1060
+#: src/nssbackup/ui/SBConfigGTK.py:1063
 msgid "Save configuration as..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1123
+#: src/nssbackup/ui/SBConfigGTK.py:1126
 #, fuzzy, python-format
 msgid ""
 "A backup run is initiated in the background.\n"
 "The process id is: %s."
 msgstr "En säkerhetskopiering har startats i bakgrunden. Processid är: "
 
-#: src/nssbackup/ui/SBConfigGTK.py:1178
+#: src/nssbackup/ui/SBConfigGTK.py:1181
 msgid "Include file..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1185 src/nssbackup/ui/SBConfigGTK.py:1339
+#: src/nssbackup/ui/SBConfigGTK.py:1188 src/nssbackup/ui/SBConfigGTK.py:1342
 msgid "All files"
 msgstr "Alla filer"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1204
+#: src/nssbackup/ui/SBConfigGTK.py:1207
 msgid "Include folder..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1311
+#: src/nssbackup/ui/SBConfigGTK.py:1314
 #, python-format
 msgid "Test on '%s' didn't succeed!"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1321
+#: src/nssbackup/ui/SBConfigGTK.py:1324
 msgid "Test was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1326
+#: src/nssbackup/ui/SBConfigGTK.py:1329
 #, python-format
 msgid "'%d' test(s) didn't succeed !"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1332
+#: src/nssbackup/ui/SBConfigGTK.py:1335
 msgid "Exclude file..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1354
+#: src/nssbackup/ui/SBConfigGTK.py:1357
 msgid "Exclude folder..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1615
+#: src/nssbackup/ui/SBConfigGTK.py:1618
 msgid "Configuration has changed"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1616
+#: src/nssbackup/ui/SBConfigGTK.py:1619
 msgid ""
 "There are unsaved modifications. Please save the configuration or revert "
 "these changes before testing the mail settings."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1622 src/nssbackup/ui/SBConfigGTK.py:1628
+#: src/nssbackup/ui/SBConfigGTK.py:1625 src/nssbackup/ui/SBConfigGTK.py:1631
 msgid "Test mail settings"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1623
+#: src/nssbackup/ui/SBConfigGTK.py:1626
 msgid "The test failed with following output:"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1629
+#: src/nssbackup/ui/SBConfigGTK.py:1632
 msgid "The test was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1711 src/nssbackup/ui/SBConfigGTK.py:1755
+#: src/nssbackup/ui/SBConfigGTK.py:1715 src/nssbackup/ui/SBConfigGTK.py:1759
 #, python-format
 msgid ""
 "The given expression contains unsupported characters ('%s'). Currently it is "
 "not possible to use these characters in exclude expressions."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1714 src/nssbackup/ui/SBConfigGTK.py:1758
+#: src/nssbackup/ui/SBConfigGTK.py:1718 src/nssbackup/ui/SBConfigGTK.py:1762
 msgid "Unsupported character"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1858
+#: src/nssbackup/ui/SBConfigGTK.py:1862
 msgid ""
 "Please test writability of the target directory by pressing \"Test\" button "
 "on the right."
@@ -837,49 +837,49 @@ msgstr ""
 "Prova målkatalogens skrivbarhet genom att klicka på knappen \"Testa\" till "
 "höger."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1870
+#: src/nssbackup/ui/SBConfigGTK.py:1874
 msgid "Test Succeeded !"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1876
+#: src/nssbackup/ui/SBConfigGTK.py:1880
 msgid "Target directory is writable."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1885
+#: src/nssbackup/ui/SBConfigGTK.py:1889
 msgid ""
 "Please change target directory and test writability of the target directory "
 "by pressing \"Test\" button on the right."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2031
+#: src/nssbackup/ui/SBConfigGTK.py:2035
 msgid ""
 "The given name of the new profile is empty. Please enter a valid profile "
 "name."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2032 src/nssbackup/ui/SBConfigGTK.py:2039
+#: src/nssbackup/ui/SBConfigGTK.py:2036 src/nssbackup/ui/SBConfigGTK.py:2043
 msgid "Profile name not valid"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2038
+#: src/nssbackup/ui/SBConfigGTK.py:2042
 msgid ""
 "The given name of the new profile already exists. Please enter another name."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2040
+#: src/nssbackup/ui/SBConfigGTK.py:2044
 msgid "Renaming of profiles is not supported."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2065 src/nssbackup/ui/SBConfigGTK.py:2093
-#: src/nssbackup/ui/SBConfigGTK.py:2116
+#: src/nssbackup/ui/SBConfigGTK.py:2069 src/nssbackup/ui/SBConfigGTK.py:2097
+#: src/nssbackup/ui/SBConfigGTK.py:2120
 msgid "Please select a Profile !"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2072
+#: src/nssbackup/ui/SBConfigGTK.py:2076
 msgid "remove"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2074
+#: src/nssbackup/ui/SBConfigGTK.py:2078
 #, python-format
 msgid ""
 "You are trying to remove a profile. You will not be able to restore it .\n"
@@ -888,11 +888,11 @@ msgid ""
 "<b>Are you sure to want to delete the '%(name)s' profile?</b>"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2123
+#: src/nssbackup/ui/SBConfigGTK.py:2127
 msgid "disable"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2152
+#: src/nssbackup/ui/SBConfigGTK.py:2156
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
@@ -903,7 +903,7 @@ msgid ""
 "are appropriate for your use before saving the changed configuration."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2186
+#: src/nssbackup/ui/SBConfigGTK.py:2190
 #, python-format
 msgid ""
 "You can't %s the Default Profile. Please use it if you need only one profile."
@@ -1000,8 +1000,18 @@ msgstr ""
 msgid "Select restore location"
 msgstr "Välj plats för återskapning"
 
+#: src/nssbackup/ui/SBRestoreGTK.py:588
+#, python-format
+msgid "Do you really want to revert '%s'?"
+msgstr ""
+
 #: src/nssbackup/ui/SBRestoreGTK.py:601
 msgid "Select revert location"
+msgstr ""
+
+#: src/nssbackup/ui/SBRestoreGTK.py:608
+#, python-format
+msgid "Do you really want to revert '%s' to '%s'?"
 msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:691
@@ -1385,6 +1395,10 @@ msgstr ""
 msgid "_View all help topics"
 msgstr ""
 
+#: datas/nssbackup-config.glade:1077
+msgid "_About this program"
+msgstr ""
+
 #: datas/nssbackup-config.glade:1132
 msgid "Reload configuration"
 msgstr ""
@@ -1472,8 +1486,9 @@ msgstr "Allmänt"
 msgid "<b>Local files and directories</b>"
 msgstr ""
 
-#: datas/nssbackup-config.glade:1556 datas/nssbackup-config.glade:1920
-#: datas/nssbackup-config.glade:2126 datas/nssbackup-config.glade:2285
+#: datas/nssbackup-config.glade:1556 datas/nssbackup-config.glade:1783
+#: datas/nssbackup-config.glade:1920 datas/nssbackup-config.glade:2126
+#: datas/nssbackup-config.glade:2285
 msgid "Remove"
 msgstr ""
 
@@ -1493,6 +1508,11 @@ msgstr ""
 msgid "Test remote paths"
 msgstr ""
 
+#: datas/nssbackup-config.glade:1798 datas/nssbackup-config.glade:2177
+#: datas/nssbackup-config.glade:2336
+msgid "Add"
+msgstr ""
+
 #: datas/nssbackup-config.glade:1842
 msgid "Include"
 msgstr "Inkludera"
@@ -1500,10 +1520,6 @@ msgstr "Inkludera"
 #: datas/nssbackup-config.glade:2054
 msgid "Paths"
 msgstr "Sökvägar"
-
-#: datas/nssbackup-config.glade:2177 datas/nssbackup-config.glade:2336
-msgid "Add"
-msgstr ""
 
 #: datas/nssbackup-config.glade:2212
 msgid "File types"

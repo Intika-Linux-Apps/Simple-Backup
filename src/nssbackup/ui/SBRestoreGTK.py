@@ -585,7 +585,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 	def on_revert_clicked(self, *args):
 		tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
 		src = self.path_to_dir( tstore.get_path( iter ) )
-		dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format="Do you really want to revert '%s' ?" % src)
+		dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=_("Do you really want to revert '%s'?") % src)
 		
 		response = dialog.run()
 		dialog.destroy()
@@ -605,7 +605,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		dialog.destroy()
 		
 		if result == gtk.RESPONSE_OK:
-			dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format="Do you really want to revert '%s' to '%s' ?" % (src, dirname))
+			dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=_("Do you really want to revert '%s' to '%s'?") % (src, dirname))
 			response = dialog.run()
 			dialog.destroy()
 			if response == gtk.RESPONSE_YES:
