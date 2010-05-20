@@ -1476,9 +1476,11 @@ class _DefaultConfiguration(Configuration):
 # see http://fuhm.net/super-harmful/
 		Configuration.__init__(self)
 		
-		self._regex_excludes = "\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,"\
-		                   "/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,"\
-		                   "/home/[^/]+?/\..+/[cC]ache"
+		self._regex_excludes = "\.mp3$,\.avi$,\.mpeg$,\.mkv$,\.ogg$,\.iso$,"\
+							   "/home/[^/]+?/\.gvfs/,"\
+							   "/home/[^/]+?/\.thumbnails/,"\
+							   "/home/[^/]+?/\..+/[tT]rash/,"\
+							   "/home/[^/]+?/\..+/[cC]ache/"
 
 		self._maxinc = 7
 		self._cformat = 'gzip'

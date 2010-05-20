@@ -536,14 +536,17 @@ class SBconfigGTK(GladeGnomeApp):
 			if not Util.is_empty_regexp(r):
 				list = str(r).split(",")
 				for i in list:
-					if re.match( r"\\\.\w+", i ):
-						if i[2:] in _known_ftypes_dict:
-							self.ex_ftype.append( [_known_ftypes_dict[i[2:]], i[2:]] )
+# Bugfix LP #258542 
+					if re.match(r"\\\.\w+\$", i):
+						_ftype = i[2:len(i)-1]
+						if _ftype in _known_ftypes_dict:
+							self.ex_ftype.append([_known_ftypes_dict[_ftype], _ftype])
+
 						else:
-							self.ex_ftype.append( [_("Custom"), i[2:]] )
+							self.ex_ftype.append([_("Custom"), _ftype])
 					else:
 						if (not Util.is_empty_regexp(i)) and Util.is_valid_regexp(i):
-							self.ex_regex.append( [i] )
+							self.ex_regex.append([i])
 						else:
 							r = Util.remove_conf_entry(r, i)
 							self.logger.warning(_("Invalid or empty regular expression ('%s') found in configuration. Removed.") % i )
@@ -1705,7 +1708,8 @@ class SBconfigGTK(GladeGnomeApp):
 			r = r""
 			if self.configman.has_option("exclude", "regex"):
 				r = self.configman.get("exclude", "regex")
-			ftype_regex = r"\.%s" % ftype.strip()
+# Bugfix LP #258542 
+			ftype_regex = r"\.%s$" % ftype.strip()
 			_sep = "," 
 			if _sep in ftype_regex:				
 				_msg = _("The given expression contains unsupported characters ('%s'). Currently it is not possible to use these characters in exclude expressions.") % _sep
