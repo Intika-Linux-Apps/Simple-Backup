@@ -1520,6 +1520,7 @@ class _DefaultConfigurationForAdmins(_DefaultConfiguration):
 							'/var/cache/'	: '0',
 							'/var/tmp/'		: '0',
 							'/var/spool/'	: '0',
+							'/var/run/'		: '0',							
 							'/usr/local/'	: '1',
 							'/media/'		: '0' }
 		
