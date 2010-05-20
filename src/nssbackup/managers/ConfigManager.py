@@ -1486,7 +1486,7 @@ class _DefaultConfiguration(Configuration):
 		self._cformat = 'gzip'
 		self._follow_links = False
 		self._splitsize = 0
-		self._max_filesize = 104857600		# in bytes = 100 MB * 1024 * 1024
+		self._max_filesize = -1 #Bugfix LP #146618
 
 		self._loglevel = 20
 		self._report_smtpfrom = Infos.SMTPFROM
