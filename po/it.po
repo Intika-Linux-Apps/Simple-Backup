@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-21 00:58+0200\n"
+"POT-Creation-Date: 2010-05-21 18:29+0200\n"
 "PO-Revision-Date: 2010-04-18 01:31+0000\n"
 "Last-Translator: Claudio Arseni <claudio.arseni@gmail.com>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -17,31 +17,7 @@ msgstr ""
 "X-Launchpad-Export-Date: 2010-04-19 03:39+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
-#: src/nssbackup/__init__.py:54
-msgid ""
-"This is a user friendly backup solution for common desktop needs. If you "
-"want to help by submitting bugs, by translating or anything else please "
-"visit our website."
-msgstr ""
-
-#: src/nssbackup/__init__.py:67
-msgid "translator-credits"
-msgstr ""
-"Ubuntu Italian Translators, https://launchpad.net/~ubuntu-l10n-it, 2006-"
-"2007\n"
-"\n"
-"Launchpad Contributions:\n"
-"  Claudio Arseni https://launchpad.net/~claudio-arseni\n"
-"  Expo https://launchpad.net/~expo-1993\n"
-"  Jean-Peer Lorenz https://launchpad.net/~peer.loz\n"
-"  Lorenzo De Liso https://launchpad.net/~blackz\n"
-"  Milo Casagrande https://launchpad.net/~milo\n"
-"  Simone Oberti https://launchpad.net/~simone-obo\n"
-"  Stefyru91 https://launchpad.net/~stefyru91\n"
-"  aleritty https://launchpad.net/~aleritty\n"
-"  vinz65 https://launchpad.net/~vinz65"
-
-#: src/nssbackup/__init__.py:75 src/nssbackup/nssbackupd.py:111
+#: src/nssbackup/nssbackupd.py:111 src/nssbackup/pkginfo.py:64
 #, python-format
 msgid "NSsbackup Daemon <%(login)s@%(hostname)s>"
 msgstr "Demone NSsbackup <%(login)s@%(hostname)s>"
@@ -67,15 +43,39 @@ msgstr ""
 "Continuare elaborando i profili rimanenti."
 
 #: src/nssbackup/nssbackupd.py:240
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "An error occured during the backup:\n"
 "%s"
-msgstr "TAR ha mandato un avviso quando si faceva il backup : "
+msgstr ""
 
 #: src/nssbackup/nssbackupd.py:271
 msgid "The following error(s) occurred before:"
 msgstr "Si sono verificati i seguenti errori:"
+
+#: src/nssbackup/pkginfo.py:43
+msgid ""
+"This is a user friendly backup solution for common desktop needs. If you "
+"want to help by submitting bugs, by translating or anything else please "
+"visit our website."
+msgstr ""
+
+#: src/nssbackup/pkginfo.py:56
+msgid "translator-credits"
+msgstr ""
+"Ubuntu Italian Translators, https://launchpad.net/~ubuntu-l10n-it, 2006-"
+"2007\n"
+"\n"
+"Launchpad Contributions:\n"
+"  Claudio Arseni https://launchpad.net/~claudio-arseni\n"
+"  Expo https://launchpad.net/~expo-1993\n"
+"  Jean-Peer Lorenz https://launchpad.net/~peer.loz\n"
+"  Lorenzo De Liso https://launchpad.net/~blackz\n"
+"  Milo Casagrande https://launchpad.net/~milo\n"
+"  Simone Oberti https://launchpad.net/~simone-obo\n"
+"  Stefyru91 https://launchpad.net/~stefyru91\n"
+"  aleritty https://launchpad.net/~aleritty\n"
+"  vinz65 https://launchpad.net/~vinz65"
 
 #: src/nssbackup/managers/BackupManager.py:89
 msgid "Initialization of module 'pynotify' failed."
@@ -444,7 +444,7 @@ msgid "4 GiB (FAT32)"
 msgstr "4 GiB (FAT32)"
 
 #: src/nssbackup/managers/ConfigManager.py:1257
-#: src/nssbackup/ui/SBConfigGTK.py:546 src/nssbackup/ui/SBConfigGTK.py:1726
+#: src/nssbackup/ui/SBConfigGTK.py:546 src/nssbackup/ui/SBConfigGTK.py:1725
 msgid "Custom"
 msgstr "Personalizzato"
 
@@ -774,11 +774,11 @@ msgid "Empty filename or path. Please enter a valid filename or path."
 msgstr ""
 "Nome file o per percorso vuoto. Inserire un nome file o un percorso valido."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1004 src/nssbackup/ui/SBConfigGTK.py:1767
+#: src/nssbackup/ui/SBConfigGTK.py:1004 src/nssbackup/ui/SBConfigGTK.py:1766
 msgid "Empty expression. Please enter a valid regular expression."
 msgstr "Espressione vuota. Inserire un'espressione regolare valida."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1018 src/nssbackup/ui/SBConfigGTK.py:1781
+#: src/nssbackup/ui/SBConfigGTK.py:1018 src/nssbackup/ui/SBConfigGTK.py:1780
 msgid "Provided regular expression is not valid."
 msgstr "L'espressione regolare fornita non è valida."
 
@@ -792,7 +792,7 @@ msgstr ""
 msgid "Save configuration as..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1126
+#: src/nssbackup/ui/SBConfigGTK.py:1125
 #, fuzzy, python-format
 msgid ""
 "A backup run is initiated in the background.\n"
@@ -800,74 +800,74 @@ msgid ""
 msgstr ""
 "È stato avviato un processo di backup in background. L'ID del processo è: "
 
-#: src/nssbackup/ui/SBConfigGTK.py:1181
+#: src/nssbackup/ui/SBConfigGTK.py:1180
 msgid "Include file..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1188 src/nssbackup/ui/SBConfigGTK.py:1342
+#: src/nssbackup/ui/SBConfigGTK.py:1187 src/nssbackup/ui/SBConfigGTK.py:1341
 msgid "All files"
 msgstr "Tutti i file"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1207
+#: src/nssbackup/ui/SBConfigGTK.py:1206
 msgid "Include folder..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1314
+#: src/nssbackup/ui/SBConfigGTK.py:1313
 #, python-format
 msgid "Test on '%s' didn't succeed!"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1324
+#: src/nssbackup/ui/SBConfigGTK.py:1323
 msgid "Test was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1329
+#: src/nssbackup/ui/SBConfigGTK.py:1328
 #, python-format
 msgid "'%d' test(s) didn't succeed !"
 msgstr "La prova «%d» non ha avuto successo."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1335
+#: src/nssbackup/ui/SBConfigGTK.py:1334
 msgid "Exclude file..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1357
+#: src/nssbackup/ui/SBConfigGTK.py:1356
 msgid "Exclude folder..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1618
+#: src/nssbackup/ui/SBConfigGTK.py:1617
 msgid "Configuration has changed"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1619
+#: src/nssbackup/ui/SBConfigGTK.py:1618
 msgid ""
 "There are unsaved modifications. Please save the configuration or revert "
 "these changes before testing the mail settings."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1625 src/nssbackup/ui/SBConfigGTK.py:1631
+#: src/nssbackup/ui/SBConfigGTK.py:1624 src/nssbackup/ui/SBConfigGTK.py:1630
 msgid "Test mail settings"
 msgstr "Provare le impostazioni delle email"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1626
+#: src/nssbackup/ui/SBConfigGTK.py:1625
 msgid "The test failed with following output:"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1632
+#: src/nssbackup/ui/SBConfigGTK.py:1631
 msgid "The test was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1715 src/nssbackup/ui/SBConfigGTK.py:1759
+#: src/nssbackup/ui/SBConfigGTK.py:1714 src/nssbackup/ui/SBConfigGTK.py:1758
 #, python-format
 msgid ""
 "The given expression contains unsupported characters ('%s'). Currently it is "
 "not possible to use these characters in exclude expressions."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1718 src/nssbackup/ui/SBConfigGTK.py:1762
+#: src/nssbackup/ui/SBConfigGTK.py:1717 src/nssbackup/ui/SBConfigGTK.py:1761
 msgid "Unsupported character"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1862
+#: src/nssbackup/ui/SBConfigGTK.py:1861
 msgid ""
 "Please test writability of the target directory by pressing \"Test\" button "
 "on the right."
@@ -875,15 +875,15 @@ msgstr ""
 "Controllare che la directory di destinazione sia accessibile premendo il "
 "pulsante «Prova»."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1874
+#: src/nssbackup/ui/SBConfigGTK.py:1873
 msgid "Test Succeeded !"
 msgstr "Prova superata con successo."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1880
+#: src/nssbackup/ui/SBConfigGTK.py:1879
 msgid "Target directory is writable."
 msgstr "È possibile scrivere nella directory di destinazione."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1889
+#: src/nssbackup/ui/SBConfigGTK.py:1888
 msgid ""
 "Please change target directory and test writability of the target directory "
 "by pressing \"Test\" button on the right."
@@ -891,35 +891,35 @@ msgstr ""
 "Cambiare la directory di destinazione e controllare di avere i permessi di "
 "scrittura facendo clic sul pulsante «Prova» sulla destra."
 
-#: src/nssbackup/ui/SBConfigGTK.py:2035
+#: src/nssbackup/ui/SBConfigGTK.py:2034
 msgid ""
 "The given name of the new profile is empty. Please enter a valid profile "
 "name."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2036 src/nssbackup/ui/SBConfigGTK.py:2043
+#: src/nssbackup/ui/SBConfigGTK.py:2035 src/nssbackup/ui/SBConfigGTK.py:2042
 msgid "Profile name not valid"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2042
+#: src/nssbackup/ui/SBConfigGTK.py:2041
 msgid ""
 "The given name of the new profile already exists. Please enter another name."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2044
+#: src/nssbackup/ui/SBConfigGTK.py:2043
 msgid "Renaming of profiles is not supported."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2069 src/nssbackup/ui/SBConfigGTK.py:2097
-#: src/nssbackup/ui/SBConfigGTK.py:2120
+#: src/nssbackup/ui/SBConfigGTK.py:2068 src/nssbackup/ui/SBConfigGTK.py:2096
+#: src/nssbackup/ui/SBConfigGTK.py:2119
 msgid "Please select a Profile !"
 msgstr "Selezionare un profilo."
 
-#: src/nssbackup/ui/SBConfigGTK.py:2076
+#: src/nssbackup/ui/SBConfigGTK.py:2075
 msgid "remove"
 msgstr "rimuovi"
 
-#: src/nssbackup/ui/SBConfigGTK.py:2078
+#: src/nssbackup/ui/SBConfigGTK.py:2077
 #, python-format
 msgid ""
 "You are trying to remove a profile. You will not be able to restore it .\n"
@@ -928,11 +928,11 @@ msgid ""
 "<b>Are you sure to want to delete the '%(name)s' profile?</b>"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2127
+#: src/nssbackup/ui/SBConfigGTK.py:2126
 msgid "disable"
 msgstr "disabilita"
 
-#: src/nssbackup/ui/SBConfigGTK.py:2156
+#: src/nssbackup/ui/SBConfigGTK.py:2155
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
@@ -943,7 +943,7 @@ msgid ""
 "are appropriate for your use before saving the changed configuration."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2190
+#: src/nssbackup/ui/SBConfigGTK.py:2189
 #, python-format
 msgid ""
 "You can't %s the Default Profile. Please use it if you need only one profile."
@@ -1293,7 +1293,7 @@ msgstr "TAR ha mandato un avviso quando si faceva il backup : "
 #: src/nssbackup/util/tar.py:374
 #, fuzzy
 msgid "Unable to make a proper backup. TAR was terminated."
-msgstr "Impossibile fare un backup corretto: "
+msgstr "Impossibile aprire l'oggetto di backup"
 
 #: src/nssbackup/util/tar.py:441
 msgid "Included"
@@ -1985,12 +1985,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Impossibile trovare il file del registro. Impostarlo in nssbackup.conf "
 
-#~ msgid "Starting snapshot %(name)s "
-#~ msgstr "Avvio dell'immagine %(name)s "
-
-#~ msgid "Unable to change permissions for "
-#~ msgstr "Impossibile cambiare i permessi per "
-
 #~ msgid "there was a problem initializing the "
 #~ msgstr "si è verificato un errore inizializzando "
 
@@ -1999,6 +1993,15 @@ msgstr ""
 
 #~ msgid "Starting backup Session"
 #~ msgstr "Avvio della sessione di backup"
+
+#~ msgid "Starting snapshot %(name)s "
+#~ msgstr "Avvio dell'immagine %(name)s "
+
+#~ msgid "Unable to change permissions for "
+#~ msgstr "Impossibile cambiare i permessi per "
+
+#~ msgid "Couldn't make a proper backup : "
+#~ msgstr "Impossibile fare un backup corretto: "
 
 #~ msgid "Use default backup directory (/var/backup)"
 #~ msgstr "Usare la directory predefinita (/var/backup)"
