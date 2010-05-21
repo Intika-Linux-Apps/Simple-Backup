@@ -51,7 +51,7 @@ from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.managers.UpgradeManager import UpgradeManager
 from nssbackup.util.log import LogFactory
 import nssbackup.util.tar as TAR
-from nssbackup import Infos
+from nssbackup.pkginfo import Infos
 from nssbackup.util import exceptions
 from nssbackup.util import tasks
 from nssbackup.util.tar import Dumpdir

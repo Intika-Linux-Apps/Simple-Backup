@@ -27,7 +27,7 @@ import gtk
 from gettext import gettext as _
 
 # project imports
-from nssbackup import Infos
+from nssbackup.pkginfo import Infos
 from nssbackup.plugins import PluginManager
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir
@@ -1079,7 +1079,6 @@ class SBconfigGTK(GladeGnomeApp):
 	def on_menu_about_activate(self, *args):
 		about = gtk.AboutDialog()
 		about.set_name(Infos.NAME)
-		# TODO: Always keep this updated
 		about.set_version(Infos.VERSION)
 		about.set_comments(Infos.DESCRIPTION)
 		about.set_transient_for(self.widgets["nssbackupConfApp"])

@@ -18,10 +18,13 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import gettext, sys
-from nssbackup.ui.SBConfigGTK import main
-from nssbackup.util import get_resource_dir
+import gettext
+import sys
 import gtk
+import gtk.glade
+
+from nssbackup.util import get_resource_dir
+
 
 #----------------------------------------------------------------------
 
@@ -35,5 +38,6 @@ if __name__ == '__main__':
 
 	gtk.glade.bindtextdomain(application, locale_dir)
 	gtk.glade.textdomain(application)
-
+	
+	from nssbackup.ui.SBConfigGTK import main
 	main(sys.argv)

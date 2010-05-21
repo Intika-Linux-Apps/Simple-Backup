@@ -35,7 +35,7 @@ import time
 import traceback
 from gettext import gettext as _
 
-from nssbackup import Infos
+from nssbackup.pkginfo import Infos
 import nssbackup.util.tar as TAR
 import FileAccessManager as FAM
 import nssbackup.util as Util

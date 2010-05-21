@@ -40,7 +40,7 @@ import re
 from gettext import gettext as _
 
 # project imports
-from nssbackup import Infos
+from nssbackup.pkginfo import Infos
 from nssbackup.util import log
 from nssbackup.util import exceptions
 import nssbackup.managers.FileAccessManager as FAM

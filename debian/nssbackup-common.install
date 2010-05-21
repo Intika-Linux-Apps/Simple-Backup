@@ -1,5 +1,6 @@
 debian/tmp/usr/lib/python*/*/nssbackup/__init__.py
 debian/tmp/usr/lib/python*/*/nssbackup/nssbackupd.py
+debian/tmp/usr/lib/python*/*/nssbackup/pkginfo.py
 debian/tmp/usr/lib/python*/*/nssbackup/resources
 debian/tmp/usr/lib/python*/*/nssbackup/metainfo
 debian/tmp/usr/lib/python*/*/nssbackup/managers/*.py

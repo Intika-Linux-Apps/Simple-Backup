@@ -110,7 +110,7 @@ import types
 from gettext import gettext as _
 from optparse import OptionParser
 
-from nssbackup import Infos
+from nssbackup.pkginfo import Infos
 from nssbackup.util.log import LogFactory
 import FileAccessManager as FAM
 import nssbackup.util as Util
