@@ -605,7 +605,10 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		dialog.destroy()
 		
 		if result == gtk.RESPONSE_OK:
-			dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=_("Do you really want to revert '%s' to '%s'?") % (src, dirname))
+			dialog = gtk.MessageDialog(parent=None, flags=0,
+						type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO,
+						message_format=_("Do you really want to revert '%(source)s' to '%(dir)s'?")\
+						% {'source' : src, 'dir' : dirname})
 			response = dialog.run()
 			dialog.destroy()
 			if response == gtk.RESPONSE_YES:

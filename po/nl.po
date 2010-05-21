@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-21 18:29+0200\n"
+"POT-Creation-Date: 2010-05-22 01:22+0200\n"
 "PO-Revision-Date: 2010-04-18 01:32+0000\n"
 "Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -541,34 +541,40 @@ msgstr ""
 msgid "Rebasing '%(current)s' on '%(base)s'"
 msgstr "Snapshot '%(current)s' wordt op '%(base)s' geënt"
 
-#: src/nssbackup/managers/SnapshotManager.py:502
+#: src/nssbackup/managers/SnapshotManager.py:507
 #, python-format
 msgid "An error occurred when pulling snapshot '%s'."
 msgstr ""
 
-#: src/nssbackup/managers/SnapshotManager.py:541 src/nssbackup/util/tar.py:836
+#: src/nssbackup/managers/SnapshotManager.py:546 src/nssbackup/util/tar.py:836
 msgid "The snarfile header is incomplete !"
 msgstr "De header van het SNAR-bestand is incompleet"
 
-#: src/nssbackup/managers/SnapshotManager.py:679
+#: src/nssbackup/managers/SnapshotManager.py:698
 #, python-format
 msgid "Base of snapshot '%s' is not set."
 msgstr ""
 
-#: src/nssbackup/managers/SnapshotManager.py:716
+#: src/nssbackup/managers/SnapshotManager.py:735
 #, fuzzy, python-format
 msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 "Snapshot '%s' is reeds een volledige backup. Niet nodig om volledig te maken."
 
-#: src/nssbackup/managers/SnapshotManager.py:756
+#: src/nssbackup/managers/SnapshotManager.py:775
 #, python-format
 msgid "Cancelling pull of snapshot '%s'"
 msgstr "Afzien van het ophalen van snapshot '%s'"
 
-#: src/nssbackup/managers/SnapshotManager.py:805
+#: src/nssbackup/managers/SnapshotManager.py:824
 #, python-format
 msgid "Deleting snapshot: '%(snp)s'."
+msgstr ""
+
+#: src/nssbackup/managers/SnapshotManager.py:923
+msgid ""
+"Logarithmic purge is currently disabled. Falling back to cutoff purge of "
+"snapshots older than 30 days."
 msgstr ""
 
 #: src/nssbackup/managers/UpgradeManager.py:167
@@ -1044,35 +1050,35 @@ msgstr "Wert je zeker dat je '%(current)s' op '%(base)s' wil enten?"
 msgid "Select revert location"
 msgstr "Terugzet-locatie selecteren"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:608
+#: src/nssbackup/ui/SBRestoreGTK.py:610
 #, fuzzy, python-format
-msgid "Do you really want to revert '%s' to '%s'?"
+msgid "Do you really want to revert '%(source)s' to '%(dir)s'?"
 msgstr "Wert je zeker dat je '%(current)s' op '%(base)s' wil enten?"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:691
+#: src/nssbackup/ui/SBRestoreGTK.py:694
 #, python-format
 msgid "Actual base : <b>%s</b>"
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:701
+#: src/nssbackup/ui/SBRestoreGTK.py:704
 msgid "The version of the snapshot is greater than the supported one!"
 msgstr "De versie van het snapshot is hoger dan wordt ondersteund!"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:719
+#: src/nssbackup/ui/SBRestoreGTK.py:722
 #, fuzzy
 msgid "(Not So) Simple Backup restoration error"
 msgstr "NSsbackup herstel-fout"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:721
+#: src/nssbackup/ui/SBRestoreGTK.py:724
 msgid "Unable to upgrade snapshot"
 msgstr "Upgrade van snapshot is mislukt"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:743
+#: src/nssbackup/ui/SBRestoreGTK.py:746
 #, python-format
 msgid "Do you really want to rebase '%(current)s' on '%(base)s' ?"
 msgstr "Wert je zeker dat je '%(current)s' op '%(base)s' wil enten?"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:760
+#: src/nssbackup/ui/SBRestoreGTK.py:763
 #, python-format
 msgid ""
 "Are you sure that you want to remove snapshot '%s'?\n"
@@ -1080,27 +1086,27 @@ msgid ""
 "This may take a while - be patient."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:791 src/nssbackup/ui/SBRestoreGTK.py:797
-#: src/nssbackup/ui/SBRestoreGTK.py:803 src/nssbackup/ui/SBRestoreGTK.py:809
+#: src/nssbackup/ui/SBRestoreGTK.py:794 src/nssbackup/ui/SBRestoreGTK.py:800
+#: src/nssbackup/ui/SBRestoreGTK.py:806 src/nssbackup/ui/SBRestoreGTK.py:812
 #, fuzzy
 msgid "(Not So) Simple Backup restoration"
 msgstr "NSsbackup herstel"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:792 src/nssbackup/ui/SBRestoreGTK.py:798
+#: src/nssbackup/ui/SBRestoreGTK.py:795 src/nssbackup/ui/SBRestoreGTK.py:801
 msgid "<b>Restoring of selected files</b>"
 msgstr "<b>Herstel van geselecteerde bestanden</b>"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:793
+#: src/nssbackup/ui/SBRestoreGTK.py:796
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> is in progress."
 msgstr "Herstel van <tt>'%s'</tt> is nu bezig."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:794
+#: src/nssbackup/ui/SBRestoreGTK.py:797
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:795
+#: src/nssbackup/ui/SBRestoreGTK.py:798
 #, python-format
 msgid ""
 "Restoring of <tt>'%s'</tt> was not successful.\n"
@@ -1108,7 +1114,7 @@ msgid ""
 "The following error occurred:\n"
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:799
+#: src/nssbackup/ui/SBRestoreGTK.py:802
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
@@ -1117,14 +1123,14 @@ msgstr ""
 "Herstel van <tt>'%(source)s'</tt>\n"
 "naar <tt>'%(dirname)s'</tt> is nu bezig."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:800
+#: src/nssbackup/ui/SBRestoreGTK.py:803
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:801
+#: src/nssbackup/ui/SBRestoreGTK.py:804
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
@@ -1133,21 +1139,21 @@ msgid ""
 "The following error occurred:\n"
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:804 src/nssbackup/ui/SBRestoreGTK.py:810
+#: src/nssbackup/ui/SBRestoreGTK.py:807 src/nssbackup/ui/SBRestoreGTK.py:813
 msgid "<b>Reverting selected files</b>"
 msgstr "<b>Bezig met terugzetten van geselecteerde bestanden</b>"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:805
+#: src/nssbackup/ui/SBRestoreGTK.py:808
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> is in progress.\n"
 msgstr "Terugzetten van <tt>'%s'</tt> is nu bezig\n"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:806
+#: src/nssbackup/ui/SBRestoreGTK.py:809
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:807
+#: src/nssbackup/ui/SBRestoreGTK.py:810
 #, python-format
 msgid ""
 "Reverting of <tt>'%s'</tt> was not successful.\n"
@@ -1155,21 +1161,21 @@ msgid ""
 "The following error occurred:\n"
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:811
+#: src/nssbackup/ui/SBRestoreGTK.py:814
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> is in progress."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:812
+#: src/nssbackup/ui/SBRestoreGTK.py:815
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:813
+#: src/nssbackup/ui/SBRestoreGTK.py:816
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"

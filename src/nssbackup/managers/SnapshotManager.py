@@ -248,7 +248,7 @@ class SnapshotManager(object):
 		:todo: Remove status message from this non-gui class!
 		
 		"""
-		self.logger.info("Re-base of snapshot '%s' to '%s'" % (torebase, newbase))
+		self.logger.info("Re-base of snapshot '%s' - new base: '%s'" % (torebase, newbase))
 
 		# checks before processing 
 		if torebase.isfull() : 
@@ -470,7 +470,12 @@ class SnapshotManager(object):
 			
 			# create temporary SNAR file and copy the header, then merge
 			finalsnar = self._copy_empty_snar(snapshot, _tmpfinal)
+#			_snp_excl = snapshot.read_excludeflist_from_file()
+#			print ">>> getExcludeFlist"
+#			print "%s" % _snp_excl
+#			assert isinstance(_snp_excl, set)
 			_files_extract = self._merge_snarfiles(snapshot.getSnapshotFileInfos(),
+											snapshot.read_excludeflist_from_file(),
 											topullSnp.getSnapshotFileInfos(),
 											finalsnar)
 											
@@ -567,12 +572,14 @@ class SnapshotManager(object):
 			_header = finalsnar.getHeader()
 		return finalsnar
 					
-	def _merge_snarfiles(self, target_snpfinfo, src_snpfinfo, res_snpfinfo):
+	def _merge_snarfiles(self, target_snpfinfo, target_excludes,
+						       src_snpfinfo, res_snpfinfo):
 		"""Covers all actions for merging 2 given snar files into a single
 		one. This is quite TAR specific - think it over where to place it!
 		
 		:Parameters:
 		- `target_snpfinfo`: the resulting snapshot
+		- `target_excludes`: set of the excludes file list of resulting snapshot
 		- `src_snpfinfo`: the snapshot that should be merged into the target
 		- `res_snpfinfo`: the name of the resulting SNAR file  
 		
@@ -589,6 +596,10 @@ class SnapshotManager(object):
 			raise TypeError("Given parameter 'target_snpfinfo' must be of "\
 						"SnapshotFileWrapper "\
 						"type! Got %s instead." % type(target_snpfinfo))
+		if not isinstance(target_excludes, set):
+			raise TypeError("Given parameter 'target_excludes' must be of "\
+						"type Set! "\
+						"Got %s instead." % type(target_excludes))
 		if not isinstance(src_snpfinfo, SnapshotFileWrapper):
 			raise TypeError("Given parameter 'src_snpfinfo' must be of "\
 						"SnapshotFileWrapper "\
@@ -613,26 +624,33 @@ class SnapshotManager(object):
 				_ctrl = _dumpdir.getControl()
 				_filen = _dumpdir.getFilename()
 				_ddir_final = None
-
+				_was_excluded = False
 				if _ctrl == Dumpdir.UNCHANGED:
-					# Item has not changed and is therefore not included in child (i.e. target) snapshot.
-					# look for the item in the parent (i.e. base/source) snapshot
-					_basedumpd = get_dumpdir_from_list(\
-											src_snpfinfo.getContent(_curdir),
-											_filen)
-					_base_ctrl = _basedumpd.getControl()
-					
-					if _base_ctrl == Dumpdir.UNCHANGED:
-						_ddir_final = _dumpdir
-						
-					elif _base_ctrl == Dumpdir.INCLUDED:
-						_ddir_final = _basedumpd
-						files_to_extract.append(os.path.join(_curdir,
-															 _filen))
+					# Item was explicitly excluded and is therefore not included in child
+#					_filenfull = os.path.join(_curdir, _filen)
+#					print "Full path: %s" % (_filenfull)
+					if os.path.join(_curdir, _filen) in target_excludes:
+						self.logger.debug("Path '%s' was excluded. Not merged." % _filen)
+						_was_excluded = True
 					else:
-						raise SBException("Found unexpected control code "\
-										  "('%s') in snapshot file '%s'."\
-										  % (_ctrl, target_snpfinfo.get_snapfile_path()))
+						# Item has not changed and is therefore not included in child (i.e. target) snapshot.
+						# look for the item in the parent (i.e. base/source) snapshot
+						_basedumpd = get_dumpdir_from_list(\
+												src_snpfinfo.getContent(_curdir),
+												_filen)
+						_base_ctrl = _basedumpd.getControl()
+						
+						if _base_ctrl == Dumpdir.UNCHANGED:
+							_ddir_final = _dumpdir
+							
+						elif _base_ctrl == Dumpdir.INCLUDED:
+							_ddir_final = _basedumpd
+							files_to_extract.append(os.path.join(_curdir,
+																 _filen))
+						else:
+							raise SBException("Found unexpected control code "\
+											  "('%s') in snapshot file '%s'."\
+											  % (_ctrl, target_snpfinfo.get_snapfile_path()))
 					
 				elif _ctrl == Dumpdir.DIRECTORY:
 					_ddir_final = _dumpdir
@@ -643,8 +661,9 @@ class SnapshotManager(object):
 					raise SBException("Found unexpected control code "\
 									  "('%s') in snapshot file '%s'."\
 									  % (_ctrl, target_snpfinfo.get_snpfile_Path()))
-				
-				_tmp_dumpdirs.append(_ddir_final)
+
+				if not _was_excluded:
+					_tmp_dumpdirs.append(_ddir_final)
 			# end of loop over dumpdirs 
 			_final_record = target_record[:SnapshotFile.REC_CONTENT]
 			_final_record.append(_tmp_dumpdirs)

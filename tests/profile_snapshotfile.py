@@ -31,7 +31,7 @@ LOGLEVEL = 100
 
 class TestSnapshotfile(object):
 
-	__file = os.path.abspath("./test-datas/test-snapshotfile/files_big.snar")
+	__file = os.path.abspath("./test-datas/test-snapshotfile/files.snar")
 #	__file = os.path.abspath("./test-datas/test-snapshotfile/files_ful.snar")
 	
 	def __init__(self):
@@ -49,7 +49,8 @@ class TestSnapshotfile(object):
 		_time = snar.get_time_of_backup()
 		print "Time of backup: %s sec" % (_time)
 		
-		_dict = snar.get_dict_format2()
+#		_dict = snar.get_dict_format2()
+		self.read_on_demand(snar)
 		
 #		_size = sys.getsizeof(_dict)
 #		mb = _size / (1000*1000)
@@ -57,11 +58,15 @@ class TestSnapshotfile(object):
 #		b = ( _size % (1000*1000) ) % 1000
 #		print "Size: %s MB %s kB %s" % (mb, kb, b) 
 
-		self.read_dict(_dict)
+#		self.read_dict(_dict)
 
 	def read_dict(self, adict):
 		for _item in adict:
 			adict[_item] = 'M'
+			
+	def read_on_demand(self, snar):
+		for _record in snar.parseFormat2():
+			pass
 
 
 	def main(self):
