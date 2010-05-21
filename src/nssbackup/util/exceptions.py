@@ -35,6 +35,11 @@ class SBException(Exception):
 
 	"""
 
+class InstanceRunningError(SBException) :
+	"""This Exception is thrown if another NSsbackup daemon is
+	already running.
+	"""
+	
 class NotValidSnapshotException(SBException) :
 	"""
 	This Exception is thrown by Snapshot validation.

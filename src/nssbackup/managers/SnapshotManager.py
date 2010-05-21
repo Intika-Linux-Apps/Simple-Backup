@@ -255,14 +255,12 @@ class SnapshotManager(object):
 			raise RebaseFullSnpForbidden(\
 			   _("No need to rebase a full snapshot '%s'") % torebase.getName()) 
 		if not torebase.getBase():
-			raise RebaseSnpException(_("'%(snapshotToRebase)s'  doesn't have "\
-					                 "'base' file , it might have been broken ")
+			raise RebaseSnpException(_("'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken ")\
  				               	     % {'snapshotToRebase':torebase.getName()})
 
 		# check if the new base is earlier
 		if newbase and torebase.getName() <= newbase.getName() :
-			raise RebaseSnpException(_("Cannot rebase a snapshot on an earlier"\
-					" one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")\
+			raise RebaseSnpException(_("Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")\
 					% { 'snapshotToRebase':torebase.getName(),
 					    'NewBaseSnapshot': newbase.getName() }) 
 		
@@ -715,8 +713,7 @@ class SnapshotManager(object):
 		
 		"""
 		if snapshot.isfull():
-			self.logger.info(_("Snapshot '%s' is already Full, nothing to do "\
-							   "(not changing it to full") % snapshot.getName())
+			self.logger.info(_("Snapshot '%s' is already Full, nothing to do (not changing it to full).") % snapshot.getName())
 			res_snp = snapshot
 		else:
 			childs = self._retrieve_childsnps(snapshot)

@@ -20,8 +20,20 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-if [ -x /usr/bin/nssbackupd ]
-then /usr/bin/nssbackupd
-elif [ -x /usr/local/bin/nssbackupd ]
-then /usr/local/bin/nssbackupd
+set -e
+
+if [ -x /usr/bin/nice ]; then
+nicecmd="/usr/bin/nice -n 19"
+fi
+
+# See ionice(1)
+if [ -x /usr/bin/ionice ]; then
+#ionicecmd="/usr/bin/ionice -c 2 -n 7 -t"
+ionicecmd="/usr/bin/ionice -c 3 -t"
+fi
+
+if [ -x /usr/bin/nssbackupd ]; then
+$nicecmd $ionicecmd /usr/bin/nssbackupd
+elif [ -x /usr/local/bin/nssbackupd ]; then
+$nicecmd $ionicecmd /usr/local/bin/nssbackupd
 fi

@@ -68,7 +68,6 @@ class BackupManager(object):
         self.config            = configmanager
         self.__state           = backupstate
         self.logger            = LogFactory.getLogger()
-         
         self.__profilename    = self.config.getProfileName()
         self.__state.set_profilename(self.__profilename)
         
@@ -88,8 +87,8 @@ class BackupManager(object):
         self.logger.debug("Instance of BackupManager created.")
         
     def makeBackup(self ):
-        """Runs the whole backup process.
-
+        """Runs the whole backup process:
+        
         1. create lock and initialize file systems
         3. check pre-conditions
         4. test for upgrades (but don't perform)
@@ -102,13 +101,12 @@ class BackupManager(object):
             writes everything into the snapshot directory).
         9. release lock
         """
+        self.__setlockfile()
+
         _msg = _("Backup process is being started.")
 #        self._notify_info(self.__profilename, _msg)
         self.logger.info(_msg)
         self.__state.set_state('start')
-        
-        # set the lockfile
-        self.__setlockfile()
         
         try:
             self.__fusefam.initialize()
@@ -143,8 +141,7 @@ class BackupManager(object):
 
         if needupgrade:
             self.__state.set_state('needupgrade')
-            _msg = "There are snapshots with old snapshot format."\
-                   " Please upgrade them if you want to use them."
+            _msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using '(Not So) Simple Backup-Restoration' if you want to use them.")
 #            self._notify_warning(self.__profilename, _msg)
             self.logger.warning(_msg)
         
@@ -160,7 +157,7 @@ class BackupManager(object):
         
         # Create a new snapshot
         self.__actualSnapshot = Snapshot(snppath)
-        self.logger.info(_("Starting snapshot %(name)s ")
+        self.logger.info(_("Snapshot '%(name)s' is being made.")
                          % {'name' :str(self.__actualSnapshot)})
         
         # Set the base file
@@ -168,7 +165,7 @@ class BackupManager(object):
             if self.__actualSnapshot.isfull():
                 self.logger.debug("Base is not being set for this full snapshot.")
             else:
-                self.logger.info(_("Setting Base to '%(value)s' ") % {'value' : str(base)})
+                self.logger.info(_("Setting Base to '%(value)s'.") % {'value' : str(base)})
                 self.__actualSnapshot.setBase(base.getName())
         del base
 
@@ -184,7 +181,7 @@ class BackupManager(object):
                 s.close()
                 self.__actualSnapshot.setPackages(pkg)
             except Exception, _exc:
-                self.logger.warning(_("Problem when setting the packages: ") + str(_exc))
+                self.logger.warning(_("Problem when setting the packages list: ") + str(_exc))
         
         # set Excludes
 # TODO: improve handling of Regex containing ',' (delimiter); currently this will crash
@@ -217,7 +214,6 @@ class BackupManager(object):
 #        self._notify_info(self.__profilename, _("File list ready, committing to disk."))
         self.__state.set_state('commit')
         self.__actualSnapshot.commit()
-        self.endSBsession()
         
     def __fillSnapshot(self):
         """Fill snapshot's include and exclude lists and retrieve some information
@@ -245,8 +241,7 @@ class BackupManager(object):
         self.logger.info(_("Number of items to be excluded by config: %s.") % _stats.get_count_items_excl_config())
         
         if _freespace <= _snpsize:
-            raise exceptions.SBException(_("Not enough free space in the target directory for the "\
-                                           "planned backup (%(freespace)s <= %(neededspace)s).")\
+            raise exceptions.SBException(_("Not enough free space in the target directory for the planned backup (%(freespace)s <= %(neededspace)s).")\
                                            % { 'freespace' : _freespace_hr, 'neededspace' : _snpsize_hr})
 
     def __create_collector_obj(self):
@@ -262,6 +257,8 @@ class BackupManager(object):
                 
     def __setlockfile(self):
         """Set the lockfile.
+        
+        @todo: Lock file should be created and removed in daemon!
         """
         if self.config.has_option("general", "lockfile") :
             self.__lockfile = self.config.get("general", "lockfile")
@@ -273,21 +270,28 @@ class BackupManager(object):
         if FAM.exists(self.__lockfile) :
             # the lockfile exists, is it valid ?
             last_sb_pid = FAM.readfile(self.__lockfile)
-            if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read()) ) :
-                raise exceptions.SBException(_("Another NSsbackup daemon already running (pid = %s )!") % last_sb_pid )
-            else :
-                FAM.delete(self.__lockfile)
+            if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and\
+                "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read())):
+                    raise exceptions.InstanceRunningError(\
+                    _("Another instance of '(Not So) Simple Backup' is already running (process id: %s).")\
+                      % last_sb_pid )
+            else:
+                self.logger.info(_("Invalid lock file found. Is being removed."))
+                self.__unsetlockfile()
         
         FAM.writetofile(self.__lockfile, str(os.getpid()))
-        self.logger.debug("Created lockfile at '%s' with info '%s'"\
+        self.logger.debug("Created lockfile at '%s' with info '%s'."\
                           % (self.__lockfile, str(os.getpid()) ))
         
     def __unsetlockfile(self):
         """Remove lockfile.
         """
-        FAM.delete(self.__lockfile)
-        self.logger.debug("Lock file '%s' removed."    % self.__lockfile)
-
+        try:
+            FAM.delete(self.__lockfile)
+            self.logger.debug("Lock file '%s' removed."    % self.__lockfile)
+        except OSError, _exc:
+            self.logger.error(_("Unable to remove lock file: %s" % str(_exc)))
+            
     def __copylogfile(self):
         # destination for copying the logfile
         if self.__actualSnapshot:
@@ -299,8 +303,8 @@ class BackupManager(object):
                 try:
                     Util.nssb_copy( self.config.get("log","file"), logf_target )
                 except exceptions.ChmodNotSupportedError:
-                    self.logger.warning(_("Unable to change permissions for "\
-                                          "file '%s'.") % logf_target )
+                    self.logger.warning(_("Unable to change permissions for file '%s'.")\
+                                    % logf_target )
             else :
                 self.logger.warning(_("Unable to find logfile to copy into snapshot."))
         else:
@@ -812,7 +816,7 @@ class FileCollector(object):
                 
         # if the file is in exclude list, return true
         if self.__snapshot.is_path_in_excl_filelist(path):
-            self.__logger.info(_("File '%(file)s' found in defined exclude list.") % {'file' : path})
+            self.__logger.info(_("Path '%(file)s' defined in excludes list.") % {'file' : path})
             return True        
         #all tests passed
         return False
@@ -864,7 +868,7 @@ class FileCollector(object):
         if not _excluded:
             # path was not excluded, so do further tests (stats, enter dir...)            
             if self.__fislink:
-                self.__logger.info(_("Symbolic link found: '%(path)s' -> '%(ln_target)s'.")\
+                self.__logger.debug("Symbolic link found: '%(path)s' -> '%(ln_target)s'."\
                                 % {'path' : path, 'ln_target' : FAM.get_link(path)})
                 self.__collect_stats.count_symlink()
                 if not self.__snapshot.isFollowLinks():
@@ -931,15 +935,13 @@ class FileCollector(object):
         if _snp_excl:
             for _regex in _snp_excl:
                 if Util.is_empty_regexp(_regex):
-                    self.__logger.warning(_("Empty regular expression found. "\
-                                        "Skipped."))
+                    self.__logger.warning(_("Empty regular expression found. Skipped."))
                 else:
                     if Util.is_valid_regexp(_regex):
                         _regex_c = re.compile(_regex)
                         _rexclude.append(_regex_c)
                     else:
-                        self.__logger.warning(_("Invalid regular expression ('%s')"\
-                                        " found. Skipped.") % _regex)
+                        self.__logger.warning(_("Invalid regular expression ('%s') found. Skipped.") % _regex)
         self.__excl_regex = _rexclude
 
     def __prepare_explicit_flists(self):

@@ -44,6 +44,7 @@ import optparse
 # project imports
 from nssbackup import Infos
 from nssbackup.util import log
+from nssbackup.util import exceptions
 import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.managers.ConfigManager import getUserConfDir
 from nssbackup.managers.ConfigManager import ConfigManager
@@ -87,7 +88,6 @@ class NSsbackupd(object):
         
         # collection of all config managers
         self.__confm            = []
-
         # the name of the currently processed profile
         self.__profilename        = None
         self.__retrieve_confm(configfile)
@@ -137,8 +137,7 @@ class NSsbackupd(object):
         """
         if os.getuid() == 0:
             self.__super_user = True
-            
-                
+        
     def __sendEmail(self):
         """Checks if the sent of emails is set in the config file 
         then send an email with the report
@@ -165,8 +164,7 @@ class NSsbackupd(object):
         if FAM.exists( logf ):
             _content = FAM.readfile( logf )
         else :
-            _content = _("I didn't find the log file. Please set it up in "\
-                         "nssbackup.conf ")
+            _content = _("No path to log file specified. Please set it in the configuration.")
         
         server = smtplib.SMTP()
         msg = MIMEMultipart()
@@ -233,9 +231,7 @@ class NSsbackupd(object):
             # store the created ConfigManager in a collection
             self.__confm.append( confm )
         else:
-            errmsg = _("Critical Error: No configuration file for the default "\
-                       "profile was found!\n\nNow continue processing "\
-                       "remaining profiles.")
+            errmsg = _("Critical Error: No configuration file for the default profile was found!\n\nNow continue processing remaining profiles.")
             self.__errors.append(errmsg)
 
         # Now search for alternate configuration files
@@ -263,7 +259,7 @@ class NSsbackupd(object):
         
         """
         self.__notify_init_errors()
-
+        
         for confm in self.__confm:
             try:
                 self.__profilename     = confm.getProfileName()
@@ -274,29 +270,42 @@ class NSsbackupd(object):
                 self.__bm              = BackupManager(confm, self.__state)
                 self.__log_errlist()
                 self.__bm.makeBackup()
+                self.__bm.endSBsession()
+            except exceptions.InstanceRunningError, exc:
+                self.__on_already_running(exc)
             except Exception, exc:
-                self.__on_error(exc)
-            finally:
-                self.__onFinish()
-
+                self.__onError(exc)
+            self.__onFinish()
         self.__terminate_notifiers()
+
+    def __on_already_running(self, error):
+        """Handler for the case a backup process is already running.
+        Fuse is not initialized yet.
+        """
+        try:
+            _msg = "Backup is not being started.\n%s" % (str(error))
+            self.logger.warning(_msg)
+            self._notify_warning(self.__profileName, _msg)
+        except Exception, exc:
+            self.logger.error("Exception in error handling code:\n%s" % str(exc))
+            self.logger.error(traceback.format_exc())
 
     def __on_error(self, error):
         """Handles errors that occurs during backup process.
         
         """
-        self.logger.error(str(error))
-        self.logger.error(traceback.format_exc())
-
         try:
+	        n_body = _("An error occured during the backup:\n%s") % (str(e))
+            self.logger.error(n_body)
+            self.logger.debug(traceback.format_exc())
             self.__state.set_recent_error(error)
             self.__state.set_state('error')
-        except Exception, err2:
-            self.logger.warning(str(err2))
+		    if self.__bm:
+		        self.__bm.endSBsession()
+        except Exception, exc:
+            self.logger.error("Exception in error handling code:\n%s" % str(exc))
+            self.logger.error(traceback.format_exc())
         
-        if self.__bm:
-            self.__bm.endSBsession()
-
     def __onFinish(self):
         """Method that is finally called after backup process.
         """

@@ -100,8 +100,7 @@ class ftpFuseFAM (pluginFAM)  :
 			try:
 				retval = subprocess.call( curl_cmd, 0, None, None, outptr, errptr)
 			except OSError, _exc:
-				raise FuseFAMException(_("Couldn't found external application "\
-					"'curlftpfs' needed for handling of ftp sites: %s") % _exc)
+				raise FuseFAMException(_("Couldn't found external application 'curlftpfs' needed for handling of ftp sites: %s") % _exc)
 	
 			# Close log handles
 			os.close(errptr)
@@ -110,8 +109,7 @@ class ftpFuseFAM (pluginFAM)  :
 			FAM.delete(outFile)
 			FAM.delete(errFile)
 			if retval != 0 :
-				raise FuseFAMException(_("Couldn't mount '%(server)s' into "\
-						"'%(mountpoint)s' : %(error)s") %  {'server' : spliturl.server ,
+				raise FuseFAMException(_("Couldn't mount '%(server)s' into '%(mountpoint)s' : %(error)s") %  {'server' : spliturl.server ,
 													'mountpoint': mountpoint,
 													'error':errStr})
 		else:
@@ -172,9 +170,7 @@ class SplittedURL:
 		exp = re.compile(ftpUrlRegex)
 		match = exp.search(url)
 		if match is None: 
-			raise FuseFAMException(_("Error matching the schema "\
-							"'ftp://user:pass@server/anything' with '%s' "\
-							"(The '/' after server is mandatory)") % url)
+			raise FuseFAMException(_("Error matching the schema 'ftp://user:pass@server/anything' with '%s' (The '/' after server is mandatory)") % url)
 
 		self.user = match.group(2)
 		self.password = match.group(3)

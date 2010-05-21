@@ -235,8 +235,8 @@ class ConfigManager(ConfigParser.ConfigParser):
 			self.logger.info(_("Profile settings are being read from file '%s'.")\
 							  % self.conffile)
 		else :
-			self.logger.info(_("Profile settings are being set to default values. "\
-							 "Configuration file is set to '%s'.") % self.conffile)
+			self.logger.info(_("Profile settings are being set to default values. Configuration file is set to '%s'.")\
+							% self.conffile)
 			
 	def __str__(self):
 		retval = []
@@ -456,8 +456,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 				if type(remotes) == str :
 					remotes = eval(remotes)
 				if type(remotes) != dict :
-					raise SBException(_("Unable to evaluate '%(parameter)s' as "\
-							"a dictionary (value got = '%(value)r').") \
+					raise SBException(_("Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r').")\
 							% {'parameter': remotes,'value': type(remotes)})
 				if not remotes.has_key(option) :
 					# then it wasn't for us , fall back on the parent
@@ -617,8 +616,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 			else :
 				self.logger = LogFactory.getLogger(self.getProfileName(), logf)
 
-			self.logger.info(_("Log output for [%(profile)s] is directed to "\
-							   "file '%(file)s'.")\
+			self.logger.info(_("Log output for [%(profile)s] is directed to file '%(file)s'.")\
 							   % {'profile' : self.getProfileName(),
 								  'file': logf})
 
@@ -723,8 +721,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 				and not self.has_option("schedule", "anacron")):
 			
 			# no entry in configuration found, look at Cron/Anacron directly
-			self.logger.info(_("No schedule defined in configuration file. "\
-								"Probing from filesystem."))
+			self.logger.info(_("No schedule defined in configuration file. Probing from filesystem."))
 			#hourly
 			if os.path.exists("/etc/cron.hourly/nssbackup"):
 				self.logger.debug("Anacron hourly has been found")
@@ -831,8 +828,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 		"""
 		if not self.conffile: 
-			raise SBException(_("The config file is not set yet into this "\
-							    "ConfigManager"))
+			raise SBException(_("The config file is not set yet into this ConfigManager"))
 		is_default = is_default_profile(self.conffile)
 		return is_default
 		
@@ -1480,15 +1476,17 @@ class _DefaultConfiguration(Configuration):
 # see http://fuhm.net/super-harmful/
 		Configuration.__init__(self)
 		
-		self._regex_excludes = "\.mp3,\.avi,\.mpeg,\.mkv,\.ogg,\.iso,"\
-		                   "/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,"\
-		                   "/home/[^/]+?/\..+/[cC]ache"
+		self._regex_excludes = "\.mp3$,\.avi$,\.mpeg$,\.mkv$,\.ogg$,\.iso$,"\
+							   "/home/[^/]+?/\.gvfs/,"\
+							   "/home/[^/]+?/\.thumbnails/,"\
+							   "/home/[^/]+?/\..+/[tT]rash/,"\
+							   "/home/[^/]+?/\..+/[cC]ache/"
 
 		self._maxinc = 7
 		self._cformat = 'gzip'
 		self._follow_links = False
 		self._splitsize = 0
-		self._max_filesize = 104857600		# in bytes = 100 MB * 1024 * 1024
+		self._max_filesize = -1 #Bugfix LP #146618
 
 		self._loglevel = 20
 		self._report_smtpfrom = Infos.SMTPFROM
@@ -1522,6 +1520,7 @@ class _DefaultConfigurationForAdmins(_DefaultConfiguration):
 							'/var/cache/'	: '0',
 							'/var/tmp/'		: '0',
 							'/var/spool/'	: '0',
+							'/var/run/'		: '0',							
 							'/usr/local/'	: '1',
 							'/media/'		: '0' }
 		
