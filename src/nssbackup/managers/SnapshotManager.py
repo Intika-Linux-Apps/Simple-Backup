@@ -901,9 +901,13 @@ class SnapshotManager(object):
 		"""
 		self.get_snapshots(forceReload = True)
 		if purge == "log":
-			self._do_log_purge()
-		else:
-			self._do_cutoff_purge(purge)
+			self.logger.warning(_("Logarithmic purge is currently disabled. Falling back to cutoff purge of snapshots older than 30 days."))
+			purge = "30"
+#			self._do_log_purge()
+#		else:
+#			self._do_cutoff_purge(purge)
+		# currently disabled, therefore only cutoff purge
+		self._do_cutoff_purge(purge)
 		self.get_snapshots(forceReload = True)
 
 	def _do_log_purge(self):
