@@ -44,6 +44,7 @@ from GladeWindow import GladeWindow
 from GladeWindow import ProgressbarMixin
 
 import nssbackup.util as Util
+from nssbackup.util import log
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir
 from nssbackup.managers.SnapshotManager import SnapshotManager
@@ -783,6 +784,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 	
 	def gtk_main_quit( self, *args):
 		self.fusefam.terminate()
+		self.config = None
 		gtk.main_quit()
 
 
@@ -944,3 +946,4 @@ def main(argv):
 	restore_win = SBRestoreGTK()
 	restore_win.show()
 	gtk.main()
+	log.shutdown_logging()

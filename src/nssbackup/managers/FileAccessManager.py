@@ -34,6 +34,8 @@ import os.path
 import shutil
 import pickle
 import stat
+import types
+import datetime
 
 
 def __remove_trailing_sep(path):
@@ -90,7 +92,74 @@ def normpath(*args):
 
 def rename(src, dst):
 	os.rename(src, dst)
+	
+	
+def rename_rotating(src, dst, max_num):
+	"""Renames the given file `src` to `dst`. The destination (i.e. the new
+	file name) is renamed in rotated manner prior the actual renaming
+	process.
+	"""
+	if not isinstance(src, types.StringTypes):
+		raise TypeError("Expected string as source. Got %s instead." % type(src))
+	if not isinstance(dst, types.StringTypes):
+		raise TypeError("Expected string as destination. Got %s instead." % type(dst))
+	if not isinstance(max_num, types.IntType):
+		raise TypeError("Expected integer as max. number. Got %s instead." % type(max_num))
+	if max_num < 1:
+		raise ValueError("Max. number must be greater than 0.")
+	
+	# at first: rotating rename of destination
+	for _num in range(max_num, 0, -1):
+		_rot_src = append_str_to_filename(dst, str((_num - 1)))
+		_rot_target = append_str_to_filename(dst, str(_num)) 
+		if _num == 1:
+			_rot_src = dst
+		if exists(_rot_src):
+			rename(_rot_src, _rot_target)
+	# then rename the source file
+	rename(src, dst)
+			
 		
+def append_time_to_filename(filename, filetype=""):
+	if not isinstance(filename, types.StringTypes):
+		raise TypeError("Expected string. Got %s instead." % type(filename))
+	if not isinstance(filetype, types.StringTypes):
+		raise TypeError("Expected string as file type. Got %s instead." % type(filetype))
+	if filetype != "" and not filetype.startswith("."):
+		raise ValueError("Given file type must start with dot (.xyz).")
+
+	_time = datetime.datetime.now().isoformat("_").replace( ":", "." )
+	_res = append_str_to_filename(filename, _time, filetype)
+	return _res
+
+
+def append_str_to_filename(filename, str_to_append, filetype=""):
+	"""If a file type (i.e. file extension) is specified, the string
+	to append is put in front of the file type extension.
+	
+	Example: string to append = 123
+			 filename = basename.log
+			 result without specifying a filetype = basename.log.123 
+			 result with specifying filetype '.log' = basename.123.log 
+			 
+	"""
+	if not isinstance(filename, types.StringTypes):
+		raise TypeError("Expected string as filename. Got %s instead." % type(filename))
+	if not isinstance(str_to_append, types.StringTypes):
+		raise TypeError("Expected string to append. Got %s instead." % type(str_to_append))
+	if not isinstance(filetype, types.StringTypes):
+		raise TypeError("Expected string as file type. Got %s instead." % type(filetype))
+	if filetype != "" and not filetype.startswith("."):
+		raise ValueError("Given file type must start with dot (.xyz).")
+	
+	_filen = filename
+	_ext = ""
+	if filetype != "":
+		if filename.endswith(filetype):
+			_filen = filename.rstrip(filetype)
+	_res = "%s.%s%s" % (_filen, str_to_append, filetype)
+	return _res
+
 
 def __add_write_permission(path, recursive = True):
 	"""Sets write permissions for user, group, and others for

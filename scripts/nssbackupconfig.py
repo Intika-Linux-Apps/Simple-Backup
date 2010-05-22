@@ -284,7 +284,7 @@ class UpgradeLogOption(object):
 					logfile = config.get("log", "file")			   
 					logdir = os.path.dirname(logfile)
 					
-					new_logfn = ConfigManager.get_logfile_name(conffile)
+					new_logfn = ConfigManager.get_logfile_name_template(conffile)
 					new_log = os.path.join(logdir, new_logfn)
 					
 					if logfile == new_log:

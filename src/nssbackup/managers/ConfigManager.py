@@ -109,6 +109,7 @@ import smtplib
 import types
 from gettext import gettext as _
 from optparse import OptionParser
+#import datetime
 
 from nssbackup.pkginfo import Infos
 from nssbackup.util.log import LogFactory
@@ -210,9 +211,12 @@ def is_default_profile(conffile):
 	
 	return is_default
 
-def get_logfile_name(conffile):
+def get_logfile_name_template(conffile):
 	"""Determines the profilename from the given pathname `conffile`
 	and returns an appropriate logfile name.
+	
+	By 'template' is indicated this is the base logfile name. It is
+	extended by the current time if a logfile is actually created. 
 	
 	The given `conffile` may not exist.
 	 	
@@ -287,6 +291,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		self.__dirconfig		= {}
 		
 		self.__logfile_dir		= ""
+		self.__current_logfile	= None
 		self.conffile 			= None
 		self.logger 			= None
 		self.__profileName 		= None
@@ -326,6 +331,9 @@ class ConfigManager(ConfigParser.ConfigParser):
 			self.logger.info(_("Profile settings are being set to default values. Configuration file is set to '%s'.")\
 							% self.conffile)
 			
+	def __del__(self):
+		self.__cleanup_logfiles()
+
 	def __str__(self):
 		retval = []
 		for section, sec_data in self._sections.iteritems():
@@ -432,7 +440,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 		# Section log
 		self.set("log", "level", str(defaults.get_loglevel()))
 		self.set_logdir(defaults.get_logdir())
-		self.set_logfile()
+		self.set_logfile_templ_to_config()
 		if not FAM.exists(self.get("log","file")) :
 			FAM.createfile(self.get("log","file"))
 
@@ -695,27 +703,50 @@ class ConfigManager(ConfigParser.ConfigParser):
 	def __create_logger(self):
 		"""Initializes logger with profile name as identifier
 		and use the specified file as log file.
+		
+		Uses the defined 'template' which is extended by the current time
+		in order to provide a unique name when the file is actually created. 
 		"""
+		curr_logf = None
 		if self.has_section("log") and self.has_option("log", "file"):
-			logf = self.get("log", "file")
-			self.__logfile_dir = os.path.dirname(logf)
+			logf_templ = self.get("log", "file")
+			curr_logf = FAM.append_time_to_filename(logf_templ, ".log")
+			self.__logfile_dir = os.path.dirname(curr_logf)
 			
 			if self.has_option("log", "level") :
-				self.logger = LogFactory.getLogger(self.getProfileName(), logf,
+				self.logger = LogFactory.getLogger(self.getProfileName(),
+												   curr_logf,
 												   self.getint("log","level"))
 			else :
-				self.logger = LogFactory.getLogger(self.getProfileName(), logf)
+				self.logger = LogFactory.getLogger(self.getProfileName(),
+												   curr_logf)
 
 			self.logger.info(_("Log output for [%(profile)s] is directed to file '%(file)s'.")\
 							   % {'profile' : self.getProfileName(),
-								  'file': logf})
-
+								  'file': curr_logf})
 		else:
 		# if no file is specified, use the logger's default (no log file)
 # TODO: Raise an assertion exception if no log section was found ?!
 			self.logger = LogFactory.getLogger(self.getProfileName())
 			self.logger.info(_("Log output for [%s] is not directed into a file.")\
 							    % (self.getProfileName()))
+		self.__current_logfile = curr_logf
+		
+	def __cleanup_logfiles(self):
+		"""Renames the unique log file that was created in the constructor
+		and rotates existing files in order to keep the log directory
+		clear.
+		"""
+		logf_src = self.get_current_logfile()
+		if logf_src is not None:
+			logf_target = self.__get_logfile_template()				
+			if FAM.exists(logf_src):
+				try:
+					FAM.rename_rotating(logf_src, logf_target, 6)
+				except OSError, error:
+					self.logger.error(_("Unable to rename log file '%(src)s'->'%(dst)s': %(err)s")\
+									% {'src': logf_src, 'dst': logf_target, 'err': str(error)})
+		self.logger = None
 
 	def read(self, filename=None ):
 		"""Reads the configuration file and returns its content. Moreover it
@@ -964,30 +995,40 @@ class ConfigManager(ConfigParser.ConfigParser):
 		
 	def get_logdir(self):
 		"""Returns the currently set directory for log files.
-		
 		"""
 		return self.__logfile_dir
 
-	def set_logfile(self):
+	def set_logfile_templ_to_config(self):
 		"""Retrieves the path to log file and writes it into the configuration.
-		
+
+		By 'template' is indicated this is the base logfile name. It is
+		extended by the current time if a logfile is actually created. 		
 		"""
-		logf = self.get_logfile()
+		logf = self.__get_logfile_template()
 		if not self.has_section("log") :
 			self.add_section("log")
 		self.set("log", "file", logf )
 		
-	def get_logfile(self):
+	def __get_logfile_template(self):
 		"""Builds the full path to log file for this configuration and
 		returns it. The log file for the default profile is named
 		'nssbackup.log', log files for other profiles are extended by
 		the profile's name to keep them unique and avoid problems while logging.
 		
+		By 'template' is indicated this is the base logfile name. It is
+		extended by the current time if a logfile is actually created. 
+
 		"""
-		logfname = get_logfile_name(self.conffile)
+		logfname = get_logfile_name_template(self.conffile)
 		logf = os.path.join(self.__logfile_dir, logfname)
 		return logf
 		
+	def get_current_logfile(self):
+		"""Returns the full path of the log file currently used.
+		Might return None.
+		"""
+		return self.__current_logfile
+	
 	def __clear_report_section(self):
 		"""Any options present in the report section are removed. The section
 		itself is not removed. 
@@ -1524,7 +1565,7 @@ class _DefaultConfigurationForAdmins(_DefaultConfiguration):
 							'/usr/local/'	: '1',
 							'/media/'		: '0' }
 		
-		self._logdir = "/var/log"
+		self._logdir = "/var/log/nssbackup"
 		
 		self._schedule = [False, "daily"]
 
@@ -1550,6 +1591,6 @@ class _DefaultConfigurationForUsers(_DefaultConfiguration):
 				
 		self._dirconf = {	os.getenv("HOME")+os.sep		: '1' }
 		
-		self._logdir = getUserDatasDir()
+		self._logdir = os.path.join(getUserDatasDir(), "log")
 
 		self._schedule = [False, ""]	# no scheduling

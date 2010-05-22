@@ -28,6 +28,7 @@ from gettext import gettext as _
 
 # project imports
 from nssbackup.pkginfo import Infos
+from nssbackup.util import log
 from nssbackup.plugins import PluginManager
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.managers.ConfigManager import ConfigManager, getUserConfDir
@@ -67,9 +68,7 @@ class SBconfigGTK(GladeGnomeApp):
 	
 	def __init__(self):
 		"""Default constructor.
-		"""
-		self.logger = LogFactory.getLogger()
-		
+		"""		
 		# it is distinguished between the 'current' conffile and
 		# the 'default file' configuring the default profile
 		self.default_conffile = None		
@@ -89,7 +88,9 @@ class SBconfigGTK(GladeGnomeApp):
 		else :
 			self.configman = ConfigManager()		
 			self.orig_configman = None
-				
+		
+		self.logger = LogFactory.getLogger()
+	
 		self._init_ui()
 		
 		# hide the schedule tab if not root
@@ -1891,7 +1892,7 @@ class SBconfigGTK(GladeGnomeApp):
 	
 	def on_logfilechooser_selection_changed(self, *args):
 		self.configman.set_logdir(self.widgets['logfilechooser'].get_filename())
-		self.configman.set_logfile()
+		self.configman.set_logfile_templ_to_config()
 		self.isConfigChanged()
 		self.logger.debug("Log file set: " + self.configman.get("log", "file"))
 
@@ -1982,20 +1983,25 @@ class SBconfigGTK(GladeGnomeApp):
 		"""
 		cancelled = self.ask_save_config()		
 		return cancelled
+
+	def __terminate_app(self):
+		self.configman = None
+		self.orig_configman = None
+		gtk.main_quit()
 		
 	def on_nssbackupConfApp_destroy(self, *args):
 		"""Signal handler that is called when the window was destroyed.
 		"""
-		gtk.main_quit()
-		
+		self.__terminate_app()
+			
 	def on_exit_activate(self, *args):
 		"""Signal handler that is called when the 'Quit' menu item
 		is selected.
 		"""
 		cancelled = self.ask_save_config()
 		if not cancelled:
-			gtk.main_quit()
-
+			self.__terminate_app()
+			
 	def on_ftype_custom_ex_changed(self, *args):
 		print("TODO: on_ftype_custom_ex_changed")
 
@@ -2200,3 +2206,4 @@ def main(argv):
 	window = SBconfigGTK()
 	window.show()
 	gtk.main()
+	log.shutdown_logging()

@@ -368,6 +368,10 @@ class BackupManager(PyNotifyMixin):
 		self.__fillSnapshot()					
 		self._notify_info(self.__profilename, _("File list ready, committing to disk."))				
 		self.__actualSnapshot.commit()
+
+		_msg = _("Backup process finished.")
+		self._notify_info(self.__profilename, _msg)
+		self.logger.info(_msg)
 		
 	def __fillSnapshot(self):
 		"""Fill snapshot's include and exclude lists and retrieve some information
@@ -447,20 +451,24 @@ class BackupManager(PyNotifyMixin):
 			self.logger.error(_("Unable to remove lock file: %s" % str(_exc)))
 			
 	def __copylogfile(self):
+# TODO: we should flush the log file before copy!
 		# destination for copying the logfile
 		if self.__actualSnapshot:
-			logf_src = self.config.get_logfile()
-			logf_name = os.path.basename(logf_src)
-			logf_target = os.path.join( self.__actualSnapshot.getPath(),
-									    logf_name )
-			if FAM.exists(logf_src):
-				try:
-					Util.nssb_copy( self.config.get("log","file"), logf_target )
-				except exceptions.ChmodNotSupportedError:
-					self.logger.warning(_("Unable to change permissions for file '%s'.")\
-									% logf_target )
-			else :
-				self.logger.warning(_("Unable to find logfile to copy into snapshot."))
+			logf_src = self.config.get_current_logfile()
+			if logf_src is None:
+				self.logger.warning(_("No log file specified."))
+			else:
+				logf_name = os.path.basename(logf_src)
+				logf_target = os.path.join( self.__actualSnapshot.getPath(),
+										    logf_name )
+				if FAM.exists(logf_src):
+					try:
+						Util.nssb_copy(logf_src, logf_target)
+					except exceptions.ChmodNotSupportedError:
+						self.logger.warning(_("Unable to change permissions for file '%s'.")\
+										% logf_target )
+				else :
+					self.logger.warning(_("Unable to find logfile to copy into snapshot."))
 		else:
 			self.logger.warning(_("No snapshot to copy logfile."))
 		
@@ -474,12 +482,9 @@ class BackupManager(PyNotifyMixin):
 		successful or not.
 		"""
 		self.__unsetlockfile()
-		self.__copylogfile()			
+		self.__copylogfile()
 		self.__fusefam.terminate()
-		
-		_msg = _("Backup process finished.")
-		self._notify_info(self.__profilename, _msg)
-		self.logger.info(_msg)
+		self.logger.info(_("Processing of profile is finished."))
 
 	def __checkTarget(self):
 		"""

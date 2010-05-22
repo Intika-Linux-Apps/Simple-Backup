@@ -30,7 +30,6 @@
 
 import os
 import os.path
-import traceback
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -115,11 +114,14 @@ class NSsbackupd(PyNotifyMixin) :
 		_title = _("[NSsbackup] [%(profile)s] Report of %(date)s")\
 					% { 'profile':self.__profileName,
 					    'date': datetime.datetime.now() }
-		logf = self.__bm.config.get_logfile()
-		if FAM.exists( logf ):
-			_content = FAM.readfile( logf )
-		else :
-			_content = _("No path to log file specified. Please set it in the configuration.")
+		logf = self.__bm.config.get_current_logfile()
+		if logf is None:
+			_content = _("No log file specified.")
+		else:
+			if FAM.exists( logf ):
+				_content = FAM.readfile( logf )
+			else :
+				_content = _("Unable to find log file.")
 		
 		server = smtplib.SMTP()
 		msg = MIMEMultipart()
@@ -213,7 +215,7 @@ class NSsbackupd(PyNotifyMixin) :
 				self.__bm 			= BackupManager( confm )
 				self.__log_errlist()
 				self.__bm.makeBackup()
-				self.__bm.endSBsession()
+				self.__bm.endSBsession()				
 			except exceptions.InstanceRunningError, exc:
 				self.__on_already_running(exc)
 			except Exception, exc:
@@ -230,27 +232,24 @@ class NSsbackupd(PyNotifyMixin) :
 			self.logger.warning(_msg)
 			self._notify_warning(self.__profileName, _msg)
 		except Exception, exc:
-			self.logger.error("Exception in error handling code:\n%s" % str(exc))
-			self.logger.error(traceback.format_exc())
+			self.logger.exception("Exception in error handling code:\n%s" % str(exc))
 
 	def __onError(self, e):
 		"""Handles errors that occurs during backup process.
 		"""
 		try:
 			n_body = _("An error occured during the backup:\n%s") % (str(e))
-			self.logger.error(n_body)
-			self.logger.debug(traceback.format_exc())
+			self.logger.exception(n_body)
 			self._notify_error(self.__profileName, n_body)
 			if self.__bm:
 				self.__bm.endSBsession()
 		except Exception, exc:
-			self.logger.error("Exception in error handling code:\n%s" % str(exc))
-			self.logger.error(traceback.format_exc())
+			self.logger.exception("Exception in error handling code:\n%s" % str(exc))
 		
 	def __onFinish(self):
 		"""Method that is finally called after backup process.
 		"""
-		if self.__bm and self.__bm.config :
+		if self.__bm and self.__bm.config:
 			# send the mail
 			if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
 				self.__sendEmail()
