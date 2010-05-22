@@ -19,7 +19,16 @@ set -e
 
 
 case "$1" in
-    remove|upgrade|deconfigure)
+    remove|deconfigure)
+      find /usr/lib/python*/*/nssbackup -name '*.pyc' -exec rm -f '{}' \;
+      rm -f /etc/cron.d/nssbackup;
+      rm -f /etc/cron.hourly/nssbackup;
+      rm -f /etc/cron.daily/nssbackup;
+      rm -f /etc/cron.weekly/nssbackup;
+      rm -f /etc/cron.monthly/nssbackup;
+    ;;
+
+    upgrade)
       find /usr/lib/python*/*/nssbackup -name '*.pyc' -exec rm -f '{}' \;
     ;;
 

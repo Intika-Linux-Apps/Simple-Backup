@@ -131,7 +131,7 @@ install-help:
 	done
 
 # targets for un-installation
-uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-help
+uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-cron uninstall-help
 
 uninstall-bin:
 	rm -f $(BIN)/nssbackupd
@@ -158,6 +158,13 @@ uninstall-data:
 	rm -rf $(DATADIR)/doc/nssbackup
 	set -e; find $(LANGDIR) -name nssbackup.mo -exec rm -f '{}' \;
 	
+uninstall-cron:
+	rm -f /etc/cron.d/nssbackup
+	rm -f /etc/cron.hourly/nssbackup
+	rm -f /etc/cron.daily/nssbackup
+	rm -f /etc/cron.weekly/nssbackup
+	rm -f /etc/cron.monthly/nssbackup
+
 uninstall-help:
 	rm -rf $(HELPDIR)
 	
