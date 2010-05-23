@@ -1521,7 +1521,8 @@ class _DefaultConfiguration(Configuration):
 							   "/home/[^/]+?/\.gvfs/,"\
 							   "/home/[^/]+?/\.thumbnails/,"\
 							   "/home/[^/]+?/\..+/[tT]rash/,"\
-							   "/home/[^/]+?/\..+/[cC]ache/"
+							   "/home/[^/]+?/\..+/[cC]ache/,"\
+							   "~$"
 
 		self._maxinc = 7
 		self._cformat = 'gzip'
