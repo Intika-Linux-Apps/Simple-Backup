@@ -1030,8 +1030,11 @@ class FileCollector(object):
                     # if `followlinks` is *disabled*, just count the link and finish
                     _stop_checking = True
                     
-            if not _stop_checking:    # i.e. `followlinks` is enabled
-                if self.__fisdir:
+            if self.__fisdir:
+                if _stop_checking:	# i.e. `followlinks` is not enabled
+                    self.__collect_stats.count_file()
+                    self.__cumulate_size(path)
+                else:
                     # if it's a directory, enter inside
                     try:
                         for _dir_item in FAM.listdir(path) :
@@ -1040,13 +1043,13 @@ class FileCollector(object):
                         self.__collect_stats.count_dir()    # the directory `path`
                     except OSError, _exc:
                         self.__logger.warning(_("Error while checking directory '%(dir)s': %(error)s.")\
-                                                % {'dir' : path, 'error' : str(_exc)})
+                                              % {'dir' : path, 'error' : str(_exc)})
                         self.__snapshot.addToExcludeFlist(path)    # problems with `path` -> exclude it
                         self.__collect_stats.count_excl_forced()
-                else:
-                    # it's a file (may also a link target in case of enabled `followlinks` option)
-                    self.__collect_stats.count_file()
-                    self.__cumulate_size(path)
+            else:
+                # it's a file (may also a link target in case of enabled `followlinks` option)
+                self.__collect_stats.count_file()
+                self.__cumulate_size(path)
                 
     def __cumulate_size(self, path):
         """
@@ -1060,8 +1063,8 @@ class FileCollector(object):
             _incl_file = True
         else:
             # we don't look at the access time since this was even modified during the last backup 
-            ftime = max(self.__fstats.st_mtime,         
-                        self.__fstats.st_ctime)            
+            ftime = max(self.__fstats.st_mtime,
+                        self.__fstats.st_ctime)
             if path in self.__parent.get_base_snardict():
 #                self.__logger.debug("%s: is in snapshot file." % path)
                 if ftime > self.__parent.get_base_backup_time():
