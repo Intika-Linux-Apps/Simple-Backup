@@ -212,7 +212,7 @@ def __prepareTarCommonOpts(snapshot):
 	"""
 	# don't escape spaces i.e. do not replace them with '\ '; this will fail
 	tdir = snapshot.getPath()
-	options = list()
+	options = ["-i", "/bin/tar"]
 	
 	options.extend(["-cS","--directory="+ os.sep,
 				    "--ignore-failed-read",
@@ -302,9 +302,11 @@ def makeTarIncBackup(snapshot):
 		# backup target does not support 'open' within the TAR process and
 		# would fail
 		options.append("--listed-incremental="+tmp_snarfile)
-		
-		outStr, errStr, retVal = Util.launch("tar", options)
-		LogFactory.getLogger().debug("TAR Output : " + outStr)
+
+		outStr, errStr, retVal = Util.launch("/usr/bin/env", options)
+		LogFactory.getLogger().debug("TAR exitcode: %s" % retVal)
+		LogFactory.getLogger().debug("TAR Output: " + outStr)
+		LogFactory.getLogger().debug("TAR Errors: " + errStr)
 		
 		# and move the temporary snarfile back into the backup directory
 		try:
@@ -346,7 +348,7 @@ def makeTarFullBackup(snapshot):
 	
 	options.append( "--listed-incremental="+tmp_snarfile )
 
-	outStr, errStr, retVal = Util.launch("tar", options)
+	outStr, errStr, retVal = Util.launch("/usr/bin/env", options)
 	LogFactory.getLogger().debug("TAR exitcode: %s" % retVal)
 	LogFactory.getLogger().debug("TAR Output: " + outStr)
 	LogFactory.getLogger().debug("TAR Errors: " + errStr)
