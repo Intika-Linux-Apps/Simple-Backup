@@ -200,7 +200,7 @@ class SnapshotManager(object):
 				snps.append(csnp)
 		self.__snapshots = snps
 		# debugging output
-		if self.logger.isEnabledFor(10):
+		if self.logger.isEnabledFor(5):
 			self.logger.debug("[Snapshots Listing - current format]") 
 			for csnp in snps:
 				self.logger.debug(str(csnp)) 
@@ -807,6 +807,14 @@ class SnapshotManager(object):
 			child_snps.append(snp.getName())
 		return child_snps
 	
+	def _remove_standalone_snapshot(self, snapshot):
+		_childs = self._retrieve_childsnps(snapshot=snapshot)
+		if len(_childs) != 0:
+			raise AssertionError("The given snapshot '%s' is not stand-alone." % snapshot)
+		self.logger.debug("Removing '%s'" % snapshot.getName())
+		FAM.delete(snapshot.getPath())
+		self.get_snapshots(forceReload = True)
+		
 	def removeSnapshot(self, snapshot):
 		"""Public method that removes a given snapshot safely. The removal
 		of a snapshot is more complicated than just to remove the snapshot
@@ -830,8 +838,7 @@ class SnapshotManager(object):
 			for snp in listing:
 				if snp.getBase() == _this_snp_name:
 					self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
-			self.logger.debug("Removing '%s'" % snapshot.getName())
-			FAM.delete(snapshot.getPath())
+			self._remove_standalone_snapshot(snapshot)
 			listing = self.get_snapshots(forceReload = True)
 		
 	def __remove_full_snapshot(self, snapshot):
@@ -865,14 +872,10 @@ class SnapshotManager(object):
 				is_standalone = False
 				break
 		if is_standalone:
-			self.logger.debug("Removing full snapshot '%s'" % _ful_snp_name)
-			FAM.delete(snapshot.getPath())
+			self._remove_standalone_snapshot(snapshot)
 		else:
 			raise RemoveFullSnpForbidden("The removal of a full snapshot is "\
 				"not possible as long as this is the base of other snapshots.")	
-		
-		# finally force a reload of the attributes
-		listing = self.get_snapshots(forceReload = True)
 
 	def compareSnapshots(self, snap1, snap2):
 		"""Compare 2 snapshots and return and SBdict with the
@@ -1011,21 +1014,40 @@ class SnapshotManager(object):
 		if purge > 0:
 			self.logger.info("Simple purge - remove all backups older "\
 							 "then %s days." % purge)
-			snapshots = self.get_snapshots()
-			for snp in snapshots:
-				self.logger.debug("Checking snapshot '%s' for simple purge!" % snp)
-				date = snp.getDate()
-				age  = (datetime.date.today() - datetime.date(date['year'],
-															date['month'],
-															date['day']) ).days
-				if age > purge:
-					self.logger.debug("Snapshot '%s' is older than %s days "\
-									  "-> will be removed." % (snp, purge))
-					try:
-						self.removeSnapshot(snp)
-					except RemoveFullSnpForbidden, exc:
-						self.logger.info("%s Continue with next one." % exc)
-						continue
+			
+			while True:
+				_was_removed = False
+				snapshots = _get_snapshots_older_than(self.get_snapshots(),
+													  purge, logger=self.logger)
+				for snp in snapshots:
+					self.logger.debug("Checking '%s' for childs." % (snp))
+					childs = self._retrieve_childsnps(snapshot=snp)
+					if len(childs) == 0:
+						self.logger.debug("Snapshot '%s' has no childs "\
+										"-> is being removed." % (snp))
+						self._remove_standalone_snapshot(snapshot=snp)
+						_was_removed = True
+						break
+				if _was_removed is not True:
+					break
+					print "No more snapshots to remove. Break."
+			self.get_snapshots(forceReload= True)
+
+def _get_snapshots_older_than(snapshots, max_age, logger=None):
+	_res = []
+	for snp in snapshots:
+		if logger:
+			logger.debug("Checking age of snapshot '%s'." % snp)
+		date = snp.getDate()
+		age  = (datetime.date.today() - datetime.date(date['year'],
+													date['month'],
+													date['day']) ).days
+		if age > max_age:
+			_res.append(snp)
+			if logger:
+				logger.debug("Adding '%s' to list of removable snapshots."\
+							  % (snp))
+	return _res
 
 
 def debug_print_snarfile(filename):
@@ -1042,6 +1064,7 @@ def debug_print_snarfile(filename):
 			print "%s" % _record
 	else:
 		print "\nSUMMARY of SNAR '%s': file not found!" % filename
+
 
 def debug_snarfile_to_list(filename):
 	"""Helper function for debugging: the snar-file given by parameter
