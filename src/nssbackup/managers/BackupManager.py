@@ -366,7 +366,7 @@ class BackupManager(PyNotifyMixin):
 
         os.nice(20)                    # Reduce the priority, so not to interfere with other processes
         self.__fillSnapshot()                    
-        self._notify_info(self.__profilename, _("File list ready, committing to disk."))                
+        self._notify_info(self.__profilename, _("Preparation of backup is done. Archive is being created."))
         self.__actualSnapshot.commit()
 
         _msg = _("Backup process finished.")
@@ -430,7 +430,7 @@ class BackupManager(PyNotifyMixin):
             last_sb_pid = FAM.readfile(self.__lockfile)
             if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and\
                 "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read())):
-                    raise exceptions.InstanceRunningError(\
+                raise exceptions.InstanceRunningError(\
                     _("Another instance of '(Not So) Simple Backup' is already running (process id: %s).")\
                       % last_sb_pid )
             else:
