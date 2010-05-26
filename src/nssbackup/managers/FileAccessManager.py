@@ -36,6 +36,7 @@ import pickle
 import stat
 import types
 import datetime
+import gzip
 
 
 def __remove_trailing_sep(path):
@@ -118,8 +119,36 @@ def rename_rotating(src, dst, max_num):
 			rename(_rot_src, _rot_target)
 	# then rename the source file
 	rename(src, dst)
-			
-		
+
+
+def compress_rotated_files(basename, max_num):
+	if not isinstance(basename, types.StringTypes):
+		raise TypeError("Expected string as basename. Got %s instead." % type(basename))
+	if not isinstance(max_num, types.IntType):
+		raise TypeError("Expected integer as max. number. Got %s instead." % type(max_num))
+	if max_num < 1:
+		raise ValueError("Max. number must be greater than 0.")
+	
+	for _num in range(max_num, 0, -1):
+		_src = append_str_to_filename(basename, str(_num))
+		if exists(_src):
+			compress(_src)
+
+
+def compress(src, keep_original=False):
+	if not isinstance(src, types.StringTypes):
+		raise TypeError("Expected string as source. Got %s instead." % type(src))
+	out_file = "%s.gz" % src
+	if exists(src) and os.path.isfile(src):
+		f_in = open(src, 'rb')
+		f_out = gzip.open(out_file, 'wb')
+		f_out.writelines(f_in)
+		f_out.close()
+		f_in.close()
+		if not keep_original:
+			delete(src)
+
+
 def append_time_to_filename(filename, filetype=""):
 	if not isinstance(filename, types.StringTypes):
 		raise TypeError("Expected string. Got %s instead." % type(filename))

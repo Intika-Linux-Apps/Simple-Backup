@@ -743,6 +743,7 @@ class ConfigManager(ConfigParser.ConfigParser):
 			if FAM.exists(logf_src):
 				try:
 					FAM.rename_rotating(logf_src, logf_target, 6)
+					FAM.compress_rotated_files(logf_target, 6)
 				except OSError, error:
 					self.logger.error(_("Unable to rename log file '%(src)s'->'%(dst)s': %(err)s")\
 									% {'src': logf_src, 'dst': logf_target, 'err': str(error)})
