@@ -737,15 +737,17 @@ class ConfigManager(ConfigParser.ConfigParser):
 		and rotates existing files in order to keep the log directory
 		clear.
 		"""
+		_max_num = 6
 		logf_src = self.get_current_logfile()
 		if logf_src is not None:
 			logf_target = self.__get_logfile_template()				
 			if FAM.exists(logf_src):
 				try:
-					FAM.rename_rotating(logf_src, logf_target, 6)
-					FAM.compress_rotated_files(logf_target, 6)
+					FAM.rename_errors_ignored(logf_target, "%s.0" % logf_target)
+					FAM.compress_rotated_files(logf_target, _max_num)
+					FAM.rename_rotating(logf_src, logf_target, _max_num)
 				except OSError, error:
-					self.logger.error(_("Unable to rename log file '%(src)s'->'%(dst)s': %(err)s")\
+					self.logger.exception(_("Unable to rename log file '%(src)s'->'%(dst)s': %(err)s")\
 									% {'src': logf_src, 'dst': logf_target, 'err': str(error)})
 		self.logger = None
 

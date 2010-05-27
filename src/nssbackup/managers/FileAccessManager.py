@@ -93,12 +93,20 @@ def normpath(*args):
 
 def rename(src, dst):
 	os.rename(src, dst)
-	
-	
-def rename_rotating(src, dst, max_num):
+
+
+def rename_errors_ignored(src, dst):
+	try:
+		os.rename(src, dst)
+	except OSError:
+		pass
+
+
+def rename_rotating(src, dst, max_num, compressed=True):
 	"""Renames the given file `src` to `dst`. The destination (i.e. the new
 	file name) is renamed in rotated manner prior the actual renaming
 	process.
+	If `compressed` is set to True, compressed files (*.gz) are considered.
 	"""
 	if not isinstance(src, types.StringTypes):
 		raise TypeError("Expected string as source. Got %s instead." % type(src))
@@ -113,8 +121,9 @@ def rename_rotating(src, dst, max_num):
 	for _num in range(max_num, 0, -1):
 		_rot_src = append_str_to_filename(dst, str((_num - 1)))
 		_rot_target = append_str_to_filename(dst, str(_num)) 
-		if _num == 1:
-			_rot_src = dst
+		if compressed is True:
+			_rot_src = "%s.gz" % _rot_src
+			_rot_target = "%s.gz" % _rot_target
 		if exists(_rot_src):
 			rename(_rot_src, _rot_target)
 	# then rename the source file
@@ -122,6 +131,8 @@ def rename_rotating(src, dst, max_num):
 
 
 def compress_rotated_files(basename, max_num):
+	"""Compresses files with trailing number 0..max_num.
+	"""
 	if not isinstance(basename, types.StringTypes):
 		raise TypeError("Expected string as basename. Got %s instead." % type(basename))
 	if not isinstance(max_num, types.IntType):
@@ -129,7 +140,7 @@ def compress_rotated_files(basename, max_num):
 	if max_num < 1:
 		raise ValueError("Max. number must be greater than 0.")
 	
-	for _num in range(max_num, 0, -1):
+	for _num in range(max_num, -1, -1):
 		_src = append_str_to_filename(basename, str(_num))
 		if exists(_src):
 			compress(_src)
