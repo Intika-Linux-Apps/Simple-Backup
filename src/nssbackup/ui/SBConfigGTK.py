@@ -1738,8 +1738,8 @@ class SBconfigGTK(GladeGnomeApp):
 		if store and iter:
 			value = store.get_value(iter, 1)
 			r = self.configman.get( "exclude", "regex" )
-#			r = re.sub( r",\\."+re.escape(value)+"," , ",", r )
-			ftype_regex = "\.%s" % value
+# Bugfix LP #258542 
+			ftype_regex = r"\.%s$" % value
 			r = Util.remove_conf_entry(r, ftype_regex)
 			self.configman.set( "exclude", "regex", r )
 			self.isConfigChanged()
