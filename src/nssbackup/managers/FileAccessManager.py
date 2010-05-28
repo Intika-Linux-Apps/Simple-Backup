@@ -289,12 +289,15 @@ def createfile(filepath):
 			writetofile(filepath, "")
 
 		
-def readfile( uri ) :
-	" Read a file from a given URI and return a string with the read content "
+def readfile(uri):
+	"""Read a file from a given URI and returns a string with the read content.
+	
+	@rtype: String
+	"""
 	f = open( uri, "r" )
 	value = f.read()
 	f.close()
-	return str( value )
+	return value
 
 
 def writetofile( File, StringToWrite ) :

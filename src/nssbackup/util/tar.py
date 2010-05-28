@@ -359,15 +359,35 @@ def makeTarFullBackup(snapshot):
 
 
 def __finish_tar(exitcode, out_str, error_str):
+	"""The exit code is actually the exit code of the `env` command.
+	See `man env`.
+	"""
 	_logger = LogFactory.getLogger() 
 	_logger.debug("Exit code: %s" % exitcode)
 	_logger.debug("Standard out: %s" % out_str)
 	_logger.debug("Error out: %s" % error_str)
 	if exitcode == 0:
+		_res_err = []
 		if error_str != "":
-			# startswith
-			_logger.info(_("TAR returned:\n%s") % error_str)
+			err_lst = error_str.split("\n")
+			for err_item in err_lst:
+				if err_item == "/bin/tar: Removing leading `/' from member names":
+					_logger.info(_("Leading '/' from member names were removed."))
+				elif err_item == "/bin/tar: Removing leading `/' from hard link targets":
+					_logger.info(_("Leading '/' from hard link targets were removed."))
+				else:
+					err_item = err_item.lstrip("/bin/tar: ")
+					err_item = err_item.strip()
+					if err_item != "":
+						_res_err.append()
+		if len(_res_err) == 1:
+			_logger.info(_("TAR returned a warning: %s") % _res_err[0])
+		elif len(_res_err) > 1:
+			_logger.info(_("TAR returned warnings:\n%s") % "\n".join(_res_err))
+		else:
+			pass
 		_logger.info(_("TAR has been finished successfully."))
+		
 	elif exitcode == 1:
 		_errmsg = _("Command 'env' failed.")
 		_logger.error("%s\n%s (exit code: %s)" % (_errmsg, error_str, exitcode))
