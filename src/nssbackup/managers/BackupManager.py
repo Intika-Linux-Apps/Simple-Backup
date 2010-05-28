@@ -108,7 +108,9 @@ class PyNotifyMixin(object):
             if isinstance(self.__notif, self.__pynotif_mod.Notification):
                 try:
                     self.__notif.set_urgency(self.__pynotif_mod.URGENCY_LOW)
-                    self.__notif.show()
+                    _res = self.__notif.show()
+                    if not _res:
+                        self.logger.warning(_("Unable to send notification."))
                 except gobject.GError, exc:
                     # Connection to notification-daemon failed 
                     self.logger.warning(_("Connection to notification-daemon failed: %s.") % str(exc))
@@ -152,7 +154,9 @@ class PyNotifyMixin(object):
                         notif.set_urgency(self.__pynotif_mod.URGENCY_CRITICAL)
                     else:
                         notif.set_urgency(self.__pynotif_mod.URGENCY_NORMAL)
-                    notif.show()
+                    _res = notif.show()
+                    if not _res:
+                        self.logger.warning(_("Unable to send notification."))
                 except gobject.GError, exc:
                     # Connection to notification-daemon failed 
                     self.logger.warning(_("Connection to notification-daemon failed: %s.") % str(exc))

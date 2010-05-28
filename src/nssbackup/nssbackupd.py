@@ -28,7 +28,7 @@
 
 """
 
-import os
+import sys
 import os.path
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -69,6 +69,7 @@ class NSsbackupd(PyNotifyMixin) :
                an appropriate logger instances are created.
         
         """
+        self.__retcode = 0
         self.__errors            = []
         self.__super_user        = False
         self.__check_for_superuser()
@@ -222,6 +223,7 @@ class NSsbackupd(PyNotifyMixin) :
                 self.__onError(exc)
                 
             self.__onFinish()
+        return self.__retcode
 
     def __on_already_running(self, error):
         """Handler for the case a backup process is already running.
@@ -231,7 +233,9 @@ class NSsbackupd(PyNotifyMixin) :
             _msg = "Backup is not being started.\n%s" % (str(error))
             self.logger.warning(_msg)
             self._notify_warning(self.__profileName, _msg)
+            self.__retcode = 3
         except Exception, exc:
+            self.__retcode = 6
             self.logger.exception("Exception in error handling code:\n%s" % str(exc))
 
     def __onError(self, e):
@@ -241,18 +245,24 @@ class NSsbackupd(PyNotifyMixin) :
             n_body = _("An error occured during the backup:\n%s") % (str(e))
             self.logger.exception(n_body)
             self._notify_error(self.__profileName, n_body)
+            self.__retcode = 4
             if self.__bm:
                 self.__bm.endSBsession()
         except Exception, exc:
+            self.__retcode = 6
             self.logger.exception("Exception in error handling code:\n%s" % str(exc))
         
     def __onFinish(self):
         """Method that is finally called after backup process.
         """
-        if self.__bm and self.__bm.config:
-            # send the mail
-            if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
-                self.__sendEmail()
+        try:
+            if self.__bm and self.__bm.config:
+                # send the mail
+                if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
+                    self.__sendEmail()
+        except Exception, exc:
+            self.__retcode = 5
+            self.logger.exception("Error when sending email:\n%s" % str(exc))
                 
     def __notify_init_errors(self):
         """Errors that occurred during the initialization process were stored
@@ -275,5 +285,6 @@ def main(argv):
     """Public function that process the backups.
     """
     sbd = NSsbackupd()
-    sbd.run()
+    exc = sbd.run()
     log.shutdown_logging()
+    sys.exit(exc)

@@ -10,6 +10,8 @@ debian/tmp/usr/lib/python*/*/nssbackup/plugins/__init__.py
 debian/tmp/usr/lib/python*/*/nssbackup/ui/__init__.py
 debian/tmp/usr/share/nssbackup/multipleTarScript
 debian/tmp/usr/share/nssbackup/nssbackup
+debian/tmp/usr/share/nssbackup/nssbackup-notify
+debian/tmp/usr/share/nssbackup/nssbackup-notify.py
 debian/tmp/usr/share/locale
 debian/tmp/usr/share/gnome/help/nssbackup
 debian/tmp/usr/sbin/nssbackupconfig
