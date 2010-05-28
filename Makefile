@@ -199,7 +199,7 @@ po-data: po-dir
 	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 	
 po-gen:
-	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade scripts/*.py
+	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.py scripts/*.py
 	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/nssbackup.pot; done
 
 # Purpose of this target is to print some informational data
