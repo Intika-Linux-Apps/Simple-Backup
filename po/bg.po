@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-28 12:54+0200\n"
-"PO-Revision-Date: 2010-05-20 23:46+0000\n"
+"PO-Revision-Date: 2010-05-28 11:34+0000\n"
 "Last-Translator: Svetoslav Stefanov <svetlisashkov@yahoo.com>\n"
 "Language-Team: Bulgarian <lfu.project@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-21 03:35+0000\n"
+"X-Launchpad-Export-Date: 2010-05-29 03:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: BULGARIA\n"
 "X-Poedit-Language: Bulgarian\n"
@@ -207,8 +207,8 @@ msgstr ""
 #: src/nssbackup/managers/BackupManager.py:406
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (%"
-"(freespace)s <= %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup "
+"(%(freespace)s <= %(neededspace)s)."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:438
@@ -270,7 +270,8 @@ msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:912
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:916
@@ -538,8 +539,8 @@ msgstr ""
 #: src/nssbackup/managers/SnapshotManager.py:263
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 
 #: src/nssbackup/managers/SnapshotManager.py:270
@@ -563,7 +564,8 @@ msgstr ""
 
 #: src/nssbackup/managers/SnapshotManager.py:735
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 
 #: src/nssbackup/managers/SnapshotManager.py:775
@@ -669,8 +671,8 @@ msgstr ""
 #: src/nssbackup/plugins/sshFuseFAM.py:113
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
 
 #: src/nssbackup/plugins/sshFuseFAM.py:118
@@ -680,8 +682,8 @@ msgstr ""
 #: src/nssbackup/plugins/sshFuseFAM.py:134
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:100
@@ -925,8 +927,8 @@ msgstr ""
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -1024,8 +1026,8 @@ msgid ""
 "The snapshot version is not supported (Just %(supportedversion)s is "
 "supported). Version '%(currentversion)s' found. You should upgrade it. "
 msgstr ""
-"Версията на моментния архив не се поддържа (поддържа се само версия %"
-"(supportedversion)s). Засечена е версия '%(currentversion)s'. Трябва да я "
+"Версията на моментния архив не се поддържа (поддържа се само версия "
+"%(supportedversion)s). Засечена е версия '%(currentversion)s'. Трябва да я "
 "надградите. "
 
 #: src/nssbackup/ui/SBRestoreGTK.py:571
@@ -1190,8 +1192,8 @@ msgid ""
 "The snapshot compression format is supposed to be '%s' but the corresponding "
 "well named file wasn't found"
 msgstr ""
-"Предполага се, че форматът за компресиране на моментния архив трябва да е '%"
-"s', но съответния правилно именуван файл не е открит"
+"Предполага се, че форматът за компресиране на моментния архив трябва да е "
+"'%s', но съответния правилно именуван файл не е открит"
 
 #: src/nssbackup/util/Snapshot.py:317
 #, python-format
@@ -1978,30 +1980,34 @@ msgstr ""
 #~ msgid "Initializing FUSE FILE ACCESS MANAGER !"
 #~ msgstr "Инициализиране на FUSE FILE ACCESS MANAGER !"
 
+#, python-format
 #~ msgid "Problem with '%(file)s' : %(error)s "
 #~ msgstr "Проблем с '%(file)s' : %(error)s "
 
+#, python-format
 #~ msgid "got an error with '%(file)s' : %(error)s"
 #~ msgstr "възникна грешка с '%(file)s' : %(error)s"
 
 #~ msgid "No directory to backup !"
 #~ msgstr "Няма папка, която да бъде архивирана!"
 
+#, python-format
 #~ msgid "'%(file)s' doesn't exist, it has to be exclude "
 #~ msgstr "'%(file)s' не съществува и трябва да бъде изключен "
 
+#, python-format
 #~ msgid ""
 #~ "We don't have read access to '%(file)s', it has to be exclude : %(error)s "
 #~ msgstr ""
-#~ "Няма достъп за четене до %(file)s' и той трябва да бъде изключен : %"
-#~ "(error)s "
+#~ "Няма достъп за четене до %(file)s' и той трябва да бъде изключен : %(error)s "
 
+#, python-format
 #~ msgid ""
-#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > %"
-#~ "(maxsize)s), it has to be exclude "
+#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > "
+#~ "%(maxsize)s), it has to be exclude "
 #~ msgstr ""
-#~ "Размерът на '%(file)s' е по-голям от зададения ( %(filesize)s > %(maxsize)"
-#~ "s) и то трябва да бъде изключен "
+#~ "Размерът на '%(file)s' е по-голям от зададения ( %(filesize)s > %(maxsize)s) "
+#~ "и то трябва да бъде изключен "
 
 #~ msgid "Terminating FUSE FILE ACCESS MANAGER !"
 #~ msgstr "Прекратяване на FUSE FILE ACCESS MANAGER !"
@@ -2019,12 +2025,15 @@ msgstr ""
 #~ msgid "Use default backup directory (/var/backup)"
 #~ msgstr "Използване на папката за архивиране по подрабиране (/var/backup)"
 
+#, python-format
 #~ msgid "Non existing directory : %s"
 #~ msgstr "Несъществуваща папка: %s"
 
+#, python-format
 #~ msgid "Target '%s' directory is excluded"
 #~ msgstr "Целевата папка '%s' е изключена"
 
+#, python-format
 #~ msgid "Deleting '%(snp)s' for purge !"
 #~ msgstr "Изтриване на '%(snp)s' за изчистване!"
 
@@ -2096,15 +2105,15 @@ msgstr ""
 
 #~ msgid "Choose the SSL option (smtptls=1) to be able to use Cert and Key"
 #~ msgstr ""
-#~ "Изберете настройката SLL  (smtptls=1) за да може да използвате "
-#~ "удостоверение и ключ"
+#~ "Изберете настройката SLL  (smtptls=1) за да може да използвате удостоверение "
+#~ "и ключ"
 
 #~ msgid ""
-#~ "Please enter the new profile name in the <b>Profile name</b> entry and "
-#~ "check the <b>Enable</b> checkbox to enable it."
+#~ "Please enter the new profile name in the <b>Profile name</b> entry and check "
+#~ "the <b>Enable</b> checkbox to enable it."
 #~ msgstr ""
-#~ "Моля въведете новото име на профил в полето <b>Име на профил</b> и "
-#~ "сложете отметка пред <b>Включване</b>."
+#~ "Моля въведете новото име на профил в полето <b>Име на профил</b> и сложете "
+#~ "отметка пред <b>Включване</b>."
 
 #~ msgid ""
 #~ "<small>Do backups according to the settings defined on the next pages of "

@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-28 12:54+0200\n"
-"PO-Revision-Date: 2010-05-20 23:52+0000\n"
+"PO-Revision-Date: 2010-05-28 12:04+0000\n"
 "Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-21 03:35+0000\n"
+"X-Launchpad-Export-Date: 2010-05-29 03:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: src/nssbackup/nssbackupd.py:111 src/nssbackup/pkginfo.py:64
@@ -214,8 +214,8 @@ msgstr ""
 #: src/nssbackup/managers/BackupManager.py:406
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (%"
-"(freespace)s <= %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup "
+"(%(freespace)s <= %(neededspace)s)."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:438
@@ -249,9 +249,8 @@ msgid "No snapshot to copy logfile."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:491
-#, fuzzy
 msgid "Processing of profile is finished."
-msgstr "Zmiana nazw profili nie jest obsługiwana."
+msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:498
 msgid "Option 'target' is missing, aborting."
@@ -278,7 +277,8 @@ msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:912
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:916
@@ -383,7 +383,8 @@ msgstr ""
 #: src/nssbackup/managers/ConfigManager.py:799
 #, python-format
 msgid "section [%(section)s] in '%(configfile)s' should not exist, aborting"
-msgstr "sekcja [%(section)s] w '%(configfile)s' nie powinna istnieć, przerywam"
+msgstr ""
+"sekcja [%(section)s] w '%(configfile)s' nie powinna istnieć, przerywam"
 
 #: src/nssbackup/managers/ConfigManager.py:865
 msgid "No schedule defined in configuration file. Probing from filesystem."
@@ -544,8 +545,8 @@ msgstr ""
 #: src/nssbackup/managers/SnapshotManager.py:263
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 
 #: src/nssbackup/managers/SnapshotManager.py:270
@@ -569,7 +570,8 @@ msgstr ""
 
 #: src/nssbackup/managers/SnapshotManager.py:735
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 
 #: src/nssbackup/managers/SnapshotManager.py:775
@@ -677,8 +679,8 @@ msgstr ""
 #: src/nssbackup/plugins/sshFuseFAM.py:113
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
 
 #: src/nssbackup/plugins/sshFuseFAM.py:118
@@ -688,8 +690,8 @@ msgstr ""
 #: src/nssbackup/plugins/sshFuseFAM.py:134
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:100
@@ -937,8 +939,8 @@ msgstr "wyłącz"
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -2023,6 +2025,7 @@ msgstr ""
 #~ msgid "Minute"
 #~ msgstr "Minuta"
 
+#, python-format
 #~ msgid "Target '%s' directory is excluded"
 #~ msgstr "Docelowy katalog '%s' jest wykluczony"
 
@@ -2047,9 +2050,11 @@ msgstr ""
 #~ msgid "there was a problem initializing the "
 #~ msgstr "wystąpił problem z inicjalizowaniem "
 
+#, python-format
 #~ msgid "Problem with '%(file)s' : %(error)s "
 #~ msgstr "Problem z '%(file)s' : %(error)s "
 
+#, python-format
 #~ msgid "Non existing directory : %s"
 #~ msgstr "Nieistniejący katalog : %s"
 
