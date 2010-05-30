@@ -379,7 +379,7 @@ def __finish_tar(exitcode, out_str, error_str):
 					err_item = err_item.lstrip("/bin/tar: ")
 					err_item = err_item.strip()
 					if err_item != "":
-						_res_err.append()
+						_res_err.append(err_item)
 		if len(_res_err) == 1:
 			_logger.info(_("TAR returned a warning: %s") % _res_err[0])
 		elif len(_res_err) > 1:
