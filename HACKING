@@ -29,8 +29,6 @@ Summary of style guide
 * Top level functions and classes are separated by 2 lines, method definitions
   within classes by a single line
 
-See also: http://blog.melhase.net/files/epp-chapter-10.pdf
-
 
 How to run from source code
 ---------------------------
@@ -77,3 +75,4 @@ First, some links related to translations using Launchpad/Rosetta:
 * https://help.launchpad.net/Translations/YourProject/ImportingTranslations
 * https://help.launchpad.net/Translations/YourProject/ImportPolicy
 * https://help.launchpad.net/Translations/YourProject/Exports
+
