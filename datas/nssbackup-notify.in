@@ -20,16 +20,13 @@
 PATH=/usr/local/bin:/usr/bin:/bin
 
 gspid=$(pgrep gnome-session)
-gsuser=$(grep -z USER= /proc/$gspid/environ)
-
-# if gsuser==$USER: do not execute notify.py
-
-export $gsuser
-export $(grep -z DISPLAY= /proc/$gspid/environ)
-export $(grep -z DBUS_SESSION_BUS_ADDRESS= /proc/$gspid/environ)
-export $(grep -z LANG= /proc/$gspid/environ)
+if test "$gspid"; then
+    export $(grep -z USER= /proc/$gspid/environ)
+    export $(grep -z DISPLAY= /proc/$gspid/environ)
+    export $(grep -z DBUS_SESSION_BUS_ADDRESS= /proc/$gspid/environ)
+    export $(grep -z LANG= /proc/$gspid/environ)
+fi
 
 notifyscript="@prefix@/share/nssbackup/nssbackup-notify.py"
-
 sudo -u $USER @python@ "$notifyscript" $*
 

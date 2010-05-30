@@ -22,6 +22,15 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+PATH=/usr/local/bin:/usr/bin:/bin
+
+if test -z "$LANG"; then
+    gspid=$(pgrep gnome-session)
+    if test "$gspid"; then
+        export $(grep -z LANG= /proc/$gspid/environ)
+    fi
+fi
+
 if [ -x /usr/bin/nice ]; then
 	nicecmd="/usr/bin/nice -n 19"
 fi
@@ -29,7 +38,8 @@ fi
 # See ionice(1)
 if [ -x /usr/bin/ionice ]; then
 	#ionicecmd="/usr/bin/ionice -c 2 -n 7 -t"
-	ionicecmd="/usr/bin/ionice -c 3 -t"
+	# option -t is not implement in Ubuntu Hardy
+	ionicecmd="/usr/bin/ionice -c 3"
 fi
 
 if [ -x /usr/share/nssbackup/nssbackup-notify ]; then
