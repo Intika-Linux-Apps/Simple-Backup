@@ -1,4 +1,4 @@
-nssbackup (0.2.0ppa1~lucid2) lucid; urgency=high
+nssbackup (0.2.0ppa1~lucid3) lucid; urgency=high
 
   * [Fix] LP Bug #573733: nssbackup does not prevent itself from running in
           parallel.
