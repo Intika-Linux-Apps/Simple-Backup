@@ -319,7 +319,7 @@ class Snapshot(object):
 				return self.__version
 	
 	def getExcludes(self) :
-		"Return the content of excludes"
+		"Return the content of excludes (the list of Regex excludes)"
 		if self.__excludes : return self.__excludes
 		else :
 			excludefile = self.getPath() +os.sep +"excludes"
@@ -471,7 +471,7 @@ class Snapshot(object):
 		self.__version = ver
 	
 	def setExcludes(self, excludes) :
-		"Set the content of excludes"
+		"Set the content of excludes (the list of Regex excludes)"
 		self.__excludes = excludes
 	
 	def setPackages(self, packages="") :
@@ -553,16 +553,17 @@ class Snapshot(object):
 		
 	def commitexcludefile(self):
 		"""
-		Commit exclude file on the disk.
+		Commit exclude file on the disk (the list of Regex excludes).
 		@raise SBException: if excludes hasn't been set 
 		"""
 		FAM.pickledump( self.__excludes, self.getPath()+os.sep +"excludes" )
 
 	def commitflistFiles(self):
 		"""
-		Commit the include.list and exclude.list to the disk
+		Commit the include.list and exclude.list to the disk.
+		@todo: simplify the written files! The *.tmp files are partly obsolete.
 		"""
-		if os.path.exists(self.getIncludeFListFile()) or os.path.exists(self.getIncludeFListFile()) :
+		if os.path.exists(self.getIncludeFListFile()) or os.path.exists(self.getExcludeFListFile()) :
 			raise SBException("includes.list and excludes.list shouldn't exist at this stage")
 		
 		# commit include.list.tmp
@@ -603,7 +604,13 @@ class Snapshot(object):
 			FAM.writetofile(self.getPath()+os.sep +"packages", "")
 		else :
 			FAM.writetofile(self.getPath()+os.sep +"packages", self.getPackages())
-		
+
+	def read_excludeflist_from_file(self):
+		fe = open(self.getExcludeFListFile(),"r")
+		_res = set(line.strip("\n") for line in fe)
+		fe.close()
+		return _res
+
 	def __makebackup(self):
 		" Make the backup on the disk "
 		

@@ -211,9 +211,16 @@ class BackupManager(object):
 
         os.nice(20)                    # Reduce the priority, so not to interfere with other processes
         self.__fillSnapshot()                    
-#        self._notify_info(self.__profilename, _("File list ready, committing to disk."))
+#		self._notify_info(self.__profilename, _("Preparation of backup is done. Archive is being created."))
         self.__state.set_state('commit')
         self.__actualSnapshot.commit()
+
+        _msg = _("Backup process finished.")
+#        self._notify_info(self.__profilename, _msg)
+        self.logger.info(_msg)
+# TODO: Check this!
+		time.sleep(10)
+        self.__state.set_state('finish')
         
     def __fillSnapshot(self):
         """Fill snapshot's include and exclude lists and retrieve some information
@@ -272,7 +279,7 @@ class BackupManager(object):
             last_sb_pid = FAM.readfile(self.__lockfile)
             if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and\
                 "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read())):
-                    raise exceptions.InstanceRunningError(\
+                raise exceptions.InstanceRunningError(\
                     _("Another instance of '(Not So) Simple Backup' is already running (process id: %s).")\
                       % last_sb_pid )
             else:
@@ -293,20 +300,24 @@ class BackupManager(object):
             self.logger.error(_("Unable to remove lock file: %s" % str(_exc)))
             
     def __copylogfile(self):
+# TODO: we should flush the log file before copy!
         # destination for copying the logfile
         if self.__actualSnapshot:
-            logf_src = self.config.get_logfile()
-            logf_name = os.path.basename(logf_src)
-            logf_target = os.path.join( self.__actualSnapshot.getPath(),
-                                        logf_name )
-            if FAM.exists(logf_src):
-                try:
-                    Util.nssb_copy( self.config.get("log","file"), logf_target )
-                except exceptions.ChmodNotSupportedError:
-                    self.logger.warning(_("Unable to change permissions for file '%s'.")\
-                                    % logf_target )
-            else :
-                self.logger.warning(_("Unable to find logfile to copy into snapshot."))
+            logf_src = self.config.get_current_logfile()
+            if logf_src is None:
+                self.logger.warning(_("No log file specified."))
+            else:
+                logf_name = os.path.basename(logf_src)
+                logf_target = os.path.join( self.__actualSnapshot.getPath(),
+                                            logf_name )
+                if FAM.exists(logf_src):
+                    try:
+                        Util.nssb_copy(logf_src, logf_target)
+                    except exceptions.ChmodNotSupportedError:
+                        self.logger.warning(_("Unable to change permissions for file '%s'.")\
+                                        % logf_target )
+                else :
+                    self.logger.warning(_("Unable to find logfile to copy into snapshot."))
         else:
             self.logger.warning(_("No snapshot to copy logfile."))
         
@@ -321,15 +332,9 @@ class BackupManager(object):
                     
         """
         self.__unsetlockfile()
-        self.__copylogfile()            
+        self.__copylogfile()
         self.__fusefam.terminate()
-        
-        _msg = _("Backup process finished.")
-#        self._notify_info(self.__profilename, _msg)
-        self.logger.info(_msg)
-        time.sleep(10)
-        
-        self.__state.set_state('finish')
+        self.logger.info(_("Processing of profile is finished."))
 
     def __checkTarget(self):
         """
@@ -875,8 +880,11 @@ class FileCollector(object):
                     # if `followlinks` is *disabled*, just count the link and finish
                     _stop_checking = True
                     
-            if not _stop_checking:    # i.e. `followlinks` is enabled
-                if self.__fisdir:
+            if self.__fisdir:
+                if _stop_checking:	# i.e. `followlinks` is not enabled
+                    self.__collect_stats.count_file()
+                    self.__cumulate_size(path)
+                else:
                     # if it's a directory, enter inside
                     try:
                         for _dir_item in FAM.listdir(path) :
@@ -885,13 +893,13 @@ class FileCollector(object):
                         self.__collect_stats.count_dir()    # the directory `path`
                     except OSError, _exc:
                         self.__logger.warning(_("Error while checking directory '%(dir)s': %(error)s.")\
-                                                % {'dir' : path, 'error' : str(_exc)})
+                                              % {'dir' : path, 'error' : str(_exc)})
                         self.__snapshot.addToExcludeFlist(path)    # problems with `path` -> exclude it
                         self.__collect_stats.count_excl_forced()
-                else:
-                    # it's a file (may also a link target in case of enabled `followlinks` option)
-                    self.__collect_stats.count_file()
-                    self.__cumulate_size(path)
+            else:
+                # it's a file (may also a link target in case of enabled `followlinks` option)
+                self.__collect_stats.count_file()
+                self.__cumulate_size(path)
                 
     def __cumulate_size(self, path):
         """
@@ -905,8 +913,8 @@ class FileCollector(object):
             _incl_file = True
         else:
             # we don't look at the access time since this was even modified during the last backup 
-            ftime = max(self.__fstats.st_mtime,         
-                        self.__fstats.st_ctime)            
+            ftime = max(self.__fstats.st_mtime,
+                        self.__fstats.st_ctime)
             if path in self.__parent.get_base_snardict():
 #                self.__logger.debug("%s: is in snapshot file." % path)
                 if ftime > self.__parent.get_base_backup_time():

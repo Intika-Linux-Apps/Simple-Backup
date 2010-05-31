@@ -44,6 +44,7 @@ from GladeWindow import GladeWindow
 from GladeWindow import ProgressbarMixin
 
 import nssbackup.util as Util
+from nssbackup.util import log
 from nssbackup.managers.FuseFAM import FuseFAM
 from nssbackup.managers.ConfigManager import ConfigManager, ConfigurationFileHandler
 from nssbackup.managers.SnapshotManager import SnapshotManager
@@ -51,7 +52,7 @@ from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.managers.UpgradeManager import UpgradeManager
 from nssbackup.util.log import LogFactory
 import nssbackup.util.tar as TAR
-from nssbackup import Infos
+from nssbackup.pkginfo import Infos
 from nssbackup.util import exceptions
 from nssbackup.util import tasks
 from nssbackup.util.tar import Dumpdir
@@ -607,7 +608,10 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 		dialog.destroy()
 		
 		if result == gtk.RESPONSE_OK:
-			dialog = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO, message_format=_("Do you really want to revert '%s' to '%s'?") % (src, dirname))
+			dialog = gtk.MessageDialog(parent=None, flags=0,
+						type=gtk.MESSAGE_QUESTION, buttons=gtk.BUTTONS_YES_NO,
+						message_format=_("Do you really want to revert '%(source)s' to '%(dir)s'?")\
+						% {'source' : src, 'dir' : dirname})
 			response = dialog.run()
 			dialog.destroy()
 			if response == gtk.RESPONSE_YES:
@@ -782,6 +786,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 	
 	def gtk_main_quit( self, *args):
 		self.fusefam.terminate()
+		self.config = None
 		gtk.main_quit()
 
 
@@ -943,3 +948,4 @@ def main(argv):
 	restore_win = SBRestoreGTK()
 	restore_win.show()
 	gtk.main()
+	log.shutdown_logging()

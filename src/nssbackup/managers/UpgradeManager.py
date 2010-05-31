@@ -36,7 +36,7 @@ import datetime
 import cPickle as pickle
 from gettext import gettext as _
 
-from nssbackup import Infos
+from nssbackup.pkginfo import Infos
 import FileAccessManager as FAM
 import nssbackup.util as Util
 from SnapshotManager import SnapshotManager

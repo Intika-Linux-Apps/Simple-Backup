@@ -7,34 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-21 00:58+0200\n"
-"PO-Revision-Date: 2010-04-18 01:28+0000\n"
-"Last-Translator: Jean-Peer Lorenz <Unknown>\n"
+"POT-Creation-Date: 2010-05-22 01:22+0200\n"
+"PO-Revision-Date: 2010-05-21 17:09+0000\n"
+"Last-Translator: François Tissandier <francois.tissandier@gmail.com>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-04-19 03:39+0000\n"
+"X-Launchpad-Export-Date: 2010-05-22 03:53+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
-#: src/nssbackup/__init__.py:54
-msgid ""
-"This is a user friendly backup solution for common desktop needs. If you "
-"want to help by submitting bugs, by translating or anything else please "
-"visit our website."
-msgstr ""
-
-#: src/nssbackup/__init__.py:67
-msgid "translator-credits"
-msgstr ""
-"Launchpad Contributions:\n"
-"  Jean-Peer Lorenz https://launchpad.net/~peer.loz\n"
-"  Johan Serre https://launchpad.net/~serre-johan\n"
-"  Oumar Aziz OUATTARA https://launchpad.net/~wattazoum\n"
-"  PirBoazo https://launchpad.net/~pierre-boizot-name\n"
-"  duke05 https://launchpad.net/~presto-duke"
-
-#: src/nssbackup/__init__.py:75 src/nssbackup/nssbackupd.py:111
+#: src/nssbackup/nssbackupd.py:111 src/nssbackup/pkginfo.py:64
 #, python-format
 msgid "NSsbackup Daemon <%(login)s@%(hostname)s>"
 msgstr "Démon NSsbackup <%(login)s@%(hostname)s>"
@@ -68,14 +51,35 @@ msgstr ""
 msgid "The following error(s) occurred before:"
 msgstr "Les érreurs suivantes ont eu lieu avant:"
 
+#: src/nssbackup/pkginfo.py:43
+msgid ""
+"This is a user friendly backup solution for common desktop needs. If you "
+"want to help by submitting bugs, by translating or anything else please "
+"visit our website."
+msgstr ""
+"Nssbackup est une solution convivial de sauvegarde pour un PC de bureau. Si "
+"vous souhaitez aider en soumettant des bugs, en traduisant ou autre, merci "
+"de visiter notre site internet."
+
+#: src/nssbackup/pkginfo.py:56
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  François Tissandier https://launchpad.net/~baloo\n"
+"  Jean-Peer Lorenz https://launchpad.net/~peer.loz\n"
+"  Johan Serre https://launchpad.net/~serre-johan\n"
+"  Oumar Aziz OUATTARA https://launchpad.net/~wattazoum\n"
+"  PirBoazo https://launchpad.net/~pierre-boizot-name\n"
+"  duke05 https://launchpad.net/~presto-duke"
+
 #: src/nssbackup/managers/BackupManager.py:89
 msgid "Initialization of module 'pynotify' failed."
-msgstr ""
+msgstr "L'initialisation du module 'pynotify' a échoué"
 
 #: src/nssbackup/managers/BackupManager.py:92
 #, python-format
 msgid "Import of module 'pynotify' failed with error: %s."
-msgstr ""
+msgstr "L'import du module 'pynotify' a échoué avec l'erreur : %s."
 
 #: src/nssbackup/managers/BackupManager.py:114
 #: src/nssbackup/managers/BackupManager.py:158
@@ -87,7 +91,7 @@ msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:263
 msgid "Backup process is being started."
-msgstr ""
+msgstr "Le processus de sauvegarde est en cours de démarrage"
 
 #: src/nssbackup/managers/BackupManager.py:281
 msgid "Failed to set the gid to 'admin' one :"
@@ -105,13 +109,13 @@ msgid "Snapshot '%(name)s' is being made."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:323
-#, fuzzy, python-format
+#, python-format
 msgid "Setting Base to '%(value)s'."
-msgstr "Paramétrage de la base à '%(value)s' "
+msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:333
 msgid "Setting packages File."
-msgstr ""
+msgstr "Réglage des fichiers de sauvegarde."
 
 #: src/nssbackup/managers/BackupManager.py:339
 msgid "Problem when setting the packages list: "
@@ -119,100 +123,100 @@ msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:343
 msgid "Setting Excludes File."
-msgstr ""
+msgstr "Réglage des exclusions de fichiers."
 
 #: src/nssbackup/managers/BackupManager.py:351
 msgid "Setting compression format."
-msgstr ""
+msgstr "Réglage du format de compression"
 
 #: src/nssbackup/managers/BackupManager.py:356
 msgid "Setting split size."
-msgstr ""
+msgstr "Réglage de la taille de découpe."
 
 #: src/nssbackup/managers/BackupManager.py:363
 msgid "Option 'Follow symbolic links' is enabled."
-msgstr ""
+msgstr "L'option 'suivre les liens symboliques' est activée."
 
 #: src/nssbackup/managers/BackupManager.py:365
 msgid "Option 'Follow symbolic links' is disabled."
-msgstr ""
+msgstr "L'option 'Suivre les liens symboliques' est désactivée."
 
 #: src/nssbackup/managers/BackupManager.py:369
 msgid "File list ready, committing to disk."
-msgstr ""
+msgstr "La liste des fichiers est prête, écriture sur le disque."
 
 #: src/nssbackup/managers/BackupManager.py:386
 #, python-format
 msgid "Maximum free size required is '%s'."
-msgstr ""
+msgstr "L'espace libre maximum requis est '%s'."
 
 #: src/nssbackup/managers/BackupManager.py:387
 #, python-format
 msgid "Available disk size is '%s'."
-msgstr ""
+msgstr "L'espace disque disponible est '%s'."
 
 #: src/nssbackup/managers/BackupManager.py:388
 #, python-format
 msgid "Number of directories: %s."
-msgstr ""
+msgstr "Nombre de répertoires : %s."
 
 #: src/nssbackup/managers/BackupManager.py:389
 #, python-format
 msgid "Number of symlinks: %s."
-msgstr ""
+msgstr "Nombre de liens symboliques : %s."
 
 #: src/nssbackup/managers/BackupManager.py:390
 #, python-format
 msgid "Total number of files: %s."
-msgstr ""
+msgstr "Nombre total de fichiers : %s."
 
 #: src/nssbackup/managers/BackupManager.py:391
 #, python-format
 msgid "Number of files included in snapshot: %s."
-msgstr ""
+msgstr "Nombre de fichiers inclus dans l'instantanée : %s."
 
 #: src/nssbackup/managers/BackupManager.py:392
 #, python-format
 msgid "Number of new files (also included): %s."
-msgstr ""
+msgstr "Nombre de nouveaux fichiers (également inclus) : %s."
 
 #: src/nssbackup/managers/BackupManager.py:393
 #, python-format
 msgid "Number of files skipped in incremental snapshot: %s."
-msgstr ""
+msgstr "Nombre de fichiers ignorés dans l'instantanée incrémental : %s."
 
 #: src/nssbackup/managers/BackupManager.py:394
 #, python-format
 msgid "Number of items forced to be excluded: %s."
-msgstr ""
+msgstr "Nombre de fichiers exclus de force : %s."
 
 #: src/nssbackup/managers/BackupManager.py:395
 #, python-format
 msgid "Number of items to be excluded by config: %s."
-msgstr ""
+msgstr "Nombre de fichiers exclus selon la configuration : %s."
 
 #: src/nssbackup/managers/BackupManager.py:398
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (%"
-"(freespace)s <= %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup "
+"(%(freespace)s <= %(neededspace)s)."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:430
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Another instance of '(Not So) Simple Backup' is already running (process id: "
 "%s)."
-msgstr "Un autre démon NSsbackup est en cours d'exécution (pid = %s )!"
+msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:433
 msgid "Invalid lock file found. Is being removed."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:447
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to remove lock file: %s"
-msgstr "Impossible de changer la permission du fichier '%s'."
+msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:460 src/nssbackup/util/tar.py:313
 #: src/nssbackup/util/tar.py:358
@@ -223,6 +227,7 @@ msgstr "Impossible de changer la permission du fichier '%s'."
 #: src/nssbackup/managers/BackupManager.py:463
 msgid "Unable to find logfile to copy into snapshot."
 msgstr ""
+"Impossible de trouver le fichier de journal à copier dans l'instantanée."
 
 #: src/nssbackup/managers/BackupManager.py:465
 msgid "No snapshot to copy logfile."
@@ -230,7 +235,7 @@ msgstr "Aucune sauvegarde pour copier le fichier de rapport."
 
 #: src/nssbackup/managers/BackupManager.py:480
 msgid "Backup process finished."
-msgstr ""
+msgstr "Le processus de sauvegarde est terminé."
 
 #: src/nssbackup/managers/BackupManager.py:489
 msgid "Option 'target' is missing, aborting."
@@ -243,21 +248,22 @@ msgstr "Création du répertoire cible '%s'"
 
 #: src/nssbackup/managers/BackupManager.py:503
 msgid "Target not writeable: "
-msgstr ""
+msgstr "Il n'est pas permis d'écrire dans le répertoire de destination. "
 
 #: src/nssbackup/managers/BackupManager.py:876
 #, python-format
 msgid "File '%(file)s' does not exist."
-msgstr ""
+msgstr "Le fichier '%(file)s' n'existe pas."
 
 #: src/nssbackup/managers/BackupManager.py:887
 #, python-format
 msgid "File '%(file)s' is not accessable with error '%(error)s'."
-msgstr ""
+msgstr "Le fichier '%(file)s' n'est pas accessible, erreur '%(error)s'"
 
 #: src/nssbackup/managers/BackupManager.py:903
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:907
@@ -265,11 +271,13 @@ msgstr ""
 msgid ""
 "File '%(file)s' cannot be opened for read access with error '%(error)s'."
 msgstr ""
+"Le fichier '%(file)s' ne peut être ouvert en lecture, erreur '%(error)s'"
 
 #: src/nssbackup/managers/BackupManager.py:924
 #, python-format
 msgid "File '%(file)s' is backup's target directory."
 msgstr ""
+"Le fichier '%(file)s' est le répertoire de destination de la sauvegarde."
 
 #: src/nssbackup/managers/BackupManager.py:933
 #, python-format
@@ -281,11 +289,14 @@ msgstr ""
 msgid ""
 "File '%(file)s' exceeds maximum file size ( %(filesize)s > %(maxsize)s)."
 msgstr ""
+"Le fichier '%(file)s' excède la taille maximale de fichier ( %(filesize)s > "
+"%(maxsize)s)."
 
 #: src/nssbackup/managers/BackupManager.py:963
 #, python-format
 msgid "File '%(file)s' matches regular expression '%(regex)s'."
 msgstr ""
+"Le fichier '%(file)s' correspond à l'expression régulière '%(regex)s'."
 
 #: src/nssbackup/managers/BackupManager.py:969
 #, python-format
@@ -295,26 +306,25 @@ msgstr ""
 #: src/nssbackup/managers/BackupManager.py:1037
 #, python-format
 msgid "Error while checking directory '%(dir)s': %(error)s."
-msgstr ""
+msgstr "Erreur lors de la vérification du répertoire '%(dir)s' : %(error)s."
 
 #: src/nssbackup/managers/BackupManager.py:1088
-#, fuzzy
 msgid "Empty regular expression found. Skipped."
-msgstr "Expression régulière vide trouvée. "
+msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:1094
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid regular expression ('%s') found. Skipped."
-msgstr "Expression régulière invalide ('%s')"
+msgstr ""
 
 #: src/nssbackup/managers/BackupManager.py:1113
 msgid "No directories to backup defined."
-msgstr ""
+msgstr "Aucun répertoire de destination de la sauvegarde n'a été défini."
 
 #: src/nssbackup/managers/ConfigManager.py:323
 #, python-format
 msgid "Profile settings are being read from file '%s'."
-msgstr ""
+msgstr "Les réglages du profil sont lus à partir du fichier '%s'."
 
 #: src/nssbackup/managers/ConfigManager.py:326
 #, python-format
@@ -322,6 +332,8 @@ msgid ""
 "Profile settings are being set to default values. Configuration file is set "
 "to '%s'."
 msgstr ""
+"Les réglages du profil sont réglés par défaut. Le fichier de configuration "
+"est '%s'."
 
 #: src/nssbackup/managers/ConfigManager.py:547
 #: src/nssbackup/managers/ConfigManager.py:581
@@ -340,22 +352,22 @@ msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:597
 msgid "You must provide a dictionary."
-msgstr ""
+msgstr "Vous devez fournir un dictionnaire."
 
 #: src/nssbackup/managers/ConfigManager.py:709
 #, python-format
 msgid "Log output for [%(profile)s] is directed to file '%(file)s'."
-msgstr ""
+msgstr "Le journal pour [%(profile)s] sera écrit dans '%(file)s'."
 
 #: src/nssbackup/managers/ConfigManager.py:717
 #, python-format
 msgid "Log output for [%s] is not directed into a file."
-msgstr ""
+msgstr "La journal pour [%s] n'est pas écrit dans un fichier."
 
 #: src/nssbackup/managers/ConfigManager.py:736
 #, python-format
 msgid "The config file '%s' couldn't be read!"
-msgstr ""
+msgstr "Le fichier de configuration '%s' n'a pas pu être lu !"
 
 #: src/nssbackup/managers/ConfigManager.py:765
 #, python-format
@@ -367,6 +379,8 @@ msgstr ""
 #: src/nssbackup/managers/ConfigManager.py:831
 msgid "No schedule defined in configuration file. Probing from filesystem."
 msgstr ""
+"Pas de calendrier défini dans le fichier de configuration. Recherche dans le "
+"système de fichier."
 
 #: src/nssbackup/managers/ConfigManager.py:925
 #: src/nssbackup/managers/ConfigManager.py:937
@@ -376,19 +390,19 @@ msgstr ""
 
 #: src/nssbackup/managers/ConfigManager.py:1105
 msgid "No receiver set."
-msgstr ""
+msgstr "Pas de destination défini."
 
 #: src/nssbackup/managers/ConfigManager.py:1107
 msgid "No SMTP server set."
-msgstr ""
+msgstr "Pas de serveur SMTP défini."
 
 #: src/nssbackup/managers/ConfigManager.py:1110
 msgid "Username set but no password specified."
-msgstr ""
+msgstr "Nom d'utilisateur défini, mais pas le mot de passe."
 
 #: src/nssbackup/managers/ConfigManager.py:1113
 msgid "Password set but no username specified."
-msgstr ""
+msgstr "Mot de passe défini, mais pas le nom d'utilisateur."
 
 #: src/nssbackup/managers/ConfigManager.py:1116
 msgid ""
@@ -396,6 +410,9 @@ msgid ""
 "set.\n"
 "Select SSL in order to use Certificate and Key."
 msgstr ""
+"Un certificat et un fichier clé sont fournis alors que l'option SSL "
+"(smtptls=1) n'est pas activé.\n"
+"Sélectionnez SSL afin d'utiliser le certificat et la clé."
 
 #: src/nssbackup/managers/ConfigManager.py:1120
 msgid ""
@@ -417,26 +434,26 @@ msgstr "Illimité"
 
 #: src/nssbackup/managers/ConfigManager.py:1252
 msgid "100 MiB"
-msgstr ""
+msgstr "100 Mo"
 
 #: src/nssbackup/managers/ConfigManager.py:1253
 msgid "250 MiB"
-msgstr ""
+msgstr "250 Mo"
 
 #: src/nssbackup/managers/ConfigManager.py:1254
 msgid "650 MiB"
-msgstr ""
+msgstr "650 Mo"
 
 #: src/nssbackup/managers/ConfigManager.py:1255
 msgid "2 GiB (FAT16)"
-msgstr ""
+msgstr "2 Go (FAT16)"
 
 #: src/nssbackup/managers/ConfigManager.py:1256
 msgid "4 GiB (FAT32)"
-msgstr ""
+msgstr "4 Go (FAT32)"
 
 #: src/nssbackup/managers/ConfigManager.py:1257
-#: src/nssbackup/ui/SBConfigGTK.py:546 src/nssbackup/ui/SBConfigGTK.py:1726
+#: src/nssbackup/ui/SBConfigGTK.py:546 src/nssbackup/ui/SBConfigGTK.py:1725
 msgid "Custom"
 msgstr "Personnalisé"
 
@@ -467,12 +484,12 @@ msgstr "Images CD"
 
 #: src/nssbackup/managers/FuseFAM.py:176
 msgid "Initializing FUSE File Access Manager."
-msgstr ""
+msgstr "Initialisation du gestionnaire d'accès aux fichiers FUSE."
 
 #: src/nssbackup/managers/FuseFAM.py:203
 #, python-format
 msgid "Target directory '%(target)s' does not exist."
-msgstr ""
+msgstr "Le répertoire de destination '%(target)s' n'existe pas."
 
 #: src/nssbackup/managers/FuseFAM.py:248
 msgid "Terminating FUSE File Access Manager."
@@ -506,8 +523,8 @@ msgstr "Sauvegarde '%s' non trouvée. "
 msgid ""
 "Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s "
 msgstr ""
-"Sauvegarde '%(name)s' non valide à cause de la convention de nommage : %"
-"(error_cause)s "
+"Sauvegarde '%(name)s' non valide à cause de la convention de nommage : "
+"%(error_cause)s "
 
 #: src/nssbackup/managers/SnapshotManager.py:173
 #, python-format
@@ -532,8 +549,8 @@ msgstr ""
 #: src/nssbackup/managers/SnapshotManager.py:263
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 "Nous ne pouvons pas changer la base d'une sauvegarde à une sauvegarde "
 "postérieure : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' "
@@ -543,34 +560,40 @@ msgstr ""
 msgid "Rebasing '%(current)s' on '%(base)s'"
 msgstr "Changement de la base de '%(current)s' à '%(base)s'"
 
-#: src/nssbackup/managers/SnapshotManager.py:502
+#: src/nssbackup/managers/SnapshotManager.py:507
 #, python-format
 msgid "An error occurred when pulling snapshot '%s'."
 msgstr ""
 
-#: src/nssbackup/managers/SnapshotManager.py:541 src/nssbackup/util/tar.py:836
+#: src/nssbackup/managers/SnapshotManager.py:546 src/nssbackup/util/tar.py:836
 msgid "The snarfile header is incomplete !"
 msgstr "L'entête du fichier SNAR est incomplète !"
 
-#: src/nssbackup/managers/SnapshotManager.py:679
+#: src/nssbackup/managers/SnapshotManager.py:698
 #, python-format
 msgid "Base of snapshot '%s' is not set."
 msgstr ""
 
-#: src/nssbackup/managers/SnapshotManager.py:716
-#, fuzzy, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+#: src/nssbackup/managers/SnapshotManager.py:735
+#, python-format
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
-"La sauvegarde '%s' est déjà complète. Rien à faire (Ne sera pas convertie)"
 
-#: src/nssbackup/managers/SnapshotManager.py:756
+#: src/nssbackup/managers/SnapshotManager.py:775
 #, python-format
 msgid "Cancelling pull of snapshot '%s'"
 msgstr "Abandon de l'export du contenu de la sauvegarde '%s'"
 
-#: src/nssbackup/managers/SnapshotManager.py:805
+#: src/nssbackup/managers/SnapshotManager.py:824
 #, python-format
 msgid "Deleting snapshot: '%(snp)s'."
+msgstr ""
+
+#: src/nssbackup/managers/SnapshotManager.py:923
+msgid ""
+"Logarithmic purge is currently disabled. Falling back to cutoff purge of "
+"snapshots older than 30 days."
 msgstr ""
 
 #: src/nssbackup/managers/UpgradeManager.py:167
@@ -669,8 +692,8 @@ msgstr ""
 #: src/nssbackup/plugins/sshFuseFAM.py:113
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
 
 #: src/nssbackup/plugins/sshFuseFAM.py:118
@@ -680,8 +703,8 @@ msgstr ""
 #: src/nssbackup/plugins/sshFuseFAM.py:134
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
 
 #: src/nssbackup/ui/SBConfigGTK.py:99
@@ -767,11 +790,11 @@ msgstr ""
 "Nom de fichier ou chemin vide. Veuillez entrer un nom de fichier ou un "
 "chemin valide."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1004 src/nssbackup/ui/SBConfigGTK.py:1767
+#: src/nssbackup/ui/SBConfigGTK.py:1004 src/nssbackup/ui/SBConfigGTK.py:1766
 msgid "Empty expression. Please enter a valid regular expression."
 msgstr "Expression vide. Veuillez entrer une expression régulière valide."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1018 src/nssbackup/ui/SBConfigGTK.py:1781
+#: src/nssbackup/ui/SBConfigGTK.py:1018 src/nssbackup/ui/SBConfigGTK.py:1780
 msgid "Provided regular expression is not valid."
 msgstr "L'expression régulière fournie est invalide."
 
@@ -785,81 +808,81 @@ msgstr ""
 msgid "Save configuration as..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1126
-#, fuzzy, python-format
+#: src/nssbackup/ui/SBConfigGTK.py:1125
+#, python-format
 msgid ""
 "A backup run is initiated in the background.\n"
 "The process id is: %s."
-msgstr "Une sauvegarde est initiée en arrière-plan. L'id du processus est: "
+msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1181
+#: src/nssbackup/ui/SBConfigGTK.py:1180
 msgid "Include file..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1188 src/nssbackup/ui/SBConfigGTK.py:1342
+#: src/nssbackup/ui/SBConfigGTK.py:1187 src/nssbackup/ui/SBConfigGTK.py:1341
 msgid "All files"
 msgstr "Tous fichiers"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1207
+#: src/nssbackup/ui/SBConfigGTK.py:1206
 msgid "Include folder..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1314
+#: src/nssbackup/ui/SBConfigGTK.py:1313
 #, python-format
 msgid "Test on '%s' didn't succeed!"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1324
+#: src/nssbackup/ui/SBConfigGTK.py:1323
 msgid "Test was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1329
+#: src/nssbackup/ui/SBConfigGTK.py:1328
 #, python-format
 msgid "'%d' test(s) didn't succeed !"
 msgstr "'%d' tests n'ont pas reussi !"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1335
+#: src/nssbackup/ui/SBConfigGTK.py:1334
 msgid "Exclude file..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1357
+#: src/nssbackup/ui/SBConfigGTK.py:1356
 msgid "Exclude folder..."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1618
+#: src/nssbackup/ui/SBConfigGTK.py:1617
 msgid "Configuration has changed"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1619
+#: src/nssbackup/ui/SBConfigGTK.py:1618
 msgid ""
 "There are unsaved modifications. Please save the configuration or revert "
 "these changes before testing the mail settings."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1625 src/nssbackup/ui/SBConfigGTK.py:1631
+#: src/nssbackup/ui/SBConfigGTK.py:1624 src/nssbackup/ui/SBConfigGTK.py:1630
 msgid "Test mail settings"
 msgstr "Tester le paramétrage mail"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1626
+#: src/nssbackup/ui/SBConfigGTK.py:1625
 msgid "The test failed with following output:"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1632
+#: src/nssbackup/ui/SBConfigGTK.py:1631
 msgid "The test was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1715 src/nssbackup/ui/SBConfigGTK.py:1759
+#: src/nssbackup/ui/SBConfigGTK.py:1714 src/nssbackup/ui/SBConfigGTK.py:1758
 #, python-format
 msgid ""
 "The given expression contains unsupported characters ('%s'). Currently it is "
 "not possible to use these characters in exclude expressions."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1718 src/nssbackup/ui/SBConfigGTK.py:1762
+#: src/nssbackup/ui/SBConfigGTK.py:1717 src/nssbackup/ui/SBConfigGTK.py:1761
 msgid "Unsupported character"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:1862
+#: src/nssbackup/ui/SBConfigGTK.py:1861
 msgid ""
 "Please test writability of the target directory by pressing \"Test\" button "
 "on the right."
@@ -867,15 +890,15 @@ msgstr ""
 "Veuillez tester la capacité d'écriture sur le répertoire cible en appuyant "
 "sur le bouton \"Test\" sur la droite."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1874
+#: src/nssbackup/ui/SBConfigGTK.py:1873
 msgid "Test Succeeded !"
 msgstr "Test réussi"
 
-#: src/nssbackup/ui/SBConfigGTK.py:1880
+#: src/nssbackup/ui/SBConfigGTK.py:1879
 msgid "Target directory is writable."
 msgstr "Le répertoire cible n'est pas inscriptible."
 
-#: src/nssbackup/ui/SBConfigGTK.py:1889
+#: src/nssbackup/ui/SBConfigGTK.py:1888
 msgid ""
 "Please change target directory and test writability of the target directory "
 "by pressing \"Test\" button on the right."
@@ -883,35 +906,35 @@ msgstr ""
 "Veuillez changer le répertoire de destination et tester les permissions "
 "d'écriture en appuyant sur le bouton \"Test\" à droite."
 
-#: src/nssbackup/ui/SBConfigGTK.py:2035
+#: src/nssbackup/ui/SBConfigGTK.py:2034
 msgid ""
 "The given name of the new profile is empty. Please enter a valid profile "
 "name."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2036 src/nssbackup/ui/SBConfigGTK.py:2043
+#: src/nssbackup/ui/SBConfigGTK.py:2035 src/nssbackup/ui/SBConfigGTK.py:2042
 msgid "Profile name not valid"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2042
+#: src/nssbackup/ui/SBConfigGTK.py:2041
 msgid ""
 "The given name of the new profile already exists. Please enter another name."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2044
+#: src/nssbackup/ui/SBConfigGTK.py:2043
 msgid "Renaming of profiles is not supported."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2069 src/nssbackup/ui/SBConfigGTK.py:2097
-#: src/nssbackup/ui/SBConfigGTK.py:2120
+#: src/nssbackup/ui/SBConfigGTK.py:2068 src/nssbackup/ui/SBConfigGTK.py:2096
+#: src/nssbackup/ui/SBConfigGTK.py:2119
 msgid "Please select a Profile !"
 msgstr "Choisissez un profil, s'il vous plait"
 
-#: src/nssbackup/ui/SBConfigGTK.py:2076
+#: src/nssbackup/ui/SBConfigGTK.py:2075
 msgid "remove"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2078
+#: src/nssbackup/ui/SBConfigGTK.py:2077
 #, python-format
 msgid ""
 "You are trying to remove a profile. You will not be able to restore it .\n"
@@ -920,22 +943,22 @@ msgid ""
 "<b>Are you sure to want to delete the '%(name)s' profile?</b>"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2127
+#: src/nssbackup/ui/SBConfigGTK.py:2126
 msgid "disable"
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2156
+#: src/nssbackup/ui/SBConfigGTK.py:2155
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
 msgstr ""
 
-#: src/nssbackup/ui/SBConfigGTK.py:2190
+#: src/nssbackup/ui/SBConfigGTK.py:2189
 #, python-format
 msgid ""
 "You can't %s the Default Profile. Please use it if you need only one profile."
@@ -958,22 +981,16 @@ msgid "Revert as..."
 msgstr "Rétrograder comme ..."
 
 #: src/nssbackup/ui/SBRestoreGTK.py:102
-#, fuzzy
 msgid ""
 "The program is going to be terminated. Please make sure the missing "
 "directory exists (e.g. by mounting an external disk) or change the specified "
 "target in '(Not So) Simple Backup-Configuration' tool and restart this "
 "application."
 msgstr ""
-"Le programme va s'arrêter. Assurez vous que le répertoire manquant existe "
-"(en montant un disque externe par exemple) ou changez le répertoire spécifié "
-"comme destination dans l'interface de configuration de NSsbackup et relancez "
-"cette application."
 
 #: src/nssbackup/ui/SBRestoreGTK.py:104
-#, fuzzy
 msgid "(Not So) Simple Backup error"
-msgstr "Erreur NSsbackup"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:105
 msgid "An error occurred during initialization:"
@@ -1008,9 +1025,8 @@ msgid "Loading ..."
 msgstr "Chargement en cours..."
 
 #: src/nssbackup/ui/SBRestoreGTK.py:484
-#, fuzzy
 msgid "(Not So) Simple Backup restore error"
-msgstr "Erreur de NSsbackup Restoration"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:485
 msgid "An error occurred while reading snapshot"
@@ -1034,52 +1050,51 @@ msgid ""
 "The snapshot version is not supported (Just %(supportedversion)s is "
 "supported). Version '%(currentversion)s' found. You should upgrade it. "
 msgstr ""
-"La version de la sauvegarde n'est pas supportée (seule '%(supportedversion)"
-"s' est supportée). Version '%(currentversion)s' trouvée. Vous devriez mettre "
-"à jour la sauvegarde. "
+"La version de la sauvegarde n'est pas supportée (seule "
+"'%(supportedversion)s' est supportée). Version '%(currentversion)s' trouvée. "
+"Vous devriez mettre à jour la sauvegarde. "
 
 #: src/nssbackup/ui/SBRestoreGTK.py:570
 msgid "Select restore location"
 msgstr "Sélectionnez l'emplacement de restauration"
 
 #: src/nssbackup/ui/SBRestoreGTK.py:588
-#, fuzzy, python-format
+#, python-format
 msgid "Do you really want to revert '%s'?"
-msgstr "Voulez vous vraiment changer la base de '%(current)s' à '%(base)s' ?"
+msgstr ""
 
 #: src/nssbackup/ui/SBRestoreGTK.py:601
 msgid "Select revert location"
 msgstr "Choisissez la destionnation de restauration"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:608
-#, fuzzy, python-format
-msgid "Do you really want to revert '%s' to '%s'?"
-msgstr "Voulez vous vraiment changer la base de '%(current)s' à '%(base)s' ?"
+#: src/nssbackup/ui/SBRestoreGTK.py:610
+#, python-format
+msgid "Do you really want to revert '%(source)s' to '%(dir)s'?"
+msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:691
+#: src/nssbackup/ui/SBRestoreGTK.py:694
 #, python-format
 msgid "Actual base : <b>%s</b>"
 msgstr "Parent actuel : <b>%s</b>"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:701
+#: src/nssbackup/ui/SBRestoreGTK.py:704
 msgid "The version of the snapshot is greater than the supported one!"
 msgstr "La version de la sauvegarde est plus haute que celle supportée."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:719
-#, fuzzy
+#: src/nssbackup/ui/SBRestoreGTK.py:722
 msgid "(Not So) Simple Backup restoration error"
-msgstr "Erreur de NSsbackup Restauration"
+msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:721
+#: src/nssbackup/ui/SBRestoreGTK.py:724
 msgid "Unable to upgrade snapshot"
 msgstr "Echec de la mise à jour de la sauvegarde."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:743
+#: src/nssbackup/ui/SBRestoreGTK.py:746
 #, python-format
 msgid "Do you really want to rebase '%(current)s' on '%(base)s' ?"
 msgstr "Voulez vous vraiment changer la base de '%(current)s' à '%(base)s' ?"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:760
+#: src/nssbackup/ui/SBRestoreGTK.py:763
 #, python-format
 msgid ""
 "Are you sure that you want to remove snapshot '%s'?\n"
@@ -1087,27 +1102,26 @@ msgid ""
 "This may take a while - be patient."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:791 src/nssbackup/ui/SBRestoreGTK.py:797
-#: src/nssbackup/ui/SBRestoreGTK.py:803 src/nssbackup/ui/SBRestoreGTK.py:809
-#, fuzzy
+#: src/nssbackup/ui/SBRestoreGTK.py:794 src/nssbackup/ui/SBRestoreGTK.py:800
+#: src/nssbackup/ui/SBRestoreGTK.py:806 src/nssbackup/ui/SBRestoreGTK.py:812
 msgid "(Not So) Simple Backup restoration"
-msgstr "NSbackup Restauration"
+msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:792 src/nssbackup/ui/SBRestoreGTK.py:798
+#: src/nssbackup/ui/SBRestoreGTK.py:795 src/nssbackup/ui/SBRestoreGTK.py:801
 msgid "<b>Restoring of selected files</b>"
 msgstr "Restauration des fichiers sélectionnés"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:793
+#: src/nssbackup/ui/SBRestoreGTK.py:796
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> is in progress."
 msgstr "Restauration de <tt>'%s'</tt> en cours"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:794
+#: src/nssbackup/ui/SBRestoreGTK.py:797
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:795
+#: src/nssbackup/ui/SBRestoreGTK.py:798
 #, python-format
 msgid ""
 "Restoring of <tt>'%s'</tt> was not successful.\n"
@@ -1115,7 +1129,7 @@ msgid ""
 "The following error occurred:\n"
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:799
+#: src/nssbackup/ui/SBRestoreGTK.py:802
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
@@ -1124,14 +1138,14 @@ msgstr ""
 "Restauration de <tt>'%(source)s'</tt>\n"
 "dans <tt>'%(dirname)s'</tt> en cours."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:800
+#: src/nssbackup/ui/SBRestoreGTK.py:803
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:801
+#: src/nssbackup/ui/SBRestoreGTK.py:804
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
@@ -1140,21 +1154,21 @@ msgid ""
 "The following error occurred:\n"
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:804 src/nssbackup/ui/SBRestoreGTK.py:810
+#: src/nssbackup/ui/SBRestoreGTK.py:807 src/nssbackup/ui/SBRestoreGTK.py:813
 msgid "<b>Reverting selected files</b>"
 msgstr "Rétrogradant les fichiers sélectionnés"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:805
+#: src/nssbackup/ui/SBRestoreGTK.py:808
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> is in progress.\n"
 msgstr "Rétrogradation de <tt>'%s'</tt> en cours.\n"
 
-#: src/nssbackup/ui/SBRestoreGTK.py:806
+#: src/nssbackup/ui/SBRestoreGTK.py:809
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:807
+#: src/nssbackup/ui/SBRestoreGTK.py:810
 #, python-format
 msgid ""
 "Reverting of <tt>'%s'</tt> was not successful.\n"
@@ -1162,7 +1176,7 @@ msgid ""
 "The following error occurred:\n"
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:811
+#: src/nssbackup/ui/SBRestoreGTK.py:814
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
@@ -1171,14 +1185,14 @@ msgstr ""
 "Rétrogradation de <tt>'%(source)s'</tt> \n"
 "dans <tt>'%(dirname)s'</tt> en cours."
 
-#: src/nssbackup/ui/SBRestoreGTK.py:812
+#: src/nssbackup/ui/SBRestoreGTK.py:815
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
 
-#: src/nssbackup/ui/SBRestoreGTK.py:813
+#: src/nssbackup/ui/SBRestoreGTK.py:816
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
@@ -1281,9 +1295,8 @@ msgid "TAR returned a warning during the backup process: %s"
 msgstr ""
 
 #: src/nssbackup/util/tar.py:374
-#, fuzzy
 msgid "Unable to make a proper backup. TAR was terminated."
-msgstr "Sauvegarde impossible : "
+msgstr ""
 
 #: src/nssbackup/util/tar.py:441
 msgid "Included"
@@ -1912,11 +1925,13 @@ msgstr "Changer la base"
 
 #: datas/nssbackup-restore.glade:807
 msgid "Select a snapshot and change its base to another snapshot."
-msgstr "Sélectionner une sauvegarde et changer sa base à une autre sauvegarde."
+msgstr ""
+"Sélectionner une sauvegarde et changer sa base à une autre sauvegarde."
 
 #: datas/nssbackup-restore.glade:832
 msgid "Select a snapshot on this list to rebase on it."
-msgstr "Sélectionner la sauvegarde dans la liste pour l'appliquer comme base."
+msgstr ""
+"Sélectionner la sauvegarde dans la liste pour l'appliquer comme base."
 
 #: datas/nssbackup-restore.glade:866
 msgid "<b>Snapshot History</b>"
@@ -1973,19 +1988,8 @@ msgstr ""
 "\n"
 "Utilisez simple-restore-gnome pour plus de facilité d'utilisation.\n"
 
-#~ msgid "I didn't find the log file. Please set it up in nssbackup.conf "
-#~ msgstr ""
-#~ "Je n'ai pas pu déterminer l'emplacement du fichier journal. Veuillez le "
-#~ "configurer dans nssbackup.conf "
-
-#~ msgid "Starting snapshot %(name)s "
-#~ msgstr "Début de la sauvegarde %(name)s "
-
-#~ msgid "Unable to change permissions for "
-#~ msgstr "Impossible de changer les permissions pour "
-
-#~ msgid "there was a problem initializing the "
-#~ msgstr "Il y a eu un problème en initialisant le "
+#~ msgid "Initializing FUSE FILE ACCESS MANAGER !"
+#~ msgstr "Initialisation de FUSE FILE ACCESS MANAGER"
 
 #~ msgid "BackupManager created "
 #~ msgstr "Création du BackupManager "
@@ -1993,30 +1997,41 @@ msgstr ""
 #~ msgid "Starting backup Session"
 #~ msgstr "Début de la session de sauvegarde"
 
-#~ msgid "Initializing FUSE FILE ACCESS MANAGER !"
-#~ msgstr "Initialisation de FUSE FILE ACCESS MANAGER"
+#~ msgid "I didn't find the log file. Please set it up in nssbackup.conf "
+#~ msgstr ""
+#~ "Je n'ai pas pu déterminer l'emplacement du fichier journal. Veuillez le "
+#~ "configurer dans nssbackup.conf "
 
+#, python-format
+#~ msgid "Starting snapshot %(name)s "
+#~ msgstr "Début de la sauvegarde %(name)s "
+
+#, python-format
 #~ msgid ""
 #~ "We don't have read access to '%(file)s', it has to be exclude : %(error)s "
 #~ msgstr ""
-#~ "Nous n'avons pas accès en lecture à '%(file)s'. Il doit être exclu : %"
-#~ "(error)s "
+#~ "Nous n'avons pas accès en lecture à '%(file)s'. Il doit être exclu : "
+#~ "%(error)s "
 
+#, python-format
 #~ msgid "'%(file)s' doesn't exist, it has to be exclude "
 #~ msgstr "'%(file)s' n'existe pas. Il doit être exclu "
 
+#, python-format
 #~ msgid "Problem with '%(file)s' : %(error)s "
 #~ msgstr "Un problem est survenu avec '%(file)s' : %(error)s "
 
+#, python-format
 #~ msgid "got an error with '%(file)s' : %(error)s"
 #~ msgstr "Une erreur est survenue avec  '%(file)s' : %(error)s"
 
+#, python-format
 #~ msgid ""
-#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > %"
-#~ "(maxsize)s), it has to be exclude "
+#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > "
+#~ "%(maxsize)s), it has to be exclude "
 #~ msgstr ""
-#~ "La taille de '%(file)s' est supérieure à celle définie ( %(filesize)s > %"
-#~ "(maxsize)s), Il doit être exclu. "
+#~ "La taille de '%(file)s' est supérieure à celle définie ( %(filesize)s > "
+#~ "%(maxsize)s), Il doit être exclu. "
 
 #~ msgid "Terminating FUSE FILE ACCESS MANAGER !"
 #~ msgstr "Clôture de FUSE FILE ACCESS MANAGER !"
@@ -2055,15 +2070,15 @@ msgstr ""
 #~ "<small>Do backups according to the settings defined on the next pages of "
 #~ "this dialog.</small>"
 #~ msgstr ""
-#~ "<small>Effectuer les sauvegardes selon les paramètres définis dans les "
-#~ "pages suivantes de cette fenêtre de dialogue</small>"
+#~ "<small>Effectuer les sauvegardes selon les paramètres définis dans les pages "
+#~ "suivantes de cette fenêtre de dialogue</small>"
 
 #~ msgid ""
 #~ "<small>Do not backup your data automatically. Note: this does not prevent "
 #~ "doing manual backups.</small>"
 #~ msgstr ""
-#~ "<small>Ne pas sauvegarder automatiquement vos données. Notez bien: ceci "
-#~ "ne vous empêche pas de faire des sauvegardes manuelles.</small>"
+#~ "<small>Ne pas sauvegarder automatiquement vos données. Notez bien: ceci ne "
+#~ "vous empêche pas de faire des sauvegardes manuelles.</small>"
 
 #~ msgid "Mb"
 #~ msgstr "Mo"
@@ -2114,20 +2129,25 @@ msgstr ""
 #~ msgid "Time (for admins only)"
 #~ msgstr "Plannification (seulement pour les admins)"
 
+#, python-format
 #~ msgid "Got an exception when Pulling '%s' : "
 #~ msgstr "Erreur récupérée en transférant '%s' "
 
+#, python-format
 #~ msgid "Snapshot '%s' is a full . Can't rebase on older snapshot"
 #~ msgstr ""
-#~ "La sauvegarde '%s' est une sauvegarde complète. Nous ne pouvons changer "
-#~ "la base sur une plus ancienne sauvegarde."
+#~ "La sauvegarde '%s' est une sauvegarde complète. Nous ne pouvons changer la "
+#~ "base sur une plus ancienne sauvegarde."
 
+#, python-format
 #~ msgid "Target '%s' directory is excluded"
 #~ msgstr "Le répertoire de destination '%s' est exclue"
 
+#, python-format
 #~ msgid "Deleting '%(snp)s' for purge !"
 #~ msgstr "Suppression de '%(snp)s' pour la purge !"
 
+#, python-format
 #~ msgid "Non existing directory : %s"
 #~ msgstr "Dossier non existant : %s"
 
@@ -2158,12 +2178,18 @@ msgstr ""
 #~ msgid "Unable to open target directory.\n"
 #~ msgstr "Impossible d'ouvrir le répertoire cible.\n"
 
+#~ msgid "Unable to change permissions for "
+#~ msgstr "Impossible de changer les permissions pour "
+
+#~ msgid "there was a problem initializing the "
+#~ msgstr "Il y a eu un problème en initialisant le "
+
 #~ msgid "NSsbackup configuration error"
 #~ msgstr "Erreur de configuration de NSsbackup"
 
 #~ msgid ""
-#~ "Please enter the new profile name in the <b>Profile name</b> entry and "
-#~ "check the <b>Enable</b> checkbox to enable it."
+#~ "Please enter the new profile name in the <b>Profile name</b> entry and check "
+#~ "the <b>Enable</b> checkbox to enable it."
 #~ msgstr ""
 #~ "Entrez le nom du nouveau profile dans l'entrée <b>Nom du profile</b> et "
 #~ "cochez la case <b>Activé</b> pour l'activer."

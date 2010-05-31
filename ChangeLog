@@ -1,5 +1,52 @@
-nssbackup (0.2-0~rc9)
+nssbackup (0.2-0)
 
+  * [Fix] LP Bug #573733: nssbackup does not prevent itself from running in
+          parallel.
+  * [Fix] LP Bug #526544: was re-opened, missing newline at eof
+  * [FIX] LP Bug #577296: Crash, with "%d format: a number is required, not str"
+  * [Fix] LP Bug #258542 from Mascha's branch: adding a $ add the end of new
+          file types; old file type regexps must be edited by hand to add the $;
+          prior defined file types are handled as "normal" regular expression,
+          display file type regular expressions also under regular expression
+          tab to make this clear
+  * [Fix] regression of LP #146618: The file size limitation should not be a
+          recommendation
+  * [Fix] regression: avoid backup of circular symlinks in the case of link
+          dereferencing (follow symlinks)
+  * [Fix] implemented a work-around to enable notifications when running as
+          root from cron/anacron
+  * [Fix] avoid merge of snapshots when purging snapshots by only removing
+          stand-alone snapshots
+  * [Fix] minor changes in file collection codes (counting symlinks as
+          included files)
+  * [Fix] execution of tar within empty environment; this avoids manipulation
+          of tar options by leaked in environment variables and fixes a
+          performance bug related to non-englisch languages (LANG) and tar
+          (tar was much (6x) slower when running localized)
+  * [Fix] make uninstall and removal of debian package did not removed written
+          cron entries
+  * [Fix] when starting another instance of nssbackupd or GUI tools previous
+          log files were overwritten (introduces rotating log file handling)
+  * [Fix] skip excluded paths when merging snar files (see also LP #567965)
+  * [Fix] issues with non-translated strings due to incorrect import order
+          of modules
+  * [Fix] typos and minor issues with translatable strings corrected
+  * [Fix] avoid system locks when running scheduled backups by decreasing
+          priority of backup process (nice/ionice)
+  * [Fix] disable timeout (Signal ALARM) after exception handling
+  * [Change] Logarithmic purge disabled since it still has issues  
+  * [Enhancement] improvements to the release script
+  * [Enhancement] improved handling of tar output
+  * [Enhancement] added support for compressed log files
+  * [Enhancement] Exclude process pid files as recommendation
+  * [Enhancement] added Regex for exclusion of backup files '*~' to the default
+                  recommendations
+  * [Enhancement] create a log directory exclusively for nssbackup as default
+                  recommendation in order not to mess up /var/log (no changes
+                  are made on existing configurations)
+  * Launchpad translations merged
+
+nssbackup (0.2-0~rc9)
   * [FIX] LP Bug #526544: cron servicefile was not found
   * [FIX] LP Bug #512007: add fuse allow_other option to ssh plugin
   * [FIX] LP Bug #382753: NSSBackup doesn't exclude folders with special
@@ -199,3 +246,4 @@ nssbackup (0.1-2)
 
 nssbackup (0.1-1)
   * Ubuntu Initial release
+

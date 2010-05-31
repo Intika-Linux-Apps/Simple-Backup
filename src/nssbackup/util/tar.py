@@ -205,7 +205,7 @@ def appendToTarFile(desttar, fileslist, workingdir, additionalOpts):
 	LogFactory.getLogger().debug("output was: " + outStr)
 
 
-def __prepareTarCommonOpts(snapshot):
+def __prepare_common_opts(snapshot):
 	"""Prepares common TAR options used when full or incremental
 	backups are being made.  
 	
@@ -217,7 +217,8 @@ def __prepareTarCommonOpts(snapshot):
 	"""
 	# don't escape spaces i.e. do not replace them with '\ '; this will fail
 	tdir = snapshot.getPath()
-	options = list()
+	options = ["-i", "/bin/tar"]
+	# take care where to insert additional options (e.g. --gzip)
 	
 	options.extend(["-cS","--directory="+ os.sep,
 				    "--ignore-failed-read",
@@ -229,16 +230,16 @@ def __prepareTarCommonOpts(snapshot):
 	
 	archivename = "files.tar"
 	if snapshot.getFormat() == "gzip":
-		options.insert(1,"--gzip")
+		options.insert(2,"--gzip")
 		archivename+=".gz"
 	elif snapshot.getFormat() == "bzip2":
-		options.insert(1,"--bzip2")
+		options.insert(2,"--bzip2")
 		archivename+=".bz2"
 	elif snapshot.getFormat() == "none":
 		pass
 	else :
 		LogFactory.getLogger().debug("Setting compression to default 'gzip'.")
-		options.insert(1,"--gzip")
+		options.insert(2,"--gzip")
 		archivename+=".gz"
 	
 	options.append("--file="+os.sep.join([tdir,archivename]) )
@@ -276,7 +277,7 @@ def makeTarIncBackup(snapshot):
 	"""
 	LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 	
-	options = __prepareTarCommonOpts(snapshot)
+	options = __prepare_common_opts(snapshot)
 	
 	splitSize = snapshot.getSplitedSize()
 	if splitSize :
@@ -307,9 +308,9 @@ def makeTarIncBackup(snapshot):
 		# backup target does not support 'open' within the TAR process and
 		# would fail
 		options.append("--listed-incremental="+tmp_snarfile)
-		
-		outStr, errStr, retVal = Util.launch("tar", options)
-		LogFactory.getLogger().debug("TAR Output : " + outStr)
+
+		outStr, errStr, retVal = Util.launch("/usr/bin/env", options)
+		__finish_tar(retVal, outStr, errStr)
 		
 		# and move the temporary snarfile back into the backup directory
 		try:
@@ -318,8 +319,7 @@ def makeTarIncBackup(snapshot):
 			LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
 										% snarfile )
 		os.remove( tmp_snarfile )
-		__finish_backup(retVal, errStr)
-		
+
 
 def makeTarFullBackup(snapshot):
 	"""Convenience function that launches TAR to create a full backup.
@@ -330,7 +330,7 @@ def makeTarFullBackup(snapshot):
 	"""
 	LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 	
-	options = __prepareTarCommonOpts(snapshot)
+	options = __prepare_common_opts(snapshot)
 	
 	splitSize = snapshot.getSplitedSize()
 	if splitSize :
@@ -351,10 +351,8 @@ def makeTarFullBackup(snapshot):
 	
 	options.append( "--listed-incremental="+tmp_snarfile )
 
-	outStr, errStr, retVal = Util.launch("tar", options)
-	LogFactory.getLogger().debug("TAR exitcode: %s" % retVal)
-	LogFactory.getLogger().debug("TAR Output: " + outStr)
-	LogFactory.getLogger().debug("TAR Errors: " + errStr)
+	outStr, errStr, retVal = Util.launch("/usr/bin/env", options)
+	__finish_tar(retVal, outStr, errStr)
 
 	# and move the temporary snarfile into the backup directory
 	try:
@@ -363,21 +361,46 @@ def makeTarFullBackup(snapshot):
 		LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
 									% snarfile )
 	os.remove( tmp_snarfile )
-	__finish_backup(retVal, errStr)
 
 
-def __finish_backup(exitcode, error_str):
+def __finish_tar(exitcode, out_str, error_str):
+	"""The exit code is actually the exit code of the `env` command.
+	See `man env`.
+	"""
 	_logger = LogFactory.getLogger() 
+	_logger.debug("Exit code: %s" % exitcode)
+	_logger.debug("Standard out: %s" % out_str)
+	_logger.debug("Error out: %s" % error_str)
 	if exitcode == 0:
+		_res_err = []
+		if error_str != "":
+			err_lst = error_str.split("\n")
+			for err_item in err_lst:
+				if err_item == "/bin/tar: Removing leading `/' from member names":
+					_logger.info(_("Leading '/' from member names were removed."))
+				elif err_item == "/bin/tar: Removing leading `/' from hard link targets":
+					_logger.info(_("Leading '/' from hard link targets were removed."))
+				else:
+					err_item = err_item.lstrip("/bin/tar: ")
+					err_item = err_item.strip()
+					if err_item != "":
+						_res_err.append(err_item)
+		if len(_res_err) == 1:
+			_logger.info(_("TAR returned a warning: %s") % _res_err[0])
+		elif len(_res_err) > 1:
+			_logger.info(_("TAR returned warnings:\n%s") % "\n".join(_res_err))
+		else:
+			pass
 		_logger.info(_("TAR has been finished successfully."))
+		
 	elif exitcode == 1:
-		# list-incremental is not compatible with ignore failed read
-		_logger.warning(_("TAR returned a warning during the backup process: %s")\
-					% error_str)
+		_errmsg = _("Command 'env' failed.")
+		_logger.error("%s\n%s (exit code: %s)" % (_errmsg, error_str, exitcode))
+		raise SBException(_errmsg)
 	else:
 		# list-incremental is not compatible with ignore failed read
 		_errmsg = _("Unable to make a proper backup. TAR was terminated.") 
-		_logger.error("%s\n%s" % (_errmsg, error_str))
+		_logger.error("%s\n%s (exit code: %s)" % (_errmsg, error_str, exitcode))
 		raise SBException(_errmsg)
 
 	

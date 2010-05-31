@@ -1,7 +1,8 @@
 Source: nssbackup
-Section: devel
+Section: admin
 Priority: optional
 Maintainer: NSsbackup team <nssbackup-team@lists.launchpad.net>
+Uploaders: Jean-Peer Lorenz <peer.loz@gmx.net>, Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
 Build-Depends: debhelper (>= 5), python ( >= 2.5 ), python-setuptools, lsb-release
 Standards-Version: 3.8.3
 

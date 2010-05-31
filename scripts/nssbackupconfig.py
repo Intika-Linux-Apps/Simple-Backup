@@ -2,7 +2,7 @@
 
 #	NSsbackup - helper script for upgrading nssbackup
 #
-#   Copyright (c)2009: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import pwd
 import ConfigParser
 import re
 
-import nssbackup
+from nssbackup.pkginfo import Infos
 from nssbackup.managers import ConfigManager 
 
 # definition of error codes
@@ -287,7 +287,7 @@ class UpgradeLogOption(object):
 					logfile = config.get("log", "file")			   
 					logdir = os.path.dirname(logfile)
 					
-					new_logfn = ConfigManager.get_logfile_name(conffile)
+					new_logfn = ConfigManager.get_logfile_name_template(conffile)
 					new_log = os.path.join(logdir, new_logfn)
 					
 					if logfile == new_log:
@@ -347,7 +347,7 @@ class UpgradeApplication(object):
 		
 		"""
 		print "-"*60
-		print "(Not So) Simple Backup %s upgrade tool" % nssbackup.Infos.VERSION
+		print "%s %s upgrade tool" % (Infos.NAME, Infos.VERSION)
 		print "-"*60
 		
 		if os.getuid() != 0:

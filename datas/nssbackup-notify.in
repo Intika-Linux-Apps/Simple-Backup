@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env /bin/bash
 
-#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,26 +17,16 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import gettext
-import sys
-import gtk
-import gtk.glade
+PATH=/usr/local/bin:/usr/bin:/bin
 
-from nssbackup.util import get_resource_dir
+gspid=$(pgrep gnome-session)
+if test "$gspid"; then
+    export $(grep -z USER= /proc/$gspid/environ)
+    export $(grep -z DISPLAY= /proc/$gspid/environ)
+    export $(grep -z DBUS_SESSION_BUS_ADDRESS= /proc/$gspid/environ)
+    export $(grep -z LANG= /proc/$gspid/environ)
+fi
 
+notifyscript="@prefix@/share/nssbackup/nssbackup-notify.py"
+sudo -u $USER @python@ "$notifyscript" $*
 
-#----------------------------------------------------------------------
-
-if __name__ == '__main__':
-	# i18n init
-	application = 'nssbackup'
-	locale_dir = get_resource_dir('locale')
-    
-	gettext.bindtextdomain(application, locale_dir)
-	gettext.textdomain(application)
-
-	gtk.glade.bindtextdomain(application, locale_dir)
-	gtk.glade.textdomain(application)
-	
-	from nssbackup.ui.SBRestoreGTK import main
-	main(sys.argv)

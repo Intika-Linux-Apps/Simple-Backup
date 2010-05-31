@@ -30,6 +30,7 @@
 
 from gettext import gettext as _
 import os
+import sys
 import os.path
 import traceback
 import smtplib
@@ -42,7 +43,7 @@ import subprocess
 import optparse
 
 # project imports
-from nssbackup import Infos
+from nssbackup.pkginfo import Infos
 from nssbackup.util import log
 from nssbackup.util import exceptions
 import nssbackup.managers.FileAccessManager as FAM
@@ -81,6 +82,7 @@ class NSsbackupd(object):
                to ensure that specific logger instances are created.
         
         """
+		self.__retcode = 0
         self.__errors            = []
         
 #        self.__super_user        = False
@@ -160,11 +162,14 @@ class NSsbackupd(object):
         _title = _("[NSsbackup] [%(profile)s] Report of %(date)s")\
                     % { 'profile':self.__profilename,
                         'date': datetime.datetime.now() }
-        logf = self.__bm.config.get_logfile()
-        if FAM.exists( logf ):
-            _content = FAM.readfile( logf )
-        else :
-            _content = _("No path to log file specified. Please set it in the configuration.")
+        logf = self.__bm.config.get_current_logfile()
+        if logf is None:
+            _content = _("No log file specified.")
+        else:
+            if FAM.exists( logf ):
+                _content = FAM.readfile( logf )
+            else :
+                _content = _("Unable to find log file.")
         
         server = smtplib.SMTP()
         msg = MIMEMultipart()
@@ -270,13 +275,15 @@ class NSsbackupd(object):
                 self.__bm              = BackupManager(confm, self.__state)
                 self.__log_errlist()
                 self.__bm.makeBackup()
-                self.__bm.endSBsession()
+                self.__bm.endSBsession()                
             except exceptions.InstanceRunningError, exc:
                 self.__on_already_running(exc)
             except Exception, exc:
                 self.__onError(exc)
+                
             self.__onFinish()
         self.__terminate_notifiers()
+        return self.__retcode
 
     def __on_already_running(self, error):
         """Handler for the case a backup process is already running.
@@ -286,34 +293,38 @@ class NSsbackupd(object):
             _msg = "Backup is not being started.\n%s" % (str(error))
             self.logger.warning(_msg)
             self._notify_warning(self.__profileName, _msg)
+            self.__retcode = 3
         except Exception, exc:
-            self.logger.error("Exception in error handling code:\n%s" % str(exc))
-            self.logger.error(traceback.format_exc())
+            self.__retcode = 6
+            self.logger.exception("Exception in error handling code:\n%s" % str(exc))
 
-    def __on_error(self, error):
+    def __onError(self, e):
         """Handles errors that occurs during backup process.
-        
         """
         try:
-	        n_body = _("An error occured during the backup:\n%s") % (str(e))
-            self.logger.error(n_body)
-            self.logger.debug(traceback.format_exc())
-            self.__state.set_recent_error(error)
+            n_body = _("An error occured during the backup:\n%s") % (str(e))
+            self.logger.exception(n_body)
+            self._notify_error(self.__profileName, n_body)
+            self.__retcode = 4
+            self.__state.set_recent_error(e)
             self.__state.set_state('error')
-		    if self.__bm:
-		        self.__bm.endSBsession()
+            if self.__bm:
+                self.__bm.endSBsession()
         except Exception, exc:
-            self.logger.error("Exception in error handling code:\n%s" % str(exc))
-            self.logger.error(traceback.format_exc())
+            self.__retcode = 6
+            self.logger.exception("Exception in error handling code:\n%s" % str(exc))
         
     def __onFinish(self):
         """Method that is finally called after backup process.
         """
-        if self.__bm and self.__bm.config :
-            # send the mail
-            if self.__bm.config.has_section("report") and\
-               self.__bm.config.has_option("report","to") :
-                self.__sendEmail()
+        try:
+            if self.__bm and self.__bm.config:
+                # send the mail
+                if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
+                    self.__sendEmail()
+        except Exception, exc:
+            self.__retcode = 5
+            self.logger.exception("Error when sending email:\n%s" % str(exc))
                 
     def __notify_init_errors(self):
         """Errors that occurred during the initialization process were stored
@@ -323,7 +334,7 @@ class NSsbackupd(object):
             for errmsg in self.__errors:
                 self.__state.set_recent_error(errmsg)
                 self.__state.set_state('error')
-                
+
     def __log_errlist(self):
         """Errors that occurred during the initialization process
         were stored in an error list. The full list of errors is
@@ -450,9 +461,9 @@ class NSsbackupApp(object):
         
         return retcode
         
-
+    
 def main(argv):
-    """Public function that processes the backups.
+    """Public function that process the backups.
     
     :todo: Should be give the DBus conenction as parameter? No, because it\
            cannot be determined whether the dbus should be used at this\
@@ -461,4 +472,5 @@ def main(argv):
     """
     sbackup_app = NSsbackupApp(argv)
     excode = sbackup_app.run()
+    log.shutdown_logging()
     return excode

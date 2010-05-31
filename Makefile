@@ -77,6 +77,7 @@ install: install-po install-help install-bin install-sbin install-package
 	chmod +x $(SBIN)/nssbackup*
 	chmod +x $(DATADIR)/nssbackup/multipleTarScript
 	chmod +x $(DATADIR)/nssbackup/nssbackup
+	chmod +x $(DATADIR)/nssbackup/nssbackup-notify
 
 fill-templates:
 	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/resources.in > src/nssbackup/resources
@@ -88,6 +89,9 @@ fill-templates:
 	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-restore.desktop.in > datas/nssbackup-restore.desktop	
 	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-restore-su.desktop.in > datas/nssbackup-restore-su.desktop.tmp
 	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-restore-su.desktop.tmp > datas/nssbackup-restore-su.desktop
+
+	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-notify.in > datas/nssbackup-notify.tmp
+	set -e; sed s+@python@+$(PYTHON)+ datas/nssbackup-notify.tmp > datas/nssbackup-notify
 	
 	set -e; sed s+@version@+$(VERSION)+ setup.py.in > setup.py.tmp
 	set -e; sed s+@pkgname@+$(PKGNAME)+ setup.py.tmp > setup.py
@@ -97,6 +101,7 @@ fill-templates:
 	
 	rm -f datas/nssbackup-config-su.desktop.tmp
 	rm -f datas/nssbackup-restore-su.desktop.tmp
+	rm -f datas/nssbackup-notify.tmp
 	rm -f src/nssbackup/metainfo.tmp
 	rm -f setup.py.tmp
 
@@ -131,7 +136,7 @@ install-help:
 	done
 
 # targets for un-installation
-uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-help
+uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-cron uninstall-help
 
 uninstall-bin:
 	rm -f $(BIN)/nssbackupd
@@ -158,6 +163,13 @@ uninstall-data:
 	rm -rf $(DATADIR)/doc/nssbackup
 	set -e; find $(LANGDIR) -name nssbackup.mo -exec rm -f '{}' \;
 	
+uninstall-cron:
+	rm -f /etc/cron.d/nssbackup
+	rm -f /etc/cron.hourly/nssbackup
+	rm -f /etc/cron.daily/nssbackup
+	rm -f /etc/cron.weekly/nssbackup
+	rm -f /etc/cron.monthly/nssbackup
+
 uninstall-help:
 	rm -rf $(HELPDIR)
 	
@@ -173,6 +185,7 @@ clean:
 	rm -f datas/nssbackup-config.desktop
 	rm -f datas/nssbackup-restore-su.desktop
 	rm -f datas/nssbackup-restore.desktop
+	rm -f datas/nssbackup-notify
 	
 	rm -f src/nssbackup/resources
 	rm -f src/nssbackup/metainfo
@@ -186,7 +199,7 @@ po-data: po-dir
 	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 	
 po-gen:
-	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade scripts/*.py
+	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.py scripts/*.py
 	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/nssbackup.pot; done
 
 # Purpose of this target is to print some informational data
