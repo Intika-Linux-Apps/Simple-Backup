@@ -1,0 +1,70 @@
+#!/usr/bin/env python
+#
+#    Simple Backup - Launcher script for indicator application (status icon)
+#
+#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+if __name__ == '__main__':
+
+    import sys
+    from nssbackup.util import system
+
+    appindicator_avail = False
+    _session_user = system.get_user_from_env()
+
+    if system.is_superuser():
+        print "Indicator application was started as superuser (EUID=0).\n"\
+              "Now dropping privileges (to user '%s')." % _session_user
+        system.switch_user(uid_name = _session_user)
+
+    if system.get_user_from_uid() != _session_user:
+        print "Unable to launch indicator application as current user.\n"\
+              "You must own current desktop session."
+        sys.exit(1)
+
+
+    from nssbackup.util import get_locale_dir, get_locale_domain
+    application = get_locale_domain()
+    locale_dir = get_locale_dir()
+
+
+    import gettext
+    gettext.bindtextdomain(application, locale_dir)
+    gettext.textdomain(application)
+
+
+    import gtk.glade
+    gtk.glade.bindtextdomain(application, locale_dir)
+    gtk.glade.textdomain(application)
+
+
+#TODO: Add commandline option: --use-appindicator
+    try:
+        import appindicator
+        appindicator_avail = True
+    except ImportError:
+        appindicator_avail = False
+
+    if appindicator_avail:
+        from nssbackup.ui.indicator_gtk import main
+    else:
+        from nssbackup.ui.indicator_gtk_legacy import main
+
+    retc = main(sys.argv)
+    print "SBackup indicator application exit code: `%s`" % retc
+    sys.exit(retc)
