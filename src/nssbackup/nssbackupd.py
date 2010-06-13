@@ -41,24 +41,31 @@ import datetime
 import re
 import subprocess
 import optparse
+import pwd
+import time
 
-# project imports
+# project imports 
 from nssbackup.pkginfo import Infos
 from nssbackup.util import log
 from nssbackup.util import exceptions
 import nssbackup.managers.FileAccessManager as FAM
-from nssbackup.managers.ConfigManager import getUserConfDir
-from nssbackup.managers.ConfigManager import ConfigManager
+from nssbackup.managers.ConfigManager import ConfigManager, get_profiles
 from nssbackup.managers.BackupManager import BackupManager
-from nssbackup.util import getResource
+from nssbackup.util import get_resource_file
+from nssbackup.util import readline_nullsep
+
 from nssbackup.util import dbus_support
 from nssbackup.util import state
+from nssbackup.util import system
 from nssbackup.managers.ConfigManager import ConfigurationFileHandler
-from nssbackup.managers.ConfigManager import ConfigStaticData
 
-    
-class NSsbackupd(object):
-    """This class is intended to be a wrapper of nssbackup instances. 
+
+DBUSSERVICE_FILE = "sbackup-dbusservice"
+INDICATORAPP_FILE = "sbackup-indicator"
+
+
+class SBackupProc(object):
+    """This class is intended to be a wrapper of nssbackup processes. 
     It manages :
     - the full backup process : creation of instances of the BackupManager
       with the corresponding config file 
@@ -67,8 +74,6 @@ class NSsbackupd(object):
     - the sending of emails
     
     """
-    
-    __confFilesRE = "^nssbackup-(.+?)\.conf$"
 
     def __init__(self, notifiers, configfile):
         """Default constructor. Basic initializations are done here.
@@ -82,26 +87,23 @@ class NSsbackupd(object):
                to ensure that specific logger instances are created.
         
         """
-		self.__retcode = 0
-        self.__errors            = []
-        
-#        self.__super_user        = False
-#        self.__check_for_superuser()
-        
+        self.__retcode = 0
+        self.__errors = []
+
         # collection of all config managers
-        self.__confm            = []
+        self.__confm = []
         # the name of the currently processed profile
-        self.__profilename        = None
+        self.__profilename = None
         self.__retrieve_confm(configfile)
 
         # here the logger created for the default profile is used
-        self.logger            = log.LogFactory.getLogger(self.__profilename)
+        self.logger = log.LogFactory.getLogger(self.__profilename)
         self.logger.debug("%s %s" % (Infos.NAME, Infos.VERSION))
 
         # the currently used instance of the BackupManager
-        self.__bm                = None
-        self.__state             = state.NSsbackupState()
-        
+        self.__bm = None
+        self.__state = state.SBackupState()
+
         self.__notifiers = notifiers
         self.__register_notifiers()
         self.__initialize_notifiers()
@@ -130,16 +132,16 @@ class NSsbackupd(object):
             notifier.exit()
             self.__state.detach(notifier)
 
-    def __check_for_superuser(self):
-        """Checks whether the application was invoked with super-user rights.
-        If so, the member variable 'self.__super_user' is set.
-        
-        :todo: Here should no distinction between user/superuser be necessary!
-        
-        """
-        if os.getuid() == 0:
-            self.__super_user = True
-        
+#    def __check_for_superuser(self):
+#        """Checks whether the application was invoked with super-user rights.
+#        If so, the member variable 'self.__super_user' is set.
+#        
+#        :todo: Here should no distinction between user/superuser be necessary!
+#        
+#        """
+#        if os.getuid() == 0:
+#            self.__super_user = True
+
     def __sendEmail(self):
         """Checks if the sent of emails is set in the config file 
         then send an email with the report
@@ -147,8 +149,8 @@ class NSsbackupd(object):
         :todo: Transfer this functionality to a specialized class!
         
         """
-        if self.__bm.config.has_option("report","from") :
-            _from =self.__bm.config.get("report","from")
+        if self.__bm.config.has_option("report", "from") :
+            _from = self.__bm.config.get("report", "from")
         else :
             hostname = socket.gethostname()
             if "." in hostname :
@@ -157,8 +159,8 @@ class NSsbackupd(object):
                 mailsuffix = hostname + ".ext"
             _from = _("NSsbackup Daemon <%(login)s@%(hostname)s>")\
                     % {'login' : os.getenv("USERNAME"), 'hostname': mailsuffix}
-        
-        _to = self.__bm.config.get("report","to")
+
+        _to = self.__bm.config.get("report", "to")
         _title = _("[NSsbackup] [%(profile)s] Report of %(date)s")\
                     % { 'profile':self.__profilename,
                         'date': datetime.datetime.now() }
@@ -166,45 +168,45 @@ class NSsbackupd(object):
         if logf is None:
             _content = _("No log file specified.")
         else:
-            if FAM.exists( logf ):
-                _content = FAM.readfile( logf )
+            if FAM.exists(logf):
+                _content = FAM.readfile(logf)
             else :
                 _content = _("Unable to find log file.")
-        
+
         server = smtplib.SMTP()
         msg = MIMEMultipart()
-        
+
         msg['Subject'] = _title
         msg['From'] = _from
         msg['To'] = _to
         msg.preamble = _title
-        
+
         msg_content = MIMEText(_content)
         # Set the filename parameter
         msg_content.add_header('Content-Disposition', 'attachment',
-                               filename="nssbackup.log")
+                               filename = "nssbackup.log")
         msg.attach(msg_content)
-        
+
         # getting the connection
-        if self.__bm.config.has_option("report","smtpserver") :
-            if self.__bm.config.has_option("report","smtpport") :
-                server.connect(self.__bm.config.get("report","smtpserver"),
-                               self.__bm.config.get("report","smtpport"))
-            else : 
-                server.connect(self.__bm.config.get("report","smtpserver"))
-        if self.__bm.config.has_option("report","smtptls") and\
-                    self.__bm.config.get("report","smtptls") == 1 : 
-            if self.__bm.config.has_option("report","smtpcert") and\
-                    self.__bm.config.has_option("report","smtpkey") :
-                server.starttls(self.__bm.config.get("report","smtpkey"),
-                                self.__bm.config.get("report","smtpcert"))
+        if self.__bm.config.has_option("report", "smtpserver") :
+            if self.__bm.config.has_option("report", "smtpport") :
+                server.connect(self.__bm.config.get("report", "smtpserver"),
+                               self.__bm.config.get("report", "smtpport"))
+            else :
+                server.connect(self.__bm.config.get("report", "smtpserver"))
+        if self.__bm.config.has_option("report", "smtptls") and\
+                    self.__bm.config.get("report", "smtptls") == 1 :
+            if self.__bm.config.has_option("report", "smtpcert") and\
+                    self.__bm.config.has_option("report", "smtpkey") :
+                server.starttls(self.__bm.config.get("report", "smtpkey"),
+                                self.__bm.config.get("report", "smtpcert"))
             else :
                 server.starttls()
-        if self.__bm.config.has_option("report","smtpuser") and\
-                self.__bm.config.has_option("report","smtppassword") : 
-            server.login(self.__bm.config.get("report","smtpuser"),
-                         self.__bm.config.get("report","smtppassword"))
-        
+        if self.__bm.config.has_option("report", "smtpuser") and\
+                self.__bm.config.has_option("report", "smtppassword") :
+            server.login(self.__bm.config.get("report", "smtpuser"),
+                         self.__bm.config.get("report", "smtppassword"))
+
         # send and close connection
         server.sendmail(_from, _to, msg.as_string())
         server.close()
@@ -225,34 +227,29 @@ class NSsbackupd(object):
         if force_conffile is None:
             conffile = conffile_hdl.get_conffile()
         else:
+            # conffile given on commandline is treated as default profile's config
             conffile = force_conffile
         confdir = conffile_hdl.get_profilesdir(conffile)
 
         print "ConfigFile to use: `%s`, dir: `%s`" % (conffile, confdir)
         # create config manager for the default profile and set as current
-        if os.path.exists( conffile ):
-            confm = ConfigManager( conffile )
+        if os.path.exists(conffile):
+            confm = ConfigManager(conffile)
             self.__profilename = confm.getProfileName()
             # store the created ConfigManager in a collection
-            self.__confm.append( confm )
+            self.__confm.append(confm)
         else:
             errmsg = _("Critical Error: No configuration file for the default profile was found!\n\nNow continue processing remaining profiles.")
             self.__errors.append(errmsg)
 
         # Now search for alternate configuration files
-        # They are located in (configdir)/nssbackup.d/
-        
-# TODO: replace this with 'get_profiles' from ConfigManager.py
-        if os.path.exists(confdir) and os.path.isdir(confdir):
-            cregex = re.compile(self.__confFilesRE)
-            cfiles = os.listdir( confdir )
-            for cfil in cfiles:
-                cfil_fullpath = os.path.join( confdir, cfil )
-                if os.path.isfile( cfil_fullpath ):
-                    mres = cregex.match( cfil )
-                    if mres:    # if filename matches, create manager and add it
-                        confm = ConfigManager( cfil_fullpath )
-                        self.__confm.append( confm )
+        for _prof in get_profiles(confdir).values():
+            _prof_path = _prof[0]
+            _prof_enable = _prof[1]
+
+            if _prof_enable:
+                confm = ConfigManager(_prof_path)
+                self.__confm.append(confm)
 
     def run(self):
         """Actual main method to make backups using NSsbackup
@@ -264,23 +261,24 @@ class NSsbackupd(object):
         
         """
         self.__notify_init_errors()
-        
+
         for confm in self.__confm:
             try:
-                self.__profilename     = confm.getProfileName()
-                self.logger            = log.LogFactory.getLogger(self.__profilename)
-                
-                self.__state.set_profilename(self.__profilename)
+                self.__profilename = confm.getProfileName()
+                self.logger = log.LogFactory.getLogger(self.__profilename)
 
-                self.__bm              = BackupManager(confm, self.__state)
-                self.__log_errlist()
+# doubled; done in BackupManager
+#                self.__state.set_profilename(self.__profilename)
+
+                self.__bm = BackupManager(confm, self.__state)
+                self.__write_errors_to_log()
                 self.__bm.makeBackup()
-                self.__bm.endSBsession()                
+                self.__bm.endSBsession()
             except exceptions.InstanceRunningError, exc:
                 self.__on_already_running(exc)
             except Exception, exc:
                 self.__onError(exc)
-                
+
             self.__onFinish()
         self.__terminate_notifiers()
         return self.__retcode
@@ -292,7 +290,7 @@ class NSsbackupd(object):
         try:
             _msg = "Backup is not being started.\n%s" % (str(error))
             self.logger.warning(_msg)
-            self._notify_warning(self.__profileName, _msg)
+#            self._notify_warning(self.__profileName, _msg)
             self.__retcode = 3
         except Exception, exc:
             self.__retcode = 6
@@ -304,7 +302,7 @@ class NSsbackupd(object):
         try:
             n_body = _("An error occured during the backup:\n%s") % (str(e))
             self.logger.exception(n_body)
-            self._notify_error(self.__profileName, n_body)
+#            self._notify_error(self.__profileName, n_body)
             self.__retcode = 4
             self.__state.set_recent_error(e)
             self.__state.set_state('error')
@@ -313,19 +311,19 @@ class NSsbackupd(object):
         except Exception, exc:
             self.__retcode = 6
             self.logger.exception("Exception in error handling code:\n%s" % str(exc))
-        
+
     def __onFinish(self):
         """Method that is finally called after backup process.
         """
         try:
             if self.__bm and self.__bm.config:
                 # send the mail
-                if self.__bm.config.has_section("report") and self.__bm.config.has_option("report","to") :
+                if self.__bm.config.has_section("report") and self.__bm.config.has_option("report", "to") :
                     self.__sendEmail()
         except Exception, exc:
             self.__retcode = 5
             self.logger.exception("Error when sending email:\n%s" % str(exc))
-                
+
     def __notify_init_errors(self):
         """Errors that occurred during the initialization process were stored
         in an error list. This error list is showed to the user by this method.
@@ -335,7 +333,7 @@ class NSsbackupd(object):
                 self.__state.set_recent_error(errmsg)
                 self.__state.set_state('error')
 
-    def __log_errlist(self):
+    def __write_errors_to_log(self):
         """Errors that occurred during the initialization process
         were stored in an error list. The full list of errors is
         added to the current log.
@@ -345,49 +343,103 @@ class NSsbackupd(object):
             self.logger.info(_("The following error(s) occurred before:"))
             for errmsg in self.__errors:
                 self.logger.error(errmsg.replace("\n", " "))
-                
-                
 
-class NSsbackupApp(object):
+
+
+class SBackupApp(object):
     """The application that processes the backup.
     
     :todo: Implement a base class providing common commandline parsing etc.!
     
     """
-    
+
     def __init__(self, argv):
         self.__argv = argv
         self.__use_dbus = True
         self.__use_tray = True
         self.__configfile = None
-        
+
         self.__backupdaemon = None
         self.__notifiers = []
-        
+        # we establish a connection to ensure its presence for progress action
+        self._dbus_conn = None
+
     def create_notifiers(self):
+        """Creates notifiers used within the backup process. Note that these
+        notifiers are not ready for use yet, they are initialized within
+        the backup process. Purpose is to split between notifier creation and
+        notifier use: the backup process has no information about the
+        specific notifiers (type...)
+        """
         if self.__use_dbus:
             dbus_notifier = dbus_support.DBusNotifier()
             self.__notifiers.append(dbus_notifier)
 
-    def launch_services(self):
+    def launch_externals(self):
         if self.__use_dbus == True:
-            self._launch_service()
-            
+            self._launch_dbusservice()
+
         if self.__use_tray == True:
-            self._launch_traygui()
+            self._launch_indicator()
 
-    def _launch_service(self):
-        print "Now launching DBus service"
-        dbus_launcher = getResource('nssbackup_service')
-        pid = subprocess.Popen([dbus_launcher]).pid
-        print "pid: %s" % pid
+    def _launch_dbusservice(self):
+        """Launches the DBus service and establishes a placeholder
+        connection in order to keep the service alive as long as this
+        application is running. Call `finalize` to close the
+        connection properly when terminating the application.
+        """
+        print "Now launching DBus service."
+        dbus_launcher = get_resource_file(DBUSSERVICE_FILE)
+        subprocess.Popen([dbus_launcher])
+#        print "DBus service launched (PID: %s)." % pid
+        time.sleep(2)
+        print "establish a connection to ensure its presence for progress action"
+        self._dbus_conn = dbus_support.DBusProviderConnection("Simple Backup Process")
+        self._dbus_conn.connect()
 
-    def _launch_traygui(self):
-        print "Now launching tray gui"
-        tray_gui = getResource('nssbackup_traygui')
-        pid = subprocess.Popen([tray_gui]).pid
-        print "pid: %s" % pid
-        
+    def _launch_indicator(self):
+        """
+        sudo: If the invoking user is root or if the target user is the
+              same as the invoking user, no password is required.
+              That is, we cannot change from one normal user to another without
+              password.
+              
+              sudo resets the environment (see man sudo).
+              
+        environ: the Gnome-session environ is accessable for root and the
+                 user who owns the session.
+                 
+        @todo: We should check for a running indicator!
+        """
+        print "Now launching indicator application (status icon)."
+        _path_to_app = get_resource_file(INDICATORAPP_FILE)
+
+        mod_env = system.get_gnome_session_environment()
+        if mod_env is None:
+            print "No Gnome session found. Indicator application is not started."
+        else:
+            _cmd = [_path_to_app]
+            if not system.is_superuser():
+                if system.get_user_from_uid() != mod_env["USER"]:
+                    _cmd = None
+                    print "Unable to launch indicator application as current user.\n"\
+                          "You must own current desktop session."
+
+            if _cmd is None:
+                print "Unable to launch indicator application"
+            else:
+                print "Command: %s" % str(_cmd)
+                pid = subprocess.Popen(_cmd, env = mod_env).pid
+                print "Indicator application started (PID: %s)" % pid
+                time.sleep(5)
+
+    def finalize(self):
+        """Cleaning before terminating the application:
+        * disconnects if DBus connection was established.
+        """
+        if self._dbus_conn is not None:
+            self._dbus_conn.quit()
+
     def parse_cmdline(self):
         """Parses the given commandline options and sets specific
         attributes. It must be considered that the DBus service can
@@ -401,23 +453,23 @@ class NSsbackupApp(object):
         
         """
         usage = "Usage: %prog [options] (use -h or --help for more infos)"
-        version="%prog " + Infos.VERSION
+        version = "%prog " + Infos.VERSION
         prog = "nssbackupd"
-        
-        parser = optparse.OptionParser(usage=usage, version=version, prog=prog)
-        parser.add_option("-n", "--no-tray-gui",
-                  action="store_false", dest="use_tray", default=True,
-                  help="don't use the graphical user interface in system tray")
 
-        parser.add_option("-d", "--dont-use-dbus",
-                  action="store_false", dest="use_dbus", default=True,
-                  help="don't launch the DBus service and "\
-                       "don't use it (implies --no-tray-gui)")
+        parser = optparse.OptionParser(usage = usage, version = version, prog = prog)
+        parser.add_option("--no-indicator",
+                  action = "store_false", dest = "use_indicator", default = True,
+                  help = "don't use the graphical indicator application (status icon)")
 
-        parser.add_option("-c", "--config-file", dest="configfile",
-                          metavar="FILE", default=None,
-                          help="set the configuration file to use")
-        
+        parser.add_option("--no-dbus",
+                  action = "store_false", dest = "use_dbus", default = True,
+                  help = "don't launch the DBus service and "\
+                       "don't use it (implies --no-indicator)")
+
+        parser.add_option("--config-file", dest = "configfile",
+                          metavar = "FILE", default = None,
+                          help = "set the configuration file to use")
+
         (options, args) = parser.parse_args(self.__argv[1:])
         if len(args) > 0:
             parser.error("You must not provide any non-option argument")
@@ -425,12 +477,13 @@ class NSsbackupApp(object):
         print "options: %s\nargs: %s" % (options, args)
 
         if options.configfile:
-# TODO: Add check for existence here?            
+            if not os.path.exists(options.configfile):
+                parser.error("Given configuration file does not exist")
             self.__configfile = options.configfile
-        
+
         self.__use_dbus = options.use_dbus
-        if self.__use_dbus == True: 
-            self.__use_tray = options.use_tray
+        if self.__use_dbus == True:
+            self.__use_tray = options.use_indicator
         else:
             self.__use_tray = False
 
@@ -445,23 +498,22 @@ class NSsbackupApp(object):
             print "DBus: %s, Tray: %s, Config: %s" % (self.__use_dbus,
                                                       self.__use_tray,
                                                       self.__configfile)
-            self.launch_services()
+            self.launch_externals()
             self.create_notifiers()
-            
-            self.__backupdaemon = NSsbackupd(self.__notifiers,
-                                             self.__configfile)
-#            self.__backupdaemon.run()
-
+            self.__backupdaemon = SBackupProc(self.__notifiers,
+                                              self.__configfile)
+            self.__backupdaemon.run()
+            self.finalize()
         except SystemExit, exc:
-            print "SystemExit catched `%s`" % (exc.code)
+#            print "SystemExit catched `%s`" % (exc.code)
             retcode = exc.code
-            
-        print "Now shutting down logging"
+
+#        print "Now shutting down logging"
         log.shutdown_logging()
-        
+
         return retcode
-        
-    
+
+
 def main(argv):
     """Public function that process the backups.
     
@@ -470,7 +522,6 @@ def main(argv):
            time!
            
     """
-    sbackup_app = NSsbackupApp(argv)
+    sbackup_app = SBackupApp(argv)
     excode = sbackup_app.run()
-    log.shutdown_logging()
     return excode

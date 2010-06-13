@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-
+#
+#    Simple Backup - Launcher script for backup program
+#
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -17,18 +19,20 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import sys
-import gettext
-from nssbackup.nssbackupd import main
-from nssbackup.util import get_resource_dir
 
-# i18n init
-application = 'nssbackup'
-locale_dir = get_resource_dir('locale')
+if __name__ == '__main__':
 
-gettext.bindtextdomain(application, locale_dir)
-gettext.textdomain(application)
+    import sys
 
-retc = main(sys.argv)
-print "Exit code: `%s`" % retc
-sys.exit(retc)
+    from nssbackup.util import get_locale_dir, get_locale_domain
+    application = get_locale_domain()
+    locale_dir = get_locale_dir()
+
+    import gettext
+    gettext.bindtextdomain(application, locale_dir)
+    gettext.textdomain(application)
+
+    from nssbackup.nssbackupd import main
+    retc = main(sys.argv)
+    print "SBackupd exit code: `%s`" % retc
+    sys.exit(retc)

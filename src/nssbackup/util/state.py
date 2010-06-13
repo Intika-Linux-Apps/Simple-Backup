@@ -1,6 +1,6 @@
 #    NSsbackup - state of backup process
 #
-#   Copyright (c)2009: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -27,10 +27,12 @@
 """
 
 
+#TODO: Move into module notifier.
+
 from nssbackup.util import notifier
 
 
-class NSsbackupState(notifier.Subject):
+class SBackupState(notifier.Subject):
     """Represents a single state and according data within
     the backup process. Whenever interesting data changes
     one can change the state and it is published to registered
@@ -40,7 +42,8 @@ class NSsbackupState(notifier.Subject):
     
     """
     def __init__(self):
-        super(NSsbackupState, self).__init__()
+        notifier.Subject.__init__(self)
+
         self.__state = 'unknown'
         self.__urgency = 'info'
         self.__profilename = 'None'
@@ -52,10 +55,10 @@ class NSsbackupState(notifier.Subject):
         """
         self.__state = state
         self.notify()
-        
+
     def get_state(self):
         return self.__state
-    
+
     def set_urgency(self, urgency):
         """The urgency is used to distinguish several types of events.
         There are following urgencies:
@@ -67,18 +70,18 @@ class NSsbackupState(notifier.Subject):
         
         """
         self.__urgency = urgency
-        
+
     def get_urgency(self):
         return self.__urgency
-    
+
     def set_profilename(self, profilename):
         self.__profilename = profilename
-        
+
     def get_profilename(self):
         return self.__profilename
 
     def set_recent_error(self, recent_error):
         self.__recent_error = recent_error
-        
+
     def get_recent_error(self):
         return self.__recent_error

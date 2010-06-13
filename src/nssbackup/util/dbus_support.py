@@ -1,6 +1,6 @@
 #    NSsbackup - support of DBus functionality
 #
-#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -34,27 +34,23 @@ Exec=/home/peer/programming/python/nssb/local_modified/0.2/src/nssbackup_dbus_se
 
 """
 
+import os
 import time
 import dbus
 
-from nssbackup.util import exceptions
 from nssbackup.util import log
 from nssbackup.util import notifier
 
 
-DBUS_SERVICE    = "org.launchpad.nssbackupService"
-DBUS_OBJ_PATH   = "/org/launchpad/nssbackupService/nssbackupdDbusObject"
-DBUS_INTERFACE  = "org.launchpad.nssbackupService.nssbackupdDbusInterface"
-DBUS_EXCEPTION  = "org.launchpad.nssbackupdDbusException"
-
-# this is for providing methods by the GUI service
-DBUS_GUI_SERVICE    = "org.launchpad.nssbackupGuiService"
-DBUS_GUI_OBJ_PATH   = "/org/launchpad/nssbackupService/nssbackupdDbusGuiObject"
-DBUS_GUI_INTERFACE  = "org.launchpad.nssbackupService.nssbackupdDbusGuiInterface"
-DBUS_GUI_EXCEPTION  = "org.launchpad.nssbackupdDbusGuiException"
+DBUS_EXCEPTION = "org.launchpad.nssbackupdDbusException"
+DBUS_SERVICE = "org.launchpad.nssbackupService"
+DBUS_OBJ_PATH = "/nssbackupdDbusObject"
+DBUS_INTERFACE = "org.launchpad.nssbackupService.nssbackupdDbusInterface"
 
 
-class DBusConnection(object):
+
+
+class _DBusConnection(object):
     """This class provides functionality for sending signals
     and calling methods over the dbus.
     
@@ -64,27 +60,34 @@ class DBusConnection(object):
     don't want to use it, no connection is created.
     
     """
-    def __init__(self):
+    def __init__(self, name):
         """Default constructor.
         
         :param logger: Instance of logger to be used.
         
         """
-        self.__logger = log.LogFactory.getLogger()
-        # maybe it is better to retrieve the logger on demand?
+        self._logger = log.LogFactory.getLogger()
+#TODO: maybe it is better to retrieve the logger on demand?
 
-        self._session_bus   = None
-        self._remote_obj    = None
-        self._remote_gui    = None
-        self._dbus_present  = False
-        self._gui_present = False
+        self._name = name
+        self._id = ""
+
+        self._system_bus = None
+        self._remote_obj = None
+        self._dbus_present = False
+
+#    def __del__(self):
+#        self.quit()
+
+    def is_dbus_present(self):
+        return self._dbus_present
 
     def __do_connect(self, service, path):
         remote_obj = None
         timeout = 30        # seconds
         max_trials = 10     # number of max. trials
-        dur = timeout/max_trials
-        
+        dur = timeout / max_trials
+
         trials = 0          # done trials
         connecting = True
         while connecting:
@@ -92,7 +95,7 @@ class DBusConnection(object):
                 trials += 1
                 print "Trying to connect to `%s` (trial no. %s)" % (service,
                                                                     trials)
-                remote_obj  = self._session_bus.get_object(service, path)
+                remote_obj = self._system_bus.get_object(service, path)
                 connecting = False
                 print "successfully connected to `%s`" % service
             except dbus.DBusException, exc:
@@ -105,28 +108,51 @@ class DBusConnection(object):
                     print "Waiting %s sec. before re-connecting" % dur
                     time.sleep(dur)
         return remote_obj
-        
+
     def connect(self):
         """
-        :todo: Implement check whether the service is already running!
+        """
+        self._system_bus = dbus.SystemBus()
+
+        self._remote_obj = self.__do_connect(DBUS_SERVICE,
+                                             DBUS_OBJ_PATH)
+        if self._remote_obj is not None:
+            pid = os.getpid()
+            self._id = self._remote_obj.register_connection(self._name, str(pid))
+            print "INFO: Registered with id: %s" % self._id
+            self._dbus_present = True
+        print "INFO: Dbus service available: %s" % self._dbus_present
+
+    def quit(self):
+        """
+        """
+        if self._remote_obj:
+            if self._id != "":
+                if self._remote_obj.unregister_connection(self._id):
+                    self._id = ""
+                    print "INFO: Connection was successfully unregistered."
+                else:
+                    print "WARN: Unable to unregister connection (failed)."
+            else:
+                print "WARN: Unable to unregister connection (no client id)."
+
+
+class DBusProviderConnection(_DBusConnection):
+    """This class provides functionality for sending signals
+    and calling methods over the dbus.
+    
+    The sender needs a dbus connection.
+    
+    The Dbus connection is only created on demand. In the case the user
+    don't want to use it, no connection is created.
+    
+    """
+    def __init__(self, name):
+        """Default constructor.
         
         """
-        self._session_bus = dbus.SessionBus()
-        
-        self._remote_obj  = self.__do_connect(DBUS_SERVICE,
-                                              DBUS_OBJ_PATH)
-        if self._remote_obj is not None:
-            self._dbus_present = True
+        _DBusConnection.__init__(self, name)
 
-        # now for the gui service
-        self._remote_gui  = self.__do_connect(DBUS_GUI_SERVICE,
-                                              DBUS_GUI_OBJ_PATH)
-        if self._remote_gui is not None:
-            self._gui_present = True
-
-        print "Dbus service available: %s" % self._dbus_present
-        print "GUI service available: %s" % self._gui_present
-            
     def emit_event_signal(self, event, urgency, profile):
         """Used for sending a generic event over the signal dbus.
         This includes informations and warnings.
@@ -137,7 +163,7 @@ class DBusConnection(object):
 
         """
         ret_val = self._remote_obj.emit_nssbackup_event_signal(event, urgency,
-                                        profile, dbus_interface=DBUS_INTERFACE)
+                                        profile, dbus_interface = DBUS_INTERFACE)
         print "Returned value: %s" % ret_val
         return ret_val
 
@@ -149,39 +175,54 @@ class DBusConnection(object):
         
         """
         ret_val = self._remote_obj.emit_nssbackup_error_signal(profile, error,
-                        dbus_interface=DBUS_INTERFACE)
-            
+                        dbus_interface = DBUS_INTERFACE)
+
         print "Returned value: %s" % ret_val
         return ret_val
 
-    def call_method(self, msg):
-        """Used for calling a method on the GUI Dbus.
-        
-        """
-        print "call_method - msg: %s" % msg
-        ret_val = self._remote_gui.HelloWorld(msg,
-                        dbus_interface=DBUS_GUI_INTERFACE)
-        print "returned: %s" % ret_val
-    
     def exit(self):
         """
         :todo: Remove the `time.sleep` statement!
         
         """
         print "Sending 'Exit'"
-    
+
         if self._remote_obj:
             # first send an `Exit` signal out
-            self._remote_obj.emit_nssbackup_exit_signal(dbus_interface=\
+            self._remote_obj.emit_nssbackup_exit_signal(dbus_interface = \
                                                     DBUS_INTERFACE)
             time.sleep(2)
-            # and then exit the service itself
-            self._remote_obj.Exit(dbus_interface=\
-                                  DBUS_INTERFACE)
+#            # and then exit the service itself
+#            self._remote_obj.Exit(dbus_interface = \
+#                                  DBUS_INTERFACE)
+            self.quit()
+
+
+class DBusClientConnection(_DBusConnection):
+    """This class provides functionality for sending signals
+    and calling methods over the dbus.
+    
+    The sender needs a dbus connection.
+    
+    The Dbus connection is only created on demand. In the case the user
+    don't want to use it, no connection is created.
+    
+    """
+    def __init__(self, name):
+        """Default constructor.
+        
+        """
+        _DBusConnection.__init__(self, name)
+
+    def connect_to_signal(self, signal, handler):
+        self._remote_obj.connect_to_signal(signal, handler,
+                            dbus_interface = DBUS_INTERFACE)
+
 
 
 class DBusNotifier(notifier.Observer):
     """Sends notifications as signals over the DBus.
+    It uses an instance of DBusConnection for signaling.
     
     """
     def __init__(self):
@@ -194,17 +235,17 @@ class DBusNotifier(notifier.Observer):
 
         self.__logger = log.LogFactory.getLogger()
         self.__dbus = None
-        
+
     def initialize(self):
         self.__setup_dbus()
-        
+
     def exit(self):
         self.__dbus.exit()
-        
+
     def __setup_dbus(self):
-        self.__dbus = DBusConnection()
+        self.__dbus = DBusProviderConnection("Simple Backup DBus Notifier")
         self.__dbus.connect()
-        
+
     def update(self, subject):
         """Interface method for observer objects that is called by the
         observed subject. In the case of the `DBusNotifier` were
@@ -216,7 +257,7 @@ class DBusNotifier(notifier.Observer):
         self.__urgency = subject.get_urgency()
         self.__profilename = subject.get_profilename()
         self.__recent_error = subject.get_recent_error()
-        
+
         self.__attempt_notify()
 
     def __attempt_notify(self):
@@ -230,7 +271,7 @@ class DBusNotifier(notifier.Observer):
         state = self.__state
         urgency = self.__urgency
         print "ATTEMPT NOTIFY - STATE: `%s` - Urgency: `%s`" % (state, urgency)
-        
+
         ret_val = None
         if self.__dbus is not None:
             if state in ('start',
@@ -243,9 +284,9 @@ class DBusNotifier(notifier.Observer):
             elif state == 'error':
                 ret_val = self.__dbus.emit_error_signal(self.__profilename,
                                                         str(self.__recent_error))
-    
+
             else:
                 raise ValueError("STATE UNSUPPORTED (%s)" % state)
-                
+
         print "Returned value: %s" % ret_val
         return ret_val
