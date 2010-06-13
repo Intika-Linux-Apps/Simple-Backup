@@ -24,13 +24,6 @@
 
 PATH=/usr/local/bin:/usr/bin:/bin
 
-if test -z "$LANG"; then
-    gspid=$(pgrep gnome-session)
-    if test "$gspid"; then
-        export $(grep -z LANG= /proc/$gspid/environ)
-    fi
-fi
-
 if [ -x /usr/bin/nice ]; then
 	nicecmd="/usr/bin/nice -n 19"
 fi
@@ -42,30 +35,8 @@ if [ -x /usr/bin/ionice ]; then
 	ionicecmd="/usr/bin/ionice -c 3"
 fi
 
-if [ -x /usr/share/nssbackup/nssbackup-notify ]; then
-	/usr/share/nssbackup/nssbackup-notify start
-elif [ -x /usr/local/share/nssbackup/nssbackup-notify ]; then
-	/usr/local/share/nssbackup/nssbackup-notify start
-fi
-
 if [ -x /usr/bin/nssbackupd ]; then
 	$nicecmd $ionicecmd /usr/bin/nssbackupd
 elif [ -x /usr/local/bin/nssbackupd ]; then
 	$nicecmd $ionicecmd /usr/local/bin/nssbackupd
-fi
-
-ret=$?
-
-if test $ret -eq 0; then
-	if [ -x /usr/share/nssbackup/nssbackup-notify ]; then
-		/usr/share/nssbackup/nssbackup-notify finish
-	elif [ -x /usr/local/share/nssbackup/nssbackup-notify ]; then
-		/usr/local/share/nssbackup/nssbackup-notify finish
-	fi
-else
-	if [ -x /usr/share/nssbackup/nssbackup-notify ]; then
-		/usr/share/nssbackup/nssbackup-notify error
-	elif [ -x /usr/local/share/nssbackup/nssbackup-notify ]; then
-		/usr/local/share/nssbackup/nssbackup-notify error
-	fi
 fi
