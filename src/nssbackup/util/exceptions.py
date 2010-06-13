@@ -1,4 +1,4 @@
-#	NSsbackup - custom exceptions
+#    NSsbackup - custom exceptions
 #
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
@@ -29,80 +29,80 @@
 """
 
 class SBException(Exception):
-	"""This class will help us distinguish Exception that we must
-	handle (exceptions created by ourself) and exceptions due to 
-	programming errors (Python Exceptions).
+    """This class will help us distinguish Exception that we must
+    handle (exceptions created by ourself) and exceptions due to 
+    programming errors (Python Exceptions).
 
-	"""
+    """
 
 class InstanceRunningError(SBException) :
-	"""This Exception is thrown if another NSsbackup daemon is
-	already running.
-	"""
-	
+    """This Exception is thrown if another NSsbackup daemon is
+    already running.
+    """
+    
 class NotValidSnapshotException(SBException) :
-	"""
-	This Exception is thrown by Snapshot validation.
-	"""
-	
+    """
+    This Exception is thrown by Snapshot validation.
+    """
+    
 class NotValidSnapshotNameException(NotValidSnapshotException):
-	"""Exception launched when the name of a snapshot is not valid
-	
-	"""
-	
-	
+    """Exception launched when the name of a snapshot is not valid
+    
+    """
+    
+    
 class NotValidSectionException(SBException) :
-	"""This Exception is thrown by Config Section validation.
-	
-	"""
+    """This Exception is thrown by Config Section validation.
+    
+    """
 
 class NonValidOptionException(SBException):
-	"""Thrown when a config option is not Valid
+    """Thrown when a config option is not Valid
 
-	"""
+    """
 
 class CorruptedSBdictException(SBException):
-	"""Thrown when a SBdict is corrupted
+    """Thrown when a SBdict is corrupted
 
-	"""
-	
+    """
+    
 class FuseFAMException(SBException):
-	"""Thrown when a Fuse mount fails
+    """Thrown when a Fuse mount fails
 
-	"""
-	
+    """
+    
 class TimeoutError(SBException):
-	"""Thrown when an IO operation times out.
-	"""
-	
+    """Thrown when an IO operation times out.
+    """
+    
 class RebaseSnpException(SBException):
-	"""Thrown for rebase exception
-	
-	"""
+    """Thrown for rebase exception
+    
+    """
 
 class RebaseFullSnpForbidden(RebaseSnpException):
-	"""Thrown when trying to rebase a full snapshot
+    """Thrown when trying to rebase a full snapshot
 
-	"""
+    """
 
 class RemoveFullSnpForbidden(RebaseSnpException):
-	"""Thrown when trying to remove a full snapshot.
-	:todo: Check whether this exception is unused and can be removed!
-	
-	"""
-	
+    """Thrown when trying to remove a full snapshot.
+    :todo: Check whether this exception is unused and can be removed!
+    
+    """
+    
 class ChmodNotSupportedError(SBException):
-	"""Thrown when a destination does not support file modes (e.g. some
-	ftp servers or FAT filesystems).
-	
-	"""
-	
+    """Thrown when a destination does not support file modes (e.g. some
+    ftp servers or FAT filesystems).
+    
+    """
+    
 class NotSupportedError(Exception):
-	"""Thrown when trying to call a stub.
+    """Thrown when trying to call a stub.
 
-	"""
+    """
 
 class NotifyException(SBException) :
-	"""This Exception is thrown by notifiers and listeners.
+    """This Exception is thrown by notifiers and listeners.
 
-	"""
+    """

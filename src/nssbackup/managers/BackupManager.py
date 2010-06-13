@@ -54,7 +54,7 @@ class BackupManager(object):
     """Class that handles/manages the backup process.
     
     """
-    
+
     def __init__(self, configmanager, backupstate):
         """The `BackupManager` Constructor.
 
@@ -65,28 +65,27 @@ class BackupManager(object):
                instantiating this class!
                
         """
-        self.config            = configmanager
-        self.__state           = backupstate
-        self.logger            = LogFactory.getLogger()
-        self.__profilename    = self.config.getProfileName()
+        self.config = configmanager
+        self.__state = backupstate
+        self.logger = LogFactory.getLogger()
+        self.__profilename = self.config.getProfileName()
         self.__state.set_profilename(self.__profilename)
-        
-        self.__um            = UpgradeManager()
-        self.__snpman        = None
-        
+
+        self.__um = UpgradeManager()
+        self.__snpman = None
+
         # The whole snapshot path
         self.__actualSnapshot = None
-        
-        self.__lockfile     = None
-        
-        self.__includeInSnp = None
-        
-        self.__fusefam        = FuseFAM(self.config)
-        
-#        PyNotifyMixin.__init__(self, self.logger)
+
+        self.__lockfile = None
+
+#        self.__includeInSnp = None
+
+        self.__fusefam = FuseFAM(self.config)
+
         self.logger.debug("Instance of BackupManager created.")
-        
-    def makeBackup(self ):
+
+    def makeBackup(self):
         """Runs the whole backup process:
         
         1. create lock and initialize file systems
@@ -107,26 +106,26 @@ class BackupManager(object):
 #        self._notify_info(self.__profilename, _msg)
         self.logger.info(_msg)
         self.__state.set_state('start')
-        
+
         try:
             self.__fusefam.initialize()
         except exceptions.FuseFAMException:
             self.__fusefam.terminate()
             raise
-        
-        self.__snpman = SnapshotManager(self.config.get("general","target"))
-        
+
+        self.__snpman = SnapshotManager(self.config.get("general", "target"))
+
         # Set the admin group to the process
         if os.geteuid() == 0 :
             try :
                 # The uid is still root and the gid is admin
-                os.setgid( grp.getgrnam("admin").gr_gid )                
-            except (KeyError, OSError), exc: 
+                os.setgid(grp.getgrnam("admin").gr_gid)
+            except (KeyError, OSError), exc:
                 self.logger.warning(_("Failed to set the gid to 'admin' one :") + str(exc))
 
         # Check the target dir
         self.__checkTarget()
-        
+
         # Upgrade Target
         # But we should not upgrade without user's agreement!
         # Solution 1: add an option: AutoAupgrade = True/False
@@ -144,22 +143,22 @@ class BackupManager(object):
             _msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using '(Not So) Simple Backup-Restoration' if you want to use them.")
 #            self._notify_warning(self.__profilename, _msg)
             self.logger.warning(_msg)
-        
+
         # purge
         purge = None
         if self.config.has_option("general", "purge"):
             purge = self.config.get("general", "purge")
         if purge :
             self.__snpman.purge(purge)
-                
+
         # get basic informations about new snapshot
         (snppath, base) = self.__retrieve_basic_infos()
-        
+
         # Create a new snapshot
         self.__actualSnapshot = Snapshot(snppath)
         self.logger.info(_("Snapshot '%(name)s' is being made.")
                          % {'name' :str(self.__actualSnapshot)})
-        
+
         # Set the base file
         if base :
             if self.__actualSnapshot.isfull():
@@ -176,13 +175,13 @@ class BackupManager(object):
         if _packagecmd:
             try:
                 self.logger.info(_("Setting packages File."))
-                s = os.popen( _packagecmd )
+                s = os.popen(_packagecmd)
                 pkg = s.read()
                 s.close()
                 self.__actualSnapshot.setPackages(pkg)
             except Exception, _exc:
                 self.logger.warning(_("Problem when setting the packages list: ") + str(_exc))
-        
+
         # set Excludes
 # TODO: improve handling of Regex containing ',' (delimiter); currently this will crash
         self.logger.info(_("Setting Excludes File."))
@@ -191,17 +190,17 @@ class BackupManager(object):
         else :
             gexclude = ""
         self.__actualSnapshot.setExcludes(gexclude)
-        
+
         # set format
         self.logger.info(_("Setting compression format."))
         if self.config.has_option("general", "format"):
-            self.__actualSnapshot.setFormat(self.config.get("general","format"))
-            
+            self.__actualSnapshot.setFormat(self.config.get("general", "format"))
+
         # set splited size
         self.logger.info(_("Setting split size."))
         if self.config.has_option("general", "splitsize"):
-            self.__actualSnapshot.setSplitedSize(int(self.config.get("general","splitsize")))
-        
+            self.__actualSnapshot.setSplitedSize(int(self.config.get("general", "splitsize")))
+
         # set followlinks
         self.__actualSnapshot.setFollowLinks(self.config.get_followlinks())
         if self.__actualSnapshot.isFollowLinks():
@@ -210,8 +209,8 @@ class BackupManager(object):
             self.logger.info(_("Option 'Follow symbolic links' is disabled."))
 
         os.nice(20)                    # Reduce the priority, so not to interfere with other processes
-        self.__fillSnapshot()                    
-#		self._notify_info(self.__profilename, _("Preparation of backup is done. Archive is being created."))
+        self.__fillSnapshot()
+#        self._notify_info(self.__profilename, _("Preparation of backup is done. Archive is being created."))
         self.__state.set_state('commit')
         self.__actualSnapshot.commit()
 
@@ -219,23 +218,23 @@ class BackupManager(object):
 #        self._notify_info(self.__profilename, _msg)
         self.logger.info(_msg)
 # TODO: Check this!
-		time.sleep(10)
+#        time.sleep(10)
         self.__state.set_state('finish')
-        
+
     def __fillSnapshot(self):
         """Fill snapshot's include and exclude lists and retrieve some information
         about the snapshot (uncompressed size, file count).
         """
         _collector = self.__create_collector_obj()
         _collector.collect_files()
-        _stats = _collector.get_stats()        
-        _snpsize = _stats.get_size_payload() + _stats.get_size_overhead(size_per_item=512)        
+        _stats = _collector.get_stats()
+        _snpsize = _stats.get_size_payload() + _stats.get_size_overhead(size_per_item = 512)
 
         vstat = os.statvfs(self.__actualSnapshot.getPath())
         _freespace = vstat.f_bavail * vstat.f_bsize
-        
-        _snpsize_hr = Util.get_humanreadable_size_str(size_in_bytes=_snpsize, binary_prefixes=True)
-        _freespace_hr = Util.get_humanreadable_size_str(size_in_bytes=_freespace, binary_prefixes=True)
+
+        _snpsize_hr = Util.get_humanreadable_size_str(size_in_bytes = _snpsize, binary_prefixes = True)
+        _freespace_hr = Util.get_humanreadable_size_str(size_in_bytes = _freespace, binary_prefixes = True)
         self.logger.info(_("Maximum free size required is '%s'.") % _snpsize_hr)
         self.logger.info(_("Available disk size is '%s'.") % _freespace_hr)
         self.logger.info(_("Number of directories: %s.") % _stats.get_count_dirs())
@@ -246,7 +245,7 @@ class BackupManager(object):
         self.logger.info(_("Number of files skipped in incremental snapshot: %s.") % _stats.get_count_files_skip())
         self.logger.info(_("Number of items forced to be excluded: %s.") % _stats.get_count_items_excl_forced())
         self.logger.info(_("Number of items to be excluded by config: %s.") % _stats.get_count_items_excl_config())
-        
+
         if _freespace <= _snpsize:
             raise exceptions.SBException(_("Not enough free space in the target directory for the planned backup (%(freespace)s <= %(neededspace)s).")\
                                            % { 'freespace' : _freespace_hr, 'neededspace' : _snpsize_hr})
@@ -261,44 +260,46 @@ class BackupManager(object):
             _basesnar = _base.getSnapshotFileInfos().get_snapfile_obj()
             _collect.set_parent_snapshot(_basesnar)
         return _collect
-                
+
     def __setlockfile(self):
         """Set the lockfile.
         
         @todo: Lock file should be created and removed in daemon!
+        
+        @todo: Enhance these checks!
         """
         if self.config.has_option("general", "lockfile") :
             self.__lockfile = self.config.get("general", "lockfile")
         else :
             self.logger.debug("no lockfile in config, the default will be used ")
             self.__lockfile = "/var/lock/nssbackup.lock"
-        
+
         # Create the lockfile so none disturbs us
         if FAM.exists(self.__lockfile) :
             # the lockfile exists, is it valid ?
             last_sb_pid = FAM.readfile(self.__lockfile)
-            if (last_sb_pid and os.path.lexists("/proc/"+last_sb_pid) and\
-                "nssbackupd" in str(open("/proc/"+last_sb_pid+"/cmdline").read())):
+            if (last_sb_pid and os.path.lexists("/proc/" + last_sb_pid) and\
+                "nssbackupd" in str(open("/proc/" + last_sb_pid + "/cmdline").read())):
                 raise exceptions.InstanceRunningError(\
                     _("Another instance of '(Not So) Simple Backup' is already running (process id: %s).")\
-                      % last_sb_pid )
+                      % last_sb_pid)
             else:
                 self.logger.info(_("Invalid lock file found. Is being removed."))
                 self.__unsetlockfile()
-        
+
         FAM.writetofile(self.__lockfile, str(os.getpid()))
         self.logger.debug("Created lockfile at '%s' with info '%s'."\
-                          % (self.__lockfile, str(os.getpid()) ))
-        
+                          % (self.__lockfile, str(os.getpid())))
+
     def __unsetlockfile(self):
         """Remove lockfile.
         """
         try:
             FAM.delete(self.__lockfile)
-            self.logger.debug("Lock file '%s' removed."    % self.__lockfile)
+            self.logger.debug("Lock file '%s' removed." % self.__lockfile)
         except OSError, _exc:
             self.logger.error(_("Unable to remove lock file: %s" % str(_exc)))
-            
+
     def __copylogfile(self):
 # TODO: we should flush the log file before copy!
         # destination for copying the logfile
@@ -308,19 +309,19 @@ class BackupManager(object):
                 self.logger.warning(_("No log file specified."))
             else:
                 logf_name = os.path.basename(logf_src)
-                logf_target = os.path.join( self.__actualSnapshot.getPath(),
-                                            logf_name )
+                logf_target = os.path.join(self.__actualSnapshot.getPath(),
+                                            logf_name)
                 if FAM.exists(logf_src):
                     try:
                         Util.nssb_copy(logf_src, logf_target)
                     except exceptions.ChmodNotSupportedError:
                         self.logger.warning(_("Unable to change permissions for file '%s'.")\
-                                        % logf_target )
+                                        % logf_target)
                 else :
                     self.logger.warning(_("Unable to find logfile to copy into snapshot."))
         else:
             self.logger.warning(_("No snapshot to copy logfile."))
-        
+
     def endSBsession(self):
         """End nssbackup session :
         
@@ -340,24 +341,24 @@ class BackupManager(object):
         """
         """
         # Check if the mandatory target option exists
-        if not self.config.has_option("general","target") :
+        if not self.config.has_option("general", "target") :
             raise exceptions.SBException (_("Option 'target' is missing, aborting."))
-        
+
         # Check if the target dir exists or create it
-        if not FAM.exists(self.config.get("general","target")) :
-            self.logger.info(_("Creating the target dir '%s'") % self.config.get("general","target"))
-            FAM.makedir(self.config.get("general","target"))
-        
+        if not FAM.exists(self.config.get("general", "target")) :
+            self.logger.info(_("Creating the target dir '%s'") % self.config.get("general", "target"))
+            FAM.makedir(self.config.get("general", "target"))
+
         # Try to write inside so that we don't work for nothing
-        _testfile = os.path.join(self.config.get("general","target"), "test")
+        _testfile = os.path.join(self.config.get("general", "target"), "test")
         try :
-            
+
             FAM.writetofile(_testfile, "testWritable")
             FAM.delete(_testfile)
         except Exception, e :
             self.logger.error(_("Target not writeable: ") + str(e))
             raise e
-    
+
     def __retrieve_basic_infos(self):
         """Retrieves basic informations about the snapshot that is going
         to be created. This informations include:
@@ -384,7 +385,7 @@ class BackupManager(object):
             if listing[0].isfull() :  # Last backup was full backup
                 self.logger.debug("Last (%s) was a full backup" % listing[0].getName())
                 d = listing[0].getDate()
-                if ( datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days < self.config.get("general","maxincrement") :
+                if (datetime.date.today() - datetime.date(d["year"], d["month"], d["day"])).days < self.config.get("general", "maxincrement") :
                     # Less than maxincrement days passed since that -> make an increment
                     increment = True
                 else:
@@ -395,10 +396,10 @@ class BackupManager(object):
                 for i in listing :
                     if i.isfull():
                         d = i.getDate()
-                        age = (datetime.date.today() - datetime.date(d["year"],d["month"],d["day"]) ).days
-                        if  age < int(self.config.get("general","maxincrement")) :
+                        age = (datetime.date.today() - datetime.date(d["year"], d["month"], d["day"])).days
+                        if  age < int(self.config.get("general", "maxincrement")) :
                             # Last full backup is fresh -> make an increment
-                            self.logger.info("Last full backup is fresh (%d days old )-> make an increment" % age )
+                            self.logger.info("Last full backup is fresh (%d days old )-> make an increment" % age)
                             increment = True
                         else: # Last full backup is old -> make a full backup
                             self.logger.info("Last full backup is old -> make a full backup")
@@ -407,18 +408,18 @@ class BackupManager(object):
                 else:
                     self.logger.info("No full backup found -> lets make a full backup to be safe")
                     increment = False
-        
+
         # Determine and create backup target directory
         hostname = socket.gethostname()
-        snpname = "%s.%s" % (datetime.datetime.now().isoformat("_").replace( ":", "." ),
+        snpname = "%s.%s" % (datetime.datetime.now().isoformat("_").replace(":", "."),
                              hostname)
         if increment:
             snpname = "%s.inc" % snpname
         else:
             snpname = "%s.ful" % snpname
-        
-        tdir = os.path.join(self.config.get("general","target"), snpname)
-            
+
+        tdir = os.path.join(self.config.get("general", "target"), snpname)
+
         return (tdir, base)
 
     def getActualSnapshot(self):
@@ -435,14 +436,14 @@ class FileCollectorStats(object):
     * size of files being backuped
     * number of files being backuped.
     """
-    
+
     def __init__(self, followlinks = False):
         self.__followlinks = False
         self.set_followlinks(followlinks)
         # uncompressed size of snapshot (cummulative)
         self.__size_in_bytes = 0L
-        
-        self.__ndirs  = 0L
+
+        self.__ndirs = 0L
         self.__nfiles = 0L
         self.__nsymlinks = 0L
 
@@ -459,7 +460,7 @@ class FileCollectorStats(object):
             raise TypeError("Expected parameter of boolean type. "\
                             "Got %s instead." % type(followlinks))
         self.__followlinks = followlinks
-        
+
     def get_size_payload(self):
         """Returns the cumulated size of files being backuped in bytes.
         Additional overhead due to storage etc. is not considered.
@@ -478,7 +479,7 @@ class FileCollectorStats(object):
         if not self.__followlinks:
             _overhead += self.__nsymlinks * size_per_item
         return _overhead
-    
+
     def get_count_files_total(self):
         """Returns the number of files.
         """
@@ -518,12 +519,12 @@ class FileCollectorStats(object):
         """Returns the number of files.
         """
         return self.__nexcl_config
-    
+
     def clear(self):
         """Clears collected data.
         """
-        self.__size_in_bytes = 0L        
-        self.__ndirs  = 0L
+        self.__size_in_bytes = 0L
+        self.__ndirs = 0L
         self.__nfiles = 0L
         self.__nsymlinks = 0L
         self.__nfiles_incl = 0L
@@ -536,7 +537,7 @@ class FileCollectorStats(object):
         """The given value is added to the cumulated file size.
         """
         self.__size_in_bytes += value
-        
+
     def count_file(self):
         """The file counter is increased by 1.
         """
@@ -547,7 +548,7 @@ class FileCollectorStats(object):
 
     def count_new_file(self):
         self.__nfiles_new += 1
-        
+
     def count_skip_file(self):
         self.__nfiles_skip += 1
 
@@ -555,30 +556,30 @@ class FileCollectorStats(object):
         """The file counter is increased by 1.
         """
         self.__ndirs += 1
-        
+
     def count_symlink(self):
         self.__nsymlinks += 1
-        
+
     def count_excl_forced(self):
         self.__nexcl_forced += 1
-    
+
     def count_excl_config(self):
         self.__nexcl_config += 1
 
-        
+
 class FileCollectorParentSnapshotFacade(object):
     """Class that provides simplified access to attributes of the parent
     snapshot (the base). The class is designed for use with `FileCollector`.
     """
-    
+
     def __init__(self):
         self.__logger = LogFactory.getLogger()
         # snapshot file (snar) of current snapshot's parent (base snapshot)
         # only set if the current one is incremental
-        self.__base_snar         = None
-        self.__base_backup_time    = None
-        self.__base_snardict     = None
-        
+        self.__base_snar = None
+        self.__base_backup_time = None
+        self.__base_snardict = None
+
     def set_base_snar(self, basesnar):
         """Sets the snapshot file (snar) of the base (parent) snapshot.
         
@@ -600,7 +601,7 @@ class FileCollectorParentSnapshotFacade(object):
             raise TypeError("Expected parameter of floar type. "\
                             "Got %s instead." % type(backup_time))
         self.__logger.debug("Backup time of parent snapshot: %s" % backup_time)
-        self.__base_backup_time = backup_time        
+        self.__base_backup_time = backup_time
 
     def __set_base_snardict(self, snardict):
         """Sets the dictonary containing the parent snapshot file (snar file).
@@ -614,13 +615,13 @@ class FileCollectorParentSnapshotFacade(object):
         """Returns the dictonary containing the parent snapshot file (snar file).
         """
         return self.__base_snardict
-    
+
     def get_base_backup_time(self):
         """Returns the time the parent backup was created.
         """
         return self.__base_backup_time
-    
-    
+
+
 class FileCollector(object):
     """Responsible for the process of collecting files that are being backuped.
     The collecting process comprises of:
@@ -630,29 +631,29 @@ class FileCollector(object):
     * calculate the required space for the backup
     * prepare include and exclude file lists used by the backup process.
     """
-    
+
     def __init__(self, snapshot, configuration):
-        self.__logger            = LogFactory.getLogger()
+        self.__logger = LogFactory.getLogger()
 
         # current snapshot (the new one)
-        self.__snapshot         = None
+        self.__snapshot = None
         # flag whether the current snapshot is full or incremental
-        self.__isfull             = True
-        
-        self.__parent            = FileCollectorParentSnapshotFacade()
-        self.__collect_stats     = FileCollectorStats()        
-        self.__configuration    = None
-        
+        self.__isfull = True
+
+        self.__parent = FileCollectorParentSnapshotFacade()
+        self.__collect_stats = FileCollectorStats()
+        self.__configuration = None
+
         # stats of last processed file
-        self.__exists_func        = None
-        self.__stat_func        = None
-        self.__fstats             = None
-        self.__fislink            = None
-        self.__fisdir            = None
+        self.__exists_func = None
+        self.__stat_func = None
+        self.__fstats = None
+        self.__fislink = None
+        self.__fisdir = None
         # list of Regular Expressions defining exclusion rules
-        self.__excl_regex         = []
+        self.__excl_regex = []
 # TODO: put list of compiled regex into `Snapshot` (i.e. compile them when setting the excludes). 
-        
+
         self.set_snapshot(snapshot)
         self.set_configuration(configuration)
 
@@ -663,8 +664,8 @@ class FileCollector(object):
             raise TypeError("Expected parameter of type 'Snapshot'. "\
                             "Got %s instead." % type(snapshot))
         self.__snapshot = snapshot
-        self.__set_isfull(isfull=snapshot.isfull())
-        self.__collect_stats.set_followlinks(followlinks=snapshot.isFollowLinks())
+        self.__set_isfull(isfull = snapshot.isfull())
+        self.__collect_stats.set_followlinks(followlinks = snapshot.isFollowLinks())
 
     def set_configuration(self, configuration):
         """Sets the given object of type `FileCollectorConfigFacade`.
@@ -673,7 +674,7 @@ class FileCollector(object):
             raise TypeError("Expected parameter of type 'FileCollectorConfigFacade'. "\
                             "Got %s instead." % type(configuration))
         self.__configuration = configuration
-        
+
     def set_parent_snapshot(self, parent):
         """Sets the snapshot file (snar) of the base (parent) snapshot.
         
@@ -683,14 +684,14 @@ class FileCollector(object):
         if not isinstance(parent, SnapshotFile):
             raise TypeError("Expected parameter of type 'SnapshotFile'. "\
                             "Got %s instead." % type(parent))
-        self.__set_isfull(isfull=False)
+        self.__set_isfull(isfull = False)
         self.__parent.set_base_snar(parent)
-        
+
     def get_stats(self):
         """Returns the collector stats object.
         """
         return self.__collect_stats
-        
+
     def __prepare_collecting(self):
         """The actual process of collecting is prepared (i.e. stats are cleared etc.).
         
@@ -732,7 +733,7 @@ class FileCollector(object):
                 return True
         except OSError:
             return True
-        
+
         # get the stats, If not possible, the file has to be exclude, return True
         try:
             self.__fstats = self.__stat_func(path)
@@ -751,8 +752,8 @@ class FileCollector(object):
         # taken from: http://docs.python.org/library/signal.html#example
         _res = False
         try:
-            Util.set_timeout_alarm(timeout=5)
-            fdscr = os.open(path, os.R_OK)  
+            Util.set_timeout_alarm(timeout = 5)
+            fdscr = os.open(path, os.R_OK)
             os.close(fdscr)
         except exceptions.TimeoutError, _exc:
             self.__logger.warning(_("File '%(file)s' cannot be opened for read access. Operation timed out.")\
@@ -763,7 +764,7 @@ class FileCollector(object):
                                     % {'file': path, 'error' : str(_exc)})
             _res = True
 
-        Util.set_timeout_alarm(timeout=0)
+        Util.set_timeout_alarm(timeout = 0)
             # when file does not exist, the `open` fails and variable `fdscr` is not defined here
 #            try:
 #                os.close(fdscr)
@@ -777,17 +778,17 @@ class FileCollector(object):
         """
         if path == self.__configuration.get_target_dir():
             self.__logger.info(_("File '%(file)s' is backup's target directory.") % {'file' : path})
-            return True            
+            return True
         return False
-    
+
     def __is_circular_symlink(self, path):
         if self.__fislink:
             if self.__snapshot.isFollowLinks():
-                ln_target = FAM.get_link_abs(path)    
+                ln_target = FAM.get_link_abs(path)
                 if path.startswith(ln_target):
                     self.__logger.info(_("Symbolic link '%(path)s' -> '%(ln_target)s' is a circular symlink.")\
                                 % {'path' : path, 'ln_target' : ln_target})
-                    return True        
+                    return True
         #test passed
         return False
 
@@ -809,7 +810,7 @@ class FileCollector(object):
                                     % {'file' : path, 'filesize' : str(self.__fstats.st_size),
                                        'maxsize' : str(self.__configuration.get_maxsize_limit())})
                 return True
-        
+
         # if the file matches an exclude regexp, return true
 # TODO: Regex are applied to the full path. Add a choice to apply Regex only to files, directories etc.
         for _regex in self.__excl_regex:
@@ -818,14 +819,14 @@ class FileCollector(object):
                 self.__logger.info(_("File '%(file)s' matches regular expression '%(regex)s'.")\
                                     % {'file' : path, 'regex' : str(_regex.pattern)})
                 return True
-                
+
         # if the file is in exclude list, return true
         if self.__snapshot.is_path_in_excl_filelist(path):
             self.__logger.info(_("Path '%(file)s' defined in excludes list.") % {'file' : path})
-            return True        
+            return True
         #all tests passed
         return False
-    
+
     def _is_excluded_by_force(self, path):
         """Private interface method which checks for forced exclusion of given `path` by
         calling the according test methods in turn. If this method returns True, the
@@ -841,7 +842,7 @@ class FileCollector(object):
         elif self.__is_circular_symlink(path) is True:
             _res = True
         return _res
-        
+
     def _check_for_excludes(self, path): #, force_exclusion=False):
         """Checks given `path` for exclusion and adds it to the `ExcludeFlist` if
         required. Sub-directories are only entered in the case the `path` is not
@@ -861,7 +862,7 @@ class FileCollector(object):
             self.__snapshot.addToExcludeFlist(path)
             self.__collect_stats.count_excl_forced()
             _excluded = True
-            
+
         elif self._is_excluded_by_config(path):
             if not self.__snapshot.is_subpath_in_incl_filelist(path):
                 # add to exclude list, if not explicitly included; since paths can be nested,
@@ -879,9 +880,9 @@ class FileCollector(object):
                 if not self.__snapshot.isFollowLinks():
                     # if `followlinks` is *disabled*, just count the link and finish
                     _stop_checking = True
-                    
+
             if self.__fisdir:
-                if _stop_checking:	# i.e. `followlinks` is not enabled
+                if _stop_checking:    # i.e. `followlinks` is not enabled
                     self.__collect_stats.count_file()
                     self.__cumulate_size(path)
                 else:
@@ -889,7 +890,7 @@ class FileCollector(object):
                     try:
                         for _dir_item in FAM.listdir(path) :
                             _dir_item = FAM.normpath(path, _dir_item)
-                            self._check_for_excludes(path=_dir_item)
+                            self._check_for_excludes(path = _dir_item)
                         self.__collect_stats.count_dir()    # the directory `path`
                     except OSError, _exc:
                         self.__logger.warning(_("Error while checking directory '%(dir)s': %(error)s.")\
@@ -900,7 +901,7 @@ class FileCollector(object):
                 # it's a file (may also a link target in case of enabled `followlinks` option)
                 self.__collect_stats.count_file()
                 self.__cumulate_size(path)
-                
+
     def __cumulate_size(self, path):
         """
         
@@ -908,7 +909,7 @@ class FileCollector(object):
         (e.g. a directory was added to the includes)
         """
 #        self.__logger.debug("%s" % path)
-        _incl_file = False        
+        _incl_file = False
         if self.__isfull:        # full snapshots do not have a base snar file
             _incl_file = True
         else:
@@ -922,18 +923,18 @@ class FileCollector(object):
                                                                      path, ftime,
                                                                      self.__parent.get_base_backup_time()))
                     _incl_file = True
-                    
+
             else:
                 self.__logger.debug("%s: No yet included - included." % path)
                 self.__collect_stats.count_new_file()
                 _incl_file = True
-                
+
         if _incl_file:
             self.__collect_stats.count_incl_file()
             self.__collect_stats.add_size(self.__fstats.st_size)
         else:
             self.__collect_stats.count_skip_file()
-        
+
     def __prepare_excl_regex(self):
         """Prepares (i.e. compiles) Regular Expressions used for excluding files from flist.
         """
@@ -964,7 +965,7 @@ class FileCollector(object):
         _config = self.__configuration
         if _config is None:
             raise ValueError("No configuration object set.")
-        
+
         # set the list to backup (includes) and to exclude
         self.__logger.debug("Preparation of include and exclude lists.")
         if _config.has_dirconfig_entries() is False:
@@ -975,7 +976,7 @@ class FileCollector(object):
                     self.__snapshot.addToIncludeFlist(_dir)
                 elif int(_incl) == 0:
                     self.__snapshot.addToExcludeFlist(_dir)
-                    
+
         # add the default excluded ones
 # TODO: why add an empty string?
 # TODO: put the default excludes into `ConfigManager`.
@@ -983,28 +984,28 @@ class FileCollector(object):
         for _excl in ["", "/dev", "/proc", "/sys", "/tmp",
                           "/dev/", "/proc/", "/sys/", "/tmp/",
                           _config.get_target_dir(),
-                          _config.get_target_dir().rstrip(os.sep)+os.sep]:
+                          _config.get_target_dir().rstrip(os.sep) + os.sep]:
             self.__snapshot.disable_path_in_incl_filelist(_excl)
 
 # TODO: Even better: Remove this inconsistency and don't use TAR's shell patterns. Prefer pure Regex exclusion.
         for _excl in ["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*", _config.get_target_dir()]:
             self.__snapshot.addToExcludeFlist(_excl)
-            
+
         # sanity check of the lists
-        self.__snapshot.check_and_clean_flists()        
-                
+        self.__snapshot.check_and_clean_flists()
+
     def collect_files(self):
         """Collects information about files that are included resp. excluded in
         the backup.
         """
         self.__prepare_collecting()
         self.__prepare_excl_regex()
-        self.__prepare_explicit_flists()            
+        self.__prepare_explicit_flists()
         Util.enable_timeout_alarm()
-        
+
         # We have now every thing we need , the rexclude, excludelist, includelist and already stored 
         self.__logger.debug("Creation of the complete exclude list.")
-        
+
         # walk recursively into paths defined as includes (therefore don't call nested paths)
         for _incl in self.__snapshot.get_eff_incl_filelst_not_nested():
             _incl = FAM.normpath(_incl)
@@ -1017,17 +1018,17 @@ class FileCollectorConfigFacade(object):
     since only very little configuration settings are required in order to collect the files.
     """
     def __init__(self, configuration):
-        self.__configuration    = None
-        self.__target_dir        = None
-        
-        self.__maxsize_enabled    = False
-        self.__maxsize            = 0
-        
-        self.__dirconfig        = None
-        self.__dirconfig_set    = False
-        
+        self.__configuration = None
+        self.__target_dir = None
+
+        self.__maxsize_enabled = False
+        self.__maxsize = 0
+
+        self.__dirconfig = None
+        self.__dirconfig_set = False
+
         self.set_configuration(configuration)
-        
+
     def set_configuration(self, configuration):
         """Sets the given `configuration`. Corresponding attributes are
         set from this ConfigManager instance.
@@ -1039,18 +1040,18 @@ class FileCollectorConfigFacade(object):
         self.__set_target_dir_from_config()
         self.__set_maxsize_limit_from_config()
         self.__set_dirconfig_from_config()
-        
+
     def __set_target_dir_from_config(self):
         if self.__configuration is None:
             raise ValueError("No configuration set.")
         self.__target_dir = FAM.normpath(self.__configuration.get_backup_target())
-        
+
     def __set_maxsize_limit_from_config(self):
         if self.__configuration is None:
             raise ValueError("No configuration set.")
         self.__maxsize_enabled = self.__configuration.has_maxsize_limit()
         self.__maxsize = self.__configuration.get_maxsize_limit()
-        
+
     def __set_dirconfig_from_config(self):
         if self.__configuration is None:
             raise ValueError("No configuration set.")
@@ -1059,23 +1060,23 @@ class FileCollectorConfigFacade(object):
             self.__dirconfig_set = False
         else:
             self.__dirconfig_set = True
-        
+
     def is_maxsize_enable(self):
         return self.__maxsize_enabled
-    
+
     def get_maxsize_limit(self):
         return self.__maxsize
-    
+
     def get_target_dir(self):
         return self.__target_dir
-    
+
     def get_dirconfig(self):
         """Returns the directory configuration stored in a list of pairs (name, value).
         
         @rtype: List
         """
         return self.__dirconfig
-    
+
     def has_dirconfig_entries(self):
         """Returns True if the `dirconfig` has any entries. Purpose is improvement of
         performance when checking for entries in the `dirconfig` and hiding implementation
