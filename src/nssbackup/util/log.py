@@ -1,4 +1,4 @@
-#	NSsbackup - Logging facilities
+#    NSsbackup - Logging facilities
 #
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
@@ -25,86 +25,86 @@ from nssbackup.util import file_handling as FAM
 
 
 def shutdown_logging():
-	logging.shutdown()
+    logging.shutdown()
 
 
 class LogFactory(object):
-	"""
-	"""
-	logger = None
-	created_loggers = []
+    """
+    """
+    logger = None
+    created_loggers = []
 
-	#create formatter
-	formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
-	debug_formatter = logging.Formatter("%(asctime)s - %(levelname)s in "\
-						"%(module)s.%(funcName)s(%(lineno)d): %(message)s")
+    #create formatter
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
+    debug_formatter = logging.Formatter("%(asctime)s - %(levelname)s in "\
+                        "%(module)s.%(funcName)s(%(lineno)d): %(message)s")
 
-	def __init__(self):
-		pass
+    def __init__(self):
+        pass
 
-	def getLogger(name = None, logfile = None, level = 20) :
-		"""Returns last used logger instance. If no instance exists, a new
-		one is created.
-		
-		@param name: The name of the logger
-		@param logfile : default=False
-		@param level: The level of the logger (default = logging.INFO(20) )
-		"""
-		if LogFactory.logger :
-			if name:
-				if LogFactory.logger.name == name :
-					return LogFactory.logger
-				else :
-					return LogFactory.__createLogger(name, logfile, level)
-			else :
-				return LogFactory.logger
-		else :
-			return LogFactory.__createLogger(name, logfile, level)
+    def getLogger(name = None, logfile = None, level = 20) :
+        """Returns last used logger instance. If no instance exists, a new
+        one is created.
+        
+        @param name: The name of the logger
+        @param logfile : default=False
+        @param level: The level of the logger (default = logging.INFO(20) )
+        """
+        if LogFactory.logger :
+            if name:
+                if LogFactory.logger.name == name :
+                    return LogFactory.logger
+                else :
+                    return LogFactory.__createLogger(name, logfile, level)
+            else :
+                return LogFactory.logger
+        else :
+            return LogFactory.__createLogger(name, logfile, level)
 
-	getLogger = staticmethod(getLogger)
+    getLogger = staticmethod(getLogger)
 
-	def __createLogger(name = None, logfile = None, level = 20):
-		"""Private helper method that creates a new logger instance.
-		To avoid the overwriting of previous settings, the names of
-		already created loggers are stored.
-		"""
-		if not name:
-			name = "NSsbackup"
+    def __createLogger(name = None, logfile = None, level = 20):
+        """Private helper method that creates a new logger instance.
+        To avoid the overwriting of previous settings, the names of
+        already created loggers are stored.
+        """
+        if not name:
+            name = "NSsbackup"
 
-		_formatter = LogFactory.formatter
-		if level == logging.DEBUG:
-			_formatter = LogFactory.debug_formatter
+        _formatter = LogFactory.formatter
+        if level == logging.DEBUG:
+            _formatter = LogFactory.debug_formatter
 
-		#create logger
-		LogFactory.logger = logging.getLogger(name)
-		if name in LogFactory.created_loggers:
-			pass
-		else:
-			LogFactory.created_loggers.append(name)
-			LogFactory.logger.setLevel(level)
+        #create logger
+        LogFactory.logger = logging.getLogger(name)
+        if name in LogFactory.created_loggers:
+            pass
+        else:
+            LogFactory.created_loggers.append(name)
+            LogFactory.logger.setLevel(level)
 
-			#create console handler and set level and formatter
-			ch = logging.StreamHandler()
-			ch.setLevel(level)
-			ch.setFormatter(_formatter)
-			LogFactory.logger.addHandler(ch)
+            #create console handler and set level and formatter
+            ch = logging.StreamHandler()
+            ch.setLevel(level)
+            ch.setFormatter(_formatter)
+            LogFactory.logger.addHandler(ch)
 
-			if logfile:
-				# create the logfile
-				if not os.path.exists(logfile) :
-					#make sure that the parent directory exist
-					parentdir = os.path.dirname(os.path.abspath(logfile))
-					if not os.path.exists(parentdir):
-						os.makedirs(parentdir)
-					FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
-				else :
-					# clean the logfile
-					FAM.rename(logfile, logfile + ".old")
-					FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
-				ch1 = logging.FileHandler(logfile)
-				ch1.setLevel(level)
-				ch1.setFormatter(_formatter)
-				LogFactory.logger.addHandler(ch1)
-		return LogFactory.logger
+            if logfile:
+                # create the logfile
+                if not os.path.exists(logfile) :
+                    #make sure that the parent directory exist
+                    parentdir = os.path.dirname(os.path.abspath(logfile))
+                    if not os.path.exists(parentdir):
+                        os.makedirs(parentdir)
+                    FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
+                else :
+                    # clean the logfile
+                    FAM.rename(logfile, logfile + ".old")
+                    FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
+                ch1 = logging.FileHandler(logfile)
+                ch1.setLevel(level)
+                ch1.setFormatter(_formatter)
+                LogFactory.logger.addHandler(ch1)
+        return LogFactory.logger
 
-	__createLogger = staticmethod(__createLogger)
+    __createLogger = staticmethod(__createLogger)

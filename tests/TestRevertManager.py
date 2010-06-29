@@ -13,7 +13,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+#    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 from nssbackup.managers.RestoreManager import RestoreManager
 from nssbackup.managers.SnapshotManager import SnapshotManager
@@ -22,43 +22,43 @@ import unittest
 import os
 
 class TestRestoreManager(unittest.TestCase) :
-	
-	def setUp(self):
-		LogFactory.getLogger("Test",level=10)
-		self.rvtman = RestoreManager()
-		self.snpman = SnapshotManager(os.path.abspath("test-datas/backupdir"))
-	
-	def testRestore(self):
-		"""
-		Restore a dir into it's location
-		"""
-		snapshots = self.snpman.get_snapshots_allversions()
-		self.rvtman.restore(snapshots[0],"/home/wattazoum/Desktop/sbackup-test/d17/")
-		self.assertTrue(os.path.exists("/home/wattazoum/Desktop/sbackup-test/d17/"))
-		
-		
-	def testRestoreAs(self):
-		"""
-		"""
-		snapshots = self.snpman.get_snapshots_allversions()
-		self.rvtman.restoreAs(snapshots[0],"/home/wattazoum/Desktop/sbackup-test/d17/", os.path.abspath('./test-datas/restoredir/') )
-		self.assertTrue(os.path.exists(os.path.abspath('./test-datas/restoredir/')+"/home/wattazoum/Desktop/sbackup-test/d17/"))
-		
-		
-	def testRevert(self):
-		"""
-		"""
-		snapshots = self.snpman.get_snapshots_allversions()
-		self.rvtman.revert(snapshots[0],"/home/wattazoum/Desktop/sbackup-test/")
-		self.assertTrue(os.path.exists("/home/wattazoum/Desktop/sbackup-test/"))
-	
-	def testRevertAs(self):
-		"""
-		"""
-		snapshots = self.snpman.get_snapshots_allversions()
-		self.rvtman.revertAs(snapshots[0],"/home/wattazoum/Desktop/sbackup-test/",os.path.abspath('./test-datas/restoredir/'))
-		self.assertTrue(os.path.exists(os.path.abspath('./test-datas/restoredir/')+"/home/wattazoum/Desktop/sbackup-test/"))
+
+    def setUp(self):
+        LogFactory.getLogger("Test", level = 10)
+        self.rvtman = RestoreManager()
+        self.snpman = SnapshotManager(os.path.abspath("test-datas/backupdir"))
+
+    def testRestore(self):
+        """
+        Restore a dir into it's location
+        """
+        snapshots = self.snpman.get_snapshots_allversions()
+        self.rvtman.restore(snapshots[0], "/home/wattazoum/Desktop/sbackup-test/d17/")
+        self.assertTrue(os.path.exists("/home/wattazoum/Desktop/sbackup-test/d17/"))
+
+
+    def testRestoreAs(self):
+        """
+        """
+        snapshots = self.snpman.get_snapshots_allversions()
+        self.rvtman.restoreAs(snapshots[0], "/home/wattazoum/Desktop/sbackup-test/d17/", os.path.abspath('./test-datas/restoredir/'))
+        self.assertTrue(os.path.exists(os.path.abspath('./test-datas/restoredir/') + "/home/wattazoum/Desktop/sbackup-test/d17/"))
+
+
+    def testRevert(self):
+        """
+        """
+        snapshots = self.snpman.get_snapshots_allversions()
+        self.rvtman.revert(snapshots[0], "/home/wattazoum/Desktop/sbackup-test/")
+        self.assertTrue(os.path.exists("/home/wattazoum/Desktop/sbackup-test/"))
+
+    def testRevertAs(self):
+        """
+        """
+        snapshots = self.snpman.get_snapshots_allversions()
+        self.rvtman.revertAs(snapshots[0], "/home/wattazoum/Desktop/sbackup-test/", os.path.abspath('./test-datas/restoredir/'))
+        self.assertTrue(os.path.exists(os.path.abspath('./test-datas/restoredir/') + "/home/wattazoum/Desktop/sbackup-test/"))
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestRestoreManager)
-unittest.TextTestRunner(verbosity=2).run(suite)
+unittest.TextTestRunner(verbosity = 2).run(suite)

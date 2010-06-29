@@ -29,15 +29,15 @@ from nssbackup.util import get_resource_dir
 #----------------------------------------------------------------------
 
 if __name__ == '__main__':
-	# i18n init
-	application = 'nssbackup'
-	locale_dir = get_resource_dir('locale')
-    
-	gettext.bindtextdomain(application, locale_dir)
-	gettext.textdomain(application)
+    # i18n init
+    application = 'nssbackup'
+    locale_dir = get_resource_dir('locale')
 
-	gtk.glade.bindtextdomain(application, locale_dir)
-	gtk.glade.textdomain(application)
-	
-	from nssbackup.ui.SBRestoreGTK import main
-	main(sys.argv)
+    gettext.bindtextdomain(application, locale_dir)
+    gettext.textdomain(application)
+
+    gtk.glade.bindtextdomain(application, locale_dir)
+    gtk.glade.textdomain(application)
+
+    from nssbackup.ui.SBRestoreGTK import main
+    main(sys.argv)

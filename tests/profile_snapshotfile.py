@@ -31,51 +31,50 @@ LOGLEVEL = 100
 
 class TestSnapshotfile(object):
 
-	__file = os.path.abspath("./test-datas/test-snapshotfile/files.snar")
-#	__file = os.path.abspath("./test-datas/test-snapshotfile/files_ful.snar")
+    __file = os.path.abspath("./test-datas/test-snapshotfile/files.snar")
+#    __file = os.path.abspath("./test-datas/test-snapshotfile/files_ful.snar")
 
-	def __init__(self):
-		pass
+    def __init__(self):
+        pass
 
-	def setUp(self):
-		LogFactory.getLogger(level = LOGLEVEL)
+    def setUp(self):
+        LogFactory.getLogger(level = LOGLEVEL)
 
-	def tearDown(self):
-		pass
+    def tearDown(self):
+        pass
 
-	def test_constructor(self):
-		snar = tar.SnapshotFile(self.__file)
-#		print str(snar)
-		_time = snar.get_time_of_backup()
-		print "Time of backup: %s sec" % (_time)
+    def test_constructor(self):
+        snar = tar.SnapshotFile(self.__file)
+#        print str(snar)
+        _time = snar.get_time_of_backup()
+        print "Time of backup: %s sec" % (_time)
 
-#		_dict = snar.get_dict_format2()
-		self.read_on_demand(snar)
+#        _dict = snar.get_dict_format2()
+        self.read_on_demand(snar)
 
-#		_size = sys.getsizeof(_dict)
-#		mb = _size / (1000*1000)
-#		kb = ( _size % (1000*1000) ) / 1000
-#		b = ( _size % (1000*1000) ) % 1000
-#		print "Size: %s MB %s kB %s" % (mb, kb, b) 
+#        _size = sys.getsizeof(_dict)
+#        mb = _size / (1000*1000)
+#        kb = ( _size % (1000*1000) ) / 1000
+#        b = ( _size % (1000*1000) ) % 1000
+#        print "Size: %s MB %s kB %s" % (mb, kb, b) 
 
-#		self.read_dict(_dict)
+#        self.read_dict(_dict)
 
-	def read_dict(self, adict):
-		for _item in adict:
-			adict[_item] = 'M'
+    def read_dict(self, adict):
+        for _item in adict:
+            adict[_item] = 'M'
 
-	def read_on_demand(self, snar):
-		for _record in snar.parseFormat2():
-			pass
+    def read_on_demand(self, snar):
+        for _record in snar.parseFormat2():
+            pass
 
 
-	def main(self):
-		self.setUp()
-		self.test_constructor()
-		self.tearDown()
+    def main(self):
+        self.setUp()
+        self.test_constructor()
+        self.tearDown()
 
 
 if __name__ == "__main__":
-	tsnp = TestSnapshotfile()
-	cProfile.run('tsnp.main()')
-
+    tsnp = TestSnapshotfile()
+    cProfile.run('tsnp.main()')

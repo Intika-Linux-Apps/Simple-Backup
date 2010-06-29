@@ -26,15 +26,15 @@ import traceback
 from nssbackup.util import get_resource_dir
 
 if __name__ == "__main__" :
-	# i18n init
-	application = 'nssbackup'
-	locale_dir = get_resource_dir('locale')
-    
-	gettext.bindtextdomain(application, locale_dir)
-	gettext.textdomain(application)
-	
-	if not len(sys.argv) in [2]:
-		print _("""
+    # i18n init
+    application = 'nssbackup'
+    locale_dir = get_resource_dir('locale')
+
+    gettext.bindtextdomain(application, locale_dir)
+    gettext.textdomain(application)
+
+    if not len(sys.argv) in [2]:
+        print _("""
 Simple Backup suit command line backup format upgrade
 Usage: upgrade-backup backup-target-url
 Note: backup-target-url must not include the snapshot subdirectory name, for example:
@@ -43,13 +43,12 @@ Note: backup-target-url must not include the snapshot subdirectory name, for exa
 
 Use simple-restore-gnome for more ease of use.
 """)
-		sys.exit(1)
-	
-	try : 
-		u = UpgradeManager()
-		path = os.path.abspath(sys.argv[1])
-		u.upgradeAll(path)
-	except Exception, e :
-			LogFactory.getLogger().error(str(e))
-			LogFactory.getLogger().error(traceback.format_exc())
-			
+        sys.exit(1)
+
+    try :
+        u = UpgradeManager()
+        path = os.path.abspath(sys.argv[1])
+        u.upgradeAll(path)
+    except Exception, e :
+            LogFactory.getLogger().error(str(e))
+            LogFactory.getLogger().error(traceback.format_exc())

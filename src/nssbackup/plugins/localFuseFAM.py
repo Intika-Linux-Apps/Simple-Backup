@@ -13,39 +13,39 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Authors :
-#	Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
+#    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
 from nssbackup.plugins import pluginFAM
 import os
 
 class localFuseFAM (pluginFAM):
-	"""
-	The localFuseFAM plugin do nothing when the mount method is called
-	@author: Oumar Aziz Ouattara <wattazoum@gmail.com>
-	@version: 1.0
-	"""
+    """
+    The localFuseFAM plugin do nothing when the mount method is called
+    @author: Oumar Aziz Ouattara <wattazoum@gmail.com>
+    @version: 1.0
+    """
 
-	def matchScheme(self,remoteSource):
-		"""
-		Try to match the scheme of the remoteSource.
-		@param remoteSource: The remote path
-		@return: True if the scheme matches the one for this 
-		@rtype: boolean
-		"""
-		return remoteSource.startswith(os.sep)
-	
-	def mount(self,source, mountbase):
-		"""
-		Fake mounter to be used by the fuseFAM
-		@param source: The remote path
-		@param mountbase: The mount points base dir
-		@return: The mount point complete path
-		@rtype: str
-		"""
-		self.logger.debug("Nothing to do for '%s'" % source)
-		return (os.sep,"",source.lstrip(os.sep))
-	
-	def umount(self,mounteddir):
-		"""
-		"""
-		self.logger.debug("No need to unmount %s"% mounteddir)
+    def matchScheme(self, remoteSource):
+        """
+        Try to match the scheme of the remoteSource.
+        @param remoteSource: The remote path
+        @return: True if the scheme matches the one for this 
+        @rtype: boolean
+        """
+        return remoteSource.startswith(os.sep)
+
+    def mount(self, source, mountbase):
+        """
+        Fake mounter to be used by the fuseFAM
+        @param source: The remote path
+        @param mountbase: The mount points base dir
+        @return: The mount point complete path
+        @rtype: str
+        """
+        self.logger.debug("Nothing to do for '%s'" % source)
+        return (os.sep, "", source.lstrip(os.sep))
+
+    def umount(self, mounteddir):
+        """
+        """
+        self.logger.debug("No need to unmount %s" % mounteddir)

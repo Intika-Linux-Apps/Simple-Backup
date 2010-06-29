@@ -1,24 +1,24 @@
 from nssbackup.util.log import LogFactory
 
 class Test:
-	"""
-	@todo: Add tests for different log levels etc.!
-	"""
-	
-	def __init__(self):
-		""
-	
-	def logsome(self):
-		l = LogFactory.getLogger("TestLogger", "sbackup.log")
+    """
+    @todo: Add tests for different log levels etc.!
+    """
 
-		l.info("Hello World")
-		l.debug("Argh")
-		
-		l = LogFactory.getLogger("TestLogger1", "sbackup.log")
+    def __init__(self):
+        ""
 
-		l.info("Hello World Log 1")
-		l.error("Argh")
+    def logsome(self):
+        l = LogFactory.getLogger("TestLogger", "sbackup.log")
+
+        l.info("Hello World")
+        l.debug("Argh")
+
+        l = LogFactory.getLogger("TestLogger1", "sbackup.log")
+
+        l.info("Hello World Log 1")
+        l.error("Argh")
 
 if __name__ == '__main__':
-	t = Test()
-	t.logsome()
+    t = Test()
+    t.logsome()

@@ -1,4 +1,4 @@
-#	NSsbackup - package info
+#    NSsbackup - package info
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -26,40 +26,40 @@ from nssbackup import util
 
 
 class Infos(object):
-	"""Collects general informations about NSsbackup.
-	
-	`name` The application's full name
-	`version` Full current version
-	`description` some description
-	
-	@todo: Remove the smtpfrom info from here.
-	
-	"""
-	
-	NAME = "(Not So) Simple Backup Suite"
-	
-	VERSION = util.get_version_number()
-	
-	DESCRIPTION = _("This is a user friendly backup solution for common desktop needs. If you want to help by submitting bugs, by translating or anything else please visit our website.")
-	
-	WEBSITE = "https://launchpad.net/nssbackup/"
+    """Collects general informations about NSsbackup.
+    
+    `name` The application's full name
+    `version` Full current version
+    `description` some description
+    
+    @todo: Remove the smtpfrom info from here.
+    
+    """
 
-	SNPCURVERSION = "1.5"
-	
-	COPYRIGHT = "2007-2010 NSsbackup Development team"
-	
-	AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
-			   "Jean-Peer Lorenz <peer.loz@gmx.net>",
-			   "Aigars Mahinovs <aigarius@debian.org>",
-			   "Mathias Houngbo <mathias.houngbo@gmail.com>"
-			  ]
-	TRANSLATORS = _("translator-credits")
-	
-	#
-	hostname = socket.gethostname()
-	if "." in hostname:
-		mailsuffix = hostname
-	else:
-		mailsuffix = hostname + ".ext"
-	SMTPFROM = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {
-					'login' : os.getenv("USERNAME"), 'hostname': mailsuffix }
+    NAME = "(Not So) Simple Backup Suite"
+
+    VERSION = util.get_version_number()
+
+    DESCRIPTION = _("This is a user friendly backup solution for common desktop needs. If you want to help by submitting bugs, by translating or anything else please visit our website.")
+
+    WEBSITE = "https://launchpad.net/nssbackup/"
+
+    SNPCURVERSION = "1.5"
+
+    COPYRIGHT = "2007-2010 NSsbackup Development team"
+
+    AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
+               "Jean-Peer Lorenz <peer.loz@gmx.net>",
+               "Aigars Mahinovs <aigarius@debian.org>",
+               "Mathias Houngbo <mathias.houngbo@gmail.com>"
+              ]
+    TRANSLATORS = _("translator-credits")
+
+    #
+    hostname = socket.gethostname()
+    if "." in hostname:
+        mailsuffix = hostname
+    else:
+        mailsuffix = hostname + ".ext"
+    SMTPFROM = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {
+                    'login' : os.getenv("USERNAME"), 'hostname': mailsuffix }

@@ -15,7 +15,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Authors :
-#	Jean-Peer Lorenz <peer.loz@gmx.net>
+#    Jean-Peer Lorenz <peer.loz@gmx.net>
 
 
 import unittest
@@ -26,12 +26,12 @@ import test_tar
 
 
 def suite():
-	alltests = unittest.TestSuite([ test_snapshot.suite(),
-								    test_utils.suite(),
-								    test_tar.suite()
-								  ])
-	return alltests
-		
-		
-if __name__ == "__main__":	
-	unittest.TextTestRunner(verbosity=1).run(suite())
+    alltests = unittest.TestSuite([ test_snapshot.suite(),
+                                    test_utils.suite(),
+                                    test_tar.suite()
+                                  ])
+    return alltests
+
+
+if __name__ == "__main__":
+    unittest.TextTestRunner(verbosity = 1).run(suite())

@@ -25,14 +25,14 @@ import gtk
 import gtk.glade
 
 if __name__ == '__main__':
-	# i18n init
-	application = 'nssbackup'
-	locale_dir = get_resource_dir('locale')
-    
-	gettext.bindtextdomain(application, locale_dir)
-	gettext.textdomain(application)
+    # i18n init
+    application = 'nssbackup'
+    locale_dir = get_resource_dir('locale')
 
-	gtk.glade.bindtextdomain(application, locale_dir)
-	gtk.glade.textdomain(application)
+    gettext.bindtextdomain(application, locale_dir)
+    gettext.textdomain(application)
 
-	main(sys.argv)
+    gtk.glade.bindtextdomain(application, locale_dir)
+    gtk.glade.textdomain(application)
+
+    main(sys.argv)

@@ -1319,9 +1319,9 @@ class SBconfigGTK(GladeGnomeApp):
                 else :
                     n = n + 1
             except Exception, e:
-                    dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-                    dialog.run()
-                    dialog.destroy()
+                dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
+                dialog.run()
+                dialog.destroy()
         if n == len(self.remoteinc) :
             dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = _("Test was successful."))
             dialog.run()
@@ -1558,11 +1558,11 @@ class SBconfigGTK(GladeGnomeApp):
         self.isConfigChanged()
 
     def __enable_purge_options(self, enable = True):
-            self.widgets['purgeradiobutton'].set_sensitive(enable)
-            self.widgets['purgedays'].set_sensitive(enable)
-            self.widgets['purgelabel'].set_sensitive(enable)
-            self.widgets['logpurgeradiobutton'].set_sensitive(enable)
-            self.widgets['purgelabel2'].set_sensitive(enable)
+        self.widgets['purgeradiobutton'].set_sensitive(enable)
+        self.widgets['purgedays'].set_sensitive(enable)
+        self.widgets['purgelabel'].set_sensitive(enable)
+        self.widgets['logpurgeradiobutton'].set_sensitive(enable)
+        self.widgets['purgelabel2'].set_sensitive(enable)
 
     def on_purgecheckbox_toggled(self, *args):
         """Signal handler that is called whenever the state of the 'Purging'
@@ -1882,15 +1882,15 @@ class SBconfigGTK(GladeGnomeApp):
                 _icon.set_tooltip_text(_("Target directory is writable."))
 
         except Exception, e:
-                dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-                dialog.run()
-                dialog.destroy()
+            dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
+            dialog.run()
+            dialog.destroy()
 
-                _icon.set_from_stock(gtk.STOCK_DIALOG_ERROR,
-                                     gtk.ICON_SIZE_MENU)
-                _icon.set_tooltip_text(_("Please change target directory and test writability of the target directory by pressing \"Test\" button on the right."))
+            _icon.set_from_stock(gtk.STOCK_DIALOG_ERROR,
+                                 gtk.ICON_SIZE_MENU)
+            _icon.set_tooltip_text(_("Please change target directory and test writability of the target directory by pressing \"Test\" button on the right."))
 
-                self.widgets["dest_unusable"].show()
+            self.widgets["dest_unusable"].show()
 
     def on_logfilechooser_selection_changed(self, *args):
         self.configman.set_logdir(self.widgets['logfilechooser'].get_filename())
