@@ -22,7 +22,7 @@ import unittest
 
 from nssbackup.util.log import LogFactory
 from nssbackup.util import tar
-from nssbackup.managers import FileAccessManager as fam
+from nssbackup.util import file_handling as fam
 
 import cProfile
 
@@ -33,25 +33,25 @@ class TestSnapshotfile(object):
 
 	__file = os.path.abspath("./test-datas/test-snapshotfile/files.snar")
 #	__file = os.path.abspath("./test-datas/test-snapshotfile/files_ful.snar")
-	
+
 	def __init__(self):
 		pass
-	
+
 	def setUp(self):
-		LogFactory.getLogger( level=LOGLEVEL )
+		LogFactory.getLogger(level = LOGLEVEL)
 
 	def tearDown(self):
 		pass
-				
+
 	def test_constructor(self):
 		snar = tar.SnapshotFile(self.__file)
 #		print str(snar)
 		_time = snar.get_time_of_backup()
 		print "Time of backup: %s sec" % (_time)
-		
+
 #		_dict = snar.get_dict_format2()
 		self.read_on_demand(snar)
-		
+
 #		_size = sys.getsizeof(_dict)
 #		mb = _size / (1000*1000)
 #		kb = ( _size % (1000*1000) ) / 1000
@@ -63,7 +63,7 @@ class TestSnapshotfile(object):
 	def read_dict(self, adict):
 		for _item in adict:
 			adict[_item] = 'M'
-			
+
 	def read_on_demand(self, snar):
 		for _record in snar.parseFormat2():
 			pass
@@ -73,9 +73,9 @@ class TestSnapshotfile(object):
 		self.setUp()
 		self.test_constructor()
 		self.tearDown()
-						
+
 
 if __name__ == "__main__":
 	tsnp = TestSnapshotfile()
 	cProfile.run('tsnp.main()')
-	
+

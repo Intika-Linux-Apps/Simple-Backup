@@ -40,3 +40,4 @@ if __name__ == '__main__':
     retc = run(sys.argv)
     print "SBackup DBus Service terminated (exit code: %s)." % retc
     sys.exit(retc)
+

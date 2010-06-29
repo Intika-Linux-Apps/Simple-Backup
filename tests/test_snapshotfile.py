@@ -24,7 +24,7 @@ import unittest
 
 from nssbackup.util.log import LogFactory
 from nssbackup.util import tar
-from nssbackup.managers import FileAccessManager as fam
+from nssbackup.util import file_handling as fam
 
 
 LOGLEVEL = 100
@@ -34,30 +34,30 @@ class TestSnapshotfile(unittest.TestCase):
 
 #	__file = os.path.abspath("./test-datas/test-snapshotfile/files_big.snar")
 	__file = os.path.abspath("./test-datas/test-snapshotfile/files_ful.snar")
-	
+
 	def setUp(self):
-		LogFactory.getLogger( level=LOGLEVEL )
+		LogFactory.getLogger(level = LOGLEVEL)
 
 	def tearDown(self):
 		pass
-				
+
 	def test_constructor(self):
 		snar = tar.SnapshotFile(self.__file)
 #		print str(snar)
 		_time = snar.get_time_of_backup()
 		print "Time of backup: %s sec" % (_time)
-		
+
 		_dict = snar.get_dict_format2()
-		
+
 		for _item in _dict:
 			print _item, _dict[_item]
-		
+
 #		_size = sys.getsizeof(_dict)
 #		mb = _size / (1000*1000)
 #		kb = ( _size % (1000*1000) ) / 1000
 #		b = ( _size % (1000*1000) ) % 1000
 #		print "Size: %s MB %s kB %s" % (mb, kb, b) 
-				
+
 
 def suite():
 	"""Returns a test suite containing all test cases from this module.
@@ -66,10 +66,10 @@ def suite():
 	_suite = unittest.TestSuite()
 	_suite.addTests(
 		[
-		 _loader( TestSnapshotfile )
+		 _loader(TestSnapshotfile)
 		])
 	return _suite
 
 
-if __name__ == "__main__":	
-	unittest.TextTestRunner(verbosity=2).run(suite())
+if __name__ == "__main__":
+	unittest.TextTestRunner(verbosity = 2).run(suite())

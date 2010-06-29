@@ -23,7 +23,7 @@ from gettext import gettext as _
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.SnapshotManager import SnapshotManager
-import FileAccessManager as FAM
+from nssbackup.util import file_handling as FAM
 import nssbackup.util as Util
 import nssbackup.util.tar as Tar
 
@@ -31,13 +31,13 @@ import nssbackup.util.tar as Tar
 class RestoreManager(object):
 	"""
 	"""
-	
+
 	def __init__(self):
 		"""
 		"""
 		self.logger = LogFactory.getLogger()
-		
-	def restore(self,snapshot, _file):
+
+	def restore(self, snapshot, _file):
 		"""
 		Restore one file or directory from the backup tdir with name
 		file to its old location.
@@ -46,8 +46,8 @@ class RestoreManager(object):
 		@param file : 
 		"""
 		self.restoreAs(snapshot, _file, None)
-		
-	def restoreAs(self,snapshot,_file, target, backupFlag=True,failOnNotFound=True) :
+
+	def restoreAs(self, snapshot, _file, target, backupFlag = True, failOnNotFound = True) :
 		"""
 		Restore one file or directory from the backup tdir with name
 		file to target (or to its old location if None if given to target).
@@ -62,62 +62,62 @@ class RestoreManager(object):
 			raise SBException("Please provide a Snapshot")
 		if not _file:
 			raise SBException("Please provide a File/directory")
-		
-		_file = os.sep+_file.lstrip(os.sep)
-		
+
+		_file = os.sep + _file.lstrip(os.sep)
+
 		# restore
 		if not snapshot.getSnapshotFileInfos().hasPath(_file) and not snapshot.getSnapshotFileInfos().hasFile(_file):
 			if failOnNotFound :
 				raise SBException(_("File '%s' not found in the backup snapshot files list") % _file)
-			else : 
-				self.logger.warning(_("File '%(filename)s' not found in the backup snapshot [%(snapshotname)s] files list, We'll not fail though !") % {"filename": _file, "snapshotname" : snapshot.getName()} )
+			else :
+				self.logger.warning(_("File '%(filename)s' not found in the backup snapshot [%(snapshotname)s] files list, We'll not fail though !") % {"filename": _file, "snapshotname" : snapshot.getName()})
 				return
-		
+
 		suffix = None
 		if backupFlag :
-			now = datetime.datetime.now().isoformat("_").replace( ":", "." )
-			suffix = ".before_restore_"+now
-		
+			now = datetime.datetime.now().isoformat("_").replace(":", ".")
+			suffix = ".before_restore_" + now
+
 		if target and os.path.exists(target):
 			# The target is given and exists
 			if os.path.isdir(target):
 				# the target is a dir 	
 				#create a temp file , extract inside then move the content
-				tmpdir = tempfile.mkdtemp(dir=target,
-										  prefix='nssbackup-restore_')
-				
+				tmpdir = tempfile.mkdtemp(dir = target,
+										  prefix = 'nssbackup-restore_')
+
 				Tar.extract(snapshot.getArchive(),
 							_file,
 							tmpdir,
-							bckupsuffix=suffix,
-							splitsize=snapshot.getSplitedSize())
-				
-				if os.path.exists(target+os.sep+ os.path.basename(_file))  and backupFlag :
-					Util.force_nssb_move(target+os.sep+ os.path.basename(_file),
-								   target+os.sep+ os.path.basename(_file)+suffix)
-				
-				Util.force_nssb_move(tmpdir+_file, target+os.sep+ os.path.basename(_file))
+							bckupsuffix = suffix,
+							splitsize = snapshot.getSplitedSize())
+
+				if os.path.exists(target + os.sep + os.path.basename(_file))  and backupFlag :
+					Util.force_nssb_move(target + os.sep + os.path.basename(_file),
+								   target + os.sep + os.path.basename(_file) + suffix)
+
+				Util.force_nssb_move(tmpdir + _file, target + os.sep + os.path.basename(_file))
 				FAM.force_delete(tmpdir)
 			else:
 				#the target is a file
 				parent = os.path.dirname(target)
-				Tar.extract( snapshot.getArchive(), _file, parent, bckupsuffix=suffix,splitsize=snapshot.getSplitedSize() )
+				Tar.extract(snapshot.getArchive(), _file, parent, bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
 		else:
 			# target is set to None or target not exists
 			if target and not os.path.exists(target) :
 				#target != None but target doesn't exists
 				os.makedirs(target)
-				Tar.extract( snapshot.getArchive(), _file, target,splitsize=snapshot.getSplitedSize() )
+				Tar.extract(snapshot.getArchive(), _file, target, splitsize = snapshot.getSplitedSize())
 			else :
 				# Target = None , extract at the place it belongs
 				if os.path.exists(_file) :
 					# file exist:
-					Tar.extract(snapshot.getArchive(), _file, target, bckupsuffix=suffix,splitsize=snapshot.getSplitedSize())
+					Tar.extract(snapshot.getArchive(), _file, target, bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
 				else :
 					# file doesn't exist nothing to move, just extract
-					Tar.extract(snapshot.getArchive(), _file, target,splitsize=snapshot.getSplitedSize() )
-		
-		
+					Tar.extract(snapshot.getArchive(), _file, target, splitsize = snapshot.getSplitedSize())
+
+
 	def revert(self, snapshot, dir):
 		"""
 		Revert a directory to its snapshot date state.
@@ -125,8 +125,8 @@ class RestoreManager(object):
 		@param dir : the dir to revert, use os.sep for the whole snapshot
 		"""
 		self.revertAs(snapshot, dir, None)
-		
-	
+
+
 	def __cleanBackupedFiles(self, dir , suffix):
 		"""
 		clean the backuped copies in the directory (dir) that ends with suffix
@@ -134,9 +134,9 @@ class RestoreManager(object):
 		@param suffix: the suffix of backuped files
 		"""
 		pass
-		
-	
-	def revertAs(self,snapshot, dir, targetdir):
+
+
+	def revertAs(self, snapshot, dir, targetdir):
 		"""
 		Revert a directory to its snapshot date state into a directory.
 		We will restore the directory starting from the base snapshot to the selected one and clean the restore directory each time.
@@ -148,14 +148,14 @@ class RestoreManager(object):
 			raise SBException("Please provide a Snapshot")
 		if not dir :
 			raise SBException("Please provide a File/directory")
-		
+
 		#dir = os.sep+dir.lstrip(os.sep)
 		snpman = SnapshotManager(os.path.dirname(snapshot.getPath()))
 		history = snpman.getSnpHistory(snapshot)
 		history.reverse()
-		
+
 		for snp in history :
-			self.logger.debug("Restoring '%(dirname)s' from snapshot '%(snapshotname)s' " % {"dirname" : dir, "snapshotname" : snp.getName()} )
-			self.restoreAs(snp, dir, targetdir, False,False)
+			self.logger.debug("Restoring '%(dirname)s' from snapshot '%(snapshotname)s' " % {"dirname" : dir, "snapshotname" : snp.getName()})
+			self.restoreAs(snp, dir, targetdir, False, False)
 
 

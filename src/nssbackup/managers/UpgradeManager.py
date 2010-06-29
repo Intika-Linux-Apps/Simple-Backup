@@ -37,7 +37,7 @@ import cPickle as pickle
 from gettext import gettext as _
 
 from nssbackup.pkginfo import Infos
-import FileAccessManager as FAM
+from nssbackup.util import file_handling as FAM
 import nssbackup.util as Util
 from SnapshotManager import SnapshotManager
 from nssbackup.util.exceptions import SBException
@@ -52,7 +52,7 @@ class UpgradeManager(object):
 	The UpgradeManager class
 	"""
 
-	__possibleVersion = ["1.0","1.1","1.2","1.3","1.4","1.5"]
+	__possibleVersion = ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5"]
 
 	statusMessage = None
 	substatusMessage = None
@@ -62,14 +62,14 @@ class UpgradeManager(object):
 		"""
 		"""
 		self.logger = LogFactory.getLogger()
-		
+
 	def getStatus(self):
 		"""
 		@return: [statusNumber,statusMessage,substatusMessage]
 		"""
-		return [self.statusNumber,self.statusMessage,self.substatusMessage]
+		return [self.statusNumber, self.statusMessage, self.substatusMessage]
 
-	def upgradeSnapshot(self, snapshot, version="1.5"):
+	def upgradeSnapshot(self, snapshot, version = "1.5"):
 		"""Upgrades a snapshot to a certain version. Default version
 		is the highest/latest version available.
 		
@@ -77,22 +77,22 @@ class UpgradeManager(object):
 		:param version: default is 1.5
 		
 		"""
-		
+
 		if version not in self.__possibleVersion :
-			raise SBException("Version should be in '%s' , got '%s' " % (str(self.__possibleVersion),str(version) ) )
+			raise SBException("Version should be in '%s' , got '%s' " % (str(self.__possibleVersion), str(version)))
 		else :
 			if snapshot.getVersion() >= version  :
-				self.logger.debug("Nothing to do : version of snapshot is already higher than given version (%s >= %s )" %(snapshot.getVersion() ,version))
+				self.logger.debug("Nothing to do : version of snapshot is already higher than given version (%s >= %s )" % (snapshot.getVersion() , version))
 				return
 			else :
-				self.logger.info("Upgrading snapshot '%s' to version '%s'" % (str(snapshot),str(version)) )
+				self.logger.info("Upgrading snapshot '%s' to version '%s'" % (str(snapshot), str(version)))
 				while snapshot.getVersion() < version :
 					if snapshot.getVersion() < "1.2" :
 						if ":" in snapshot.getName():
-							newname = snapshot.getName().replace( ":", "." )
-							self.logger.info("Renaming directory: '"+snapshot.getName()+"' to '"+newname+"'" )
-							FAM.rename(snapshot.getPath(), newname )
-							snapshot = Snapshot( os.path.dirname(snapshot.getPath()) + os.sep + newname )
+							newname = snapshot.getName().replace(":", ".")
+							self.logger.info("Renaming directory: '" + snapshot.getName() + "' to '" + newname + "'")
+							FAM.rename(snapshot.getPath(), newname)
+							snapshot = Snapshot(os.path.dirname(snapshot.getPath()) + os.sep + newname)
 						self.__upgrade_v12(snapshot)
 					elif snapshot.getVersion() < "1.3" :
 						self.__upgrade_v13(snapshot)
@@ -103,8 +103,8 @@ class UpgradeManager(object):
 				self.statusMessage = None
 				self.substatusMessage = None
 				self.statusNumber = None
-	
-	def downgradeSnapshot(self,snapshot,version="1.5"):
+
+	def downgradeSnapshot(self, snapshot, version = "1.5"):
 		"""Currently unused!
 		
 		The downgrade feature will be certainly used for exporting
@@ -115,12 +115,12 @@ class UpgradeManager(object):
 		:param version: The version to which one the snapshot will be downgraded
 
 		"""
-		self.logger.info("Downgrading snapshot '%s' to version '%s'" % (str(snapshot),str(version)) )
+		self.logger.info("Downgrading snapshot '%s' to version '%s'" % (str(snapshot), str(version)))
 		if version not in self.__possibleVersion :
-			raise SBException("Version should be in '%s' , got '%s' " % (str(self.__possibleVersion),str(version) ) )
+			raise SBException("Version should be in '%s' , got '%s' " % (str(self.__possibleVersion), str(version)))
 		else :
 			if snapshot.getVersion() <= version  :
-				self.logger.info("Nothing to do : version of snapshot is already higher than given version (%s <= %s )" %(snapshot.getVersion() ,version))
+				self.logger.info("Nothing to do : version of snapshot is already higher than given version (%s <= %s )" % (snapshot.getVersion() , version))
 			while snapshot.getVersion() > version :
 					if snapshot.getVersion() > "1.4" :
 						self.__downgrade_v14(snapshot)
@@ -128,9 +128,9 @@ class UpgradeManager(object):
 						self.__downgrade_v13(snapshot)
 					elif snapshot.getVersion() > "1.2" :
 						self.__downgrade_v12(snapshot)
-					else : 
+					else :
 						raise SBException("Downgrade to version '%s' isn't supported " % str(version))
-			
+
 	def need_upgrade(self, target):
 		"""Checks if there is something to upgrade. If there are snapshots
 		that should be upgraded True is returned otherwise False.
@@ -145,7 +145,7 @@ class UpgradeManager(object):
 				res = True
 				break
 		return res
-		
+
 	def upgradeAll(self, target):
 		"""Upgrades all valid snapshots in a certain directory.
 		 
@@ -154,173 +154,173 @@ class UpgradeManager(object):
 		"""
 		self.logger.info("Upgrading All valid snapshot in '%s'" % target)
 		snapman = SnapshotManager(target)
-		snapshots= snapman.get_snapshots_allformats()
+		snapshots = snapman.get_snapshots_allformats()
 		for s in snapshots :
 			if s.getVersion() < Infos.SNPCURVERSION:
 				self.upgradeSnapshot(s)
-	
-	def __upgrade_v12( self, snapshot ):
+
+	def __upgrade_v12(self, snapshot):
 		"""Private method that actually processes the upgrade to
 		version 1.2.
 		 
 		"""
-		self.statusMessage = _("Upgrading from v1.0 to v1.2: %s")  % str(snapshot)
+		self.statusMessage = _("Upgrading from v1.0 to v1.2: %s") % str(snapshot)
 		self.logger.info(self.statusMessage)
-		i = FAM.openfile(snapshot.getPath()+os.sep +"tree")
-		bfiles = pickle.load( i )
-		n = FAM.openfile( snapshot.getPath()+os.sep +"flist", True )
-		p = FAM.openfile( snapshot.getPath()+os.sep +"fprops", True )
+		i = FAM.openfile(snapshot.getPath() + os.sep + "tree")
+		bfiles = pickle.load(i)
+		n = FAM.openfile(snapshot.getPath() + os.sep + "flist", True)
+		p = FAM.openfile(snapshot.getPath() + os.sep + "fprops", True)
 		for item in bfiles:
-			n.write( str(item[0])+"\n" )
-			p.write( str(item[1])+str(item[2])+str(item[3])+str(item[4])+str(item[5])+"\n" )
+			n.write(str(item[0]) + "\n")
+			p.write(str(item[1]) + str(item[2]) + str(item[3]) + str(item[4]) + str(item[5]) + "\n")
 		p.close()
 		n.close()
 		i.close()
-		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.2\n" )
+		FAM.writetofile(snapshot.getPath() + os.sep + "ver", "1.2\n")
 		snapshot.setVersion("1.2")
 		self.statusNumber = 0.40
-		
-			
-	def __upgrade_v13( self, snapshot ):
-		self.statusMessage = _("Upgrading to v1.3: %s")  % str(snapshot) 
+
+
+	def __upgrade_v13(self, snapshot):
+		self.statusMessage = _("Upgrading to v1.3: %s") % str(snapshot)
 		self.logger.info(self.statusMessage)
-		flist = FAM.readfile( snapshot.getPath()+os.sep +"flist" ).split( "\n" )
-		fprops = FAM.readfile( snapshot.getPath()+os.sep +"fprops" ).split( "\n" )
-		if len(flist)==len(fprops) :
+		flist = FAM.readfile(snapshot.getPath() + os.sep + "flist").split("\n")
+		fprops = FAM.readfile(snapshot.getPath() + os.sep + "fprops").split("\n")
+		if len(flist) == len(fprops) :
 			if len(flist) > 1:
-				l = FAM.openfile(snapshot.getPath()+os.sep +"flist.v13", True)
-				p = FAM.openfile(snapshot.getPath()+os.sep +"fprops.v13", True)
-				for a,b in zip(flist,fprops):
-					l.write( a+"\000" )
-					p.write( b+"\000" )
+				l = FAM.openfile(snapshot.getPath() + os.sep + "flist.v13", True)
+				p = FAM.openfile(snapshot.getPath() + os.sep + "fprops.v13", True)
+				for a, b in zip(flist, fprops):
+					l.write(a + "\000")
+					p.write(b + "\000")
 				l.close()
 				p.close()
-				FAM.rename(snapshot.getPath()+os.sep +"flist", "flist.old")
-				FAM.rename(snapshot.getPath()+os.sep +"flist.v13", "flist")
-				FAM.rename(snapshot.getPath()+os.sep +"fprops", "fprops.old")
-				FAM.rename(snapshot.getPath()+os.sep +"fprops.v13", "fprops")
-				FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.3\n" )
+				FAM.rename(snapshot.getPath() + os.sep + "flist", "flist.old")
+				FAM.rename(snapshot.getPath() + os.sep + "flist.v13", "flist")
+				FAM.rename(snapshot.getPath() + os.sep + "fprops", "fprops.old")
+				FAM.rename(snapshot.getPath() + os.sep + "fprops.v13", "fprops")
+				FAM.writetofile(snapshot.getPath() + os.sep + "ver", "1.3\n")
 				snapshot.setVersion("1.3")
 		else:
-			FAM.delete(snapshot.getPath()+os.sep +"ver")
-			raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath() )
+			FAM.delete(snapshot.getPath() + os.sep + "ver")
+			raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath())
 		self.statusNumber = 0.60
 
-	def __upgrade_v14( self, snapshot ):
+	def __upgrade_v14(self, snapshot):
 		self.statusMessage = _("Upgrading to v1.4: %s") % str(snapshot)
-		self.logger.info(self.statusMessage )
-		FAM.delete( snapshot.getPath() + os.sep +"ver" )
-		
-		if not FAM.exists( snapshot.getPath()+os.sep +"flist" )\
-		   or not FAM.exists( snapshot.getPath()+os.sep +"fprops" )\
-		   or not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" )\
-		   or not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
+		self.logger.info(self.statusMessage)
+		FAM.delete(snapshot.getPath() + os.sep + "ver")
+
+		if not FAM.exists(snapshot.getPath() + os.sep + "flist")\
+		   or not FAM.exists(snapshot.getPath() + os.sep + "fprops")\
+		   or not FAM.exists(snapshot.getPath() + os.sep + "files.tgz")\
+		   or not FAM.exists(snapshot.getPath() + os.sep + "excludes"):
 			raise SBException("Snapshot is invalid! One of the essential files does not exist.")
-		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
+		FAM.writetofile(snapshot.getPath() + os.sep + "ver", "1.4\n")
 		snapshot.setVersion("1.4")
 		self.statusNumber = 0.80
-		
-	def __upgrade_v15( self, snapshot ):
+
+	def __upgrade_v15(self, snapshot):
 		self.statusMessage = _("Upgrading to v1.5: %s") % str(snapshot)
 		self.logger.info(self.statusMessage)
 		self.statusNumber = 0.80
 		self.logger.info(self.statusMessage)
-		FAM.delete( snapshot.getPath() + os.sep +"ver" )
-		
-		if not FAM.exists( snapshot.getPath()+os.sep +"flist" ):
+		FAM.delete(snapshot.getPath() + os.sep + "ver")
+
+		if not FAM.exists(snapshot.getPath() + os.sep + "flist"):
 			raise SBException("Snapshot is invalid! The essential file 'flist' does not exist.")
-		if not FAM.exists( snapshot.getPath()+os.sep +"fprops" ):
+		if not FAM.exists(snapshot.getPath() + os.sep + "fprops"):
 			raise SBException("Snapshot is invalid! The essential file 'fprops' does not exist.")
-		if not FAM.exists( snapshot.getPath()+os.sep +"files.tgz" ):
+		if not FAM.exists(snapshot.getPath() + os.sep + "files.tgz"):
 			raise SBException("Snapshot is invalid! The essential file 'files.tgz' does not exist.")
-		if not FAM.exists( snapshot.getPath()+os.sep +"excludes" ):
+		if not FAM.exists(snapshot.getPath() + os.sep + "excludes"):
 			raise SBException("Snapshot is invalid! The essential file 'excludes' does not exist.")
-		
+
 		self.logger.info("renaming file.tgz to file.tar.gz")
-		os.rename(snapshot.getPath()+os.sep +"files.tgz", snapshot.getPath()+os.sep +"files.tar.gz") 
+		os.rename(snapshot.getPath() + os.sep + "files.tgz", snapshot.getPath() + os.sep + "files.tar.gz")
 		self.statusNumber = 0.82
 		#TODO:
 		self.logger.info("Creating includes.list")
-		flist = snapshot.getPath()+os.sep +"flist" 
-		fprops = snapshot.getPath()+os.sep +"fprops" 
-		
-		f1 = open(flist,'r')
-		f2 = open(fprops,'r')
-		
+		flist = snapshot.getPath() + os.sep + "flist"
+		fprops = snapshot.getPath() + os.sep + "fprops"
+
+		f1 = open(flist, 'r')
+		f2 = open(fprops, 'r')
+
 		isEmpty = True
-		
-		for f,p in Util.readlineNULSep(f1,f2):
+
+		for f, p in Util.readlineNULSep(f1, f2):
 			if f :
 				if p is not None and p != str(None) :
 					if isEmpty:
 						isEmpty = False
 					snapshot.addToIncludeFlist(f)
 		# commit include.list
-		fi = open(snapshot.getIncludeFListFile(),"w")
+		fi = open(snapshot.getIncludeFListFile(), "w")
 		for f in snapshot.getIncludeFlist().getEffectiveFileList() :
-			fi.write(str(f) +"\n")
+			fi.write(str(f) + "\n")
 		fi.close()
-		
+
 		self.statusNumber = 0.85
 		self.logger.info("Creating empty excludes.list")
-		f1 = open(snapshot.getExcludeFListFile(),'w')
+		f1 = open(snapshot.getExcludeFListFile(), 'w')
 		f1.close()
-		
+
 		self.statusNumber = 0.87
 		self.logger.info("creating 'format' file .")
-		formatInfos = snapshot.getFormat()+"\n"
+		formatInfos = snapshot.getFormat() + "\n"
 		formatInfos += str(snapshot.getSplitedSize())
-		FAM.writetofile(snapshot.getPath()+os.sep +"format", formatInfos)
-		
+		FAM.writetofile(snapshot.getPath() + os.sep + "format", formatInfos)
+
 		self.statusNumber = 0.90
 		self.logger.info("Creating the SNAR file ")
 		if os.path.exists(snapshot.getSnarFile()) :
 			self.logger.warning(_("The SNAR file already exist for snapshot '%s'. It is not overwritten.") % str(snapshot))
 		else :
-			snarfileinfo = snapshot.getSnapshotFileInfos(writeFlag=True)
+			snarfileinfo = snapshot.getSnapshotFileInfos(writeFlag = True)
 			if not isEmpty :
 				date = snapshot.getDate()
-				datet = datetime.datetime(date['year'],date['month'],date['day'],date['hour'],date['minute'],date['second'])
+				datet = datetime.datetime(date['year'], date['month'], date['day'], date['hour'], date['minute'], date['second'])
 				snarfileinfo.setHeader(datet)
-							
+
 				#header created, let's now add the directories from includes.list
-				last_parentdir=None
+				last_parentdir = None
 				for f in snapshot.getIncludeFlist().getEffectiveFileList() :
 					if f :
-						
+
 						parentdir = os.path.dirname(f)
 						if parentdir == last_parentdir :
 							self.logger.debug("[LastParentDir] already processed '%s'" % parentdir)
 							continue
 						last_parentdir = parentdir
-						
-						
+
+
 						_time = str(int(time.mktime(datet.timetuple())))
 						result = ["0", _time, _time]
-						
+
 						if snarfileinfo.hasPath(parentdir) :
 							self.logger.debug("[SNARFileInfo] already processed '%s'" % parentdir)
 							continue
-						
+
 						self.logger.debug("processing '%s'" % parentdir)
-						
+
 						if os.path.exists(parentdir) :
 							result.append(str(os.stat(parentdir)[stat.ST_DEV]))
 							result.append(str(os.stat(parentdir)[stat.ST_INO]))
 						else :
-							result.extend(['0','0'])
-						
+							result.extend(['0', '0'])
+
 						result.append(parentdir)
-						
+
 						fname = os.path.basename(f)
 						dumpdirs = list()
-						
+
 						#get the parent dir content
 						cSBdict = snapshot.getIncludeFlist().getSon(parentdir)
-						for k,v in dict.iteritems(cSBdict):
+						for k, v in dict.iteritems(cSBdict):
 							# determine if it's a dir or a file
-							if os.path.exists(parentdir+os.sep+k) :
-								if os.path.isdir(parentdir+os.sep+k) :
+							if os.path.exists(parentdir + os.sep + k) :
+								if os.path.isdir(parentdir + os.sep + k) :
 									control = Dumpdir.DIRECTORY
 								else :
 									control = Dumpdir.INCLUDED
@@ -330,65 +330,65 @@ class UpgradeManager(object):
 									control = Dumpdir.DIRECTORY
 								else :
 									control = Dumpdir.INCLUDED
-							
-							dumpdirs.append(Dumpdir(control+k))
-						
+
+							dumpdirs.append(Dumpdir(control + k))
+
 						result.append(dumpdirs)
-					
+
 						snarfileinfo.addRecord(result)
 
 		self.statusNumber = 0.97
 		self.logger.info("creating 'ver' file .")
-		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.5\n" )
+		FAM.writetofile(snapshot.getPath() + os.sep + "ver", "1.5\n")
 		snapshot.setVersion("1.5")
-		if os.path.exists(snapshot.getPath()+os.sep +"ver") :
+		if os.path.exists(snapshot.getPath() + os.sep + "ver") :
 			self.logger.debug("'ver' file created.")
 		self.statusNumber = 1.00
-		
-	def __downgrade_v12 (self,snapshot ):
-		self.logger.info("Downgrading to v1.2: %s" % str(snapshot) )
-		flist = FAM.readfile( snapshot.getPath()+os.sep +"flist" ).split( "\000" )
-		fprops = FAM.readfile( snapshot.getPath()+os.sep +"fprops" ).split( "\000" )
-		
-		if len(flist)==len(fprops) :
+
+	def __downgrade_v12 (self, snapshot):
+		self.logger.info("Downgrading to v1.2: %s" % str(snapshot))
+		flist = FAM.readfile(snapshot.getPath() + os.sep + "flist").split("\000")
+		fprops = FAM.readfile(snapshot.getPath() + os.sep + "fprops").split("\000")
+
+		if len(flist) == len(fprops) :
 			if len(flist) > 1:
-				l = FAM.openfile(snapshot.getPath()+os.sep +"flist.v12", True)
-				p = FAM.openfile(snapshot.getPath()+os.sep +"fprops.v12", True)
-				for a,b in zip(flist,fprops):
-					l.write( a+"\n" )
-					p.write( b+"\n" )
+				l = FAM.openfile(snapshot.getPath() + os.sep + "flist.v12", True)
+				p = FAM.openfile(snapshot.getPath() + os.sep + "fprops.v12", True)
+				for a, b in zip(flist, fprops):
+					l.write(a + "\n")
+					p.write(b + "\n")
 				l.close()
 				p.close()
-				FAM.rename(snapshot.getPath()+os.sep +"flist", "flist.old")
-				FAM.rename(snapshot.getPath()+os.sep +"flist.v12", "flist")
-				FAM.rename(snapshot.getPath()+os.sep +"fprops", "fprops.old")
-				FAM.rename(snapshot.getPath()+os.sep +"fprops.v12", "fprops")
-				FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.3\n" )
+				FAM.rename(snapshot.getPath() + os.sep + "flist", "flist.old")
+				FAM.rename(snapshot.getPath() + os.sep + "flist.v12", "flist")
+				FAM.rename(snapshot.getPath() + os.sep + "fprops", "fprops.old")
+				FAM.rename(snapshot.getPath() + os.sep + "fprops.v12", "fprops")
+				FAM.writetofile(snapshot.getPath() + os.sep + "ver", "1.3\n")
 		else:
-			FAM.delete(snapshot.getPath()+os.sep +"ver")
-			raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath() )
-		FAM.delete( snapshot.getPath() + os.sep +"ver" )
-		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.2\n" )
+			FAM.delete(snapshot.getPath() + os.sep + "ver")
+			raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath())
+		FAM.delete(snapshot.getPath() + os.sep + "ver")
+		FAM.writetofile(snapshot.getPath() + os.sep + "ver", "1.2\n")
 		snapshot.setVersion("1.2")
-	
-	def __downgrade_v13( self, snapshot ):
-		self.logger.info("Downgrading to v1.3: %s" % str(snapshot) )
-		FAM.delete( snapshot.getPath() + os.sep +"ver" )
-		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.3\n" )
+
+	def __downgrade_v13(self, snapshot):
+		self.logger.info("Downgrading to v1.3: %s" % str(snapshot))
+		FAM.delete(snapshot.getPath() + os.sep + "ver")
+		FAM.writetofile(snapshot.getPath() + os.sep + "ver", "1.3\n")
 		snapshot.setVersion("1.3")
 
-	def __downgrade_v14( self, snapshot ):
+	def __downgrade_v14(self, snapshot):
 		if snapshot.getFormat() != "gzip" :
 			raise SBException (_("Cannot downgrade other format than 'gzip' to 1.4"))
-		
-		self.logger.info("Downgrading to v1.4: %s" % str(snapshot) )
-		FAM.delete( snapshot.getPath() + os.sep +"ver" )
-		
+
+		self.logger.info("Downgrading to v1.4: %s" % str(snapshot))
+		FAM.delete(snapshot.getPath() + os.sep + "ver")
+
 		self.logger.debug("renaming file.tar.gz to file.tgz")
-		os.rename(snapshot.getPath()+os.sep +"files.tar.gz", snapshot.getPath()+os.sep +"files.tgz") 
-		
+		os.rename(snapshot.getPath() + os.sep + "files.tar.gz", snapshot.getPath() + os.sep + "files.tgz")
+
 		self.logger.debug("removing 'format' file .")
-		FAM.writetofile(snapshot.getPath()+os.sep +"format", snapshot.getFormat())
-		
-		FAM.writetofile( snapshot.getPath()+os.sep +"ver", "1.4\n" )
+		FAM.writetofile(snapshot.getPath() + os.sep + "format", snapshot.getFormat())
+
+		FAM.writetofile(snapshot.getPath() + os.sep + "ver", "1.4\n")
 		snapshot.setVersion("1.4")

@@ -28,19 +28,23 @@
 
 """
 
-
-import os, re, shutil
 from gettext import gettext as _
+import os
+import re
+import shutil
+import time
+from datetime import datetime
+
 from nssbackup.util.log import LogFactory
-import nssbackup.util as Util
 from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
 from nssbackup.util import exceptions
-from datetime import datetime
-import time
-from nssbackup.managers import ConfigManager
 from nssbackup.managers.ConfigManager import ConfigurationFileHandler
-from nssbackup.managers import FileAccessManager as fam
+from nssbackup.util import file_handling as fam
+from nssbackup import util as Util
+from nssbackup.util import constants
+#from nssbackup.util import Snapshot circular reference
+
 
 def getArchiveType(archive):
     """Determines the type of an archive by its mime type.
@@ -217,9 +221,11 @@ def __prepare_common_opts(snapshot):
     """
     # don't escape spaces i.e. do not replace them with '\ '; this will fail
     # take care where to insert additional options (e.g. --gzip)
+
     tdir = snapshot.getPath()
     options = ["-cS", "--directory=" + os.sep,
                "--ignore-failed-read",
+               "--blocking-factor", str(constants.TAR_BLOCKING_FACTOR),
                "--files-from=" + snapshot.getIncludeFListFile() + ".tmp"]
     options.append ("--exclude-from=" + snapshot.getExcludeFListFile() + ".tmp")
 
@@ -242,16 +248,30 @@ def __prepare_common_opts(snapshot):
 
     options.append("--file=" + os.sep.join([tdir, archivename]))
 
-    options.append('--checkpoint=1000')
-    _progessf = Util.get_resource_file(resource_name = "sbackup-progress")
-    options.append('--checkpoint-action=exec=%s' % _progessf)
+    _snpsize = snapshot.get_space_required()
+    if _snpsize < 5000000:
+        _ncheckp = 10
+    elif _snpsize < 100000000:
+        _ncheckp = 100
+    elif _snpsize < 1000000000:
+        _ncheckp = 500
+    else:
+        _ncheckp = 1000
+
+    _checkpsize = _snpsize / _ncheckp
+    _checkp = int(_checkpsize / constants.TAR_RECORDSIZE)
+#    print "Snpsize: %s\nncheckpoints: %s" % (_snpsize, _ncheckp)
+#    print "Size between checks: %s\n--checkpoint=%s" % (_checkpsize, _checkp)
+    if _checkp > 0:
+        options.append("--checkpoint=%s" % _checkp)
+        _progessf = Util.get_resource_file(resource_name = "sbackup-progress")
+        options.append('--checkpoint-action=exec=%s' % _progessf)
 
     LogFactory.getLogger().debug("Common TAR options: %s" % str(options))
-
     return options
 
 
-def __addSplitOpts(snapshot, options, size):
+def __add_split_opts(snapshot, options, size):
     """
     Compiles and add the split management options to the TAR line.
     Valid for read and create actions
@@ -269,6 +289,23 @@ def __addSplitOpts(snapshot, options, size):
     return options
 
 
+def __move_temp_snarfile(tmp_snarfile, snarfile):
+    try:
+        Util.nssb_copy(tmp_snarfile, snarfile)
+    except exceptions.ChmodNotSupportedError:
+        LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
+                                    % snarfile)
+
+
+def __remove_temp_snarfile(tmp_snarfile):
+    #TODO: Use fam.delete_ignore_errors()!
+    try:
+        os.remove(tmp_snarfile)
+    except OSError, error:
+        LogFactory.getLogger().warning(_("Unable to remove temporary snar file: %s")\
+                                        % error)
+
+
 def makeTarIncBackup(snapshot):
     """
     Launch a TAR incremental backup
@@ -281,7 +318,7 @@ def makeTarIncBackup(snapshot):
 
     splitSize = snapshot.getSplitedSize()
     if splitSize :
-        options = __addSplitOpts(snapshot, options, splitSize)
+        options = __add_split_opts(snapshot, options, splitSize)
 
     base_snarfile = snapshot.getBaseSnapshot().getSnarFile()
     snarfile = snapshot.getSnarFile()
@@ -310,16 +347,22 @@ def makeTarIncBackup(snapshot):
         options.append("--listed-incremental=" + tmp_snarfile)
 
         # launch TAR with empty environment
-        outStr, errStr, retVal = Util.launch("/bin/tar", options, env = {})
-        __finish_tar(retVal, outStr, errStr)
+        _launcher = TarBackendLauncherSingleton()
 
-        # and move the temporary snarfile back into the backup directory
         try:
-            Util.nssb_copy(tmp_snarfile, snarfile)
-        except exceptions.ChmodNotSupportedError:
-            LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
-                                        % snarfile)
-        os.remove(tmp_snarfile)
+            _launcher.launch_sync(options, env = {})
+
+            retVal = _launcher.get_returncode()
+            outStr = _launcher.get_stdout()
+            errStr = _launcher.get_stderr()
+
+            __finish_tar(retVal, outStr, errStr)
+
+            # and move the temporary snarfile back into the backup directory
+            __move_temp_snarfile(tmp_snarfile, snarfile)
+
+        finally:
+            __remove_temp_snarfile(tmp_snarfile)
 
 
 def makeTarFullBackup(snapshot):
@@ -335,7 +378,7 @@ def makeTarFullBackup(snapshot):
 
     splitSize = snapshot.getSplitedSize()
     if splitSize :
-        options = __addSplitOpts(snapshot, options, splitSize)
+        options = __add_split_opts(snapshot, options, splitSize)
 
     snarfile = snapshot.getSnarFile()
     tmp_snarfile = os.path.join(ConfigurationFileHandler().get_user_tempdir(),
@@ -353,17 +396,20 @@ def makeTarFullBackup(snapshot):
     options.append("--listed-incremental=" + tmp_snarfile)
 
     # launch TAR with empty environment
-    outStr, errStr, retVal = Util.launch("/bin/tar", options, env = {})
+    _launcher = TarBackendLauncherSingleton()
 
-    __finish_tar(retVal, outStr, errStr)
-
-    # and move the temporary snarfile into the backup directory
     try:
-        Util.nssb_copy(tmp_snarfile, snarfile)
-    except exceptions.ChmodNotSupportedError:
-        LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
-                                    % snarfile)
-    os.remove(tmp_snarfile)
+        _launcher.launch_sync(options, env = {})
+        retVal = _launcher.get_returncode()
+        outStr = _launcher.get_stdout()
+        errStr = _launcher.get_stderr()
+
+        __finish_tar(retVal, outStr, errStr)
+
+        # and move the temporary snarfile into the backup directory
+        __move_temp_snarfile(tmp_snarfile, snarfile)
+    finally:
+        __remove_temp_snarfile(tmp_snarfile)
 
 
 def __finish_tar(exitcode, out_str, error_str):
@@ -447,6 +493,14 @@ def get_dumpdir_from_list(lst_dumpdirs, filename):
         raise SBException("File '%s' was not found in given list of Dumpdirs."
                                                                     % filename)
     return _res
+
+
+class TarBackendLauncherSingleton(Util.GenericBackendLauncherSingleton):
+
+    _cmd = "/bin/tar"
+
+    def __init__(self):
+        Util.GenericBackendLauncherSingleton.__init__(self)
 
 
 class Dumpdir(object):
@@ -1183,4 +1237,3 @@ class ProcSnapshotFile(SnapshotFileWrapper):
                 cleanDupl()
 
         return result
-

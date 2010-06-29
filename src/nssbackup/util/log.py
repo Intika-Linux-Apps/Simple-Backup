@@ -21,7 +21,7 @@
 
 import logging
 import os.path
-import nssbackup.managers.FileAccessManager as FAM
+from nssbackup.util import file_handling as FAM
 
 
 def shutdown_logging():
@@ -33,16 +33,16 @@ class LogFactory(object):
 	"""
 	logger = None
 	created_loggers = []
-	
+
 	#create formatter
 	formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
 	debug_formatter = logging.Formatter("%(asctime)s - %(levelname)s in "\
 						"%(module)s.%(funcName)s(%(lineno)d): %(message)s")
-	
+
 	def __init__(self):
 		pass
-	
-	def getLogger(name=None, logfile=None, level=20 ) :
+
+	def getLogger(name = None, logfile = None, level = 20) :
 		"""Returns last used logger instance. If no instance exists, a new
 		one is created.
 		
@@ -55,15 +55,15 @@ class LogFactory(object):
 				if LogFactory.logger.name == name :
 					return LogFactory.logger
 				else :
-					return LogFactory.__createLogger(name,logfile,level)
+					return LogFactory.__createLogger(name, logfile, level)
 			else :
 				return LogFactory.logger
 		else :
-			return LogFactory.__createLogger(name,logfile,level)
+			return LogFactory.__createLogger(name, logfile, level)
 
 	getLogger = staticmethod(getLogger)
-	
-	def __createLogger(name=None, logfile=None, level=20):
+
+	def __createLogger(name = None, logfile = None, level = 20):
 		"""Private helper method that creates a new logger instance.
 		To avoid the overwriting of previous settings, the names of
 		already created loggers are stored.
@@ -74,21 +74,21 @@ class LogFactory(object):
 		_formatter = LogFactory.formatter
 		if level == logging.DEBUG:
 			_formatter = LogFactory.debug_formatter
-			
+
 		#create logger
 		LogFactory.logger = logging.getLogger(name)
 		if name in LogFactory.created_loggers:
 			pass
 		else:
-			LogFactory.created_loggers.append( name )
+			LogFactory.created_loggers.append(name)
 			LogFactory.logger.setLevel(level)
-			
+
 			#create console handler and set level and formatter
 			ch = logging.StreamHandler()
 			ch.setLevel(level)
 			ch.setFormatter(_formatter)
 			LogFactory.logger.addHandler(ch)
-			
+
 			if logfile:
 				# create the logfile
 				if not os.path.exists(logfile) :

@@ -1,7 +1,7 @@
-#    NSsbackup - snapshot handling
+#    NSsbackup - backup a certain profile
 #
-#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -35,27 +35,28 @@ import datetime
 import re
 import socket
 import time
-import gobject
 import types
 
 from FuseFAM import FuseFAM
 from SnapshotManager import SnapshotManager
 from UpgradeManager import UpgradeManager
 from ConfigManager import ConfigManager
-import FileAccessManager as FAM
+from nssbackup.util import file_handling as FAM
 import nssbackup.util as Util
 from nssbackup.util.Snapshot import Snapshot
 from nssbackup.util.log import LogFactory
 from nssbackup.util import exceptions
-
+from nssbackup.util import constants
 from nssbackup.util.tar import SnapshotFile
 
+
 class BackupManager(object):
-    """Class that handles/manages the backup process.
+    """Class that handles/manages the backup process of a single profile.
     
     """
 
-    def __init__(self, configmanager, backupstate):
+    def __init__(self, configmanager, backupstate, dbus_connection = None,
+                 use_indicator = False):
         """The `BackupManager` Constructor.
 
         :param configmanager : The current configuration manager
@@ -65,21 +66,22 @@ class BackupManager(object):
                instantiating this class!
                
         """
+        self.logger = LogFactory.getLogger()
+#TODO: Simplify/refactor these attributes.
+        self.__dbus_conn = dbus_connection
+        self.__use_indicator = use_indicator
+
         self.config = configmanager
         self.__state = backupstate
-        self.logger = LogFactory.getLogger()
+        self.__state.clear_backup_properties()
+
         self.__profilename = self.config.getProfileName()
         self.__state.set_profilename(self.__profilename)
 
         self.__um = UpgradeManager()
         self.__snpman = None
 
-        # The whole snapshot path
         self.__actualSnapshot = None
-
-        self.__lockfile = None
-
-#        self.__includeInSnp = None
 
         self.__fusefam = FuseFAM(self.config)
 
@@ -100,12 +102,10 @@ class BackupManager(object):
             writes everything into the snapshot directory).
         9. release lock
         """
-        self.__setlockfile()
+        self.logger.info(_("Preparation of backup process"))
+        self.__state.set_state('prepare')
 
-        _msg = _("Backup process is being started.")
-#        self._notify_info(self.__profilename, _msg)
-        self.logger.info(_msg)
-        self.__state.set_state('start')
+        self.__check_configuration()
 
         try:
             self.__fusefam.initialize()
@@ -113,8 +113,11 @@ class BackupManager(object):
             self.__fusefam.terminate()
             raise
 
+        self.__check_target()
+
         self.__snpman = SnapshotManager(self.config.get("general", "target"))
 
+#TODO: What is this for?
         # Set the admin group to the process
         if os.geteuid() == 0 :
             try :
@@ -123,8 +126,6 @@ class BackupManager(object):
             except (KeyError, OSError), exc:
                 self.logger.warning(_("Failed to set the gid to 'admin' one :") + str(exc))
 
-        # Check the target dir
-        self.__checkTarget()
 
         # Upgrade Target
         # But we should not upgrade without user's agreement!
@@ -141,8 +142,11 @@ class BackupManager(object):
         if needupgrade:
             self.__state.set_state('needupgrade')
             _msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using '(Not So) Simple Backup-Restoration' if you want to use them.")
-#            self._notify_warning(self.__profilename, _msg)
             self.logger.warning(_msg)
+
+
+        self.logger.info(_("Backup process is being started."))
+        self.__state.set_state('start')
 
         # purge
         purge = None
@@ -208,17 +212,11 @@ class BackupManager(object):
         else:
             self.logger.info(_("Option 'Follow symbolic links' is disabled."))
 
-        os.nice(20)                    # Reduce the priority, so not to interfere with other processes
         self.__fillSnapshot()
-#        self._notify_info(self.__profilename, _("Preparation of backup is done. Archive is being created."))
         self.__state.set_state('commit')
         self.__actualSnapshot.commit()
 
-        _msg = _("Backup process finished.")
-#        self._notify_info(self.__profilename, _msg)
-        self.logger.info(_msg)
-# TODO: Check this!
-#        time.sleep(10)
+        self.logger.info(_("Backup process finished."))
         self.__state.set_state('finish')
 
     def __fillSnapshot(self):
@@ -228,7 +226,10 @@ class BackupManager(object):
         _collector = self.__create_collector_obj()
         _collector.collect_files()
         _stats = _collector.get_stats()
-        _snpsize = _stats.get_size_payload() + _stats.get_size_overhead(size_per_item = 512)
+        _snpsize = _stats.get_size_payload() + _stats.get_size_overhead(size_per_item = constants.TAR_BLOCKSIZE)
+
+        self.__state.set_space_required(_snpsize)
+        self.__actualSnapshot.set_space_required(_snpsize)
 
         vstat = os.statvfs(self.__actualSnapshot.getPath())
         _freespace = vstat.f_bavail * vstat.f_bsize
@@ -261,45 +262,6 @@ class BackupManager(object):
             _collect.set_parent_snapshot(_basesnar)
         return _collect
 
-    def __setlockfile(self):
-        """Set the lockfile.
-        
-        @todo: Lock file should be created and removed in daemon!
-        
-        @todo: Enhance these checks!
-        """
-        if self.config.has_option("general", "lockfile") :
-            self.__lockfile = self.config.get("general", "lockfile")
-        else :
-            self.logger.debug("no lockfile in config, the default will be used ")
-            self.__lockfile = "/var/lock/nssbackup.lock"
-
-        # Create the lockfile so none disturbs us
-        if FAM.exists(self.__lockfile) :
-            # the lockfile exists, is it valid ?
-            last_sb_pid = FAM.readfile(self.__lockfile)
-            if (last_sb_pid and os.path.lexists("/proc/" + last_sb_pid) and\
-                "nssbackupd" in str(open("/proc/" + last_sb_pid + "/cmdline").read())):
-                raise exceptions.InstanceRunningError(\
-                    _("Another instance of '(Not So) Simple Backup' is already running (process id: %s).")\
-                      % last_sb_pid)
-            else:
-                self.logger.info(_("Invalid lock file found. Is being removed."))
-                self.__unsetlockfile()
-
-        FAM.writetofile(self.__lockfile, str(os.getpid()))
-        self.logger.debug("Created lockfile at '%s' with info '%s'."\
-                          % (self.__lockfile, str(os.getpid())))
-
-    def __unsetlockfile(self):
-        """Remove lockfile.
-        """
-        try:
-            FAM.delete(self.__lockfile)
-            self.logger.debug("Lock file '%s' removed." % self.__lockfile)
-        except OSError, _exc:
-            self.logger.error(_("Unable to remove lock file: %s" % str(_exc)))
-
     def __copylogfile(self):
 # TODO: we should flush the log file before copy!
         # destination for copying the logfile
@@ -326,31 +288,66 @@ class BackupManager(object):
         """End nssbackup session :
         
         - copy the log file into the snapshot dir
-        - remove the lockfile
+        
+        Might be called multiple times.
         
         :attention: When calling this method is unsure whether the backup
                     was successful or not.
-                    
         """
-        self.__unsetlockfile()
         self.__copylogfile()
         self.__fusefam.terminate()
         self.logger.info(_("Processing of profile is finished."))
+        return constants.EXCODE_SUCCESS
 
-    def __checkTarget(self):
+    def __check_configuration(self):
         """
+        :todo: Do this in ConfigHandler!
         """
         # Check if the mandatory target option exists
         if not self.config.has_option("general", "target") :
             raise exceptions.SBException (_("Option 'target' is missing, aborting."))
 
-        # Check if the target dir exists or create it
-        if not FAM.exists(self.config.get("general", "target")) :
-            self.logger.info(_("Creating the target dir '%s'") % self.config.get("general", "target"))
-            FAM.makedir(self.config.get("general", "target"))
+    def __check_target(self):
+        """
+        """
+        _target = self.config.get("general", "target")
+        self.__state.set_target(_target)
+
+        # Check if the target dir exists, but Do not create any directories. 
+        if not FAM.exists(_target):
+            self.logger.warning(_("Unable to find destination directory."))
+            self.__state.set_state('target-not-found')
+
+            if self.__use_indicator and self.__dbus_conn is not None:
+                _time = 0
+                _retry = constants.RETRY_UNKNOWN
+
+                while (_time < constants.TIMEOUT_RETRY_TARGET_CHECK_SECONDS):
+                    time.sleep(constants.INTERVAL_RETRY_TARGET_CHECK_SECONDS)
+                    _time = _time + constants.INTERVAL_RETRY_TARGET_CHECK_SECONDS
+#TODO: put the get_retry_target.. into State?
+                    _retry = self.__dbus_conn.get_retry_target_check()
+                    if _retry == constants.RETRY_FALSE:
+                        raise exceptions.BackupCanceledError
+#                            raise exceptions.SBException(_("Target directory '%(target)s' does not exist.")\
+#                                            % {"target" : _target})
+                    elif _retry == constants.RETRY_TRUE:
+                        if FAM.exists(_target):
+                            pass
+                        else:
+                            self.logger.warning(_("Unable to find destination directory even after retry."))
+                            raise exceptions.SBException(_("Target directory '%(target)s' does not exist.")\
+                                            % {"target" : _target})
+                        break
+                    else:
+                        pass
+
+            else:
+                raise exceptions.SBException(_("Target directory '%(target)s' does not exist.")\
+                                % {"target" : _target})
 
         # Try to write inside so that we don't work for nothing
-        _testfile = os.path.join(self.config.get("general", "target"), "test")
+        _testfile = os.path.join(_target, "test")
         try :
 
             FAM.writetofile(_testfile, "testWritable")

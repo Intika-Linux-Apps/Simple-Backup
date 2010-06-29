@@ -1,7 +1,7 @@
 #    NSsbackup - Miscellaneous utilities
 #
-#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -28,10 +28,6 @@
 
 """
 
-_RSRC_FILE = "resources"
-_LOCALE_DIR = "locale"
-_LOCALE_DOMAIN = "nssbackup"
-
 
 from gettext import gettext as _
 import os
@@ -44,9 +40,11 @@ import re
 import signal
 
 import nssbackup
-import nssbackup.managers.FileAccessManager as FAM
 from nssbackup.util import log
 from nssbackup.util import exceptions
+from nssbackup.util import constants
+from nssbackup.util import structs
+from nssbackup.util import file_handling
 
 
 def nssb_copytree(src, dst, symlinks = False):
@@ -90,7 +88,7 @@ def nssb_copytree(src, dst, symlinks = False):
         raise shutil.Error, errors
 
 
-# this function is no longer used in series 0.2
+# this function is no longer used
 # consider removing it
 #def nssb_move(src, dst):
 #    """
@@ -121,10 +119,10 @@ def force_nssb_move(src, dst):
                 raise shutil.Error("Cannot move a directory '%s' into itself "\
                                    "'%s'." % (src, dst))
             nssb_copytree(src, dst, symlinks = True)
-            FAM.force_delete(src)
+            file_handling.force_delete(src)
         else:
             shutil.copy2(src, dst)
-            FAM.force_delete(src)
+            file_handling.force_delete(src)
 
 
 def nssb_copy(src, dst):
@@ -210,7 +208,7 @@ def __get_resource(resource_name, is_file = False):
     """
 #    print "Debug: Looking for '%s' (isFile=%s)" % (resourceName, isFile)
     tmp = inspect.getabsfile(nssbackup)
-    resfile = file(os.path.join(os.path.dirname(tmp), _RSRC_FILE), "r")
+    resfile = file(os.path.join(os.path.dirname(tmp), constants.RSRC_FILE), "r")
     resfilelines = resfile.readlines()
     resfile.close()
 
@@ -251,11 +249,11 @@ def get_resource_dir(resource_name):
 
 
 def get_locale_dir():
-    return get_resource_dir(_LOCALE_DIR)
+    return get_resource_dir(constants.LOCALE_DIR)
 
 
 def get_locale_domain():
-    return _LOCALE_DOMAIN
+    return constants.LOCALE_DOMAIN
 
 
 def get_version_number():
@@ -292,6 +290,8 @@ def launch(cmd, opts, env = None):
     retVal = the return code (= 0 means that everything were fine )
     @param cmd: The command to launch
     @return: (outStr, errStr, retVal)
+    
+    @todo: Implement a Singleton TAR launcher!
     """
     _logger = log.LogFactory.getLogger()
     # Create output log file
@@ -311,12 +311,13 @@ def launch(cmd, opts, env = None):
     os.close(errptr)
     os.close(outptr)
 
-    outStr, errStr = FAM.readfile(outFile), FAM.readfile(errFile)
+    outStr, errStr = file_handling.readfile(outFile), file_handling.readfile(errFile)
 
-    FAM.delete(outFile)
-    FAM.delete(errFile)
+    file_handling.delete(outFile)
+    file_handling.delete(errFile)
 
     return (outStr, errStr, retval)
+
 
 
 # defined in module 'tar'
@@ -610,13 +611,21 @@ def get_humanreadable_size_str(size_in_bytes, binary_prefixes = False):
     """
     _mb, _kb, _byt = get_humanreadable_size(size_in_bytes = size_in_bytes, binary_prefixes = binary_prefixes)
     if binary_prefixes is True:
-        _res = _("%(mb)d MiB %(kb)d KiB %(bytes)d") % {'mb' : _mb,
-                                                       'kb' : _kb,
-                                                       'bytes' : _byt}
+        if _byt == 0:
+            _res = _("%(mb)d MiB %(kb)d KiB") % {'mb' : _mb,
+                                                 'kb' : _kb}
+        else:
+            _res = _("%(mb)d MiB %(kb)d KiB %(bytes)d") % {'mb' : _mb,
+                                                           'kb' : _kb,
+                                                           'bytes' : _byt}
     else:
-        _res = _("%(mb)d MB %(kb)d kB %(bytes)d") % {'mb' : _mb,
-                                                       'kb' : _kb,
-                                                       'bytes' : _byt}
+        if _byt == 0:
+            _res = _("%(mb)d MB %(kb)d kB") % {'mb' : _mb,
+                                               'kb' : _kb}
+        else:
+            _res = _("%(mb)d MB %(kb)d kB %(bytes)d") % {'mb' : _mb,
+                                                         'kb' : _kb,
+                                                         'bytes' : _byt}
     return _res
 
 
@@ -641,3 +650,111 @@ def sigalarm_handler(signum, stack_frame): #IGNORE:W0613
     @raise TimeoutError: A `TimeoutError` exception is raised.
     """
     raise exceptions.TimeoutError("Unable to open device.")
+
+
+def enable_termsignal():
+    signal.signal(signal.SIGTERM, sigterm_handler)
+
+
+def sigterm_handler(signum, stack_frame): #IGNORE:W0613
+    raise exceptions.SigTerminatedError("Application was terminated by signal %s." % signum)
+
+
+def enable_backup_cancel_signal():
+    signal.signal(constants.BACKUP_CANCEL_SIG, sigcancel_handler)
+
+
+def sigcancel_handler(signum, stack_frame): #IGNORE:W0613
+    """
+    see `man 7 signal`
+    """
+    raise exceptions.BackupCanceledError
+
+
+class GenericBackendLauncherSingleton(object):
+    __metaclass__ = structs.Singleton
+
+    _cmd = None
+
+    def __init__(self):
+        self._logger = log.LogFactory.getLogger()
+        self._proc = None
+        self._argv = []
+        self._stdout = None
+        self._stderr = None
+        self._returncode = None
+
+    def get_pid(self):
+        _pid = None
+        if self._proc is not None:
+            _pid = self._proc.pid
+        return _pid
+
+    def launch_sync(self, opts, env = None):
+        if self._proc is not None:
+            raise AssertionError("Another process is already running")
+
+        self._argv = opts
+        self._argv.insert(0, self._cmd)
+
+        outptr, outfile = tempfile.mkstemp(prefix = "output_")
+        errptr, errfile = tempfile.mkstemp(prefix = "error_")
+
+        self._clear_returns()
+
+        try:
+            self._logger.debug("Lauching: %s" % (" ".join(self._argv)))
+            self._proc = subprocess.Popen(self._argv, stdin = None,
+                                          stdout = outptr,
+                                          stderr = errptr, env = env)
+            self._proc.communicate(input = None)   # waits for termination
+        except (exceptions.BackupCanceledError, exceptions.SigTerminatedError), error:
+            self.terminate()
+            self._clear_proc()
+            raise error
+
+        self._returncode = self._proc.returncode
+
+        os.close(errptr)    # Close log handles
+        os.close(outptr)
+        self._stdout = file_handling.readfile(outfile)
+        self._stderr = file_handling.readfile(errfile)
+        file_handling.delete(outfile)
+        file_handling.delete(errfile)
+
+        self._clear_proc()
+
+    def _clear_returns(self):
+        self._stdout = None
+        self._stderr = None
+        self._returncode = None
+
+    def _clear_proc(self):
+        self._proc = None
+        self._argv = []
+
+    def is_running(self):
+        """
+        :todo: Add more tests whether the process is running or not!
+        """
+        _res = False
+        if self._proc is not None:
+            # more tests here
+            _res = True
+        return _res
+
+    def get_stdout(self):
+        return self._stdout
+
+    def get_stderr(self):
+        return self._stderr
+
+    def get_returncode(self):
+        return self._returncode
+
+    def terminate(self):
+        if self.is_running():
+            try:
+                self._proc.terminate()
+            except OSError, error:
+                self._logger.warning(_("Unable to terminate backend process: %s") % error)

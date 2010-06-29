@@ -28,29 +28,38 @@
 
 """
 
+class SigTerminatedError(Exception) :
+    """This Exception is thrown if the backup process receives a
+    SIGTERM/SIGKILL signal.
+    """
+
 class SBException(Exception):
     """This class will help us distinguish Exception that we must
     handle (exceptions created by ourself) and exceptions due to 
     programming errors (Python Exceptions).
-
     """
 
 class InstanceRunningError(SBException) :
-    """This Exception is thrown if another NSsbackup daemon is
+    """This Exception is thrown if another application instance is
     already running.
     """
-    
+
+class BackupCanceledError(SBException) :
+    """This Exception is thrown if the backup process is canceled from
+    the indicator gui.
+    """
+
 class NotValidSnapshotException(SBException) :
     """
     This Exception is thrown by Snapshot validation.
     """
-    
+
 class NotValidSnapshotNameException(NotValidSnapshotException):
     """Exception launched when the name of a snapshot is not valid
     
     """
-    
-    
+
+
 class NotValidSectionException(SBException) :
     """This Exception is thrown by Config Section validation.
     
@@ -65,16 +74,16 @@ class CorruptedSBdictException(SBException):
     """Thrown when a SBdict is corrupted
 
     """
-    
+
 class FuseFAMException(SBException):
     """Thrown when a Fuse mount fails
 
     """
-    
+
 class TimeoutError(SBException):
     """Thrown when an IO operation times out.
     """
-    
+
 class RebaseSnpException(SBException):
     """Thrown for rebase exception
     
@@ -90,13 +99,13 @@ class RemoveFullSnpForbidden(RebaseSnpException):
     :todo: Check whether this exception is unused and can be removed!
     
     """
-    
+
 class ChmodNotSupportedError(SBException):
     """Thrown when a destination does not support file modes (e.g. some
     ftp servers or FAT filesystems).
     
     """
-    
+
 class NotSupportedError(Exception):
     """Thrown when trying to call a stub.
 
@@ -104,5 +113,10 @@ class NotSupportedError(Exception):
 
 class NotifyException(SBException) :
     """This Exception is thrown by notifiers and listeners.
+
+    """
+
+class DBusException(SBException) :
+    """This Exception is thrown when problems with DBus occurs.
 
     """

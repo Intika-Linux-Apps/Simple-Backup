@@ -19,10 +19,38 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-if __name__ == '__main__':
+def parse_cmdline(argv):
+    import optparse
+    from nssbackup.pkginfo import Infos
+    from nssbackup.util import constants
+    
+    usage = "Usage: %prog [options] (use -h or --help for more infos)"
+    version = "%prog " + Infos.VERSION
+    prog = constants.INDICATORAPP_FILE
 
+    parser = optparse.OptionParser(usage = usage, version = version, prog = prog)
+    parser.add_option("--keep-alive",
+              action = "store_true", dest = "keep_alive", default = False,
+              help = "don't terminate indicator if no backup/D-Bus service is present")
+
+    parser.add_option("--legacy",
+              action = "store_true", dest = "legacy_appindicator", default = False,
+              help = "use legacy status icon instead of `libappindicator`")
+
+    (options, args) = parser.parse_args(argv[1:])
+    if len(args) != 0:
+        parser.error("Unknown argument given")
+
+    return options
+    
+    
+if __name__ == '__main__':
     import sys
+    import os
     from nssbackup.util import system
+
+    options = parse_cmdline(sys.argv)
+    os.nice(5)
 
     appindicator_avail = False
     _session_user = system.get_user_from_env()
@@ -53,18 +81,22 @@ if __name__ == '__main__':
     gtk.glade.textdomain(application)
 
 
-#TODO: Add commandline option: --use-appindicator
     try:
         import appindicator
         appindicator_avail = True
     except ImportError:
         appindicator_avail = False
 
-    if appindicator_avail:
-        from nssbackup.ui.indicator_gtk import main
+    if options.legacy_appindicator is True:
+        from nssbackup.ui.indicator_legacy import main
     else:
-        from nssbackup.ui.indicator_gtk_legacy import main
+        if appindicator_avail:
+            from nssbackup.ui.indicator import main
+        else:
+            print "Unable to use `libappindicator`. Falling back to legacy status icon."
+            from nssbackup.ui.indicator_legacy import main
 
-    retc = main(sys.argv)
-    print "SBackup indicator application exit code: `%s`" % retc
-    sys.exit(retc)
+
+    exitcode = main(options)
+#    print "SBackup indicator application exit code: `%s`" % exitcode
+    sys.exit(exitcode)

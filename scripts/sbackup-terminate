@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+#
+#    Simple Backup - helper script for terminating a running backup
+#
+#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+import os
+import sys
+import optparse
+import signal
+import subprocess
+
+
+INTERPRETER = "python"
+BACKUP_COMMAND = "nssbackupd"
+BACKUP_CANCEL_SIG = signal.SIGUSR1
+
+
+def is_sbackup(pid):
+    """Static copy of a function originally defined in module `system`.
+    The function is not imported in order to ease testing (customized
+    pythonpath is not available when using `gksu`).
+    """
+    _res = False
+    pid = str(pid)
+    _output = subprocess.Popen(["ps", "--no-headers", "-f", "--pid", pid],
+                               stdout = subprocess.PIPE).communicate()[0]
+    _output = _output.strip()
+    if (INTERPRETER in _output) and (BACKUP_COMMAND in _output):
+        _res = True
+
+    return _res
+
+
+def parse_cmdline(argv):
+    usage = "Usage: %prog PID (use -h or --help for more infos)"
+    prog = "sbackup-terminate"
+
+    parser = optparse.OptionParser(usage = usage, prog = prog)
+
+    (options, args) = parser.parse_args(argv[1:])
+    if len(args) != 1:
+        parser.error("You must provide a Process ID as argument")
+
+    try:
+        pid = int(args[0])
+    except ValueError:
+        parser.error("Given PID is invalid")
+
+    if pid <= 1:
+        parser.error("Given PID is invalid")
+
+    if not is_sbackup(pid):
+        parser.error("Given PID does not belong to `%s`" % BACKUP_COMMAND)
+
+    return pid
+
+
+if __name__ == "__main__":
+    _excode = 0
+    pid = parse_cmdline(sys.argv)
+
+    try:
+        os.kill(pid, BACKUP_CANCEL_SIG)
+    except OSError, error:
+        print "Unable to send signal to process %s: %s" % (pid, error)
+        _excode = 1
+
+    sys.exit(_excode)

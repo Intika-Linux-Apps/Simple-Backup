@@ -25,7 +25,7 @@ import glob
 from gettext import gettext as _
 import nssbackup, subprocess
 from tempfile import *
-from nssbackup.managers.FileAccessManager import *
+from nssbackup.util.file_handling import *
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
 
@@ -36,11 +36,11 @@ class pluginFAM(object):
 	@author: Oumar Aziz Ouattara <wattazoum@gmail.com>
 	@version: 1.0
 	"""
-	
+
 	def __init__(self):
 		self.logger = LogFactory.getLogger()
-	
-	def matchScheme(self,remoteSource):
+
+	def matchScheme(self, remoteSource):
 		"""
 		Try to match the scheme of the remoteSource.
 		@param remoteSource: The remote path
@@ -48,8 +48,8 @@ class pluginFAM(object):
 		@rtype: boolean
 		"""
 		raise SBException("'matchScheme' Not implemented for this plugin")
-	
-	def mount(self,source, mountbase):
+
+	def mount(self, source, mountbase):
 		"""
 		Mount the source intor the mountbase dir . This method should create a mount point to mount the source. 
 		The name of the mount point should be very expressive so that we avoid collision with other mount points
@@ -66,8 +66,8 @@ class pluginFAM(object):
 		@rtype: tuple
 		"""
 		raise SBException("'mount' Not implemented for this plugin")
-	
-	def umount(self,mounteddir):
+
+	def umount(self, mounteddir):
 		"""
 		Default behaviour is to unmount with fuse
 		"""
@@ -75,29 +75,29 @@ class pluginFAM(object):
 			# mountpoint is not mounted 
 			return
 		# Create output log file
-		outptr,outFile = mkstemp(prefix="fuseUmount_output_")
+		outptr, outFile = mkstemp(prefix = "fuseUmount_output_")
 		# Create error log file
-		errptr, errFile = mkstemp(prefix="fuseUmount_error_")
+		errptr, errFile = mkstemp(prefix = "fuseUmount_error_")
 		# Call the subprocess using convenience method
-		retval = subprocess.call(["fusermount","-u",mounteddir], 0, None, None, outptr, errptr)
+		retval = subprocess.call(["fusermount", "-u", mounteddir], 0, None, None, outptr, errptr)
 		# Close log handles
 		os.close(errptr)
 		os.close(outptr)
-		outStr, errStr = readfile(outFile), readfile(errFile)	
+		outStr, errStr = readfile(outFile), readfile(errFile)
 		delete(outFile)
 		delete(errFile)
 		if retval != 0 :
-			raise SBException("Couldn't unmount '%s' : %s" %  (mounteddir,errStr))
+			raise SBException("Couldn't unmount '%s' : %s" % (mounteddir, errStr))
 		self.logger.info("Successfully unmounted: '%s'" % mounteddir)
-	
-	def checkifmounted (self,source, mountbase):
+
+	def checkifmounted (self, source, mountbase):
 		"""
 		Should check if the source is mounted.
 		Note : you should use os.path.ismount(path) method for that, after determining the name of the mount point.
 		@return: True if it is, False if not
 		"""
 		raise SBException("'Check if mounted' Not implemented for this plugin")
-		
+
 	def getdoc(self):
 		"""
 		This method should give a little documentation about the schema used for this plugin.
@@ -114,14 +114,14 @@ class PluginManager(object):
 
 	def __init__(self):
 		self.logger = LogFactory.getLogger()
-		
+
 	def getPlugins(self):
 		"""Searches for plugins in the plugin directory and loads them.
 		
 		@return : The plugins dictionary list {'name':class}.
 		@note: Look at FuseFAM to know how it's used.
 		"""
-		
+
 		if self.__pluginList : return self.__pluginList
 		else :
 			self.__pluginList = dict()
@@ -130,7 +130,7 @@ class PluginManager(object):
 			if os.path.isdir(plugins_dir):
 				if plugins_dir not in sys.path:
 					sys.path.append(plugins_dir)
-					
+
 				for file in glob.glob('%s/*FuseFAM.py' % plugins_dir):
 					try:
 						module_filename = os.path.basename(file)
@@ -144,6 +144,6 @@ class PluginManager(object):
 								self.__pluginList[symbol_name] = symbol
 					except Exception, e:
 						from gettext import gettext as _
-						self.logger.warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file,'error_cause': str(e)})                    
+						self.logger.warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file, 'error_cause': str(e)})
 						continue
 			return self.__pluginList

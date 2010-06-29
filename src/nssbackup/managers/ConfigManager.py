@@ -111,7 +111,7 @@ from gettext import gettext as _
 
 from nssbackup.pkginfo import Infos
 from nssbackup.util.log import LogFactory
-import FileAccessManager as FAM
+from nssbackup.util import file_handling as FAM
 import nssbackup.util as Util
 from nssbackup.util.exceptions import SBException
 from nssbackup.util.exceptions import NonValidOptionException
@@ -161,17 +161,16 @@ def get_profiles(prfdir):
     @return: a dictionarity of { name: [path_to_conffile, enable] } 
     """
     profiles = dict()
-    if not os.path.exists(prfdir) or not os.path.isdir(prfdir) :
-        pass
-    else:
-        for conff in os.listdir(prfdir) :
+    if os.path.exists(prfdir) and os.path.isdir(prfdir):
+        _listing = os.listdir(prfdir)
+        for conff in  _listing:
             mobj = ConfigManagerStaticData.get_profilename_re().match(conff)
-            if mobj and os.path.isfile(conff):
+            if mobj is not None:
                 name = mobj.group(1)
                 path = os.path.join(prfdir, mobj.group(0))
-                enable = (mobj.group(2) is None)
-                profiles[name] = [path, enable]
-
+                if os.path.isfile(path):
+                    enable = (mobj.group(2) is None)
+                    profiles[name] = [path, enable]
     return profiles
 
 
@@ -1275,7 +1274,7 @@ class ConfigManagerStaticData(object):
 
     __profiles_dir = "nssbackup.d"
 
-    __profilename_re = re.compile('^nssbackup-(.+?).conf(-disable)?$')
+    __profilename_re = re.compile(r"^nssbackup-(.+?).conf(-disable)?$")
 
     # configuration's existing sections and options
     __our_options = {
@@ -1537,8 +1536,6 @@ class _DefaultConfiguration(Configuration):
     """
 
     def __init__(self):
-#        super(DefaultConfiguration, self).__init__() # don't use this form,
-# see http://fuhm.net/super-harmful/
         Configuration.__init__(self)
 
         self._regex_excludes = "\.mp3$,\.avi$,\.mpeg$,\.mkv$,\.ogg$,\.iso$,"\
@@ -1557,6 +1554,7 @@ class _DefaultConfiguration(Configuration):
         self._loglevel = 20
         self._report_smtpfrom = Infos.SMTPFROM
 
+        self._lockfile = "/var/lock/sbackup/sbackup.lock"
         self._prefix = '/usr'
         self._purge = "30"
 
@@ -1578,7 +1576,6 @@ class _DefaultConfigurationForAdmins(_DefaultConfiguration):
 
         self._mountdir = "/mnt/nssbackup"
         self._target = "/var/backup"
-        self._lockfile = "/var/lock/nssbackup.lock"
 
         self._dirconf = { '/etc/'            : '1',
                             '/var/'            : '1',
@@ -1613,7 +1610,6 @@ class _DefaultConfigurationForUsers(_DefaultConfiguration):
         _hdl = ConfigurationFileHandler()
         self._mountdir = os.path.join(_hdl.get_user_datadir(), "mountdir")
         self._target = os.path.join(_hdl.get_user_datadir(), "backups")
-        self._lockfile = os.path.join(_hdl.get_user_datadir(), "nssbackup.lock")
 
         self._dirconf = {    os.getenv("HOME") + os.sep        : '1' }
 

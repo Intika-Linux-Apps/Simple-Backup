@@ -26,6 +26,10 @@ import types
 from nssbackup.util import readline_nullsep
 
 
+COMMAND_GREP = "grep"
+COMMAND_PS = "ps"
+
+
 CLEAN_ENVIRONMENT = {
     "SHELL" : "",
     "MANDATORY_PATH" : "",
@@ -94,17 +98,16 @@ def switch_user(uid_name):
     """
     """
     starting_uid = os.getuid()
-    starting_gid = os.getgid()
-    starting_uid_name = pwd.getpwuid(starting_uid)[0]
-
-    print 'switch_user: started as %s/%s' % \
-    (pwd.getpwuid(starting_uid).pw_name,
-    grp.getgrgid(starting_gid).gr_name)
+#    starting_gid = os.getgid()
+#    starting_uid_name = pwd.getpwuid(starting_uid)[0]
+#    print 'switch_user: started as %s/%s' % \
+#    (pwd.getpwuid(starting_uid).pw_name,
+#    grp.getgrgid(starting_gid).gr_name)
 #    print "UID: %s  EUID: %s  GID: %s" % (os.getuid(), os.geteuid(), os.getgid())
 
     if os.getuid() != 0:
         # We're not root so, like, whatever dude
-        print "switch_user: already running as '%s'" % starting_uid_name
+#        print "switch_user: already running as '%s'" % starting_uid_name
         return
 
     # If we started as root, drop privs and become the specified user/group
@@ -132,7 +135,7 @@ def switch_user(uid_name):
     # Ensure a very convervative umask
     new_umask = 077
     old_umask = os.umask(new_umask)
-    print 'drop_privileges: Old umask: %s, new umask: %s' % \
+#    print 'drop_privileges: Old umask: %s, new umask: %s' % \
     (oct(old_umask), oct(new_umask))
 
     final_uid = os.getuid()
@@ -210,17 +213,36 @@ def debug_print_environment():
     print "-----------------------------------------------------------------------------"
 
 
-def exec_command(args):
+def exec_command_async(args, env = None):
     if not isinstance(args, types.ListType):
         raise TypeError("List of arguments expected.")
-    _output = subprocess.Popen(args, stdout = subprocess.PIPE).communicate()[0]
+    pid = subprocess.Popen(args, env = env).pid
+    return pid
+
+
+def exec_command_stdout(args, env = None):
+    """
+    :note: Standard output is hold in memory. Don't use this if you expect much output.
+    """
+    if not isinstance(args, types.ListType):
+        raise TypeError("List of arguments expected.")
+    _output = subprocess.Popen(args, stdout = subprocess.PIPE, env = env).communicate()[0]
     _output = _output.strip()
     return _output
 
 
+def exec_command_returncode(args, env = None):
+    """
+    """
+    if not isinstance(args, types.ListType):
+        raise TypeError("List of arguments expected.")
+    _ret = subprocess.call(args, env = env)
+    return _ret
+
+
 def grep_pid(processname):
     _pid = None
-    output = exec_command(args = ["pgrep", processname])
+    output = exec_command_stdout(args = ["pgrep", processname])
     try:
         _pid = int(output)
     except ValueError:
@@ -229,12 +251,42 @@ def grep_pid(processname):
     return _pid
 
 
-def pid_exists(pid):
+def pid_exists(pid, processname = None):
     """
     @type pid: String
     """
+    if not isinstance(pid, types.StringTypes):
+        raise TypeError("PID expected as string.")
+    if processname is not None:
+        if not isinstance(processname, types.StringTypes):
+            raise TypeError("Process name expected as string.")
+
     _exists = False
-    output = exec_command(args = ["ps", "--no-headers", "--pid", pid])
+    output = exec_command_stdout(args = [COMMAND_PS, "--no-headers", "-lF", "--pid", pid])
     if output != "":
+        if processname is None:
+            _exists = True
+        else:
+            if processname in output:
+                _exists = True
+    return _exists
+
+
+def proc_exists(processname, env = None):
+    if not isinstance(processname, types.StringTypes):
+        raise TypeError("Process name expected as string.")
+    if COMMAND_GREP in processname:
+        raise ValueError("Name of checked process must not contain `%s`" % COMMAND_GREP)
+
+    _exists = False
+    cmd_ps = subprocess.Popen([COMMAND_PS, "ax", "--no-headers", "-lF"],
+                              stdout = subprocess.PIPE, env = env)
+    cmd_v_grep = subprocess.Popen([COMMAND_GREP, "-v", COMMAND_GREP],
+                                  stdin = cmd_ps.stdout, stdout = subprocess.PIPE, env = env)
+    cmd_grep = subprocess.Popen([COMMAND_GREP, processname],
+                                stdin = cmd_v_grep.stdout, stdout = subprocess.PIPE, env = env)
+    _output = cmd_grep.communicate()[0]
+    _output = _output.strip()
+    if _output != "":
         _exists = True
     return _exists
