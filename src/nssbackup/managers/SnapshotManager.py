@@ -1027,7 +1027,6 @@ class SnapshotManager(object):
                         break
                 if _was_removed is not True:
                     break
-                    print "No more snapshots to remove. Break."
             self.get_snapshots(forceReload = True)
 
 def _get_snapshots_older_than(snapshots, max_age, logger = None):

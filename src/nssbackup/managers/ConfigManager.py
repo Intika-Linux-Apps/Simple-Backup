@@ -1,19 +1,22 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+#    NSsbackup - backup a certain profile
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
 #
-# Authors: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#           Jean-Peer Lorenz <peer.loz@gmx.net>
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
 
 """
 Format of the configuration file used by NSsbackup:
@@ -430,15 +433,17 @@ class ConfigManager(ConfigParser.ConfigParser):
         If no values are set, None is returned.
         """
         _section = "dirconfig"
-#        print ">>>> OPTIONS"
-#        print self.options(_section)
         _res = None
         if self.has_section(_section):
             _items = self.items(_section)
-            if not len(_items):
-                pass
-            else:
-                _res = _items
+            print ">>> Dirconfig items: ", str(_items)
+            if len(_items) > 0:
+                _res = []
+                for _item in _items:
+                    assert len(_item) == 2
+                    _res.append((_item[0].replace("\\x3d", "="), int(_item[1])))
+
+        print ">>> Result: ", str(_res)
         return _res
 
     def get_followlinks(self):

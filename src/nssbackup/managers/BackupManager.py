@@ -148,12 +148,12 @@ class BackupManager(object):
         self.logger.info(_("Backup process is being started."))
         self.__state.set_state('start')
 
-        # purge
-        purge = None
-        if self.config.has_option("general", "purge"):
-            purge = self.config.get("general", "purge")
-        if purge :
-            self.__snpman.purge(purge)
+#        # purge
+#        purge = None
+#        if self.config.has_option("general", "purge"):
+#            purge = self.config.get("general", "purge")
+#        if purge :
+#            self.__snpman.purge(purge)
 
         # get basic informations about new snapshot
         (snppath, base) = self.__retrieve_basic_infos()
@@ -218,6 +218,17 @@ class BackupManager(object):
 
         self.logger.info(_("Backup process finished."))
         self.__state.set_state('finish')
+
+        # purge
+        purge = None
+        if self.config.has_option("general", "purge"):
+            purge = self.config.get("general", "purge")
+        if purge is not None:
+            try:
+                self.__snpman.purge(purge)
+            except Exception, error:
+                self.logger.error(_("Error while purging old snapshots: %s") % error)
+
 
     def __fillSnapshot(self):
         """Fill snapshot's include and exclude lists and retrieve some information
@@ -329,8 +340,7 @@ class BackupManager(object):
                     _retry = self.__dbus_conn.get_retry_target_check()
                     if _retry == constants.RETRY_FALSE:
                         raise exceptions.BackupCanceledError
-#                            raise exceptions.SBException(_("Target directory '%(target)s' does not exist.")\
-#                                            % {"target" : _target})
+
                     elif _retry == constants.RETRY_TRUE:
                         if FAM.exists(_target):
                             pass
@@ -969,9 +979,9 @@ class FileCollector(object):
             self.__logger.warning(_("No directories to backup defined."))
         else:
             for _dir, _incl in _config.get_dirconfig():
-                if int(_incl) == 1:
+                if _incl == 1:
                     self.__snapshot.addToIncludeFlist(_dir)
-                elif int(_incl) == 0:
+                elif _incl == 0:
                     self.__snapshot.addToExcludeFlist(_dir)
 
         # add the default excluded ones

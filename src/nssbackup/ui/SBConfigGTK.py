@@ -503,11 +503,12 @@ class SBconfigGTK(GladeGnomeApp):
         _section = "dirconfig"
         self.include.clear()
         self.ex_paths.clear()
-        if self.configman.has_section(_section) :
-            for _item, _value in self.configman.items(_section):
-                if _value == "1":
+        dirconfig = self.configman.get_dirconfig()
+        if dirconfig is not None:
+            for _item, _value in dirconfig:
+                if _value == 1:
                     self.include.append([_item])
-                elif _value == "0":
+                elif _value == 0:
                     self.ex_paths.append([_item])
 
     def __fill_remotedir_widgets_from_config(self):
@@ -1192,12 +1193,13 @@ class SBconfigGTK(GladeGnomeApp):
         dialog.add_filter(filter)
 
         response = dialog.run()
-        if response == gtk.RESPONSE_OK and not self.already_inc(self.configman.items("dirconfig"), dialog.get_filename()):
-            self.include.append([dialog.get_filename()])
-            self.configman.set("dirconfig", dialog.get_filename(), "1")
-            self.isConfigChanged()
-        elif response == gtk.RESPONSE_CANCEL:
-            pass
+        if response == gtk.RESPONSE_OK:
+            _file = _prepare_filename(dialog.get_filename())
+            _enc_file = _escape_path(_file)
+            if not self.already_inc(self.configman.items("dirconfig"), _enc_file):
+                self.include.append([_file])
+                self.configman.set("dirconfig", _enc_file, "1")
+                self.isConfigChanged()
         dialog.destroy()
 
     def __check_for_section(self, section):
@@ -1214,20 +1216,21 @@ class SBconfigGTK(GladeGnomeApp):
         dialog.set_default_response(gtk.RESPONSE_OK)
 
         response = dialog.run()
-        if response == gtk.RESPONSE_OK and not self.already_inc(self.configman.items("dirconfig"), dialog.get_filename() + "/"):
-            self.include.append([dialog.get_filename() + "/"])
-            self.configman.set("dirconfig", dialog.get_filename() + "/", "1")
-            self.isConfigChanged()
-        elif response == gtk.RESPONSE_CANCEL:
-            pass
+        if response == gtk.RESPONSE_OK:
+            _dir = _prepare_dirname(dialog.get_filename())
+            _enc_dir = _escape_path(_dir)
+            if not self.already_inc(self.configman.items("dirconfig"), _enc_dir):
+                self.include.append([_dir])
+                self.configman.set("dirconfig", _enc_dir, "1")
+                self.isConfigChanged()
         dialog.destroy()
 
     def on_inc_del_clicked(self, *args):
         self.__check_for_section("dirconfig")
         (store, iter) = self.includetv.get_selection().get_selected()
         if store and iter:
-            value = store.get_value(iter, 0)
-            self.configman.remove_option("dirconfig", value)
+            enc_val = _escape_path(store.get_value(iter, 0))
+            self.configman.remove_option("dirconfig", enc_val)
             self.isConfigChanged()
             store.remove(iter)
 
@@ -1346,12 +1349,13 @@ class SBconfigGTK(GladeGnomeApp):
         dialog.add_filter(filter)
 
         response = dialog.run()
-        if response == gtk.RESPONSE_OK and not self.already_inc(self.configman.items("dirconfig"), dialog.get_filename()):
-            self.ex_paths.append([dialog.get_filename()])
-            self.configman.set("dirconfig", dialog.get_filename(), "0")
-            self.isConfigChanged()
-        elif response == gtk.RESPONSE_CANCEL:
-            pass
+        if response == gtk.RESPONSE_OK:
+            _file = _prepare_filename(dialog.get_filename())
+            _enc_file = _escape_path(_file)
+            if not self.already_inc(self.configman.items("dirconfig"), _enc_file):
+                self.ex_paths.append([_file])
+                self.configman.set("dirconfig", _enc_file, "0")
+                self.isConfigChanged()
         dialog.destroy()
 
     def on_ex_adddir_clicked(self, *args):
@@ -1364,20 +1368,21 @@ class SBconfigGTK(GladeGnomeApp):
         dialog.set_default_response(gtk.RESPONSE_OK)
 
         response = dialog.run()
-        if response == gtk.RESPONSE_OK and not self.already_ex(self.configman.items("dirconfig"), dialog.get_filename() + "/"):
-            self.ex_paths.append([dialog.get_filename() + "/"])
-            self.configman.set("dirconfig", dialog.get_filename() + "/", "0")
-            self.isConfigChanged()
-        elif response == gtk.RESPONSE_CANCEL:
-            pass
+        if response == gtk.RESPONSE_OK:
+            _dir = _prepare_dirname(dialog.get_filename())
+            _enc_dir = _escape_path(_dir)
+            if not self.already_ex(self.configman.items("dirconfig"), _enc_dir):
+                self.ex_paths.append([_dir])
+                self.configman.set("dirconfig", _enc_dir, "0")
+                self.isConfigChanged()
         dialog.destroy()
 
     def on_ex_delpath_clicked(self, *args):
         self.__check_for_section("dirconfig")
         (store, iter) = self.ex_pathstv.get_selection().get_selected()
         if store and iter:
-            value = store.get_value(iter, 0)
-            self.configman.remove_option("dirconfig", value)
+            enc_val = _escape_path(store.get_value(iter, 0))
+            self.configman.remove_option("dirconfig", enc_val)
             self.isConfigChanged()
             store.remove(iter)
 
@@ -2190,6 +2195,7 @@ class SBconfigGTK(GladeGnomeApp):
         # filesystem is not probed, we want to set new values
         self._fill_widgets_from_config(probe_fs = False)
 
+
 def _forbid_default_profile_removal(action):
     """Helper function that shows an info box which states that we are
     not able to do the given action on the default profile.    
@@ -2202,6 +2208,20 @@ def _forbid_default_profile_removal(action):
     dialog.set_markup(info)
     dialog.run()
     dialog.destroy()
+
+
+def _prepare_dirname(path):
+    _res = "%s%s" % (path.rstrip(os.sep), os.sep)
+    return _res
+
+
+def _prepare_filename(path):
+    _res = "%s" % (path.rstrip(os.sep))
+    return _res
+
+def _escape_path(path):
+    _enc_res = path.replace("=", "\\x3d")
+    return _enc_res
 
 
 def main(argv):
