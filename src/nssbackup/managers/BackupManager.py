@@ -978,7 +978,7 @@ class FileCollector(object):
         if _config.has_dirconfig_entries() is False:
             self.__logger.warning(_("No directories to backup defined."))
         else:
-            for _dir, _incl in _config.get_dirconfig():
+            for _dir, _incl in _config.get_dirconfig_local():
                 if _incl == 1:
                     self.__snapshot.addToIncludeFlist(_dir)
                 elif _incl == 0:
@@ -1062,7 +1062,7 @@ class FileCollectorConfigFacade(object):
     def __set_dirconfig_from_config(self):
         if self.__configuration is None:
             raise ValueError("No configuration set.")
-        self.__dirconfig = self.__configuration.get_dirconfig()
+        self.__dirconfig = self.__configuration.get_dirconfig_local()
         if self.__dirconfig is None:
             self.__dirconfig_set = False
         else:
@@ -1077,7 +1077,7 @@ class FileCollectorConfigFacade(object):
     def get_target_dir(self):
         return self.__target_dir
 
-    def get_dirconfig(self):
+    def get_dirconfig_local(self):
         """Returns the directory configuration stored in a list of pairs (name, value).
         
         @rtype: List

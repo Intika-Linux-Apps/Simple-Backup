@@ -28,24 +28,24 @@ class TestFuseFAM(unittest.TestCase):
     def testsshPluginMatchScheme(self):
         "Test sshPlugin Matching URL"
         sshPlugin = sshFuseFAM()
-        self.assertTrue(sshPlugin.matchScheme("ssh://user:pass@server/"));
-        self.assertTrue(sshPlugin.matchScheme("ssh://user:pass@server:21/my/dir"));
-        self.assertTrue(sshPlugin.matchScheme("ssh://user@server:21/my/dir"));
-        self.assertTrue(sshPlugin.matchScheme("ssh://user@server/my/dir"));
-        self.assertFalse(sshPlugin.matchScheme("ssh://userserver/my/dir"));
-        self.assertTrue(sshPlugin.matchScheme("ssh://user@mail.com@192.168.0.4:11/"))
-        self.assertTrue(sshPlugin.matchScheme("ssh://user@mail.com:password@192.168.0.4:11/test"))
+        self.assertTrue(sshPlugin.match_scheme_full("ssh://user:pass@server/"));
+        self.assertTrue(sshPlugin.match_scheme_full("ssh://user:pass@server:21/my/dir"));
+        self.assertTrue(sshPlugin.match_scheme_full("ssh://user@server:21/my/dir"));
+        self.assertTrue(sshPlugin.match_scheme_full("ssh://user@server/my/dir"));
+        self.assertFalse(sshPlugin.match_scheme_full("ssh://userserver/my/dir"));
+        self.assertTrue(sshPlugin.match_scheme_full("ssh://user@mail.com@192.168.0.4:11/"))
+        self.assertTrue(sshPlugin.match_scheme_full("ssh://user@mail.com:password@192.168.0.4:11/test"))
 
     def testftpPluginMatchScheme(self):
         "Test ftpPlugin Matching URL"
         ftpPlugin = ftpFuseFAM()
-        self.assertTrue(ftpPlugin.matchScheme("ftp://user:pass@server/"));
-        self.assertTrue(ftpPlugin.matchScheme("ftp://user:pass@server:21/my/dir"));
-        self.assertFalse(ftpPlugin.matchScheme("ftp://user@server:21/my/dir"));
-        self.assertFalse(ftpPlugin.matchScheme("ftp://user@server/my/dir"));
-        self.assertTrue(ftpPlugin.matchScheme("ftp://userserver/my/dir"));
-        self.assertFalse(ftpPlugin.matchScheme("ftp://user@mail.com@192.168.0.4:11/"))
-        self.assertTrue(ftpPlugin.matchScheme("ftp://user@mail.com:password@192.168.0.4:11/test"))
+        self.assertTrue(ftpPlugin.match_scheme_full("ftp://user:pass@server/"));
+        self.assertTrue(ftpPlugin.match_scheme_full("ftp://user:pass@server:21/my/dir"));
+        self.assertFalse(ftpPlugin.match_scheme_full("ftp://user@server:21/my/dir"));
+        self.assertFalse(ftpPlugin.match_scheme_full("ftp://user@server/my/dir"));
+        self.assertTrue(ftpPlugin.match_scheme_full("ftp://userserver/my/dir"));
+        self.assertFalse(ftpPlugin.match_scheme_full("ftp://user@mail.com@192.168.0.4:11/"))
+        self.assertTrue(ftpPlugin.match_scheme_full("ftp://user@mail.com:password@192.168.0.4:11/test"))
 
 
     def testsshPlugindefineMount(self):

@@ -40,21 +40,24 @@ class pluginFAM(object):
     def __init__(self):
         self.logger = LogFactory.getLogger()
 
-    def matchScheme(self, remoteSource):
+    def match_scheme(self, remoteSource):
+        raise SBException("'match_scheme_full' Not implemented for this plugin")
+
+    def match_scheme_full(self, remoteSource):
         """
         Try to match the scheme of the remoteSource.
         @param remoteSource: The remote path
         @return: True if the scheme matches the one for this 
         @rtype: boolean
         """
-        raise SBException("'matchScheme' Not implemented for this plugin")
+        raise SBException("'match_scheme_full' Not implemented for this plugin")
 
     def mount(self, source, mountbase):
         """
         Mount the source intor the mountbase dir . This method should create a mount point to mount the source. 
         The name of the mount point should be very expressive so that we avoid collision with other mount points
         This method will return a tuple (baseRemoteSource, mountpoint, pathinside) where
-        - baseRemoteSource is the substring that represent the mount source (usually at the start of the source). The matchScheme method should be able to match it
+        - baseRemoteSource is the substring that represent the mount source (usually at the start of the source). The match_scheme_full method should be able to match it
         - mountpoint is the mount point of this baseRemoteSource.
         - pathinside is the path inside the remote source 
         [Use case]
@@ -71,24 +74,30 @@ class pluginFAM(object):
         """
         Default behaviour is to unmount with fuse
         """
-        if not os.path.ismount(mounteddir) :
-            # mountpoint is not mounted 
-            return
-        # Create output log file
-        outptr, outFile = mkstemp(prefix = "fuseUmount_output_")
-        # Create error log file
-        errptr, errFile = mkstemp(prefix = "fuseUmount_error_")
-        # Call the subprocess using convenience method
-        retval = subprocess.call(["fusermount", "-u", mounteddir], 0, None, None, outptr, errptr)
-        # Close log handles
-        os.close(errptr)
-        os.close(outptr)
-        outStr, errStr = readfile(outFile), readfile(errFile)
-        delete(outFile)
-        delete(errFile)
-        if retval != 0 :
-            raise SBException("Couldn't unmount '%s' : %s" % (mounteddir, errStr))
-        self.logger.info("Successfully unmounted: '%s'" % mounteddir)
+        if os.path.ismount(mounteddir):
+            self.logger.debug("Unmounting `%s`" % mounteddir)
+            # Create output and error log file
+            outptr, outFile = mkstemp(prefix = "fuseUmount_output_")
+            errptr, errFile = mkstemp(prefix = "fuseUmount_error_")
+
+            # Call the subprocess using convenience method using lazy umount
+            retval = subprocess.call(["fusermount", "-u", "-z", mounteddir], 0, None, None, outptr, errptr)
+
+            # Close log handles
+            os.close(errptr)
+            os.close(outptr)
+            outStr, errStr = readfile(outFile), readfile(errFile)
+            delete(outFile)
+            delete(errFile)
+
+            self.logger.debug("fusermount output:\n%s\n%s" % (outStr, errStr))
+
+            if retval != 0 :
+                raise SBException("Unable to unmount `%s`: %s" % (mounteddir, errStr))
+            else:
+                self.logger.info("Successfully unmounted: `%s`" % mounteddir)
+        else:
+            self.logger.warning("Unable to unmount `%s`: not mounted" % mounteddir)
 
     def checkifmounted (self, source, mountbase):
         """

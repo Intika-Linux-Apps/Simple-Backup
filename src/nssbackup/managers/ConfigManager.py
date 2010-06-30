@@ -428,7 +428,7 @@ class ConfigManager(ConfigParser.ConfigParser):
                 _maxsize = _val
         return _maxsize
 
-    def get_dirconfig(self):
+    def get_dirconfig_local(self):
         """Returns a list of pairs of (name, value) from the 'dirconfig' section.
         If no values are set, None is returned.
         """
@@ -441,7 +441,10 @@ class ConfigManager(ConfigParser.ConfigParser):
                 _res = []
                 for _item in _items:
                     assert len(_item) == 2
-                    _res.append((_item[0].replace("\\x3d", "="), int(_item[1])))
+                    if _item[0] == "remote":
+                        pass
+                    else:
+                        _res.append((_item[0].replace("\\x3d", "="), int(_item[1])))
 
         print ">>> Result: ", str(_res)
         return _res

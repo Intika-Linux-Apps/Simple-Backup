@@ -28,6 +28,7 @@
 
 from gettext import gettext as _
 import types
+import os
 
 
 from nssbackup.util import file_handling as fam
@@ -51,6 +52,15 @@ class ApplicationLock(object):
         self.__pid = pid
         self.__logger = log.LogFactory.getLogger()
 
+    def __prepare_lock_dir(self):
+        _dir = os.path.dirname(self.__lockfile)
+        if not fam.exists(_dir):
+            try:
+                os.mkdir(_dir)
+                os.chmod(_dir, 0777)
+            except (OSError, IOError), error:
+                self.__logger.error("Unable to make lock directory: %s" % error)
+                raise exceptions.ApplicationLockError
 
     def lock(self):
         """Sets a lock file. 
@@ -58,6 +68,8 @@ class ApplicationLock(object):
         * use fixed location (users and superusers); ignore settings in configuration files
         * existence of directory `sbackup` with mode 777 is assumed (no sticky bit set) 
         """
+        self.__prepare_lock_dir()
+
         if fam.exists(self.__lockfile):
             if self.__is_lock_valid() is True:
                 raise exceptions.InstanceRunningError(\
@@ -65,9 +77,12 @@ class ApplicationLock(object):
             else:
                 self.__logger.info(_("Invalid lock file found. Is being removed."))
                 self.__force_unsetlock()
-
-        fam.writetofile(self.__lockfile, str(self.__pid))
-        self.__logger.debug("Created lockfile `%s` with info `%s`." % (self.__lockfile, str(self.__pid)))
+        try:
+            fam.writetofile(self.__lockfile, str(self.__pid))
+            self.__logger.debug("Created lockfile `%s` with info `%s`." % (self.__lockfile, str(self.__pid)))
+        except (OSError, IOError), error:
+            self.__logger.error("Unable to create lock: %s" % error)
+            raise exceptions.ApplicationLockError
 
     def __is_lock_valid(self):
         valid = False
@@ -109,12 +124,12 @@ class ApplicationLock(object):
                 try:
                     fam.delete(self.__lockfile)
                     self.__logger.debug("Lock file '%s' removed." % self.__lockfile)
-                except OSError, _exc:
+                except  (OSError, IOError), _exc:
                     self.__logger.error(_("Unable to remove lock file: %s") % str(_exc))
             else:
                 self.__logger.debug("Unable to remove lock: not owned by this process.")
         else:
-            self.__logger.info(_("Unable to remove lock file: File not found."))
+            self.__logger.warning(_("Unable to remove lock file: File not found."))
 
     def __force_unsetlock(self):
         """Remove lockfile.
@@ -123,7 +138,7 @@ class ApplicationLock(object):
             try:
                 fam.delete(self.__lockfile)
                 self.__logger.debug("Lock file '%s' removed." % self.__lockfile)
-            except OSError, _exc:
+            except (OSError, IOError), _exc:
                 self.__logger.error(_("Unable to remove lock file: %s") % str(_exc))
         else:
             self.__logger.info(_("Unable to remove lock file: File not found."))

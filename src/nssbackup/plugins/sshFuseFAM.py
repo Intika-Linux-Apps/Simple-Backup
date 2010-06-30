@@ -23,6 +23,10 @@ from gettext import gettext as _
 from nssbackup.util.exceptions import FuseFAMException, SBException
 from nssbackup.util.log import LogFactory
 
+
+ssh_re = "^sftp://"
+ssh_url_re = ssh_re + "([^:]+?)(:([^@]+?))?@([^/^:^@]+?)(:([0-9]+?))?/(.*)"
+
 class sshFuseFAM (pluginFAM)  :
     """
     The fuseFAM plugin for ssh
@@ -30,20 +34,32 @@ class sshFuseFAM (pluginFAM)  :
     @author: Oumar Aziz Ouattara
     """
 
-    schemeRE = "^ssh://([^:]+?)(:([^@]+?))?@([^/^:^@]+?)(:([0-9]+?))?/(.*)"
+
 
     def __init__(self):
         self.logger = LogFactory.getLogger()
 
-    def matchScheme(self, remoteSource):
+    def match_scheme(self, remoteSource):
         """
         SSH schema is like : ssh://user:pass@example.com/home/user/backup/ 
         (user,pass, the first '/' ) are mandatory
         """
-        self.logger.debug("matching '%s' using Regex '%s'" % (remoteSource, self.schemeRE))
-        if re.compile(self.schemeRE).search(remoteSource) :
-            return True
-        return False
+        _res = False
+        _search_res = re.compile(ssh_re).search(remoteSource)
+        if _search_res is not None:
+            _res = True
+        return _res
+
+    def match_scheme_full(self, remoteSource):
+        """
+        SSH schema is like : ssh://user:pass@example.com/home/user/backup/ 
+        (user,pass, the first '/' ) are mandatory
+        """
+        _res = False
+        _search_res = re.compile(ssh_url_re).search(remoteSource)
+        if _search_res is not None:
+            _res = True
+        return _res
 
     def mount(self, source, mountbase):
         """
@@ -53,7 +69,7 @@ class sshFuseFAM (pluginFAM)  :
         @param mountbase: The mount points base dir
         @return: The mount point complete path
         """
-        exp = re.compile(self.schemeRE)
+        exp = re.compile(ssh_url_re)
         match = exp.search(source)
         if not match :
             raise FuseFAMException(_("Error matching the schema 'ssh://user:pass@example.com/home/' with '%s' (The '/' after server is mandatory)") % source)
@@ -103,13 +119,15 @@ class sshFuseFAM (pluginFAM)  :
             self.logger.debug("Expecting password.")
             if not password :
                 sshfsp.sendline("fake")
+                os.rmdir(mountpoint)
                 raise SBException("sshfs is requesting a password and none has been passed.")
             sshfsp.sendline(password)
             i = sshfsp.expect(['(yes/no)', 'password:', 'Password:', pexpect.EOF])
 
         result = sshfsp.before # print out the result
 
-        if sshfsp.isalive() or sshfsp.exitstatus :
+        if sshfsp.isalive() or sshfsp.exitstatus:
+            os.rmdir(mountpoint)
             raise SBException (_("The sshfs command '%(command)s' didn't perform normally. Output => %(erroroutput)s ") % {"command" : cmd, "erroroutput" : result})
 
         return (remoteSource, mountpoint, pathinside)
@@ -128,7 +146,7 @@ class sshFuseFAM (pluginFAM)  :
     def _defineMountDirName(self, remote):
         """
         """
-        exp = re.compile(self.schemeRE)
+        exp = re.compile(ssh_url_re)
         match = exp.search(remote)
         if not match :
             raise FuseFAMException(_("Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' (The '/' after server is mandatory)") % remote)

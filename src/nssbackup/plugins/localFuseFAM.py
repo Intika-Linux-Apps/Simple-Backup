@@ -25,7 +25,10 @@ class localFuseFAM (pluginFAM):
     @version: 1.0
     """
 
-    def matchScheme(self, remoteSource):
+    def match_scheme(self, remoteSource):
+        return remoteSource.startswith(os.sep)
+
+    def match_scheme_full(self, remoteSource):
         """
         Try to match the scheme of the remoteSource.
         @param remoteSource: The remote path

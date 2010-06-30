@@ -44,6 +44,11 @@ class InstanceRunningError(SBException) :
     already running.
     """
 
+class ApplicationLockError(SBException) :
+    """This Exception is thrown if another application instance is
+    already running.
+    """
+
 class BackupCanceledError(SBException) :
     """This Exception is thrown if the backup process is canceled from
     the indicator gui.

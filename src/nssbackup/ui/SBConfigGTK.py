@@ -503,7 +503,7 @@ class SBconfigGTK(GladeGnomeApp):
         _section = "dirconfig"
         self.include.clear()
         self.ex_paths.clear()
-        dirconfig = self.configman.get_dirconfig()
+        dirconfig = self.configman.get_dirconfig_local()
         if dirconfig is not None:
             for _item, _value in dirconfig:
                 if _value == 1:
@@ -518,12 +518,17 @@ class SBconfigGTK(GladeGnomeApp):
         _section = "dirconfig"
         _option = "remote"
         self.remoteinc.clear()
-        if self.configman.has_option(_section, _option) :
+        if self.configman.has_option(_section, _option):
+            print ">>> remote option found"
             for _itm, _val in self.configman.get(_section, _option).iteritems():
-                if _val == "1":
+                print ">>> _itm: %s  _val: %s" % (_itm, _val)
+                _val = int(_val)
+                if _val == 1:
                     self.remoteinc.append([_itm])
-                elif _val == "0":
-                    print ("TODO: add a remote ex widget")
+                elif _val == 0:
+                    print "TODO: add remote exclude widget"
+                else:
+                    print "Unrecognized value for `%s`: %s" % (_itm, _val)
 
     def __fill_regex_widgets_from_config(self):
         # regexp excludes
@@ -1284,7 +1289,7 @@ class SBconfigGTK(GladeGnomeApp):
         plugin = plist[pname]()
         # update the help label
         try :
-            if plugin.matchScheme(entry) :
+            if plugin.match_scheme_full(entry) :
                 dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = "Test Succeeded !")
                 dialog.run()
                 dialog.destroy()

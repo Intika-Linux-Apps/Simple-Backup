@@ -24,7 +24,9 @@ from tempfile import mkstemp
 from nssbackup.util import file_handling as FAM
 from nssbackup.util.exceptions import FuseFAMException
 
-sftpUrlRegex = "^sftp://" + "(([^:]+):([^@]+)@)?" + "([^/^:^@]+?)" + "(:([0-9]+))?" + "/(.*)"
+
+sftp_re = "^sftp://"
+sftpUrlRegex = sftp_re + "(([^:]+):([^@]+)@)?" + "([^/^:^@]+?)" + "(:([0-9]+))?" + "/(.*)"
 
 class sftpFuseFAM (pluginFAM)  :
     """
@@ -32,7 +34,14 @@ class sftpFuseFAM (pluginFAM)  :
     @requires: curlftpfs
     """
 
-    def matchScheme(self, remoteSource):
+    def match_scheme(self, remoteSource):
+        _res = False
+        _search_res = re.compile(sftp_re).search(remoteSource)
+        if _search_res is not None:
+            _res = True
+        return _res
+
+    def match_scheme_full(self, remoteSource):
         """This method checks for the scheme (the protocol) of the given
         remote source, i.e. it should not check the validity of the URL.
         This behavior is necessary since otherwise no plugin is found
@@ -62,10 +71,8 @@ class sftpFuseFAM (pluginFAM)  :
         spliturl = SplittedURL(source)
         mountpoint = self.__get_mount_dir(mountbase, spliturl)
 
-# TODO: Should we check if it is already mounted first?
         if not os.path.exists(mountpoint) :
-# TODO: only the directories specified in URL should be created!
-            os.makedirs(mountpoint)
+            os.mkdir(mountpoint)
 
         #If the path is already mounted No need to retry
         if not self.checkifmounted(source, mountbase) :
@@ -98,6 +105,7 @@ class sftpFuseFAM (pluginFAM)  :
             try:
                 retval = subprocess.call(curl_cmd, 0, None, None, outptr, errptr)
             except OSError, _exc:
+                os.rmdir(mountpoint)
                 raise FuseFAMException(_("Couldn't found external application 'curlftpfs' needed for handling of sftp sites: %s") % _exc)
 
             # Close log handles
@@ -106,7 +114,8 @@ class sftpFuseFAM (pluginFAM)  :
             outStr, errStr = FAM.readfile(outFile), FAM.readfile(errFile)
             FAM.delete(outFile)
             FAM.delete(errFile)
-            if retval != 0 :
+            if retval != 0:
+                os.rmdir(mountpoint)
                 raise FuseFAMException(_("Couldn't mount '%(server)s' into '%(mountpoint)s' : %(error)s") % {'server' : spliturl.server ,
                                                     'mountpoint': mountpoint,
                                                     'error':errStr})

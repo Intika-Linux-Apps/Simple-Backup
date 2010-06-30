@@ -18,6 +18,7 @@
 import subprocess
 import os
 import tempfile
+import time
 from gettext import gettext as _
 
 from nssbackup.util.log import LogFactory
@@ -71,7 +72,6 @@ class FuseFAM(object):
         """
         @return: the mounted dir
         """
-        global  __mountDirs
         if not os.path.exists(self.__mountdir):
             os.mkdir(self.__mountdir)
 
@@ -80,7 +80,7 @@ class FuseFAM(object):
             try :
                 #we got the plugin
                 plugin = p_class()
-                if plugin.matchScheme(remotedir):
+                if plugin.match_scheme_full(remotedir):
                     self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name, remotedir))
                     rsource, mpoint, pathinside = plugin.mount(remotedir, self.__mountdir)
                     self.__mountedDirs[rsource] = mpoint
@@ -97,13 +97,12 @@ class FuseFAM(object):
         @param remotedir:
         @raise SBException:   
         """
-        global __config, __mountDirs
         plugin_manager = PluginManager()
         for p_name, p_class in plugin_manager.getPlugins().iteritems():
             try :
                 #we got the plugin
                 plugin = p_class()
-                if plugin.matchScheme(remotedir):
+                if plugin.match_scheme_full(remotedir):
                     self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name, remotedir))
                     rsource, mpoint, pathinside = plugin.mount(remotedir, self.__mountdir)
                     self.__mountedDirs[rsource] = mpoint
@@ -122,7 +121,7 @@ class FuseFAM(object):
                         # The plugin used was localFuseFAM
                         return True
             except Exception, e :
-                self.logger.warning("ERROR when trying to use plugin '%s' to mount '%s', disabling it ! Cause : %s" % (p_name, remotedir, str(e)))
+                self.logger.error("Error when using plugin `%s` to mount `%s`, disabling it: %s" % (p_name, remotedir, str(e)))
                 if self.__config.has_option("dirconfig", remotedir) :
                     self.logger.debug("Removing '%s' from configManager" % remotedir)
                     self.__config.remove_option("dirconfig", remotedir)
@@ -133,32 +132,22 @@ class FuseFAM(object):
         self.logger.warning("No plugin could deal with that schema '%s', disabling it" % remotedir)
         self.__config.remove_option("dirconfig", remotedir)
 
-    def __umount(self, mounteddir):
-        """
-        Unmount a mounted dir that should be in __mountedDirs dict
-        @param mounteddir:
-        
-        @todo: Should we use lazy unmount (fusermount -z)?
-        """
-        if not os.path.ismount(mounteddir) :
-            # mountpoint is not mounted 
-            return
-        # Create output log file
-        outptr, outFile = tempfile.mkstemp(prefix = "fuseUmount_output_")
-        # Create error log file
-        errptr, errFile = tempfile.mkstemp(prefix = "fuseUmount_error_")
-        # Call the subprocess using convenience method
-        retval = subprocess.call(["fusermount", "-u", mounteddir], 0, None, None, outptr, errptr)
-        # Close log handles
-        os.close(errptr)
-        os.close(outptr)
-        outStr, errStr = FAM.readfile(outFile), FAM.readfile(errFile)
-        FAM.delete(outFile)
-        FAM.delete(errFile)
-        self.logger.debug("fusermount output: %s\n%s" % (outStr, errStr))
-        if retval != 0 :
-            raise SBException("Couldn't unmount '%s' : %s" % (mounteddir, errStr))
-
+    def __remove_mountdir(self, mountpoint):
+        if os.path.exists(mountpoint):
+            if os.path.ismount(mountpoint):
+                self.logger.warning("Unable to remove mountpoint that is busy. Unmount before removing.")
+            else:
+                _listdir = os.listdir(mountpoint)
+                if len(_listdir) == 0:
+                    try:
+                        os.rmdir(mountpoint)
+                        self.logger.debug("Mountpoint `%s` successfully removed." % mountpoint)
+                    except (IOError, OSError), error:
+                        self.logger.error("Unable to remove mountpoint `%s`: %s" % (mountpoint, error))
+                else:
+                    self.logger.warning("Unable to remove mountpoint: directory is not empty.")
+        else:
+            self.logger.warning("Unable to remove mountpoint `%s`: does not exist" % mountpoint)
 
     def __keepAlive(self):
         """
@@ -175,7 +164,7 @@ class FuseFAM(object):
                sites must be improved in some way!  
         """
         self.logger.info(_("Initializing FUSE File Access Manager."))
-        global __mountdir
+
         if not self.__config :
             raise SBException("Can't launch initialize without a configManager.")
 
@@ -210,12 +199,12 @@ class FuseFAM(object):
             if type(remotes) == str :
                 remotes = eval(remotes)
             if type(remotes) != dict :
-                raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )" % (remotes, type(remotes)))
+                raise SBException("Couldn't eval '%s' as a dict (value got = '%r')" % (remotes, type(remotes)))
             self.logger.debug("remotes : '%s'" % remotes)
             for source, flag in remotes.iteritems() :
                 #TODO : check for multiple mount
                 mounted = False
-                for rsource, mountpoint in self.__mountedDirs.iteritems() :
+                for rsource, mountpoint in self.__mountedDirs.iteritems():
                     if source.startswith(rsource) :
                         self.logger.debug("'%s' is already in mounted scope" % source)
                         mounted = True
@@ -247,20 +236,21 @@ class FuseFAM(object):
         self.logger.info(_("Terminating FUSE File Access Manager."))
         plugin_manager = PluginManager()
         for src, dir in self.__mountedDirs.iteritems() :
+            self.logger.debug("Mounted dirs - %s - %s" % (src, dir))
             if src is not os.sep :
                 _umounted = False
                 for p_name, p_class in plugin_manager.getPlugins().iteritems():
                     #we got the plugin
-                    self.logger.debug("Trying '%s' plugin to match '%s' " % (p_name, src))
+                    self.logger.debug("Trying `%s` plugin to match `%s`" % (p_name, src))
                     plugin = p_class()
-                    if plugin.matchScheme(src):
-                        self.logger.debug("Unmounting with '%s' plugin " % p_name)
+                    if plugin.match_scheme(src):
+                        self.logger.debug("Unmounting with `%s` plugin" % p_name)
                         plugin.umount(dir)
-                        os.rmdir(dir)
                         _umounted = True
+                        self.__remove_mountdir(dir)
                         break
                 if not _umounted:
-                    self.logger.warning("Couldn't unmount %s " % dir)
+                    self.logger.warning("Unable to terminate FUSE `%s`" % dir)
 
     def testFusePlugins(self, remotedir):
         """The given remote directory is applied to any found plugins to
@@ -277,6 +267,8 @@ class FuseFAM(object):
         """
         if remotedir.startswith(os.sep) :
             raise SBException("Nothing to do for localpath '%s'." % remotedir)
+
+#TODO: inconsistent path handling!
         # set the defaults 
         if os.getuid() == 0 :
             mountdir = "/mnt/nssbackup/"
@@ -291,27 +283,28 @@ class FuseFAM(object):
         _plugins = plugin_manager.getPlugins()
         _iterator = _plugins.iteritems()
         for p_name, p_class in _iterator:
-            try :
-                #we got the plugin
-                self.logger.debug("Testing of plugin '%s'" % str(p_name))
-                plugin = p_class()
-                if plugin.matchScheme(remotedir):
-                    self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name, remotedir))
+            #we got the plugin
+            self.logger.debug("Testing of plugin '%s'" % str(p_name))
+            plugin = p_class()
+            if plugin.match_scheme_full(remotedir):
+                self.logger.debug("Processing with plugin '%s' to mount '%s'" % (p_name, remotedir))
+                try:
                     rsource, mpoint, pathinside = plugin.mount(remotedir, mountdir)
                     self.logger.debug("Mount Succeeded !")
-                    #write
+
                     self.logger.debug("Testing Writability")
                     test = "testFuseFam"
                     testfile = os.path.join(mpoint, pathinside, test)
                     os.mkdir(testfile)
                     os.rmdir(testfile)
-                    # Unmount 
-                    self.logger.debug("Unmounting !")
-                    self.__umount(mpoint)
-                    if os.path.exists(mpoint):
-                        self.logger.debug("Removing mount dir")
-                        os.rmdir(mpoint)
-                    return True
-            except Exception, e :
-                raise SBException("Failed : %s " % str(e))
+
+                    plugin.umount(mpoint)
+                    self.__remove_mountdir(mpoint)
+
+                except Exception, error:
+                    raise SBException("Test failed with following output:\n\n%s " % error)
+
+                return True
+
         raise SBException("No plugin could deal with that schema '%s'" % remotedir)
+
