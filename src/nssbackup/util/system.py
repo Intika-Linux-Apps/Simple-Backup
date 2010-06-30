@@ -31,46 +31,60 @@ COMMAND_PS = "ps"
 
 
 CLEAN_ENVIRONMENT = {
-    "SHELL" : "",
-    "MANDATORY_PATH" : "",
-    "MANPATH" : "",
-    "PYTHONPATH" : "",
+# default Gnome environment 
+    "_" : "",
+    "COLORTERM" : "",
     "DBUS_SESSION_BUS_ADDRESS" : "",
     "DEFAULTS_PATH" : "",
     "DESKTOP_SESSION" : "",
-    "GTK_MODULES" : "",
-    "LESSOPEN" : "",
-    "USER" : "",
-    "XAUTHORITY" : "",
-    "SESSION_MANAGER" : "",
-    "SHLVL" : "",
     "DISPLAY" : "",
-    "WINDOWID" : "",
-    "GPG_AGENT_INFO" : "",
     "GDM_KEYBOARD_LAYOUT" : "",
     "GDMSESSION" : "",
-    "_" : "",
+    "GDM_LANG" : "",
+    "GNOME_KEYRING_PID" : "",
+    "GNOME_KEYRING_CONTROL" : "",
+    "GPG_AGENT_INFO" : "",
+    "GTK_MODULES" : "",
+    "HISTCONTROL" : "",
+    "HOME" : "",
+    "LANG" : "",
+    "LC_ALL" : "",
+    "LD_LIBRARY_PATH" : "",
+    "LESSCLOSE" : "",
+    "LESSOPEN" : "",
+    "LOGNAME" : "",
+    "MANDATORY_PATH" : "",
+    "MANPATH" : "",
+    "OLDPWD" : "",
+    "PATH" : "",
+    "PWD" : "",
+    "PYTHONPATH" : "",
+    "SESSION_MANAGER" : "",
+    "SHELL" : "",
+    "SHLVL" : "",
+    "SPEECHD_PORT" : "",
+    "SSH_AUTH_SOCK" : "",
+    "TERM" : "",
+    "USER" : "",
+    "USERNAME" : "",
+    "WINDOWID" : "",
+    "XAUTHORITY" : "",
     "XDG_CONFIG_DIRS" : "",
     "XDG_DATA_DIRS" : "",
-    "COLORTERM" : "",
-    "HOME" : "",
-    "LD_LIBRARY_PATH" : "",
-    "LANG" : "",
-    "USERNAME" : "",
-    "LESSCLOSE" : "",
-    "GNOME_KEYRING_PID" : "",
-    "LOGNAME" : "",
-    "PATH" : "",
-    "GNOME_KEYRING_CONTROL" : "",
-    "HISTCONTROL" : "",
-    "TERM" : "",
     "XDG_SESSION_COOKIE" : "",
-    "SSH_AUTH_SOCK" : "",
-    "LC_ALL" : "",
-    "OLDPWD" : "",
-    "GDM_LANG" : "",
-    "SPEECHD_PORT" : "",
-    "PWD" : ""
+# additional KDE environment variables
+    "KDE_FULL_SESSION" : "",
+    "GS_LIB" : "",
+    "DM_CONTROL" : "",
+    "SSH_AGENT_PID" : "",
+    "XDM_MANAGED" : "",
+    "KDE_SESSION_VERSION" : "",
+    "LD_BIND_NOW" : "",
+    "GTK2_RC_FILES" : "",
+    "WINDOWPATH" : "",
+    "XCURSOR_THEME" : "",
+    "KDE_SESSION_UID" : "",
+    "QT_PLUGIN_PATH" : ""
     }
 
 
@@ -188,13 +202,39 @@ def get_clean_environment():
     return _clean_env
 
 
-def get_gnome_session_environment():
-    _mod_env = None
-    _session_pid = grep_pid(processname = "gnome-session")
-    if _session_pid is None:
-        print "No Gnome session found."
+def get_session_environment(session):
+    mod_env = None
+    if session == "gnome":
+        print "Gnome session running"
+        mod_env = _get_gnome_session_environment()
+
+    elif session == "kde":
+        print "KDE session running"
+        mod_env = _get_kde_session_environment()
+
     else:
-        print "Gnome session PID: %s" % _session_pid
+        mod_env = None
+        print "Neither Gnome nor KDE session providing D-Bus is running"
+    return mod_env
+
+
+def _get_gnome_session_environment():
+    _mod_env = _get_session_env(session = "gnome-session")
+    return _mod_env
+
+
+def _get_kde_session_environment():
+    _mod_env = _get_session_env(session = "ksmserver")
+    return _mod_env
+
+
+def _get_session_env(session):
+    _mod_env = None
+    _session_pid = grep_pid(processname = session)
+    if _session_pid is None:
+        print "Session `%s` not found" % session
+    else:
+        print "Session `%s` PID: %s" % (session, _session_pid)
         _mod_env = get_clean_environment()
         _session_env = get_process_environment(pid = _session_pid)
         if _session_env is None:

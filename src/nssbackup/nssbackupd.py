@@ -48,7 +48,6 @@ from nssbackup.util import file_handling
 from nssbackup.managers.ConfigManager import ConfigManager, get_profiles
 from nssbackup.managers.BackupManager import BackupManager
 from nssbackup.util import get_resource_file
-from nssbackup.util import dbus_support
 from nssbackup.util import notifier
 from nssbackup.util import system
 from nssbackup.util import constants
@@ -115,23 +114,23 @@ class SBackupProc(object):
         :todo: should we give the `state` as parameter to notfier's constructor?
 
         """
-        for notifier in self.__notifiers:
-            self.__state.attach(notifier)
+        for _notifier in self.__notifiers:
+            self.__state.attach(_notifier)
 
     def __initialize_notifiers(self):
         """Initializes the given notifiers.
 
         """
-        for notifier in self.__notifiers:
-            notifier.initialize()
+        for _notifier in self.__notifiers:
+            _notifier.initialize()
 
     def __terminate_notifiers(self):
         """Unregisters the given notifiers from state subject.
 
         """
-        for notifier in self.__notifiers:
-            notifier.publish_exit()
-            self.__state.detach(notifier)
+        for _notifier in self.__notifiers:
+            _notifier.publish_exit()
+            self.__state.detach(_notifier)
 
     def __sendEmail(self):
         """Checks if the sent of emails is set in the config file 
@@ -300,9 +299,9 @@ class SBackupProc(object):
                 # send the mail
                 if self.__bm.config.has_section("report") and self.__bm.config.has_option("report", "to") :
                     self.__sendEmail()
-        except Exception, exc:
+        except Exception, error:
             self.__exitcode = constants.EXCODE_MAIL_ERROR
-            self.logger.exception("Error when sending email:\n%s" % str(exc))
+            self.logger.exception("Error when sending email:\n%s" % error)
 
     def __notify_init_errors(self):
         """Errors that occurred during the initialization process were stored
@@ -337,8 +336,9 @@ class SBackupApp(object):
         self.__argv = argv
         self.__lock = lock.ApplicationLock(lockfile = constants.LOCKFILE_BACKUP_FULL_PATH,
                                            processname = constants.BACKUP_COMMAND, pid = os.getpid())
-        self.__options = None
+        self.__options_given = None   # do not modify given options
         self.__use_indicator = True
+        self.__dbus_avail = False
         self.__configfile = None
 
         self.__backupproc = None
@@ -353,16 +353,18 @@ class SBackupApp(object):
         the backup process. Purpose is to split between notifier creation and
         notifier use: the backup process has no information about the
         specific notifiers (type...)
+        :note: import D-Bus related modules only if using D-Bus is enabled        
         """
-        if self.__options.use_dbus:
+        if self.__options_given.use_dbus and self.__dbus_avail:
+            from nssbackup.util import dbus_support
             dbus_notifier = dbus_support.DBusNotifier()
             self.__notifiers.append(dbus_notifier)
 
     def launch_externals(self):
-        if self.__options.use_dbus == True:
+        if self.__options_given.use_dbus == True:
             self._launch_dbusservice()
 
-        if self.__use_indicator == True:
+        if (self.__use_indicator == True) and (self.__dbus_avail == True):
             self._launch_indicator()
 
     def _launch_dbusservice(self):
@@ -370,35 +372,43 @@ class SBackupApp(object):
         connection in order to keep the service alive as long as this
         application is running. Call `finalize` to close the
         connection properly when terminating the application.
+        
+        :note: import D-Bus related modules only if using D-Bus is enabled
         """
+        from nssbackup.util import dbus_support
         self._dbus_conn = dbus_support.DBusProviderFacade(constants.BACKUP_PROCESS_NAME)
-        self._dbus_conn.connect()
-        self._dbus_conn.set_backup_pid(pid = os.getpid())
+        try:
+            self._dbus_conn.connect()
+            self._dbus_conn.set_backup_pid(pid = os.getpid())
+            self.__dbus_avail = True
+        except exceptions.DBusException:
+            print "Unable to launch DBus service"
+            self._dbus_conn = None
+            self.__dbus_avail = False
+            self.__use_indicator = False
 
     def _launch_indicator(self):
-        """
-        sudo: If the invoking user is root or if the target user is the
-              same as the invoking user, no password is required.
-              That is, we cannot change from one normal user to another without
-              password.
-              
-              sudo resets the environment (see man sudo).
-              
+        """              
         environ: the Gnome-session environ is accessable for root and the
                  user who owns the session.
-                 
-        @todo: We should check for a running indicator!
+        :note: import D-Bus related modules only if using D-Bus is enabled                 
         """
+        from nssbackup.util import dbus_support
+
         print "Now launching indicator application (status icon)."
         _path_to_app = get_resource_file(constants.INDICATORAPP_FILE)
 
-        mod_env = system.get_gnome_session_environment()
+        # a full DE is supposed
+        session = dbus_support.get_session_name()
+        mod_env = system.get_session_environment(session)
+
         if mod_env is None:
-            print "No Gnome session found. Indicator application is not started."
+            print "No desktop session found. Indicator application is not started."
         else:
             _cmd = [_path_to_app]
-            if self.__options.legacy_appindicator is True:
+            if self.__options_given.legacy_appindicator is True:
                 _cmd.append("--legacy")
+
             if not system.is_superuser():
                 if system.get_user_from_uid() != mod_env["USER"]:
                     _cmd = None
@@ -410,13 +420,14 @@ class SBackupApp(object):
             else:
                 pid = system.exec_command_async(args = _cmd, env = mod_env)
                 print "Indicator application started (PID: %s)" % pid
-                time.sleep(5)
+                time.sleep(constants.INDICATOR_LAUNCH_PAUSE_SECONDS)
+
 
     def finalize(self):
         """Cleaning before terminating the application:
         * disconnects if DBus connection was established.
         """
-        if self._dbus_conn is not None:
+        if (self.__dbus_avail) and (self._dbus_conn is not None):
             self._dbus_conn.quit()
         self.__lock.unlock()
         log.shutdown_logging()
@@ -465,9 +476,9 @@ class SBackupApp(object):
                 parser.error("Given configuration file does not exist")
             self.__configfile = options.configfile
 
-        self.__options = options
+        self.__options_given = options
 
-        if self.__options.use_dbus == True:
+        if self.__options_given.use_dbus == True:
             self.__use_indicator = options.use_indicator
         else:
             self.__use_indicator = False
@@ -475,9 +486,11 @@ class SBackupApp(object):
     def __on_already_running(self, error):
         """Handler for the case a backup process is already running.
         Fuse is not initialized yet.
+        :note: import D-Bus related modules only if using D-Bus is enabled        
         """
         print _("Backup is not being started.\n%s") % (str(error))
-        if self.__options.use_dbus:
+        if self.__options_given.use_dbus and self.__dbus_avail:
+            from nssbackup.util import dbus_support
             conn = dbus_support.DBusClientFacade("Simple Backup Process (another instance)")
             conn.connect()
             conn.emit_alreadyrunning_signal()

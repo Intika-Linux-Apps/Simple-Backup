@@ -195,14 +195,12 @@ class BackupManager(object):
             gexclude = ""
         self.__actualSnapshot.setExcludes(gexclude)
 
-        # set format
-        self.logger.info(_("Setting compression format."))
         if self.config.has_option("general", "format"):
+            self.logger.info(_("Setting compression format."))
             self.__actualSnapshot.setFormat(self.config.get("general", "format"))
 
-        # set splited size
-        self.logger.info(_("Setting split size."))
         if self.config.has_option("general", "splitsize"):
+            self.logger.info(_("Setting split size."))
             self.__actualSnapshot.setSplitedSize(int(self.config.get("general", "splitsize")))
 
         # set followlinks

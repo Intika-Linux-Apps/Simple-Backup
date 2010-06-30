@@ -170,7 +170,7 @@ class SnapshotManager(object):
                 if isinstance(e, NotValidSnapshotNameException) :
                     self.logger.warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(_dir), 'error_cause' :e})
                 else :
-                    self.logger.warning(_("Got a non valid snapshot '%(name)s' , removing : %(error_cause)s ") % {'name': str(_dir), 'error_cause' :e})
+                    self.logger.warning(_("Got a non valid snapshot '%(name)s': %(error_cause)s ") % {'name': str(_dir), 'error_cause' :e})
                     self.logger.info("Invalid snapshot '%s' is going to be renamed!" % _snppath)
                     FAM.rename(_snppath, _snppath[:-3] + "corrupt")
         snapshots.sort(key = Snapshot.getName, reverse = True)

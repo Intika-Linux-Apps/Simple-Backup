@@ -142,6 +142,8 @@ class _DBusConnection(object):
     def connect(self, silent = False):
         """Connects passively to DBus service and registers this connection at the service.
         The service id is stored for later checks of the validity of the connection.
+        
+        Remote objects are set to None in case of failure. 
         """
         self.test_validity()
         if self._connected is True:
@@ -563,7 +565,10 @@ class DBusNotifier(notifier.Observer):
         """
         :todo: Rename into something better (e.g. publish_exit?)
         """
-        self.__dbus.exit()
+        try:
+            self.__dbus.exit()
+        except exceptions.DBusException:
+            self.__logger.warning("Unable to publish exit over D-Bus")
 
     def __setup_dbus(self):
         self.__dbus = DBusProviderFacade(constants.DBUS_NOTIFIER_NAME)
@@ -599,28 +604,62 @@ class DBusNotifier(notifier.Observer):
         urgency = self.__urgency
         self.__logger.debug("state: `%s` - urgency: `%s`" % (state, urgency))
 
-        ret_val = None
+        ret_val = False
         if self.__dbus is not None:
-            # update all properties
-            ret_val = self.__dbus.set_target(self.__target)
-            ret_val = self.__dbus.set_profilename(self.__profilename)
-            ret_val = self.__dbus.set_space_required(self.__space_required)
+            try:
+                # update all properties
+                ret_val = self.__dbus.set_target(self.__target)
+                ret_val = self.__dbus.set_profilename(self.__profilename)
+                ret_val = self.__dbus.set_space_required(self.__space_required)
 
-            if state in ('start',
-                         'finish',
-                         'prepare',
-                         'commit',
-                         'backup-canceled',
-                         'needupgrade'):
-                ret_val = self.__dbus.emit_event_signal(state, urgency)
+                if state in ('start',
+                             'finish',
+                             'prepare',
+                             'commit',
+                             'backup-canceled',
+                             'needupgrade'):
+                    ret_val = self.__dbus.emit_event_signal(state, urgency)
 
-            elif state == 'error':
-                ret_val = self.__dbus.emit_error_signal(str(self.__recent_error))
+                elif state == 'error':
+                    ret_val = self.__dbus.emit_error_signal(str(self.__recent_error))
 
-            elif state == 'target-not-found':
-                ret_val = self.__dbus.emit_targetnotfound_signal()
+                elif state == 'target-not-found':
+                    ret_val = self.__dbus.emit_targetnotfound_signal()
 
-            else:
-                raise ValueError("STATE UNSUPPORTED (%s)" % state)
+                else:
+                    raise ValueError("STATE UNSUPPORTED (%s)" % state)
+            except exceptions.DBusException:
+                self.__logger.warning("Unable to notifiy over D-Bus")
+                ret_val = False
 
         return ret_val
+
+
+def get_session_name():
+    # a full DE is supposed
+    session = ""
+    gnome_found = False
+    kde_found = False
+    try:
+        bus = dbus.SessionBus()
+        bus.get_object('org.kde.ksmserver', '/KSMServer')
+        session = "kde"
+        kde_found = True
+    except dbus.exceptions.DBusException, error:
+        print "Unable to get KDE Session Manager: %s" % error
+        kde_found = False
+
+    try:
+        bus = dbus.SessionBus()
+        bus.get_object('org.gnome.SessionManager',
+                                       '/org/gnome/SessionManager')
+        session = "gnome"
+        gnome_found = True
+    except dbus.exceptions.DBusException, error:
+        print "Unable to get Gnome Session Manager: %s" % error
+        gnome_found = False
+
+    if gnome_found and kde_found:
+        raise AssertionError("Unable to get desktop session: Gnome and KDE found")
+
+    return session
