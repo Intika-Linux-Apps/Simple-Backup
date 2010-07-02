@@ -405,12 +405,12 @@ class SBackupdIndicatorBase(INotifyMixin):
     def _connect_dbus_signal_handlers(self):
         """Binds DBus signals to their corresponding handler methods.        
         """
-        self._indicator_hdl.connect_dbus_event_signal(self._event_signal_handler)
-        self._indicator_hdl.connect_dbus_error_signal(self._error_signal_handler)
-        self._indicator_hdl.connect_dbus_progress_signal(self._progress_signal_handler)
-        self._indicator_hdl.connect_dbus_targetnotfound_signal(self._targetnotfound_handler)
-        self._indicator_hdl.connect_dbus_alreadyrunning_signal(self._alreadyrunning_signal_handler)
-        self._indicator_hdl.connect_dbus_exit_signal(self._exit_signal_handler)
+        self._indicator_hdl.connect_dbus_event_signal(self.dbus_event_signal_hdl)
+        self._indicator_hdl.connect_dbus_error_signal(self.dbus_error_signal_hdl)
+        self._indicator_hdl.connect_dbus_progress_signal(self.dbus_progress_signal_hdl)
+        self._indicator_hdl.connect_dbus_targetnotfound_signal(self.dbus_targetnotfound_signal_hdl)
+        self._indicator_hdl.connect_dbus_alreadyrunning_signal(self.dbus_alreadyrunning_signal_hdl)
+        self._indicator_hdl.connect_dbus_exit_signal(self.dbus_exit_signal_hdl)
 
     def _dbus_check(self):
         _res = True
@@ -500,7 +500,7 @@ class SBackupdIndicatorBase(INotifyMixin):
             self._menuitems["show_windows"].hide()
             self._menuitems["show_windows"].set_sensitive(False)
 
-    def _event_signal_handler(self, event, urgency):
+    def dbus_event_signal_hdl(self, event, urgency):
         """Method which handles event signals over D-Bus. 
         
         :todo: Implement methods for setting 'finished status' etc. (set menu, disable cancel, hide show
@@ -515,6 +515,7 @@ class SBackupdIndicatorBase(INotifyMixin):
         elif event == 'start':
             msg = _("Starting backup Session")
             self.set_status_to_normal()
+            self._set_cancel_sensitive(sensitive = True)
             self._indicator_hdl.backup_started()
 
         elif event == 'commit':
@@ -526,7 +527,7 @@ class SBackupdIndicatorBase(INotifyMixin):
             if self._cancel_dialog is not None:
                 self._cancel_dialog.destroy()
             self._set_menuitems_status_finished()
-            self._menuitems["cancel"].set_sensitive(False)
+            self._set_cancel_sensitive(sensitive = False)
             self.set_status_to_finished()
 
         elif event == 'backup-canceled':
@@ -567,7 +568,7 @@ class SBackupdIndicatorBase(INotifyMixin):
             self._current_dialogs.remove(dialog)
         self._show_showdialogs_menuitem()
 
-    def _targetnotfound_handler(self):
+    def dbus_targetnotfound_signal_hdl(self):
         self.set_status_to_attention()
         msg = self._indicator_hdl.prepare_targetnotfound_handling()
 
@@ -627,17 +628,17 @@ class SBackupdIndicatorBase(INotifyMixin):
         else:
             raise ValueError("Unknown urgency!")
 
-    def _error_signal_handler(self, error):
+    def dbus_error_signal_hdl(self, error):
         self.set_status_to_attention()
         msg = self._indicator_hdl.get_error_msg(error)
         self._show_errormsg(headline = msg[0], message = msg[1])
         self._indicator_hdl.set_error_present(is_present = False)
         self.set_status_to_normal()
 
-    def _progress_signal_handler(self, checkpoint):
+    def dbus_progress_signal_hdl(self, checkpoint):
         self._set_menuitems_status_progress(checkpoint)
 
-    def _alreadyrunning_signal_handler(self):
+    def dbus_alreadyrunning_signal_hdl(self):
         self._notify_info(profilename = "",
                           message = _("Attempt of starting another instance of Simple Backup while this one is already running."))
 
@@ -699,7 +700,7 @@ class SBackupdIndicatorBase(INotifyMixin):
         self._remove_dialog_from_showlist(dialog = errmsg)
         return False
 
-    def _exit_signal_handler(self):
+    def dbus_exit_signal_hdl(self):
         """Handler for D-Bus exit signal.
         """
         self._on_exit()

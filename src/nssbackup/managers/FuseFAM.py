@@ -15,17 +15,14 @@
 # Authors :
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-import subprocess
+
 import os
-import tempfile
-import time
 from gettext import gettext as _
 
 from nssbackup.util.log import LogFactory
 from nssbackup.plugins import PluginManager
 from nssbackup.util.exceptions import SBException
 from nssbackup.managers.ConfigManager import ConfigurationFileHandler
-from nssbackup.util import file_handling as FAM
 
 
 class FuseFAM(object):

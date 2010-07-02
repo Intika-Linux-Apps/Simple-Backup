@@ -51,6 +51,7 @@ HELPDIR=$(DATADIR)/gnome/help/$(PKGNAME)
 LANGDIR=$(DATADIR)/locale
 BIN=$(DESTDIR)/bin
 SBIN=$(DESTDIR)/sbin
+dbus_system_conf_dir=/etc/dbus-1/system.d
 
 SETUP.PY_OPTS=--root=/
 
@@ -67,12 +68,12 @@ ifneq (,$(findstring 10.04,$(UbuntuVersion)))
     LAYOUT=--install-layout=deb
 endif
 
-	
-all: po-data fill-templates
 
-default:
+default: po-data fill-templates
 
-install: install-po install-help install-bin install-sbin install-package
+all:
+
+install: install-po install-help install-bin install-sbin install-package install-conf
 	chmod +x $(BIN)/nssbackup*
 	chmod +x $(SBIN)/nssbackup*
 	chmod +x $(DATADIR)/nssbackup/multipleTarScript
@@ -134,6 +135,14 @@ install-help:
 	install -m 644 help/$$lang/*.xml $(HELPDIR)/$$lang/; \
 	install -m 644 help/$$lang/figures/*.png $(HELPDIR)/$$lang/figures; \
 	done
+	
+install-conf: install-dbus
+
+install-dbus:
+	install -m 644 datas/org.sbackupteam.SimpleBackup.conf $(dbus_system_conf_dir)
+	
+
+
 
 # targets for un-installation
 uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-cron uninstall-help
@@ -149,6 +158,11 @@ uninstall-sbin:
 
 uninstall-package:
 	rm -rf $(DESTDIR)/lib/python*/*/nssbackup*
+
+uninstall-conf: uninstall-dbus
+
+uninstall-dbus:
+	rm -f $(dbus_system_conf_dir)/org.sbackupteam.SimpleBackup.conf
 
 uninstall-data:
 	rm -f $(DATADIR)/pixmaps/nssbackup-restore.png

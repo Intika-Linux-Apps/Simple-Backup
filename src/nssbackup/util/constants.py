@@ -91,12 +91,15 @@ LOCALE_DOMAIN = "nssbackup"
 NOTIFICATION_DOMAIN = "nssbackup"
 
 
-# dbus constants
-DBUS_EXCEPTION = "org.launchpad.nssbackupdDbusException"
-DBUS_SERVICE = "org.launchpad.nssbackupService"
-DBUS_OBJ_PATH = "/nssbackupdDbusObject"
-DBUS_CONNECTION_OBJ_PATH = "/nssbackupdDbusConnection"
-DBUS_INTERFACE = "org.launchpad.nssbackupService.nssbackupdDbusInterface"
+# dbus constants - keep copies of these up-to-date in `sbackup-progress`
+#                  and `org.sbackupteam.SimpleBackup.conf` and `Makefile`
+#                  configuration file name = dbus service!
+DBUS_SERVICE = "org.sbackupteam.SimpleBackup"
+DBUS_OBJ_PATH = "/SBackupProcess"
+DBUS_CONNECTION_OBJ_PATH = "/SBackupConnection"
+DBUS_INTERFACE = "org.sbackupteam.SimpleBackup.SBackupDbusInterface"
+DBUS_EXCEPTION = "org.sbackupteam.SBackupDbusException"
+
 
 
 # Global path definitions

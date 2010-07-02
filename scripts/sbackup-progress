@@ -27,12 +27,12 @@ tar_checkpoint_str = os.environ['TAR_CHECKPOINT']
 
 try:
     _system_bus = dbus.SystemBus()
-    remote_obj = _system_bus.get_object("org.launchpad.nssbackupService",
-                                         "/nssbackupdDbusObject")
+    remote_obj = _system_bus.get_object("org.sbackupteam.SimpleBackup",
+                                        "/SBackupProcess")
 except dbus.DBusException:
     remote_obj = None
 
 if remote_obj is not None:
     remote_obj.emit_progress_signal(tar_checkpoint_str,
-        dbus_interface = "org.launchpad.nssbackupService.nssbackupdDbusInterface")
+                                    dbus_interface = "org.sbackupteam.SimpleBackup.SBackupDbusInterface")
 
