@@ -1,7 +1,7 @@
 #    NSsbackup - Restoration GUI in GTK+
 #
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -29,33 +29,40 @@
 """
 
 
-import os
+from gettext import gettext as _
+import traceback
 import os.path
 import sys
-import traceback
 import time
 
 import gtk
 import gobject
 
-from gettext import gettext as _
 
 from GladeWindow import GladeWindow
 from GladeWindow import ProgressbarMixin
 
+from nssbackup.fs_backend import fam
+
 import nssbackup.util as Util
 from nssbackup.util import log
-from nssbackup.managers.FuseFAM import FuseFAM
-from nssbackup.managers.ConfigManager import ConfigManager, ConfigurationFileHandler
-from nssbackup.managers.SnapshotManager import SnapshotManager
-from nssbackup.managers.RestoreManager import RestoreManager
-from nssbackup.managers.UpgradeManager import UpgradeManager
+from nssbackup.core.ConfigManager import ConfigManager, ConfigurationFileHandler
+from nssbackup.core.SnapshotManager import SnapshotManager
+from nssbackup.core.RestoreManager import RestoreManager
+from nssbackup.core.UpgradeManager import UpgradeManager
 from nssbackup.util.log import LogFactory
-import nssbackup.util.tar as TAR
+import nssbackup.ar_backend.tar as TAR
 from nssbackup.pkginfo import Infos
 from nssbackup.util import exceptions
 from nssbackup.util import tasks
-from nssbackup.util.tar import Dumpdir
+from nssbackup.util import system
+from nssbackup.ar_backend.tar import Dumpdir
+
+from nssbackup.ui import misc
+from nssbackup.ui import gtk_rsrc
+
+
+sys.excepthook = misc.except_hook
 
 # initialize threading before running a main loop
 gtk.gdk.threads_init()
@@ -63,68 +70,83 @@ gtk.gdk.threads_init()
 
 class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
-    currentSnp = None
-    currentsbdict = None
-    currSnpFilesInfos = None
-    restoreman = None
-
-    __msg_statusbar = { "restore"     : _("Restore..."),
-                        "restore_as" : _("Restore as..."),
-                        "revert"     : _("Revert..."),
+    __msg_statusbar = { "restore"       : _("Restore..."),
+                        "restore_as"    : _("Restore as..."),
+                        "revert"        : _("Revert..."),
                         "revert_as"     : _("Revert as...")
                       }
 
     def __init__(self, parent = None):
-        ''' '''
-        self.init(parent = parent)
+        GladeWindow.__init__(self,
+                             gladefile = Util.get_resource_file(gtk_rsrc.RESTOREGUI_GLADEFILE),
+                             widget_list = gtk_rsrc.get_restoregui_widgets(),
+                             handlers = gtk_rsrc.get_restoregui_handlers(),
+                             root = gtk_rsrc.RESTOREGUI_TOPWINDOW,
+                             parent = parent,
+                             pull_down_dict = None)
+        self.set_top_window(self.widgets[gtk_rsrc.RESTOREGUI_TOPWINDOW])
+        self.top_window.set_icon_from_file(Util.get_resource_file("nssbackup-restore.png"))
 
-        self.__configFileHandler = ConfigurationFileHandler()
-
-        # get the config file
-        if os.getuid() == 0 : # we are root
-            if os.path.exists("/etc/nssbackup.conf") :
-                self.config = ConfigManager("/etc/nssbackup.conf")
-            else :
-                self.config = ConfigManager()
-
-        else :  # we are others
-            if os.path.exists(self.__configFileHandler.get_user_confdir() + "nssbackup.conf") :
-                self.config = ConfigManager(self.__configFileHandler.get_user_confdir() + "nssbackup.conf")
-            else :
-                self.config = ConfigManager()
+        # setup progress bar
+        ProgressbarMixin.__init__(self, self.widgets['progressbar'])
+        self._init_pulse()
 
         self.logger = LogFactory.getLogger()
+        self.config = self.__get_configuration()
+        self.__default_destination_path = self.config.get_destination_path()
 
+        self.currentSnp = None
+        self.currentsbdict = None
+        self.currSnpFilesInfos = None
         self.restoreman = RestoreManager()
+        self.snpman = None
+        self.target = None
+        self.__fam_target_hdl = fam.get_fam_target_handler_facade_instance()
 
-        # set fusefam
-        self.fusefam = FuseFAM(self.config)
-        try:
-            self.fusefam.initialize()
-        except exceptions.FuseFAMException, exc:
-            _sec_msg = _("The program is going to be terminated. Please make sure the missing directory exists (e.g. by mounting an external disk) or change the specified target in '(Not So) Simple Backup-Configuration' tool and restart this application.")
-            self._show_errmessage(message_str = str(exc),
-                    boxtitle = _("(Not So) Simple Backup error"),
-                    headline_str = _("An error occurred during initialization:"),
-                    secmsg_str = _sec_msg)
-            self.fusefam.terminate()
-            sys.exit(-1)
-
-
-        # set the default label
-        self.widgets['defaultfolderlabel'].set_text(self.config.get("general",
-                                                                    "target"))
-
-        #tree strores
+        # tree stores
         self.snplisttreestore = gtk.TreeStore(str, str)
+        self.flisttreestore = gtk.TreeStore(str, str)
+        self.flisttreesort = gtk.TreeModelSort(self.flisttreestore)
+        self.historylisttreestore = gtk.TreeStore(str)
+        self.__init_treeviews()
+
+        self.widgets['snpdetails'].set_sensitive(False)
+
+        self.__context_id = None
+        self.__init_statusbar()
+
+        # firstly initialize destination with target of default profile
+        self._defaultdest_active = True
+        self.widgets['defaultradiob'].set_active(True)
+        self._apply_defaultradiob_state()
+        self.widgets['defaultfolderlabel'].set_text("")
+        self._defaultdest_active = True
+        gobject.idle_add(self.__set_destination, self.__default_destination_path)
+
+        self.__restore_dialog = RestoreDialog(parent = self)
+
+    def __get_configuration(self):
+        _configfile_hdl = ConfigurationFileHandler()
+        _config = None
+        if system.is_superuser():
+            if os.path.exists("/etc/nssbackup.conf") :
+                _config = ConfigManager("/etc/nssbackup.conf")
+            else :
+                _config = ConfigManager()
+        else:
+            if os.path.exists(_configfile_hdl.get_user_confdir() + "nssbackup.conf") :
+                _config = ConfigManager(_configfile_hdl.get_user_confdir() + "nssbackup.conf")
+            else :
+                _config = ConfigManager()
+        return _config
+
+    def __init_treeviews(self):
         self.widgets['snplisttreeview'].set_model(self.snplisttreestore)
         acolumn = gtk.TreeViewColumn(_("Snapshots"), gtk.CellRendererText(), text = 0)
         bcolumn = gtk.TreeViewColumn(_("Version"), gtk.CellRendererText(), text = 1)
         self.widgets['snplisttreeview'].append_column(acolumn)
         self.widgets['snplisttreeview'].append_column(bcolumn)
 
-        self.flisttreestore = gtk.TreeStore(str, str)
-        self.flisttreesort = gtk.TreeModelSort(self.flisttreestore)
         self.flisttreesort.set_sort_column_id(0, gtk.SORT_ASCENDING)
         self.widgets['filelisttreeview'].set_model(self.flisttreesort)
 
@@ -136,100 +158,86 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         acolumn2 = gtk.TreeViewColumn(_("State"), gtk.CellRendererText(), text = 1)
         self.widgets['filelisttreeview'].append_column(acolumn2)
 
-        self.historylisttreestore = gtk.TreeStore(str)
         self.widgets['historytv'].set_model(self.historylisttreestore)
         acolumn3 = gtk.TreeViewColumn(_("Snapshots"), gtk.CellRendererText(), text = 0)
         self.widgets['historytv'].append_column(acolumn3)
 
-        self.on_defaultradiob_toggled()
+    def _make_topwin_busy(self, busy, message, message_id = None):
+        _mid = None
+        if busy:
+            misc.set_watch_cursor(widget = self.top_window)
+            self.top_window.set_sensitive(False)
+            _mid = self.__send_statusbar_msg(message)
+        else:
+            self.top_window.set_sensitive(True)
+            misc.unset_cursor(widget = self.top_window)
+            self.__clean_statusbar_msg(message_id)
+        return False
 
-        # select the current day
-        today = time.localtime()
-        self.widgets["calendar"].select_month(today[1] - 1, today[0])
-        self.widgets["calendar"].select_day(today[2])
-        self.on_calendar_day_selected()
+    def __set_destination(self, path):
+        print ">>> __set_destination"
+        self._make_topwin_busy(True, "Connect to destination...")
+        self.__clear_calendar()
 
-        self.widgets['snpdetails'].set_sensitive(False)
+        try:
+            self.__fam_target_hdl.set_destination(path)
+            self.__fam_target_hdl.set_initialize_callback(self.__set_destination_done_cb)
+            self.__fam_target_hdl.initialize()
+        except exceptions.FileAccessException, error:
+            gobject.idle_add(self._make_topwin_busy, False, None)
+            self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error
+            self._show_destination_error(error)
 
-        # setup the progressbar
-        ProgressbarMixin.__init__(self, self.widgets['progressbar'])
-        self._init_pulse()
+    def __set_destination_done_cb(self, error):
+        print ">>> __set_destination_done_cb - error: %s" % error
+        if error is not None:
+            gobject.idle_add(self._make_topwin_busy, False, None)
+            self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error            
+            self._show_destination_error(error)
+        else:
+            gobject.idle_add(self.__set_destination_done)
 
-        self.__context_id = None
-        self.__init_statusbar()
+    def __set_destination_done(self):
+        self.target = self.__fam_target_hdl.get_eff_path()
+        if self.__fam_target_hdl.dest_eff_path_exists() is False: # no errors so far
+            self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error            
+            gobject.idle_add(self._show_destination_error, "Specified path does not exist")
+            self.__fam_target_hdl.set_terminate_callback(self._set_dest_failed_cb)
+            gobject.idle_add(self.__fam_target_hdl.terminate)
+        else:
+            if self._defaultdest_active:
+                self.widgets['defaultfolderlabel'].set_text(self.__fam_target_hdl.query_dest_display_name())
 
-        self.__restore_dialog = RestoreDialog(parent = self)
+            self.snpman = SnapshotManager(self.target)
+            self.widgets["restoreExpander"].set_expanded(False)
+            self.__fill_calendar()
+            today = time.localtime()    # select the current day
+            self.widgets["calendar"].select_month(today[1] - 1, today[0])
+            self.widgets["calendar"].select_day(today[2])
+            self.on_calendar_day_selected()
 
+        gobject.idle_add(self._make_topwin_busy, False, None)
 
-    def init(self, parent = None):
-        _gladefile = Util.get_resource_file('nssbackup-restore.glade')
+    def _set_dest_failed_cb(self, error):
+        self._make_topwin_busy(False, None)
+        if error is not None:
+            self._show_destination_error(error)
 
-        _wdgt_lst = [
-            'restorewindow',
-            'defaultfolderlabel',
-            'defaultradiob',
-            'customradiob',
-            'custominfos',
-            'customentry',
-            'customchooser',
-            'customapply',
-            'calendar',
-            'snplist',
-            'scrolledwindow1',
-            'snplisttreeview',
-            'snpdetails',
-            'scrolledwindow2',
-            'restoreExpander',
-            'snpmanExpander',
-            'filelisttreeview',
-            'buttonspool',
-            'restore',
-            'restoreas',
-            'revert',
-            'revertas',
-            'upgradeBox',
-            'upgradeButton',
-            'RebaseBox',
-            'rebaseLabel',
-            'rebaseButton',
-            'deleteBox',
-            'deleteButton',
-            'snphistoryFrame',
-            'historytv',
-            'statusbar',
-            'progressbar'
-            ]
+        gobject.idle_add(self._on_set_dest_failed)
 
-        _hdls = [
-            'gtk_main_quit',
-            'on_defaultradiob_toggled',
-            'on_customchooser_clicked',
-            'on_customapply_clicked',
-            'on_calendar_month_changed',
-            'on_calendar_day_selected',
-            'on_snplisttreeview_cursor_changed',
-            'on_filelisttreeview_row_expanded',
-            'on_filelisttreeview_cursor_changed',
-            'on_filelisttreeview_unselect_all',
-            'on_restore_clicked',
-            'on_restoreas_clicked',
-            'on_revert_clicked',
-            'on_revertas_clicked',
-            'on_restoreExpander_activate',
-            'on_snpmanExpander_activate',
-            'on_upgradeButton_clicked',
-            'on_rebaseButton_toggled',
-            'on_deleteButton_clicked',
-            'on_exportmanExpander_activate',
-            ]
+    def _on_set_dest_failed(self):
+        pass
 
-        _top_win_name = 'restorewindow'
-        GladeWindow.__init__(self, gladefile = _gladefile,
-                              widget_list = _wdgt_lst,
-                              handlers = _hdls, root = _top_win_name,
-                              parent = parent, pull_down_dict = None)
-        self.set_top_window(self.widgets[_top_win_name])
-        self.top_window.set_icon_from_file(Util.get_resource_file("nssbackup-restore.png"))
+    def _term_fam_done_cb(self, error):
+        self._make_topwin_busy(False, None)
+        if error is not None:
+            self._show_destination_error(error)
+
+        gobject.idle_add(self._on_term_fam_done)
+
+    def _on_term_fam_done(self):
+        self.config = None
+        gobject.idle_add(gtk.main_quit)
 
     def __init_statusbar(self):
         """Initializes the statusbar, i.e. gets the context (here
@@ -252,6 +260,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
     
         @raise AssertionError: if the statusbar is not initialized
         """
+        print "__send_statusbar_msg: %s" % message
         if self.__context_id is None:
             raise AssertionError("Please initialize statusbar first!")
         message_id = self.widgets['statusbar'].push(self.__context_id, message)
@@ -278,11 +287,11 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         else:
             self.widgets['statusbar'].remove(self.__context_id, message_id)
 
-    def status_callback(self, getstatus):
-        """
-        @todo: FIX ME - this does not work that way!
-        """
-        return False
+#    def status_callback(self, getstatus):
+#        """
+#        @todo: FIX ME - this does not work that way!
+#        """
+#        return False
 #        n,m, subm = getstatus()
 #        if (n,m,subm) == (None,None,None):
 #            return False
@@ -290,48 +299,87 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 #        if m : self.widgets['statusBarLabel'].set_text(m)
 #        if subm : self.widgets['statusBar'].set_text(subm)
 
-    def fill_calendar(self):
+    def __fill_calendar(self):
         """
         Fill the calendar with the snapshots of the month
         """
         self.widgets['calendar'].clear_marks()
 
-        date = self.widgets["calendar"].get_date()
-        fromDate = "-".join([str(date[0]), "%02d" % (int(date[1]) + 1), "01"])
-        toDate = "-".join([str(date[0]), "%02d" % (int(date[1]) + 1), "31"])
-        snplist = self.snpman.get_snapshots_allformats(fromDate, toDate)
+        if self.snpman is not None:
+            date = self.widgets["calendar"].get_date()
+            fromDate = "-".join([str(date[0]), "%02d" % (int(date[1]) + 1), "01"])
+            toDate = "-".join([str(date[0]), "%02d" % (int(date[1]) + 1), "31"])
+            snplist = self.snpman.get_snapshots_allformats(fromDate, toDate)
 
-        for snapshot in snplist :
-            self.widgets["calendar"].mark_day(int(snapshot.getDate()["day"]))
+            for snapshot in snplist :
+                self.widgets["calendar"].mark_day(int(snapshot.getDate()["day"]))
 
+            self.snplisttreestore.clear()
+            self.flisttreestore.clear()
+            self.widgets['buttonspool'].set_sensitive(False)
+            self.widgets['snpdetails'].set_sensitive(True)
+
+    def __clear_calendar(self):
+        self.widgets['calendar'].clear_marks()
         self.snplisttreestore.clear()
         self.flisttreestore.clear()
         self.widgets['buttonspool'].set_sensitive(False)
-        self.widgets['snpdetails'].set_sensitive(True)
+        self.widgets['snpdetails'].set_sensitive(False)
 
-    def change_target(self, newtarget):
-        """
-        """
-        try :
-            self.target = self.fusefam.mount(newtarget)
-            self.snpman = SnapshotManager(self.target)
-            self.widgets["restoreExpander"].set_expanded(False)
-            self.fill_calendar()
-        except Exception, e :
-            self.logger.error(str(e))
-            self.logger.error(traceback.format_exc())
-            dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-            dialog.run()
-            dialog.destroy()
+    def on_defaultradiob_toggled(self, *args): #IGNORE:W0613
+        self._apply_defaultradiob_state()
+        if self.widgets['defaultradiob'].get_active():
+            if not self._defaultdest_active:
+                self._defaultdest_active = True
 
-    def on_defaultradiob_toggled(self, *args):
-        if self.widgets['defaultradiob'].get_active() :
-            self.widgets['custominfos'].set_sensitive(False)
-            self.change_target(self.config.get("general", "target"))
+                if self.__fam_target_hdl.is_initialized() and\
+                  (self.__fam_target_hdl.get_destination() == self.__default_destination_path):
+                    pass
+                else:
+                    self.__fam_target_hdl.set_terminate_callback(self._custom_fam_term_cb)
+                    self.__fam_target_hdl.terminate()
+
         elif self.widgets['customradiob'].get_active() :
+            if self._defaultdest_active:
+                self._defaultdest_active = False
+                print "Custom destination selected"
+
+    def _default_fam_term_cb(self, error):
+        if error is not None:
+            self._show_destination_error(error)
+
+        ltarget = self.widgets["customentry"].get_text()
+        gobject.idle_add(self.__set_destination, ltarget)
+
+    def _custom_fam_term_cb(self, error):
+        if error is not None:
+            self._show_destination_error(error)
+
+        gobject.idle_add(self.__set_destination, self.__default_destination_path)
+
+    def on_customapply_clicked(self, *args): #IGNORE:W0613
+        """
+        Reload all backup info from a custom location
+        """
+        _ntarget = self.widgets["customentry"].get_text()
+        if _ntarget == "":
+            gobject.idle_add(self._show_destination_error, "No destination specified")
+
+        else:
+            if self.__fam_target_hdl.is_initialized() and\
+              (self.__fam_target_hdl.get_destination() == _ntarget):
+                pass
+            else:
+                self.__fam_target_hdl.set_terminate_callback(self._default_fam_term_cb)
+                self.__fam_target_hdl.terminate()
+
+    def _apply_defaultradiob_state(self):
+        if self.widgets['defaultradiob'].get_active():
+            self.widgets['custominfos'].set_sensitive(False)
+        elif self.widgets['customradiob'].get_active():
             self.widgets['custominfos'].set_sensitive(True)
 
-    def on_customchooser_clicked(self, *args):
+    def on_customchooser_clicked(self, *args): #IGNORE:W0613
         dialog = gtk.FileChooserDialog(_("Choose a source folder"), None, gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
         dialog.set_default_response(gtk.RESPONSE_OK)
         dialog.set_local_only(False)
@@ -339,23 +387,23 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self.widgets["customentry"].set_text(dialog.get_current_folder())
         dialog.destroy()
 
-    def on_customapply_clicked(self, *args):
-        """
-        Reload all backup info from a custom location
-        """
-        ltarget = self.widgets["customentry"].get_text()
-        self.change_target(ltarget)
+    def on_calendar_month_changed(self, *args): #IGNORE:W0613
+        self.__fill_calendar()
 
-    def on_calendar_month_changed(self, *args):
-        self.fill_calendar()
+    def on_calendar_day_selected(self, *args): #IGNORE:W0613
+        if self.snpman is not None:
+            self.currentSnp = None
+            self.widgets["restoreExpander"].set_expanded(False)
+            self.widgets['snpmanExpander'].set_expanded(False)
 
-    def on_calendar_day_selected(self, *args):
-        self.currentSnp = None
-        self.widgets["restoreExpander"].set_expanded(False)
-        self.widgets['snpmanExpander'].set_expanded(False)
-        self.load_snapshotslist(self.widgets['calendar'].get_date())
+            self._make_topwin_busy(True, "Reading snapshots...")
+            _date = self.widgets['calendar'].get_date()
+            gobject.idle_add(self.load_snapshotslist, _date)
+#            _task = tasks.WorkerThread(self.load_snapshotslist)
+#            _task.set_finish_callback(self._on_init_fam_done)
+#            _task.start(_date)
 
-    def on_snplisttreeview_cursor_changed(self, *args):
+    def on_snplisttreeview_cursor_changed(self, *args): #IGNORE:W0613
         self.flisttreestore.clear()
         self.widgets["restoreExpander"].set_expanded(False)
         self.widgets['snpmanExpander'].set_expanded(False)
@@ -401,7 +449,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         if dummy :
             self.flisttreestore.remove(dummy)
 
-    def on_filelisttreeview_cursor_changed(self, *args):
+    def on_filelisttreeview_cursor_changed(self, *args): #IGNORE:W0613
         self.widgets['buttonspool'].set_sensitive(True)
         # deactivate restore buttons if the selection is not included in 
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
@@ -415,7 +463,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                 self.widgets['restoreas'].set_sensitive(True)
 
 
-    def on_filelisttreeview_unselect_all(self, *args):
+    def on_filelisttreeview_unselect_all(self, *args): #IGNORE:W0613
         self.widgets['buttonspool'].set_sensitive(False)
 
     def appendContent(self, path, rootiter):
@@ -452,7 +500,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             # load the items in background
             self.__get_snpfileinfo_items_bg()
 
-    def __show_filestree(self, *args):
+    def __show_filestree(self, *args): #IGNORE:W0613
         """Shows the tree of files within the GUI. We need to use the
         magic *args parameter due to the use of this method as callback
         function. Exceptions that were raised within the thread are handled
@@ -522,22 +570,24 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         """
         day = "-".join([str(date[0]), "%02d" % (int(date[1]) + 1), "%02d" % date[2]])
         self.logger.debug("Selected day : " + day)
-        snplist = self.snpman.get_snapshots_allformats(byDate = day)
+        snplist = self.snpman.get_snapshots_allformats(byDate = day, forceReload = True)
 
         self.snplisttreestore.clear()
         self.flisttreestore.clear()
-        self.widgets['buttonspool'].set_sensitive(False)
-        self.widgets['snpdetails'].set_sensitive(True)
+        gobject.idle_add(self.widgets['buttonspool'].set_sensitive, False)
+        gobject.idle_add(self.widgets['snpdetails'].set_sensitive, True)
 
         if snplist == []:
             self.snplisttreestore.append(None, [_("No backups found for this day."), None])
-            self.widgets['snplist'].set_sensitive(False)
+            gobject.idle_add(self.widgets['snplist'].set_sensitive, False)
         else:
-            self.widgets['snplist'].set_sensitive(True)
+            gobject.idle_add(self.widgets['snplist'].set_sensitive, True)
             for snapshot in snplist:
                 self.snplisttreestore.append(None, [snapshot.getName(), snapshot.getVersion()])
 
-    def on_restoreExpander_activate(self, *args):
+        self._make_topwin_busy(False, None)
+
+    def on_restoreExpander_activate(self, *args): #IGNORE:W0613
         if not self.widgets["restoreExpander"].get_expanded():
             tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
             if iter:
@@ -554,7 +604,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             else:
                 self.widgets["snpdetails"].set_sensitive(False)
 
-    def on_restore_clicked(self, *args):
+    def on_restore_clicked(self, *args): #IGNORE:W0613
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
         src = self.path_to_dir(tstore.get_path(iter))
         dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = "Do you really want to restore backuped copy of '%s' ?" % src)
@@ -566,7 +616,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                         restore_callable = self.restoreman.restore,
                         source = src, dirname = None)
 
-    def on_restoreas_clicked(self, *args):
+    def on_restoreas_clicked(self, *args): #IGNORE:W0613
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
         src = self.path_to_dir(tstore.get_path(iter))
 
@@ -585,7 +635,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                             restore_callable = self.restoreman.restoreAs,
                             source = src, dirname = dirname)
 
-    def on_revert_clicked(self, *args):
+    def on_revert_clicked(self, *args): #IGNORE:W0613
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
         src = self.path_to_dir(tstore.get_path(iter))
         dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = _("Do you really want to revert '%s'?") % src)
@@ -597,7 +647,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                         restore_callable = self.restoreman.revert,
                         source = src, dirname = None)
 
-    def on_revertas_clicked(self, *args):
+    def on_revertas_clicked(self, *args): #IGNORE:W0613
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
         src = self.path_to_dir(tstore.get_path(iter))
 
@@ -679,11 +729,12 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
         self.__clean_statusbar_msg(_statbar_msgid)
 
-        if not isinstance(_result, Exception):
-            self.__restore_dialog.finish_sucess()
-        else:
+        print "Result: %s (%s)" % (_result, type(_result))
+        if isinstance(_result, Exception):
             self.logger.error(str(_result))
             self.__restore_dialog.finish_failure(_result)
+        else:
+            self.__restore_dialog.finish_sucess()
 
     def on_snpmanExpander_activate(self, *args):
         if not self.widgets['snpmanExpander'].get_expanded():
@@ -751,7 +802,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                     response = dialog.run()
                     dialog.destroy()
                     if response == gtk.RESPONSE_YES:
-                        self.timer = gobject.timeout_add (100, self.status_callback, self.snpman.getStatus)
+#                        self.timer = gobject.timeout_add (100, self.status_callback, self.snpman.getStatus)
                         self.snpman.rebaseSnapshot(self.currentSnp, snp)
                 except Exception, e:
                     self.logger.error(str(e))
@@ -785,9 +836,19 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         pass
 
     def gtk_main_quit(self, *args):
-        self.fusefam.terminate()
-        self.config = None
-        gtk.main_quit()
+
+        self._make_topwin_busy(True, "Termination in progress")
+        try:
+            self.__fam_target_hdl.set_terminate_callback(self._term_fam_done_cb)
+            self.__fam_target_hdl.terminate()
+        except AttributeError:
+            pass
+
+
+    def main(self):
+        print "Just entering gtk.main"
+        gtk.main()
+        print "Just leaving gtk.main"
 
 
 class RestoreDialog(GladeWindow, ProgressbarMixin):
@@ -799,39 +860,30 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
                          "msg_headline"    : _("<b>Restoring of selected files</b>"),
                          "msg_progress"    : _("Restoring of <tt>'%s'</tt> is in progress."),
                          "msg_sucess"         : _("Restoring of <tt>'%s'</tt> was successful."),
-                         "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not successful.\n\nThe following error occurred:\n") },
+                         "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not successful.\n\nFollowing error occurred:\n") },
 
         "restore_as" : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
                          "msg_headline"    : _("<b>Restoring of selected files</b>"),
                          "msg_progress"    : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
                          "msg_sucess"      : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was successful."),
-                         "msg_failure"     : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nThe following error occurred:\n") },
+                         "msg_failure"     : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nFollowing error occurred:\n") },
 
         "revert"     : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
                          "msg_headline"    : _("<b>Reverting selected files</b>"),
                          "msg_progress"    : _("Reverting of <tt>'%s'</tt> is in progress.\n"),
                          "msg_sucess"         : _("Reverting of <tt>'%s'</tt> was successful."),
-                         "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not successful.\n\nThe following error occurred:\n") },
+                         "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not successful.\n\nFollowing error occurred:\n") },
 
         "revert_as"     : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
                          "msg_headline"    : _("<b>Reverting selected files</b>"),
                          "msg_progress"    : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
                          "msg_sucess"      : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was successful."),
-                         "msg_failure"     : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nThe following error occurred:\n") },
+                         "msg_failure"     : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nFollowing error occurred:\n") },
       }
 
     def __init__(self, parent):
         """Default constructor.
         """
-        self.init(parent)
-        ProgressbarMixin.__init__(self, self.widgets['restore_progressbar'])
-        self.__mode = None
-        self.__source = None
-        self.__dirname = None
-
-        self._init_pulse()
-
-    def init(self, parent):
         _gladefile = Util.get_resource_file('nssbackup-restore.glade')
 
         _wdgt_lst = [
@@ -855,6 +907,13 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
         self.set_top_window(self.widgets[_top_win_name])
         self.top_window.set_icon_from_file(\
                                     Util.get_resource_file("nssbackup-restore.png"))
+
+        ProgressbarMixin.__init__(self, self.widgets['restore_progressbar'])
+        self.__mode = None
+        self.__source = None
+        self.__dirname = None
+
+        self._init_pulse()
 
     def _on_button_close_clicked(self, *args):
         """Event handler for clicking the close button.
@@ -936,7 +995,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
         else:
             msg_failure = msgs["msg_failure"] % {"source" : source, "dirname" : dirname}
 
-        msg_failure += str(failure)
+        msg_failure = "%s\n%s." % (msg_failure, str(failure))
 
         self._stop_pulse()
         self.widgets['restore_progressbar'].hide()
@@ -947,5 +1006,5 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 def main(argv):
     restore_win = SBRestoreGTK()
     restore_win.show()
-    gtk.main()
+    restore_win.main()
     log.shutdown_logging()

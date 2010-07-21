@@ -15,13 +15,20 @@
 # Authors :
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from nssbackup.plugins import pluginFAM
-import re
-import os
-import pexpect
+
 from gettext import gettext as _
+import re
+
+
+from nssbackup.fuse_plugins import pluginFAM
 from nssbackup.util.exceptions import FuseFAMException, SBException
-from nssbackup.util.log import LogFactory
+from nssbackup.util import local_file_utils
+from nssbackup.util import system
+
+try:
+    import pexpect
+except ImportError:
+    raise FuseFAMException("Unable to import required module `pexpect`")
 
 
 ssh_re = "^sftp://"
@@ -33,11 +40,8 @@ class sshFuseFAM (pluginFAM)  :
     @requires: sshfs, python-pexpect
     @author: Oumar Aziz Ouattara
     """
-
-
-
     def __init__(self):
-        self.logger = LogFactory.getLogger()
+        pluginFAM.__init__(self)
 
     def match_scheme(self, remoteSource):
         """
@@ -83,7 +87,7 @@ class sshFuseFAM (pluginFAM)  :
             remoteSource += "/"
 
             user = match.group(1)
-            mountpoint = os.path.join(mountbase, self._defineMountDirName(source))
+            mountpoint = local_file_utils.normpath(mountbase, self._defineMountDirName(source))
             if match.group(7) :
                 pathinside = match.group(7)
             else :
@@ -99,10 +103,10 @@ class sshFuseFAM (pluginFAM)  :
         port = match.group(6)
         if port:
             cmd += " -p " + port
-        if not os.path.exists(mountpoint) :
-            os.mkdir(mountpoint)
+        if not local_file_utils.path_exists(mountpoint) :
+            local_file_utils.makedir(mountpoint)
 
-        if os.getuid() == 0:
+        if system.is_superuser():
             cmd += " -o allow_root"
 
         self.logger.debug("Spawning: " + cmd)
@@ -119,7 +123,7 @@ class sshFuseFAM (pluginFAM)  :
             self.logger.debug("Expecting password.")
             if not password :
                 sshfsp.sendline("fake")
-                os.rmdir(mountpoint)
+                local_file_utils.delete(mountpoint)
                 raise SBException("sshfs is requesting a password and none has been passed.")
             sshfsp.sendline(password)
             i = sshfsp.expect(['(yes/no)', 'password:', 'Password:', pexpect.EOF])
@@ -127,7 +131,7 @@ class sshFuseFAM (pluginFAM)  :
         result = sshfsp.before # print out the result
 
         if sshfsp.isalive() or sshfsp.exitstatus:
-            os.rmdir(mountpoint)
+            local_file_utils.delete(mountpoint)
             raise SBException (_("The sshfs command '%(command)s' didn't perform normally. Output => %(erroroutput)s ") % {"command" : cmd, "erroroutput" : result})
 
         return (remoteSource, mountpoint, pathinside)
@@ -140,8 +144,8 @@ class sshFuseFAM (pluginFAM)  :
         """
         @return: True if mounted, False if not
         """
-        mountpoint = os.path.join(mountbase, self._defineMountDirName(source))
-        return os.path.ismount(mountpoint)
+        mountpoint = local_file_utils.normpath(mountbase, self._defineMountDirName(source))
+        return local_file_utils.is_mount(mountpoint)
 
     def _defineMountDirName(self, remote):
         """

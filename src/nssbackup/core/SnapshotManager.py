@@ -1,7 +1,7 @@
 #    NSsbackup - snapshot handling
 #
-#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -23,31 +23,32 @@
 
 .. module:: SnapshotManager
    :synopsis: Defines a snapshot handler class
-.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
 .. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
 
 """
 
-import shutil
-import os
+
+from gettext import gettext as _
+import traceback
 import datetime
 import time
-import traceback
-from gettext import gettext as _
+import types
+
 
 from nssbackup.pkginfo import Infos
-import nssbackup.util.tar as TAR
-from nssbackup.util import file_handling as FAM
+from nssbackup.fs_backend import fam
+
+from nssbackup.ar_backend import tar
+from nssbackup.ar_backend.tar import SnapshotFile
+from nssbackup.ar_backend.tar import Dumpdir
+from nssbackup.ar_backend.tar import SnapshotFileWrapper
+from nssbackup.ar_backend.tar import ProcSnapshotFile
+from nssbackup.ar_backend.tar import get_dumpdir_from_list
+
 import nssbackup.util as Util
-
-from nssbackup.util.Snapshot import Snapshot
+from nssbackup.core.snapshot import Snapshot
 from nssbackup.util.log import LogFactory
-from nssbackup.util.tar import SnapshotFile
-from nssbackup.util.tar import Dumpdir
-from nssbackup.util.tar import SnapshotFileWrapper
-from nssbackup.util.tar import ProcSnapshotFile
-from nssbackup.util.tar import get_dumpdir_from_list
-
 from nssbackup.util.exceptions import SBException
 from nssbackup.util.exceptions import NotValidSnapshotException
 from nssbackup.util.exceptions import NotValidSnapshotNameException
@@ -55,6 +56,9 @@ from nssbackup.util.exceptions import RebaseSnpException
 from nssbackup.util.exceptions import RebaseFullSnpForbidden
 from nssbackup.util.exceptions import RemoveFullSnpForbidden
 from nssbackup.util.exceptions import NotSupportedError
+
+
+_EXT_CORRUPT_SNP = ".corrupt"
 
 
 class SnapshotManager(object):
@@ -67,16 +71,28 @@ class SnapshotManager(object):
 
     REBASEDIR = "rebasetmp"
 
-    def __init__(self, target_dir):
+    def __init__(self, target_eff_path):
         """Default constructor. Takes the path to the target backup
         directory as parameter.
+        
+        Use target handler (without config) here. Refactor!
 
         """
-        # logger instance
+        if not isinstance(target_eff_path, types.StringTypes):
+            raise TypeError("Effective target path of type string expected. Got %s instead"\
+                            % type(target_eff_path))
+#        if not fam.isinstance_of_fam_target_handler_facade(fam_target_handler):
+#            raise TypeError("Instance of FAM target handler expected")
+#
+#        if not fam_target_handler.is_initialized():
+#            raise AssertionError("FAM target handler is not initialized")
+
         self.logger = LogFactory.getLogger()
 
+        self._fop = fam.get_file_operations_facade_instance()
         # This is the current directory used by this SnapshotManager
-        self.__targetDir = None
+        self.__target_eff_path = target_eff_path
+#        self._fam_target_hdl = fam_target_handler
 
         # The list of the snapshots is stored the first time it's used,
         # so we don't have to re-get it later
@@ -87,10 +103,15 @@ class SnapshotManager(object):
         self.substatusMessage = None
         self.statusNumber = None
 
-        if not target_dir or not FAM.exists(target_dir) :
-            raise SBException(_("Invalid value of the target directory : ")\
-                                + str(target_dir))
-        self.__targetDir = target_dir
+# Done during initialization of target handler
+#        if not target_dir or not FAM.exists(target_dir) :
+#            raise SBException(_("Invalid value of the target directory : ")\
+#                                + str(target_dir))
+#        self.__targetDir = target_dir
+
+#TODO: Wrap it.
+        if not self.__target_eff_path.startswith(self._fop.pathsep):
+            raise ValueError("Given effective path to target must be local")
 
     def getStatus(self):
         """
@@ -161,18 +182,29 @@ class SnapshotManager(object):
         Unreadable snapshots are being renamed.
         """
         snapshots = []
-        listing = FAM.listdir(self.__targetDir)
-        for _dir in listing :
-            _snppath = os.path.join(self.__targetDir, str(_dir))
+        listing = self._fop.listdir_fullpath(self.__target_eff_path)
+
+        for _snppath in listing :
+            _snpname = self._fop.get_basename(_snppath)
+            if _snpname.endswith(_EXT_CORRUPT_SNP):
+                self.logger.info("Corrupt snapshot `%s` found. Skipped." % _snpname)
+                continue
             try :
                 snapshots.append(Snapshot(_snppath))
-            except NotValidSnapshotException, e :
-                if isinstance(e, NotValidSnapshotNameException) :
-                    self.logger.warning(_("Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s ") % {'name': str(_dir), 'error_cause' :e})
-                else :
-                    self.logger.warning(_("Got a non valid snapshot '%(name)s': %(error_cause)s ") % {'name': str(_dir), 'error_cause' :e})
-                    self.logger.info("Invalid snapshot '%s' is going to be renamed!" % _snppath)
-                    FAM.rename(_snppath, _snppath[:-3] + "corrupt")
+            except NotValidSnapshotException, error :
+                if isinstance(error, NotValidSnapshotNameException) :
+                    self.logger.warning(_("Invalid snapshot `%(name)s` found: Name of snapshot not valid.")\
+                                        % { 'name': str(_snpname) })
+                else: # rename only if name was valid but snapshot was invalid
+                    self.logger.warning(_("Invalid snapshot `%(name)s` found: %(error_cause)s.")\
+                                        % { 'name': str(_snpname), 'error_cause' :error })
+                    self.logger.info("Invalid snapshot `%s` is being renamed." % _snpname)
+                    if _snppath.endswith(".inc") or _snppath.endswith(".ful"):
+                        _ren_snppath = "%s%s" % (_snppath[:-4], _EXT_CORRUPT_SNP)
+                    else:
+                        _ren_snppath = "%s%s" % (_snppath, _EXT_CORRUPT_SNP)
+                    self._fop.rename(_snppath, _ren_snppath)
+
         snapshots.sort(key = Snapshot.getName, reverse = True)
         self.__snapshots = snapshots
 
@@ -350,7 +382,7 @@ class SnapshotManager(object):
             @todo: Check available disk space prior.
             """
             # write temp flist created from the temporary partial snar file
-            flist_name = os.path.join(tmpdir, "flist.tmp")
+            flist_name = self._fop.normpath(tmpdir, "flist.tmp")
 
             self.logger.info("Writing the temporary Files list to make the transfer")
 #            print "  %s" % flist_name
@@ -359,26 +391,26 @@ class SnapshotManager(object):
             flistd = open(flist_name, 'w')
             for _fnam in _files_extract:
 #                print _fnam
-                flistd.write(_fnam.lstrip(os.sep) + '\0')
+                flistd.write(_fnam.lstrip(self._fop.pathsep) + '\0')
             flistd.close()
 
             self.logger.info("Make a temporary tar file by transfering the "\
                              "files from base")
-            tmptardir = tmpdir + os.sep + "tempTARdir"
-            if FAM.exists(tmptardir):
-                FAM.delete(tmptardir)
-            FAM.makedir(tmptardir)
+            tmptardir = self._fop.normpath(tmpdir, "tempTARdir")
+            if self._fop.path_exists(tmptardir):
+                self._fop.delete(tmptardir)
+            self._fop.makedir(tmptardir)
 
             # extract files that are stored in temporary flist
-            TAR.extract2(topullSnp.getArchive(), flist_name,
+            tar.extract2(topullSnp.getArchive(), flist_name,
                           tmptardir, additionalOpts = ["--no-recursion"])
 
             # uncompress the tar file so that we can append files to it
             archive = snapshot.getArchive()
-            if not TAR.getArchiveType(archive):
+            if not tar.getArchiveType(archive):
                 raise SBException("Invalid archive file '%s'" % archive)
             else :
-                arvtype = TAR.getArchiveType(archive)
+                arvtype = tar.getArchiveType(archive)
                 if arvtype == "gzip" :
                     Util.launch("gunzip", [archive])
                     archive = archive[:-3]
@@ -390,8 +422,8 @@ class SnapshotManager(object):
             # finally append them to the current
             # archive (resp. the temporary working copy)
             # we use the flist from above
-            TAR.appendToTarFile(desttar = archive, fileslist = flist_name,
-                            workingdir = tmptardir + os.sep, additionalOpts = None)
+            tar.appendToTarFile(desttar = archive, fileslist = flist_name,
+                            workingdir = tmptardir + self._fop.pathsep, additionalOpts = None)
 
             # re-compress
             if arvtype == "gzip" :
@@ -399,10 +431,10 @@ class SnapshotManager(object):
             elif arvtype == "bzip2" :
                 Util.launch("bzip2", [archive])
 
-            FAM.force_delete(tmptardir)
+            self._fop.force_delete(tmptardir)
 
         def mergeIncludesList():
-            destf_path = os.path.join(tmpdir, "includes.list.tmp")
+            destf_path = self._fop.normpath(tmpdir, "includes.list.tmp")
 
             srcfd = open(topullSnp.getIncludeFListFile())
             incl_topull = srcfd.readlines()
@@ -419,7 +451,7 @@ class SnapshotManager(object):
             destfd.close()
 
         def mergeExcludesList():
-            destf_path = os.path.join(tmpdir, "excludes.list.tmp")
+            destf_path = self._fop.normpath(tmpdir, "excludes.list.tmp")
 
             srcfd = open(topullSnp.getExcludeFListFile())
             excl_topull = srcfd.readlines()
@@ -438,21 +470,21 @@ class SnapshotManager(object):
         def movetoFinaldest():
             self.logger.debug("Move all temporary files to their final destination")
             # SNAR file
-            _tmpname = os.path.join(tmpdir, "snar.final.tmp")
-            if os.path.exists(snapshot.getSnarFile()) :
-                os.remove(snapshot.getSnarFile())
-            os.rename(_tmpname, snapshot.getSnarFile())
+            _tmpname = self._fop.normpath(tmpdir, "snar.final.tmp")
+            if self._fop.path_exists(snapshot.getSnarFile()) :
+                self._fop.delete(snapshot.getSnarFile())
+            self._fop.rename(_tmpname, snapshot.getSnarFile())
 
             # Includes.list
-            if os.path.exists(snapshot.getIncludeFListFile()) :
-                os.remove(snapshot.getIncludeFListFile())
-            os.rename(tmpdir + os.sep + "includes.list.tmp",
+            if self._fop.path_exists(snapshot.getIncludeFListFile()) :
+                self._fop.delete(snapshot.getIncludeFListFile())
+            self._fop.rename(tmpdir + self._fop.pathsep + "includes.list.tmp",
                       snapshot.getIncludeFListFile())
 
             # Excludes.list
-            if os.path.exists(snapshot.getIncludeFListFile()) :
-                os.remove(snapshot.getExcludeFListFile())
-            os.rename(tmpdir + os.sep + "excludes.list.tmp",
+            if self._fop.path_exists(snapshot.getIncludeFListFile()) :
+                self._fop.delete(snapshot.getExcludeFListFile())
+            self._fop.rename(tmpdir + self._fop.pathsep + "excludes.list.tmp",
                       snapshot.getExcludeFListFile())
 
         # process:
@@ -460,13 +492,13 @@ class SnapshotManager(object):
             self.statusNumber = 0.00
 
             # create a temporary directory within the target snapshot
-            tmpdir = os.path.join(snapshot.getPath(), self.REBASEDIR)
-            if FAM.exists(tmpdir):
-                FAM.force_delete(tmpdir) # to ensure we have write permissions
-            FAM.makedir(tmpdir)
+            tmpdir = self._fop.normpath(snapshot.getPath(), self.REBASEDIR)
+            if self._fop.path_exists(tmpdir):
+                self._fop.force_delete(tmpdir) # to ensure we have write permissions
+            self._fop.makedir(tmpdir)
 
             # specify full path to final (temporary) snar file
-            _tmpfinal = os.path.join(tmpdir, "snar.final.tmp")
+            _tmpfinal = self._fop.normpath(tmpdir, "snar.final.tmp")
 
             # create temporary SNAR file and copy the header, then merge
             finalsnar = self._copy_empty_snar(snapshot, _tmpfinal)
@@ -493,7 +525,7 @@ class SnapshotManager(object):
 
             # clean Temporary files 
             self.statusNumber = 0.85
-            FAM.delete(tmpdir)
+            self._fop.delete(tmpdir)
 
             self.statusNumber = 0.95
             snapshot.commitverfile()
@@ -629,7 +661,7 @@ class SnapshotManager(object):
                     # Item was explicitly excluded and is therefore not included in child
 #                    _filenfull = os.path.join(_curdir, _filen)
 #                    print "Full path: %s" % (_filenfull)
-                    if os.path.join(_curdir, _filen) in target_excludes:
+                    if self._fop.normpath(_curdir, _filen) in target_excludes:
                         self.logger.debug("Path '%s' was excluded. Not merged." % _filen)
                         _was_excluded = True
                     else:
@@ -645,7 +677,7 @@ class SnapshotManager(object):
 
                         elif _base_ctrl == Dumpdir.INCLUDED:
                             _ddir_final = _basedumpd
-                            files_to_extract.append(os.path.join(_curdir,
+                            files_to_extract.append(self._fop.normpath(_curdir,
                                                                  _filen))
                         else:
                             raise SBException("Found unexpected control code "\
@@ -744,8 +776,8 @@ class SnapshotManager(object):
                     _snp.commitbasefile()
 
             path = snapshot.getPath()
-            os.rename(os.path.join(path, 'base'), os.path.join(path, 'base.old'))
-            os.rename(path, path[:-3] + 'ful')
+            self._fop.rename(self._fop.normpath(path, 'base'), self._fop.normpath(path, 'base.old'))
+            self._fop.rename(path, path[:-3] + 'ful')
             res_snp = Snapshot(path[:-3] + 'ful')
 
             # post-condition check
@@ -773,15 +805,16 @@ class SnapshotManager(object):
         
         """
         self.logger.info(_("Cancelling pull of snapshot '%s'") % snapshot.getName())
-        path = snapshot.getPath() + os.sep + self.REBASEDIR
-        shutil.rmtree(path)
+        path = self._fop.normpath(snapshot.getPath(), self.REBASEDIR)
+#        shutil.rmtree(path)
+        self._fop.delete(path)
 
-        if os.path.exists(snapshot.getPath() + os.sep + "files.tar"):
+        if self._fop.path_exists(self._fop.normpath(snapshot.getPath(), "files.tar")):
             format = snapshot.getFormat()
             if format == "gzip":
-                Util.launch("gzip", [snapshot.getPath() + os.sep + "files.tar"])
+                Util.launch("gzip", [self._fop.normpath(snapshot.getPath(), "files.tar")])
             elif format == "bzip2":
-                Util.launch("bzip2", [snapshot.getPath() + os.sep + "files.tar"])
+                Util.launch("bzip2", [self._fop.normpath(snapshot.getPath(), "files.tar")])
         snapshot.commitverfile()
 
     def _retrieve_childsnps(self, snapshot):
@@ -812,7 +845,7 @@ class SnapshotManager(object):
         if len(_childs) != 0:
             raise AssertionError("The given snapshot '%s' is not stand-alone." % snapshot)
         self.logger.debug("Removing '%s'" % snapshot.getName())
-        FAM.delete(snapshot.getPath())
+        self._fop.delete(snapshot.getPath())
         self.get_snapshots(forceReload = True)
 
     def removeSnapshot(self, snapshot):
@@ -913,10 +946,11 @@ class SnapshotManager(object):
 
         return result
 
-    def purge(self, purge = "30"):
+    def purge(self, purge, no_purge_snp):
         """Public method that processes purging of archive directory.
         
-        :param mode: for the moment, only "log" and "simple" are supported 
+        :param mode: for the moment, only "log" and "simple" are supported
+        :param no_purge: name of snapshot not being purged 
         
         :todo: We should try to remove the snapshots from fresh to old to avoid multiple re-base operations!
         
@@ -926,7 +960,7 @@ class SnapshotManager(object):
             self.logger.warning(_("Logarithmic purge is currently disabled. Please specify a cutoff purge interval in your configuration instead."))
 #            self._do_log_purge()
         else:
-            self._do_cutoff_purge(purge)
+            self._do_cutoff_purge(purge, no_purge_snp)
         self.get_snapshots(forceReload = True)
 
     def _do_log_purge(self):
@@ -999,7 +1033,7 @@ class SnapshotManager(object):
         max_age = (datetime.date.today() - from_time).days
         self._do_cutoff_purge(max_age)
 
-    def _do_cutoff_purge(self, purge):
+    def _do_cutoff_purge(self, purge, no_purge_snp = ""):
         """Simple cut-off purging is processed: all snapshots older than
         a certain value are removed. During removal of snapshots the
         snapshot state (full, inc) is considered.
@@ -1009,14 +1043,18 @@ class SnapshotManager(object):
         except ValueError:
             purge = 0
         if purge > 0:
-            self.logger.info("Simple purge - remove all backups older "\
-                             "then %s days." % purge)
+            self.logger.info("Simple purge - remove freestanding snapshots older "\
+                             "than %s days." % purge)
 
             while True:
                 _was_removed = False
                 snapshots = _get_snapshots_older_than(self.get_snapshots(),
                                                       purge, logger = self.logger)
                 for snp in snapshots:
+                    if snp.getName() == no_purge_snp:
+                        self.logger.debug("`%s` skipped.")
+                        continue
+
                     self.logger.debug("Checking '%s' for childs." % (snp))
                     childs = self._retrieve_childsnps(snapshot = snp)
                     if len(childs) == 0:
@@ -1053,7 +1091,8 @@ def debug_print_snarfile(filename):
     :type filename: string
     
     """
-    if os.path.exists(filename):
+    _fop = fam.get_file_operations_facade_instance()
+    if _fop.path_exists(filename):
         _snar = SnapshotFile(filename, writeFlag = False)
         print "\nSUMMARY of SNAR '%s':" % filename
         for _record in _snar.parseFormat2():
@@ -1073,7 +1112,8 @@ def debug_snarfile_to_list(filename):
     
     """
     _res = []
-    if os.path.exists(filename):
+    _fop = fam.get_file_operations_facade_instance()
+    if _fop.path_exists(filename):
         _snar = SnapshotFile(filename, writeFlag = False)
         for _record in _snar.parseFormat2():
             _res.append(_record)

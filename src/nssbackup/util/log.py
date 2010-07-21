@@ -1,7 +1,7 @@
 #    NSsbackup - Logging facilities
 #
-#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 
 import logging
 import os.path
-from nssbackup.util import file_handling as FAM
 
 
 def shutdown_logging():
@@ -96,11 +95,11 @@ class LogFactory(object):
                     parentdir = os.path.dirname(os.path.abspath(logfile))
                     if not os.path.exists(parentdir):
                         os.makedirs(parentdir)
-                    FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
+                    _writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
                 else :
                     # clean the logfile
-                    FAM.rename(logfile, logfile + ".old")
-                    FAM.writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
+                    os.rename(logfile, logfile + ".old")
+                    _writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
                 ch1 = logging.FileHandler(logfile)
                 ch1.setLevel(level)
                 ch1.setFormatter(_formatter)
@@ -108,3 +107,9 @@ class LogFactory(object):
         return LogFactory.logger
 
     __createLogger = staticmethod(__createLogger)
+
+
+def _writetofile(path, content) :
+    _fobj = open(path, "w")
+    _fobj.write(content)
+    _fobj.close()

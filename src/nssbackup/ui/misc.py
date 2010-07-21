@@ -18,14 +18,58 @@
 """Module containing commonly used helper classes and functions related to UI
 """
 
+from gettext import gettext as _
+
 import os
 import gtk
 import pango
+import types
+import traceback
 
 
 from nssbackup.pkginfo import Infos
 from nssbackup.util import constants
+from nssbackup.util import system
+from nssbackup.util import log
 from nssbackup import util
+
+
+MODEL_COLUMN_INDEX_VALUE = 0
+MODEL_COLUMN_INDEX_KEY = 1
+
+
+def set_model(widget, values):
+    """
+    sorted by dictionary keys
+    """
+    if not isinstance(values, types.DictionaryType):
+        raise TypeError
+
+    # query types
+    _entry = values.popitem()
+    values[_entry[0]] = _entry[1]    # re-add removed pair
+    _keytype = type(_entry[0])
+    _valtype = type(_entry[1])
+
+    # ensure all dictionary entries are of same type
+    for _entry in values:
+        if not isinstance(_entry, _keytype):
+            raise TypeError
+        if not isinstance(values[_entry], _valtype):
+            raise TypeError
+
+    _model = gtk.ListStore(_valtype, _keytype)
+    _keys = values.keys()
+    _keys.sort()
+
+    for _key in _keys:
+        _model.append([values[_key], _key])
+
+    widget.set_model(_model)
+    _cell = gtk.CellRendererText()
+    widget.pack_start(_cell, True)
+    widget.add_attribute(_cell, 'text', MODEL_COLUMN_INDEX_VALUE)
+    return _model
 
 
 def open_uri(uri, timestamp = 0):
@@ -239,8 +283,40 @@ def show_about_dialog(set_transient_for = None):
     about.set_copyright(Infos.COPYRIGHT)
     about.set_translator_credits(Infos.TRANSLATORS)
     about.set_authors(Infos.AUTHORS)
-    about.set_website(Infos.WEBSITE)
+    if not system.is_superuser():
+        about.set_website(Infos.WEBSITE)
     about.set_logo(gtk.gdk.pixbuf_new_from_file(_icon_file))
     about.set_icon_from_file(_icon_file)
     about.run()
     about.destroy()
+
+
+def set_watch_cursor(widget):
+    watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+    try:
+        widget.window.set_cursor(watch)
+    except AttributeError, error:
+        print "Ignored error when setting cursor: %s" % error
+
+
+def unset_cursor(widget):
+    try:
+        widget.window.set_cursor(None)
+    except AttributeError, error:
+        print "Ignored error when un-setting cursor: %s" % error
+
+
+def except_hook(etype, evalue, etb):
+    _logger = log.LogFactory.getLogger()
+
+    _lines = traceback.format_exception(etype, evalue, etb)
+    _lines = "".join(_lines)
+
+    _logger.error("Uncaught exception: %s" % evalue)
+    _logger.error(_lines)
+
+    show_errdialog(message_str = _("Following unexpected error occurred:\n\n%s\n\n%s") % (evalue, _lines),
+                        parent = None, headline_str = _("An uncaught exception occurred"),
+                        secmsg_str = _("Please report this error on https://bugs.launchpad.net/nssbackup"))
+
+

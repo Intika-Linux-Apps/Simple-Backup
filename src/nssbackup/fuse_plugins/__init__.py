@@ -14,34 +14,34 @@
 # Authors :
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-"""
-@todo: Remove wildcard imports!
-"""
+
+from gettext import gettext as _
 
 import inspect
 import os
 import sys
 import glob
-from gettext import gettext as _
-import nssbackup, subprocess
-from tempfile import *
-from nssbackup.util.file_handling import *
-from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import SBException
+import tempfile
+import subprocess
+
+
+import nssbackup
+from nssbackup.util import local_file_utils
+from nssbackup.util import log
+from nssbackup.util import exceptions
 
 
 class pluginFAM(object):
     """
     The fuseFAM plugin interface
     @author: Oumar Aziz Ouattara <wattazoum@gmail.com>
-    @version: 1.0
     """
 
     def __init__(self):
-        self.logger = LogFactory.getLogger()
+        self.logger = log.LogFactory.getLogger()
 
     def match_scheme(self, remoteSource):
-        raise SBException("'match_scheme_full' Not implemented for this plugin")
+        raise exceptions.SBException("'match_scheme_full' Not implemented for this plugin")
 
     def match_scheme_full(self, remoteSource):
         """
@@ -50,7 +50,7 @@ class pluginFAM(object):
         @return: True if the scheme matches the one for this 
         @rtype: boolean
         """
-        raise SBException("'match_scheme_full' Not implemented for this plugin")
+        raise exceptions.SBException("'match_scheme_full' Not implemented for this plugin")
 
     def mount(self, source, mountbase):
         """
@@ -68,7 +68,7 @@ class pluginFAM(object):
         @return: The tuple (baseRemoteSource, mountpoint, pathinside)
         @rtype: tuple
         """
-        raise SBException("'mount' Not implemented for this plugin")
+        raise exceptions.SBException("'mount' Not implemented for this plugin")
 
     def umount(self, mounteddir):
         """
@@ -77,8 +77,8 @@ class pluginFAM(object):
         if os.path.ismount(mounteddir):
             self.logger.debug("Unmounting `%s`" % mounteddir)
             # Create output and error log file
-            outptr, outFile = mkstemp(prefix = "fuseUmount_output_")
-            errptr, errFile = mkstemp(prefix = "fuseUmount_error_")
+            outptr, outFile = tempfile.mkstemp(prefix = "fuseUmount_output_")
+            errptr, errFile = tempfile.mkstemp(prefix = "fuseUmount_error_")
 
             # Call the subprocess using convenience method using lazy umount
             retval = subprocess.call(["fusermount", "-u", "-z", mounteddir], 0, None, None, outptr, errptr)
@@ -86,14 +86,14 @@ class pluginFAM(object):
             # Close log handles
             os.close(errptr)
             os.close(outptr)
-            outStr, errStr = readfile(outFile), readfile(errFile)
-            delete(outFile)
-            delete(errFile)
+            outStr, errStr = local_file_utils.readfile(outFile), local_file_utils.readfile(errFile)
+            local_file_utils.delete(outFile)
+            local_file_utils.delete(errFile)
 
             self.logger.debug("fusermount output:\n%s\n%s" % (outStr, errStr))
 
             if retval != 0 :
-                raise SBException("Unable to unmount `%s`: %s" % (mounteddir, errStr))
+                raise exceptions.SBException("Unable to unmount `%s`: %s" % (mounteddir, errStr))
             else:
                 self.logger.info("Successfully unmounted: `%s`" % mounteddir)
         else:
@@ -105,24 +105,24 @@ class pluginFAM(object):
         Note : you should use os.path.ismount(path) method for that, after determining the name of the mount point.
         @return: True if it is, False if not
         """
-        raise SBException("'Check if mounted' Not implemented for this plugin")
+        raise exceptions.SBException("'Check if mounted' Not implemented for this plugin")
 
     def getdoc(self):
         """
         This method should give a little documentation about the schema used for this plugin.
         @return: The schema doc (eg. return 'example : sch://user:password@server/dir')
         """
-        raise SBException("Help not implemented for this plugin")
+        raise exceptions.SBException("Help not implemented for this plugin")
 
 
 class PluginManager(object):
     """
     """
-    # This should be a dictionary of plugins
-    __pluginList = None
-
     def __init__(self):
-        self.logger = LogFactory.getLogger()
+        self.logger = log.LogFactory.getLogger()
+
+        # This should be a dictionary of plugins
+        self.__pluginList = None
 
     def getPlugins(self):
         """Searches for plugins in the plugin directory and loads them.
@@ -131,8 +131,10 @@ class PluginManager(object):
         @note: Look at FuseFAM to know how it's used.
         """
 
-        if self.__pluginList : return self.__pluginList
-        else :
+        if self.__pluginList is not None:
+            return self.__pluginList
+
+        else:
             self.__pluginList = dict()
             tmp = inspect.getabsfile(inspect.getmodule(self))
             plugins_dir = os.path.dirname(tmp)
@@ -140,10 +142,10 @@ class PluginManager(object):
                 if plugins_dir not in sys.path:
                     sys.path.append(plugins_dir)
 
-                for file in glob.glob('%s/*FuseFAM.py' % plugins_dir):
+                for _file in glob.glob('%s/*FuseFAM.py' % plugins_dir):
                     try:
-                        module_filename = os.path.basename(file)
-                        module_name, _ = os.path.splitext(module_filename)
+                        module_filename = os.path.basename(_file)
+                        module_name, mod_ext = os.path.splitext(module_filename)  # IGNORE:W0612
                         plugin = __import__(module_name, '', module_filename)
                         for symbol_name in dir(plugin):
                             symbol = getattr(plugin, symbol_name)
@@ -151,8 +153,9 @@ class PluginManager(object):
                                 issubclass(symbol, pluginFAM):
                                 #symbol.enabled = symbol.name in plugin_names
                                 self.__pluginList[symbol_name] = symbol
-                    except Exception, e:
-                        from gettext import gettext as _
-                        self.logger.warning(_("Could not import plugin %(plugin_name)s ! Cause : %(error_cause)s ") % {'plugin_name':file, 'error_cause': str(e)})
+                    except Exception, error:
+                        self.logger.warning(_("Unable to import plugin `%(plugin_name)s`: %(error_cause)s ")\
+                                            % { 'plugin_name' : module_name,
+                                                'error_cause' : str(error) })
                         continue
             return self.__pluginList

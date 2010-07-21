@@ -88,6 +88,11 @@ CLEAN_ENVIRONMENT = {
     }
 
 
+def get_pid():
+    _pid = os.getpid()
+    return _pid
+
+
 def get_user_from_env():
     """Returns the USER defined in current environment. If no USER is
     set, None is returned.
@@ -162,6 +167,18 @@ def switch_user(uid_name):
 def drop_privileges():
     switch_user(uid_name = 'nobody')
 
+
+def set_grp(groupname):
+    # [Bug 112540] : Let the admin group have read access to the backup dirs
+    if os.geteuid() == 0:
+        try :
+            os.setgid(grp.getgrnam(groupname).gr_gid)
+        except (KeyError, OSError), error:
+            print "Failed to set GID to `admin`: %s" % error
+
+
+def very_nice():
+    os.nice(20)
 
 def get_environment():
     _env = os.environ

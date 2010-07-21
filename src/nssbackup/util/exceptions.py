@@ -28,6 +28,18 @@
 
 """
 
+
+class ErrorDescription(object):
+    def __init__(self, errorcode, errorname, errormessage):
+        self.code = errorcode
+        self.name = errorname
+        self.message = errormessage
+
+    def __str__(self):
+        res = "code: %s  name: %s  message: %s" % (self.code, self.name, self.message)
+        return res
+
+
 class SigTerminatedError(Exception) :
     """This Exception is thrown if the backup process receives a
     SIGTERM/SIGKILL signal.
@@ -80,11 +92,6 @@ class CorruptedSBdictException(SBException):
 
     """
 
-class FuseFAMException(SBException):
-    """Thrown when a Fuse mount fails
-
-    """
-
 class TimeoutError(SBException):
     """Thrown when an IO operation times out.
     """
@@ -123,5 +130,30 @@ class NotifyException(SBException) :
 
 class DBusException(SBException) :
     """This Exception is thrown when problems with DBus occurs.
+
+    """
+
+class FileAccessException(SBException) :
+    """This Exception is thrown when problems with remote paths occur.
+
+    """
+
+class FuseFAMException(FileAccessException):
+    """Thrown when a Fuse mount fails
+
+    """
+
+class RemoteMountFailedError(FileAccessException):
+    """This Exception is thrown when remote path is not mountable.
+
+    """
+
+class RemoteMountTestFailedError(FileAccessException):
+    """This Exception is thrown when remote path is not mountable.
+
+    """
+
+class RemoteUmountFailedError(FileAccessException):
+    """This Exception is thrown when remote path is not mountable.
 
     """

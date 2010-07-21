@@ -30,7 +30,7 @@ from nssbackup.util.exceptions import SBException
 from nssbackup.util.exceptions import NotValidSnapshotNameException
 from nssbackup.util.exceptions import NotValidSnapshotException
 
-from nssbackup.util import Snapshot
+from nssbackup.util import snapshot
 from nssbackup.util.log import LogFactory
 
 
@@ -121,7 +121,7 @@ class TestSnapshot(unittest.TestCase):
         for val_name in val_names:
             tdir = os.path.join(_TestSnapshotPaths.get_snp_path(), val_name)
 #            print "VAL: %s" % tdir
-            snp = Snapshot.Snapshot(tdir)
+            snp = snapshot.Snapshot(tdir)
 
             # evaluate test
             self.assertTrue(os.path.exists(tdir))
@@ -135,7 +135,7 @@ class TestSnapshot(unittest.TestCase):
             tdir = os.path.join(_TestSnapshotPaths.get_snp_path(), ill_name)
 #            print "ILL: %s" % tdir
             self.assertRaises(NotValidSnapshotNameException,
-                              Snapshot.Snapshot, tdir)
+                              snapshot.Snapshot, tdir)
 
     # test the setter methods    
     def test_set_splitted_size(self):
@@ -202,13 +202,13 @@ class TestSnapshot(unittest.TestCase):
     def __create_full_snapshot(self):
         val_name = self.snp_valid_ful_names[0]
         tdir = os.path.join(_TestSnapshotPaths.get_snp_path(), val_name)
-        snp = Snapshot.Snapshot(tdir)
+        snp = snapshot.Snapshot(tdir)
         return snp
 
     def __create_inc_snapshot(self):
         val_name = self.snp_valid_inc_names[0]
         tdir = os.path.join(_TestSnapshotPaths.get_snp_path(), val_name)
-        snp = Snapshot.Snapshot(tdir)
+        snp = snapshot.Snapshot(tdir)
         return snp
 
 
@@ -236,8 +236,8 @@ class TestSnapshotFromDisk(unittest.TestCase):
         self.__untar_snapshots()
 
         # creation of snapshots
-        self.snapshot_ful = Snapshot.Snapshot(self.snappath_ful)
-        self.snapshot_inc = Snapshot.Snapshot(self.snappath_inc)
+        self.snapshot_ful = snapshot.Snapshot(self.snappath_ful)
+        self.snapshot_inc = snapshot.Snapshot(self.snappath_inc)
 
     def tearDown(self):
         self.__clean_dir()
@@ -393,7 +393,7 @@ class TestSnapshotCreateToDisk(unittest.TestCase):
 
         # creation of a new snapshot
         tdir = self.snappath_new
-        snp = Snapshot.Snapshot(tdir)
+        snp = snapshot.Snapshot(tdir)
 
         # including and excluding some files
         snp.addToIncludeFlist(os.path.join(self.in_path_abs, "some_directory"))

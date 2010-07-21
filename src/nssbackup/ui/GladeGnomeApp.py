@@ -16,15 +16,14 @@
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum at gmail dot com>
 #
 
+
 import os
-import gtk
 import gtk.glade
 import gnome
-# import mandatory for GnomeApp to work
-import gnome.ui
+import gnome.ui # required by GnomeAppBar
 
 import nssbackup.ui.misc
-#----------------------------------------------------------------------
+
 
 def search_file(filename, search_path):
 
@@ -115,8 +114,6 @@ class GladeGnomeApp(object):
         # initialize callback func
         self.cb_func = None
 
-    #----------------------------------------------------------------------
-
     def set_top_window(self, top_window):
 
         '''set_top_window(self, top_window):
@@ -128,20 +125,15 @@ class GladeGnomeApp(object):
 
         self.top_window = top_window
 
-    #----------------------------------------------------------------------
-
-    def set_callback_function(self, cb_func, *cb_args, **cb_kwargs):
-
-        '''set_callback_function(cb_func, *cb_args, **cb_kwargs):
-        
-        stores the cb_func and its cb_args and cb_kwargs
-        '''
-        self.cb_func = cb_func
-        self.cb_args = cb_args
-        self.cb_kwargs = cb_kwargs
-
-
-    #----------------------------------------------------------------------
+#    def set_callback_function(self, cb_func, *cb_args, **cb_kwargs):
+#
+#        '''set_callback_function(cb_func, *cb_args, **cb_kwargs):
+#        
+#        stores the cb_func and its cb_args and cb_kwargs
+#        '''
+#        self.cb_func = cb_func
+#        self.cb_args = cb_args
+#        self.cb_kwargs = cb_kwargs
 
     def show(self, center = 1, prev_window = None, *args):
 
@@ -152,13 +144,11 @@ class GladeGnomeApp(object):
 
         if prev_window is not None:
             self.prev_window = prev_window
-        if center:
-            self.top_window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-        else:
-            self.top_window.set_position(gtk.WIN_POS_NONE)
+#        if center:
+#            self.top_window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+#        else:
+#            self.top_window.set_position(gtk.WIN_POS_NONE)
         self.top_window.show()
-
-    #----------------------------------------------------------------------
 
     def hide(self):
 
@@ -172,9 +162,7 @@ class GladeGnomeApp(object):
         self.top_window.hide()
         if self.prev_window is not None:
             self.prev_window.show()
-        if self.cb_func is not None:
-            self.cb_func(*self.cb_args, **self.cb_kwargs)
+#        if self.cb_func is not None:
+#            self.cb_func(*self.cb_args, **self.cb_kwargs)
         if self.prev_window is None:
             gtk.main_quit()
-
-#----------------------------------------------------------------------

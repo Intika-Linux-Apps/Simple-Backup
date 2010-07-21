@@ -38,6 +38,5 @@ if __name__ == '__main__':
 
     from nssbackup.dbus_service import run
     retc = run(sys.argv)
-    print "SBackup DBus Service terminated (exit code: %s)." % retc
     sys.exit(retc)
 

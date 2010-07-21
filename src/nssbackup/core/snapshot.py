@@ -1,7 +1,7 @@
-#    NSsbackup - snapshot definition
+#    Simple Backup - snapshot definition
 #
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,35 +18,32 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackup.util.Snapshot` -- Snapshot definition
+:mod:`nssbackup.util.snapshot` -- snapshot definition
 =====================================================
 
-.. module:: Snapshot
+.. module:: snapshot
    :synopsis: Defines snapshots
-.. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
 .. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
+.. moduleauthor:: Ouattara Oumar Aziz <wattazoum@gmail.com>
 
 """
 
-# Imports
-import re
-import os
-import types
+
 from gettext import gettext as _
+import re
+import types
+
+
+from nssbackup.fs_backend import fam
 
 from nssbackup.util.exceptions import NotValidSnapshotNameException
 from nssbackup.util.exceptions import SBException
 from nssbackup.util.exceptions import NotValidSnapshotException
 
-from log import LogFactory
-from structs import SBdict
-from nssbackup.util import tar as TAR
-from nssbackup.util import file_handling as FAM
-
-from nssbackup.util.tar import SnapshotFile
-from nssbackup.util.tar import MemSnapshotFile
-from nssbackup.util.tar import ProcSnapshotFile
 from nssbackup.util import constants
+from nssbackup.util import structs
+from nssbackup.ar_backend import tar
+from nssbackup.util import log
 
 
 class Snapshot(object):
@@ -68,9 +65,13 @@ class Snapshot(object):
                snapshot directory in any case, currently! We need to handle the\
                case: opening an snapshot that is supposed to exist but in fact\
                doesn't!
+               
+        :todo: Separate commit of snapshot and the snapshot (name, path, ...) itself into
+               classes with concise responsibilities.
 
         """
-        self.logger = LogFactory.getLogger()
+        self.logger = log.LogFactory.getLogger()
+        self._fop = fam.get_file_operations_facade_instance()
 
         # Attributes
         self.__name = False
@@ -82,9 +83,9 @@ class Snapshot(object):
         self.__snarfile = None
 
         # explicitely defined include and exclude file lists; these lists are filled from the configuration
-        self.__includeFlist = SBdict()
+        self.__includeFlist = structs.SBdict()
         self.__includeFlistFile = None # Str
-        self.__excludeFlist = SBdict()
+        self.__excludeFlist = structs.SBdict()
         self.__excludeFlistFile = None # Str
 
         self.__space_required = constants.SPACE_REQUIRED_UNKNOWN
@@ -101,10 +102,10 @@ class Snapshot(object):
         self.setPath(path)    # sets path and validates name
 
         # check if it's an existing snapshot
-        if FAM.exists(self.__snapshotpath):
+        if self._fop.path_exists(self.__snapshotpath):
             self.__validateSnapshot(self.__snapshotpath, self.__name)
         else : # Snapshot for creation
-            FAM.makedir(self.__snapshotpath)
+            self._fop.makedir(self.__snapshotpath)
 
     def __str__(self):
         "Return the snapshot name"
@@ -204,7 +205,7 @@ class Snapshot(object):
         @return: the path to the exclude file list file
         """
         if not self.__excludeFlistFile :
-            self.__excludeFlistFile = self.getPath() + os.sep + "excludes.list"
+            self.__excludeFlistFile = self._fop.normpath(self.getPath(), "excludes.list")
 
         return self.__excludeFlistFile
 
@@ -213,7 +214,7 @@ class Snapshot(object):
         @return: the path to the include file list file
         """
         if not self.__includeFlistFile :
-            self.__includeFlistFile = self.getPath() + os.sep + "includes.list"
+            self.__includeFlistFile = self._fop.normpath(self.getPath(), "includes.list")
 
         return self.__includeFlistFile
 
@@ -222,7 +223,7 @@ class Snapshot(object):
         @return: the path to the TAR SNAR file
         """
         if not self.__snarfile :
-            self.__snarfile = self.getPath() + os.sep + "files.snar"
+            self.__snarfile = self._fop.normpath(self.getPath(), "files.snar")
         return self.__snarfile
 
     def getPath(self) :
@@ -236,8 +237,9 @@ class Snapshot(object):
         """
         Returns the compression format of the snapshot (from the "format" file or default to "gzip")
         """
-        if os.path.exists(os.sep.join([self.getPath(), "format"])):
-            self.__format = FAM.readfile(os.sep.join([self.getPath(), "format"])).split('\n')[0]
+        _formatf = self._fop.normpath(self.getPath(), "format")
+        if self._fop.path_exists(_formatf):
+            self.__format = self._fop.readfile(_formatf).split('\n')[0]
         return self.__format
 
     def getBase(self) :
@@ -249,15 +251,15 @@ class Snapshot(object):
         
         """
         if not self.__base:
-            basefile = self.__snapshotpath + os.sep + "base"
-            if not FAM.exists(basefile):
+            basefile = self._fop.normpath(self.__snapshotpath, "base")
+            if not self._fop.path_exists(basefile):
                 self.__base = None
             else:
                 if self.isfull():
                     raise AssertionError("Assertion failed when retrieving "\
                             "snapshot's base: A full backup ('%s') should not "\
                             "have a base file." % self)
-                self.__base = FAM.readfile(basefile).strip()
+                self.__base = self._fop.readfile(basefile).strip()
         return self.__base
 
     def getBaseSnapshot(self):
@@ -268,9 +270,9 @@ class Snapshot(object):
         if self.__baseSnapshot is None:
             if not self.isfull():
                 if self.getBase():
-                    path = os.path.dirname(self.getPath())
-                    self.__baseSnapshot = Snapshot(os.path.normpath(
-                                            os.path.join(path, self.getBase())))
+                    _path = self._fop.get_dirname(self.getPath())
+                    _basef = self._fop.normpath(_path, self.getBase())
+                    self.__baseSnapshot = Snapshot(_basef)
         return self.__baseSnapshot
 
     def getArchive(self):
@@ -280,27 +282,39 @@ class Snapshot(object):
         @return: the path to the archive
         """
         problem = False
+
         if self.getFormat() == "none" :
-            if os.path.exists(self.getPath() + os.sep + "files.tar") :
-                return self.getPath() + os.sep + "files.tar"
+            _arn = self._fop.normpath(self.getPath(), "files.tar")
+            if self._fop.path_exists(_arn) :
+                return _arn
             else :
                 problem = True
+
         elif self.getFormat() == "gzip" :
-            if os.path.exists(self.getPath() + os.sep + "files.tar.gz") :
-                return self.getPath() + os.sep + "files.tar.gz"
+            _arn = self._fop.normpath(self.getPath(), "files.tar.gz")
+            if self._fop.path_exists(_arn) :
+                return _arn
+
             elif self.getVersion() == "1.4":
                 self.logger.warning("The tgz name is deprecated, please upgrade Snapshot to Version 1.5")
-                if os.path.exists(self.getPath() + os.sep + "files.tgz") :
-                    return self.getPath() + os.sep + "files.tgz"
+                _arn = self._fop.normpath(self.getPath(), "files.tgz")
+                if self._fop.path_exists(_arn):
+                    return _arn
                 else :
                     problem = True
             else :
                 problem = True
-        elif self.getFormat() == "bzip2" :
-            if os.path.exists(self.getPath() + os.sep + "files.tar.bz2") :
-                return self.getPath() + os.sep + "files.tar.bz2"
+
+        elif self.getFormat() == "bzip2":
+            _arn = self._fop.normpath(self.getPath(), "files.tar.bz2")
+            if self._fop.path_exists(_arn) :
+                return _arn
             else :
                 problem = True
+
+        else:
+            problem = True
+
         if problem :
             raise NotValidSnapshotException(_("The snapshot compression format is supposed to be '%s' but the corresponding well named file wasn't found") % self.getFormat())
 
@@ -314,19 +328,19 @@ class Snapshot(object):
             self.__version = "1.0"
             return self.__version
         else:
-            verfile = self.getPath() + os.sep + "ver"
-            if not FAM.exists(verfile):
+            verfile = self._fop.normpath(self.getPath(), "ver")
+            if not self._fop.path_exists(verfile):
                 return False
             else :
-                ver = FAM.readfile(verfile)
+                ver = self._fop.readfile(verfile)
+#                self.logger.debug("Version read from snapshot: `%s`" % ver)
                 try :
                     # major = 
                     int(ver[0])
                     # minor = 
                     int(ver[2])
                 except Exception:
-                    FAM.delete(self.getPath() + os.sep + "ver")
-                    raise SBException (_("%(file)s doesn't contain valid value. Ignoring incomplete or non-backup directory. ") % {"file" : self.getPath() + os.sep + "ver"})
+                    raise SBException(_("%(file)s doesn't contain valid value. Ignoring incomplete or non - backup directory. ") % {"file" : verfile})
                 self.__version = ver[:3]
                 return self.__version
 
@@ -334,54 +348,56 @@ class Snapshot(object):
         "Return the content of excludes (the list of Regex excludes)"
         if self.__excludes : return self.__excludes
         else :
-            excludefile = self.getPath() + os.sep + "excludes"
-            if not FAM.exists(excludefile) : return False
+            excludefile = self._fop.normpath(self.getPath(), "excludes")
+            if not self._fop.path_exists(excludefile):
+                return False
             else :
-                self.__excludes = FAM.pickleload(excludefile)
+                self.__excludes = self._fop.pickleload(excludefile)
                 return self.__excludes
 
     def getPackages(self) :
         "Return the packages"
         if self.__packages : return self.__packages
         else :
-            packagesfile = self.getPath() + os.sep + "packages"
-            if not FAM.exists(packagesfile) : return False
+            packagesfile = self._fop.normpath(self.getPath(), "packages")
+            if not self._fop.path_exists(packagesfile):
+                return False
             else :
-                self.__packages = FAM.readfile(packagesfile)
+                self.__packages = self._fop.readfile(packagesfile)
                 return self.__packages
 
     def getSnapshotFileInfos(self, useMem = False, writeFlag = False):
         """Returns a wrapper for the SnapshotFile resp. DirectoryFile that
         contains information what files are stored in this snapshot.
-        
+
         @param useMem: use or not the memory to store infos about the SNAR file
         @type useMem:  boolean
         @param writeFlag: Will be passed to the SnapshotFile to permit writing
         @type writeFlag:  boolean
-        
+
         @return: the corresponding SnapshotFile (Mem or Proc)
-        
-        @note: The only method usable afterward is getContent(path) 
+
+        @note: The only method usable afterward is getContent(path)
         """
-        snpfile = SnapshotFile(self.getSnarFile(), writeFlag)
+        snpfile = tar.SnapshotFile(self.getSnarFile(), writeFlag)
+        snpfileinfo = None
 
-        snpfileInfo = None
-
-        if useMem :
-            snpfileInfo = MemSnapshotFile(snpfile)
+        if useMem:
+            snpfileinfo = tar.MemSnapshotFile(snpfile)
         else :
-            snpfileInfo = ProcSnapshotFile(snpfile)
+            snpfileinfo = tar.ProcSnapshotFile(snpfile)
 
-        return snpfileInfo
+        return snpfileinfo
 
     def getSplitedSize(self):
         """
-        @return: the size of each archive in the snapshot (0 means unlimited )
-        
-        @todo: Implement CQS pattern!
+        @return: the size of each archive in the snapshot (0 means unlimited)
+
+        @todo: Implement CQS pattern !
         """
-        if os.path.exists(os.sep.join([self.getPath(), "format"])):
-            self.__splitedSize = int(FAM.readfile(os.sep.join([self.getPath(), "format"])).split('\n')[1])
+        _formatf = self._fop.normpath(self.getPath(), "format")
+        if self._fop.path_exists(_formatf):
+            self.__splitedSize = int(self._fop.readfile(_formatf).split('\n')[1])
         return self.__splitedSize
 
     def isfull(self):
@@ -413,7 +429,7 @@ class Snapshot(object):
         Add an item to be backup into the snapshot.
         Usage :  addToIncludeFlist(item) where
         - item is the item to be add (file, dir, or link)
-        
+
         The `include flist` is of type `SBDict`, the according `props` for a single entry
         is '1' for included items.
         """
@@ -434,7 +450,7 @@ class Snapshot(object):
         """Checks include and exclude flists for entries contained in both lists.
         Entries stored in both lists are removed from the exclude list (include overrides
         exclude).
-        
+
         In theory it is impossible but what's in the case of manually written configuration files?
         
         @todo: Implement this method.
@@ -454,8 +470,8 @@ class Snapshot(object):
 
     def setPath(self, path) :
         "Set the complete path of the snapshot. That path will be used to get the name of the snapshot"
-        self.__snapshotpath = os.path.normpath(str(path))
-        name = os.path.basename(self.__snapshotpath)
+        self.__snapshotpath = self._fop.normpath(str(path))
+        name = self._fop.get_basename(self.__snapshotpath)
         if not self.__isValidName(name) :
             raise NotValidSnapshotNameException(_("Name of Snapshot not valid : %s") % self.__name)
         else :
@@ -491,7 +507,7 @@ class Snapshot(object):
     def setPackages(self, packages = "") :
         """
         set the packages list for debian based distros
-        @param packages: Must be the results of the 'dpkg --get-selections' command . default = '' 
+        @param packages: Must be the results of the 'dpkg - -get - selections' command . default = '' 
         """
         self.__packages = packages
 
@@ -521,9 +537,11 @@ class Snapshot(object):
         """
         # validate the name
         if not self.__isValidName(self.__name) :
-            raise NotValidSnapshotNameException (_("Name of Snapshot not valid : %s") % self.__name)
-        if  not FAM.exists(os.path.join(self.getPath(), "ver")):
-            raise NotValidSnapshotException (_("The mandatory 'ver' file doesn't exist in [%s].") % self.getName())
+            raise NotValidSnapshotNameException(_("Invalid name of snapshot: %s") % self.__name)
+
+        _verf = self._fop.normpath(self.getPath(), "ver")
+        if  not self._fop.path_exists(_verf):
+            raise NotValidSnapshotException(_("Unable to read mandatory file `ver`"))
 
     def __isValidName(self, name) :
         " Check if the snapshot name is valid "
@@ -540,14 +558,18 @@ class Snapshot(object):
         formatInfos = self.getFormat() + "\n"
         formatInfos += str(self.getSplitedSize())
 
-        FAM.writetofile(self.getPath() + os.sep + "format", formatInfos)
+        _formatf = self._fop.normpath(self.getPath(), "format")
+        self._fop.writetofile(_formatf, formatInfos)
 
     def commitverfile(self) :
         """Commit ver file on the disk.
         """
         if not self.getVersion():
             self.setVersion()
-        FAM.writetofile(self.getPath() + os.sep + "ver", self.getVersion())
+        _ver = self.getVersion()
+        _verf = self._fop.normpath(self.getPath(), "ver")
+        self._fop.writetofile(_verf, _ver)
+        self.logger.debug("Commit `ver` file `%s` with info `%s`" % (_verf, _ver))
 
     def commitbasefile(self):
         """In case this snapshot is an incremental snapshot, base file is
@@ -557,10 +579,11 @@ class Snapshot(object):
         """
         if self.isfull():
             self.logger.debug("WARNING: Attempt of committing base file for "\
-                              "full snapshot '%s'." % self.getName())
+                              "full snapshot ' % s'." % self.getName())
         else:
-            if self.getBase() :
-                FAM.writetofile(self.getPath() + os.sep + "base", self.getBase())
+            if self.getBase():
+                _basef = self._fop.normpath(self.getPath(), "base")
+                self._fop.writetofile(_basef, self.getBase())
             else:
             # base file was not found or base wasn't set. It MUST be full backup
                 raise SBException(_("Base name must be set for incremental backup."))
@@ -570,54 +593,59 @@ class Snapshot(object):
         Commit exclude file on the disk (the list of Regex excludes).
         @raise SBException: if excludes hasn't been set 
         """
-        FAM.pickledump(self.__excludes, self.getPath() + os.sep + "excludes")
+        _exf = self._fop.normpath(self.getPath(), "excludes")
+        self._fop.pickledump(self.__excludes, _exf)
 
     def commitflistFiles(self):
         """
         Commit the include.list and exclude.list to the disk.
         @todo: simplify the written files! The *.tmp files are partly obsolete.
         """
-        if os.path.exists(self.getIncludeFListFile()) or os.path.exists(self.getExcludeFListFile()) :
-            raise SBException("includes.list and excludes.list shouldn't exist at this stage")
+        if self._fop.path_exists(self.getIncludeFListFile()):
+            raise SBException("includes.list should not exist at this stage")
+        if self._fop.path_exists(self.getExcludeFListFile()):
+            raise SBException("excludes.list should not exist at this stage")
+
+#        fi = open(self.getIncludeFListFile() + ".tmp", "w")
+#        for f in self.__includeFlist.get_eff_filelist_not_nested() :
+#            fi.write(str(f) + "\n")
+#        fi.close()
+#        fi = open(self.getIncludeFListFile(), "w")
+#        for f in self.__includeFlist.getEffectiveFileList() :
+#            fi.write(str(f) + "\n")
+#        fi.close()
+#        fe = open(self.getExcludeFListFile() + ".tmp", "w")
+#        for f in self.__excludeFlist.getEffectiveFileList() :
+#            fe.write(str(f) + "\n")
+#        fe.close()
+#        fe = open(self.getExcludeFListFile(), "w")
+#        for f in self.__excludeFlist.getEffectiveFileList() :
+#            fe.write(str(f) + "\n")
+#        fe.close()
 
         # commit include.list.tmp
-#        print "### includes.list.tmp:"
-        fi = open(self.getIncludeFListFile() + ".tmp", "w")
-        for f in self.__includeFlist.get_eff_filelist_not_nested() :
-#            print f
-            fi.write(str(f) + "\n")
-        fi.close()
+        self._fop.writetofile(self.getIncludeFListFile() + ".tmp",
+                              "\n".join(self.__includeFlist.get_eff_filelist_not_nested()))
 
         # commit include.list
-#        print "### includes.list:"
-        fi = open(self.getIncludeFListFile(), "w")
-        for f in self.__includeFlist.getEffectiveFileList() :
-#            print f
-            fi.write(str(f) + "\n")
-        fi.close()
+        self._fop.writetofile(self.getIncludeFListFile(),
+                              "\n".join(self.__includeFlist.getEffectiveFileList()))
 
         # commit exclude.list.tmp
-#        print "### excludes.list.tmp:"
-        fe = open(self.getExcludeFListFile() + ".tmp", "w")
-        for f in self.__excludeFlist.getEffectiveFileList() :
-#            print f
-            fe.write(str(f) + "\n")
-        fe.close()
+        self._fop.writetofile(self.getExcludeFListFile() + ".tmp",
+                              "\n".join(self.__excludeFlist.getEffectiveFileList()))
 
         # commit exclude.list
-#        print "### excludes.list:"        
-        fe = open(self.getExcludeFListFile(), "w")
-        for f in self.__excludeFlist.getEffectiveFileList() :
-#            print f
-            fe.write(str(f) + "\n")
-        fe.close()
+        self._fop.writetofile(self.getExcludeFListFile(),
+                              "\n".join(self.__excludeFlist.getEffectiveFileList()))
 
     def commitpackagefile(self):
         " Commit packages file on the disk"
+        _packf = self._fop.normpath(self.getPath(), "packages")
         if not self.getPackages() :
-            FAM.writetofile(self.getPath() + os.sep + "packages", "")
-        else :
-            FAM.writetofile(self.getPath() + os.sep + "packages", self.getPackages())
+            self._fop.writetofile(_packf, "")
+        else:
+            self._fop.writetofile(_packf, self.getPackages())
 
     def read_excludeflist_from_file(self):
         fe = open(self.getExcludeFListFile(), "r")
@@ -629,16 +657,16 @@ class Snapshot(object):
         " Make the backup on the disk "
 
         if self.isfull() :
-            TAR.makeTarFullBackup(self)
+            tar.makeTarFullBackup(self)
         else :
-            TAR.makeTarIncBackup(self)
+            tar.makeTarIncBackup(self)
 
     def __clean(self):
         """
         Clean operational temporary files
         """
-        # 
-        if os.path.exists(self.getIncludeFListFile() + ".tmp") :
-            os.remove(self.getIncludeFListFile() + ".tmp")
-        if os.path.exists(self.getExcludeFListFile() + ".tmp") :
-            os.remove(self.getExcludeFListFile() + ".tmp")
+        if self._fop.path_exists(self.getIncludeFListFile() + ".tmp"):
+            self._fop.delete(self.getIncludeFListFile() + ".tmp")
+
+        if self._fop.path_exists(self.getExcludeFListFile() + ".tmp"):
+            self._fop.delete(self.getExcludeFListFile() + ".tmp")

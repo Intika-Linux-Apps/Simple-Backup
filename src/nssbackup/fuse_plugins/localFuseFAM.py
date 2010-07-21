@@ -15,8 +15,10 @@
 # Authors :
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from nssbackup.plugins import pluginFAM
-import os
+
+from nssbackup.fuse_plugins import pluginFAM
+from nssbackup.util import local_file_utils
+
 
 class localFuseFAM (pluginFAM):
     """
@@ -24,9 +26,11 @@ class localFuseFAM (pluginFAM):
     @author: Oumar Aziz Ouattara <wattazoum@gmail.com>
     @version: 1.0
     """
+    def __init__(self):
+        pluginFAM.__init__(self)
 
     def match_scheme(self, remoteSource):
-        return remoteSource.startswith(os.sep)
+        return remoteSource.startswith(local_file_utils.pathsep)
 
     def match_scheme_full(self, remoteSource):
         """
@@ -35,7 +39,7 @@ class localFuseFAM (pluginFAM):
         @return: True if the scheme matches the one for this 
         @rtype: boolean
         """
-        return remoteSource.startswith(os.sep)
+        return remoteSource.startswith(local_file_utils.pathsep)
 
     def mount(self, source, mountbase):
         """
@@ -46,7 +50,7 @@ class localFuseFAM (pluginFAM):
         @rtype: str
         """
         self.logger.debug("Nothing to do for '%s'" % source)
-        return (os.sep, "", source.lstrip(os.sep))
+        return (local_file_utils.pathsep, "", source.lstrip(local_file_utils.pathsep))
 
     def umount(self, mounteddir):
         """

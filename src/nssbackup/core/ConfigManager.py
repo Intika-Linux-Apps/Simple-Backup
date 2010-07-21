@@ -105,21 +105,21 @@ regex=\.mp3,\.avi,\.mpeg,\.mpg,\.mkv,\.ogg,\.ogm,\.tmp,/home/[^/]+?/\.thumbnails
 maxsize=100000000
 """
 
-import os.path
-import re
+
+from gettext import gettext as _
 import ConfigParser
 import smtplib
 import types
-from gettext import gettext as _
+import os.path
+import re
 
 from nssbackup.pkginfo import Infos
-from nssbackup.util.log import LogFactory
-from nssbackup.util import file_handling as FAM
-import nssbackup.util as Util
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.exceptions import NonValidOptionException
-from nssbackup.util.exceptions import NotValidSectionException
-
+from nssbackup import util
+from nssbackup.util import local_file_utils
+from nssbackup.util import exceptions
+from nssbackup.util import pathparse
+from nssbackup.util import log
+from nssbackup.util import system
 
 
 def is_default_profile(conffile):
@@ -175,6 +175,17 @@ def get_profiles(prfdir):
                     enable = (mobj.group(2) is None)
                     profiles[name] = [path, enable]
     return profiles
+
+
+def get_default_config_obj():
+    """Creates and returns an object containing the default configuration.
+    Differences between normal users and privileged users (i.e. admins) are taken into account.
+    """
+    if system.is_superuser():
+        _default_config = _DefaultConfigurationForAdmins()
+    else:
+        _default_config = _DefaultConfigurationForUsers()
+    return _default_config
 
 
 class ConfigManager(ConfigParser.ConfigParser):
@@ -247,8 +258,9 @@ class ConfigManager(ConfigParser.ConfigParser):
 
         self.__create_logger()
 
-        if self.valid_options:
-            self.validateConfigFileOpts()
+#        if self.valid_options:
+        self.validateConfigFileOpts()
+        self.__check_destination_option()
 
         if _conffile_used:
             self.logger.info(_("Profile settings are being read from file '%s'.")\
@@ -304,10 +316,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         in the according instance variable. Differences between normal users
         and privileged users (i.e. admins) is taken into account.
         """
-        if os.geteuid() == 0:
-            self.__default_config = _DefaultConfigurationForAdmins()
-        else:
-            self.__default_config = _DefaultConfigurationForUsers()
+        self.__default_config = get_default_config_obj()
 
     def __get_default_config_obj(self):
         """Private accessor method that returns the default configuration
@@ -367,8 +376,8 @@ class ConfigManager(ConfigParser.ConfigParser):
         self.set("log", "level", str(defaults.get_loglevel()))
         self.set_logdir(defaults.get_logdir())
         self.set_logfile_templ_to_config()
-        if not FAM.exists(self.get("log", "file")) :
-            FAM.createfile(self.get("log", "file"))
+        if not local_file_utils.path_exists(self.get("log", "file")) :
+            local_file_utils.createfile(self.get("log", "file"))
 
         # report settings
         self.__clear_report_section()
@@ -401,11 +410,36 @@ class ConfigManager(ConfigParser.ConfigParser):
         target = defaults.get_target()
         return target
 
-    def get_backup_target(self):
+    def __check_destination_option(self):
+        if not self.has_option("general", "target"):
+            raise exceptions.SBException (_("Option 'target' is missing, aborting."))
+
+    def get_destination_path(self):
         """Returns the target option that is currently set. Purpose is to
-        hide the actual naming of options from external classes. 
+        hide the actual naming of options from external classes.
+        Returns None if not set.  
         """
-        return self.get("general", "target")
+        self.__check_destination_option()
+        _path = self.get("general", "target")
+        _uri = pathparse.UriParser()
+        _uri.set_and_parse_uri(uri = _path)     # normalizes and validates given path
+        _res = _uri.uri
+        return _res
+
+#    def get_destination_obj(self):
+#        self.__check_destination_option()
+#        _dest = self.get("general", "target")
+#        _dest_obj = pathparse.UriParser()
+#        _dest_obj.set_and_parse_uri(uri = _dest)
+#        return _dest_obj
+
+    def get_mountdir(self):
+        _defaults = self.__get_default_config_obj()
+        _mdir = _defaults.get_mountdir()
+
+        if self.has_option("general", "mountdir"):
+            _mdir = self.get("general", "mountdir")
+        return _mdir
 
     def has_maxsize_limit(self):
         """Returns True if the 'maxsize' option is enabled (i.e. set to
@@ -483,7 +517,7 @@ class ConfigManager(ConfigParser.ConfigParser):
                 if type(remotes) == str :
                     remotes = eval(remotes)
                 if type(remotes) != dict :
-                    raise SBException(_("Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r').")\
+                    raise exceptions.SBException(_("Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r').")\
                             % {'parameter': remotes, 'value': type(remotes)})
                 if not remotes.has_key(option) :
                     # then it wasn't for us , fall back on the parent
@@ -509,7 +543,7 @@ class ConfigManager(ConfigParser.ConfigParser):
             if type(remotes) == str :
                 remotes = eval(remotes)
             if type(remotes) != dict :
-                raise SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': remotes, 'value': type(remotes)})
+                raise exceptions.SBException(_("Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )") % {'parameter': remotes, 'value': type(remotes)})
             # we have that key
             return remotes[option]
         elif section == "dirconfig" and option == 'remote' and ConfigParser.ConfigParser.has_option(self, section, option):
@@ -517,7 +551,7 @@ class ConfigManager(ConfigParser.ConfigParser):
             if type(remotes) == str :
                 remotes = eval(remotes)
             if type(remotes) != dict :
-                raise SBException(_("Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r').") % {'parameter': remotes, 'value': type(remotes)})
+                raise exceptions.SBException(_("Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r').") % {'parameter': remotes, 'value': type(remotes)})
             return remotes
         else :
             #fall back in parent behaviour
@@ -533,7 +567,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         """
         if section == "dirconfig" and option == "remote" :
             if type(value) != dict :
-                raise SBException(_("You must provide a dictionary."))
+                raise exceptions.SBException(_("You must provide a dictionary."))
             if not self.has_option(section, option) :
                 ConfigParser.ConfigParser.set(self, section, option, value)
             else :
@@ -541,7 +575,7 @@ class ConfigManager(ConfigParser.ConfigParser):
                 if type(remotes) == str :
                     remotes = eval(remotes)
                 if type(remotes) != dict :
-                    raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )" % (remotes, type(remotes)))
+                    raise exceptions.SBException("Couldn't eval '%s' as a dict (value got = '%r' )" % (remotes, type(remotes)))
                 for rsource, flag in value.iteritems() :
                     remotes[rsource] = flag
                 ConfigParser.ConfigParser.set(self, section, option, remotes)
@@ -566,7 +600,7 @@ class ConfigManager(ConfigParser.ConfigParser):
                 if type(remotes) == str :
                     remotes = eval(remotes)
                 if type(remotes) != dict :
-                    raise SBException("Couldn't eval '%s' as a dict (value got = '%r' )" % (remotes, type(remotes)))
+                    raise exceptions.SBException("Couldn't eval '%s' as a dict (value got = '%r' )" % (remotes, type(remotes)))
                 if not remotes.has_key(option) :
                     # then it wasn't for us , fall back on the parent
                     ConfigParser.ConfigParser.remove_option(self, section, option)
@@ -639,15 +673,15 @@ class ConfigManager(ConfigParser.ConfigParser):
         curr_logf = None
         if self.has_section("log") and self.has_option("log", "file"):
             logf_templ = self.get("log", "file")
-            curr_logf = FAM.append_time_to_filename(logf_templ, ".log")
+            curr_logf = pathparse.append_time_to_filename(logf_templ, ".log")
             self.__logfile_dir = os.path.dirname(curr_logf)
 
             if self.has_option("log", "level") :
-                self.logger = LogFactory.getLogger(self.getProfileName(),
+                self.logger = log.LogFactory.getLogger(self.getProfileName(),
                                                    curr_logf,
                                                    self.getint("log", "level"))
             else :
-                self.logger = LogFactory.getLogger(self.getProfileName(),
+                self.logger = log.LogFactory.getLogger(self.getProfileName(),
                                                    curr_logf)
 
             self.logger.info(_("Log output for [%(profile)s] is directed to file '%(file)s'.")\
@@ -656,7 +690,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         else:
         # if no file is specified, use the logger's default (no log file)
 # TODO: Raise an assertion exception if no log section was found ?!
-            self.logger = LogFactory.getLogger(self.getProfileName())
+            self.logger = log.LogFactory.getLogger(self.getProfileName())
             self.logger.info(_("Log output for [%s] is not directed into a file.")\
                                 % (self.getProfileName()))
         self.__current_logfile = curr_logf
@@ -670,11 +704,11 @@ class ConfigManager(ConfigParser.ConfigParser):
         logf_src = self.get_current_logfile()
         if logf_src is not None:
             logf_target = self.__get_logfile_template()
-            if FAM.exists(logf_src):
+            if local_file_utils.path_exists(logf_src):
                 try:
-                    FAM.rename_errors_ignored(logf_target, "%s.0" % logf_target)
-                    FAM.compress_rotated_files(logf_target, _max_num)
-                    FAM.rename_rotating(logf_src, logf_target, _max_num)
+                    local_file_utils.rename_errors_ignored(logf_target, "%s.0" % logf_target)
+                    local_file_utils.compress_rotated_files(logf_target, _max_num)
+                    local_file_utils.rename_rotating(logf_src, logf_target, _max_num)
                 except OSError, error:
                     self.logger.exception(_("Unable to rename log file '%(src)s'->'%(dst)s': %(err)s")\
                                     % {'src': logf_src, 'dst': logf_target, 'err': str(error)})
@@ -696,7 +730,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         retValue = ConfigParser.ConfigParser.read(self, self.conffile)
 
         if len(retValue) == 0 :
-            raise SBException(_("The config file '%s' couldn't be read!")\
+            raise exceptions.SBException(_("The config file '%s' couldn't be read!")\
                                 % self.conffile)
         return retValue
 
@@ -708,11 +742,11 @@ class ConfigManager(ConfigParser.ConfigParser):
             try:
                 for key in self.options(section):
                     if (not self.valid_options.has_key(section)):
-                        raise NotValidSectionException (_("section [%(section)s] in '%(configfile)s' should not exist, aborting") % {'section': section, 'configfile' :self.conffile})
+                        raise exceptions.NotValidSectionException (_("section [%(section)s] in '%(configfile)s' should not exist, aborting") % {'section': section, 'configfile' :self.conffile})
                     if (self.valid_options[section].has_key(key) or self.valid_options[section].has_key('*')):
                         continue
-                    raise NonValidOptionException ("key '%s' in section '%s' in file '%s' is not known, a typo possibly?" % (key, section, self.conffile))
-            except SBException, e:
+                    raise exceptions.NonValidOptionException ("key '%s' in section '%s' in file '%s' is not known, a typo possibly?" % (key, section, self.conffile))
+            except exceptions.SBException, e:
                 self.logger.error(str(e))
                 raise e
         return True
@@ -738,11 +772,11 @@ class ConfigManager(ConfigParser.ConfigParser):
         """
         anacronValues = ["daily", "monthly", "hourly", "weekly"]
         if type(isCron) != int or not (isCron in [0, 1]) :
-            raise NonValidOptionException("isCron must be 0 or 1")
+            raise exceptions.NonValidOptionException("isCron must be 0 or 1")
         if isCron == 0 :
             # an Anacron entry was given (simple scheduling)
             if value not in anacronValues :
-                raise NonValidOptionException("Valid values for anacron are: "\
+                raise exceptions.NonValidOptionException("Valid values for anacron are: "\
                         "%s, got '%s' instead." % (str(anacronValues), value))
             else :
                 if self.has_option("schedule", "cron"):
@@ -792,7 +826,7 @@ class ConfigManager(ConfigParser.ConfigParser):
                 self.logger.debug("Anacron monthly has been found")
                 return (0, "monthly")
             if os.path.exists("/etc/cron.d/nssbackup"):
-                _value = FAM.readfile("/etc/cron.d/nssbackup")
+                _value = local_file_utils.readfile("/etc/cron.d/nssbackup")
                 self.logger.debug("Custom Cron has been found: %s" % _value)
                 return (1, _value)
             # none has been found
@@ -859,7 +893,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         
         @return: the current profile name if the config file name match the
                  naming convention or Unknow otherwise
-        @raise SBException: if the configfile isn't set
+        @raise exceptions.SBException: if the configfile isn't set
         
         @todo: Implement Command-Query Separation Principle (CQS)!
         
@@ -868,7 +902,7 @@ class ConfigManager(ConfigParser.ConfigParser):
             return self.__profileName
 
         if not self.conffile:
-            raise SBException(_("The config file is not set yet into this ConfigManager"))
+            raise exceptions.SBException(_("The config file is not set yet into this ConfigManager"))
         self.__profileName = self.__conffile_hdl.get_profilename(self.conffile)
         return self.__profileName
 
@@ -880,7 +914,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         
         """
         if not self.conffile:
-            raise SBException(_("The config file is not set yet into this ConfigManager"))
+            raise exceptions.SBException(_("The config file is not set yet into this ConfigManager"))
         is_default = is_default_profile(self.conffile)
         return is_default
 
@@ -965,12 +999,12 @@ class ConfigManager(ConfigParser.ConfigParser):
                 from the *original* configuration that is used by nssbackupd?
         """
         if configfile is not None:
-            fld = FAM.openfile(configfile, True)
+            fld = local_file_utils.openfile(configfile, True)
         else:
-            fld = FAM.openfile(self.conffile, True)
+            fld = local_file_utils.openfile(self.conffile, True)
         self.write(fld)
         fld.close()
-        if configfile is None and os.geteuid() == 0:
+        if configfile is None and system.is_superuser():
             self.__write_schedule()
 
     def __write_schedule(self):
@@ -978,7 +1012,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         written for admin default profiles.
         
         """
-        if os.geteuid() != 0 :
+        if not system.is_superuser():
             self.logger.warning("Not implemented for non root users yet.")
             return
 
@@ -992,7 +1026,7 @@ class ConfigManager(ConfigParser.ConfigParser):
             else:
                 if self.has_option("schedule", "cron") :
                     self.logger.debug("Saving Cron entries")
-                    FAM.writetofile("/etc/cron.d/nssbackup",
+                    local_file_utils.writetofile("/etc/cron.d/nssbackup",
                                     self.__make_cronfile_content())
 
                 if self.has_option("schedule", "anacron"):
@@ -1052,28 +1086,28 @@ class ConfigManager(ConfigParser.ConfigParser):
         """Test the mail settings
         
         @return: True if succeded
-        @raise SBException: the error message why it didn't run
+        @raise exceptions.SBException: the error message why it didn't run
         
         @todo: Not the right place for this kind of functionality?!?
         @todo: Implement specific `MailError` exception.
         """
         if not self.has_option("report", "to"):
-            raise SBException (_("No receiver set."))
+            raise exceptions.SBException (_("No receiver set."))
         if not self.has_option("report", "smtpserver") :
-            raise SBException (_("No SMTP server set."))
+            raise exceptions.SBException (_("No SMTP server set."))
 
         if (self.has_option("report", "smtpuser") and not self.has_option("report", "smtppassword")):
-            raise SBException (_("Username set but no password specified."))
+            raise exceptions.SBException (_("Username set but no password specified."))
 
         if (not self.has_option("report", "smtpuser") and self.has_option("report", "smtppassword")):
-            raise SBException (_("Password set but no username specified."))
+            raise exceptions.SBException (_("Password set but no username specified."))
 
         if not self.has_option("report", "smtptls") and (self.has_option("report", "smtpcert") or self.has_option("report", "smtpkey)")) :
-            raise SBException (_("A certificate and key file is given while SSL option (smtptls=1) is not set.\nSelect SSL in order to use Certificate and Key."))
+            raise exceptions.SBException (_("A certificate and key file is given while SSL option (smtptls=1) is not set.\nSelect SSL in order to use Certificate and Key."))
 
         if self.has_option("report", "smtptls") and ((self.has_option("report", "smtpcert") and not self.has_option("report", "smtpkey")) \
             or (not self.has_option("report", "smtpcert") and self.has_option("report", "smtpkey"))):
-            raise SBException (_("When specifying a SSL certificate or key file, a key file resp. certificate is mandatory."))
+            raise exceptions.SBException (_("When specifying a SSL certificate or key file, a key file resp. certificate is mandatory."))
 
         try :
             server = smtplib.SMTP()
@@ -1095,7 +1129,7 @@ class ConfigManager(ConfigParser.ConfigParser):
             server.close()
             return True
         except Exception, e:
-            raise SBException(e)
+            raise exceptions.SBException(e)
 
     def isConfigEquals(self, config):
         """Compares this configuration and the given configuration.
@@ -1106,7 +1140,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         
         """
         if not (isinstance(config, ConfigManager) or config is None):
-            raise SBException("Can't compare a ConfigManager with type '%s'"\
+            raise exceptions.SBException("Can't compare a ConfigManager with type '%s'"\
                             % str(type(config)))
         if config is None:
             return False
@@ -1158,7 +1192,7 @@ class ConfigurationFileHandler(object):
         :todo: Here should no distinction between user/superuser be necessary!
         
         """
-        if os.getuid() == 0:
+        if system.is_superuser():
             self.__super_user = True
 
     def get_conffile(self):
@@ -1267,7 +1301,7 @@ class ConfigManagerStaticData(object):
     __cronheader = "SHELL=/bin/bash \n"\
         "PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n"
 
-    __schedule_script_file = Util.get_resource_file("nssbackup-launch")
+    __schedule_script_file = util.get_resource_file("nssbackup-launch")
 
     __default_profilename = _("Default Profile")
     __unknown_profilename = _("Unknown Profile")
@@ -1430,6 +1464,7 @@ class ConfigManagerStaticData(object):
     @classmethod
     def get_compr_formats(cls):
         return cls.__cformats
+
 
 class Configuration(object):
     """Encapsulates a configuration, that is a set of backup profile related

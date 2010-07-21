@@ -30,7 +30,8 @@
 
 from gettext import gettext as _
 
-import os.path
+import traceback
+import sys
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -40,20 +41,32 @@ import optparse
 import time
 
 
-# project imports 
 from nssbackup.pkginfo import Infos
+
+from nssbackup.core.ConfigManager import ConfigManager, get_profiles
+from nssbackup.core.profile_handler import BackupProfileHandler
+from nssbackup.core.ConfigManager import ConfigurationFileHandler
+
 from nssbackup.util import log
 from nssbackup.util import exceptions
-from nssbackup.util import file_handling
-from nssbackup.managers.ConfigManager import ConfigManager, get_profiles
-from nssbackup.managers.BackupManager import BackupManager
 from nssbackup.util import get_resource_file
 from nssbackup.util import notifier
 from nssbackup.util import system
 from nssbackup.util import constants
 from nssbackup.util import lock
-from nssbackup.managers.ConfigManager import ConfigurationFileHandler
 from nssbackup.util import enable_backup_cancel_signal, enable_termsignal
+from nssbackup.util import local_file_utils
+
+
+def except_hook(etype, evalue, etb):
+    _logger = log.LogFactory.getLogger()
+    _lines = traceback.format_exception(etype, evalue, etb)
+    _lines = "".join(_lines)
+    _logger.error("Uncaught exception: %s" % evalue)
+    _logger.error(_lines)
+
+
+sys.excepthook = except_hook
 
 
 class SBackupProc(object):
@@ -61,9 +74,9 @@ class SBackupProc(object):
     multiple profiles.
     
     It manages :
-    - the full backup process : creation of instances of the BackupManager
+    - the full backup process : creation of instances of the BackupProfileHandler
       with the corresponding config file 
-    - the logging of exception not handled by BackupManager
+    - the logging of exception not handled by BackupProfileHandler
     - the removal of lockfiles
     - the sending of emails
     
@@ -100,8 +113,8 @@ class SBackupProc(object):
         self.logger = log.LogFactory.getLogger(self.__profilename)
         self.logger.debug("%s %s" % (Infos.NAME, Infos.VERSION))
 
-        # the currently used instance of the BackupManager
-        self.__bm = None
+        # the currently used instance of the BackupProfileHandler
+        self.__bprofilehdl = None
         self.__state = notifier.SBackupState()
 
         self.__notifiers = notifiers
@@ -139,8 +152,8 @@ class SBackupProc(object):
         :todo: Transfer this functionality to a specialized class!
         
         """
-        if self.__bm.config.has_option("report", "from") :
-            _from = self.__bm.config.get("report", "from")
+        if self.__bprofilehdl.config.has_option("report", "from") :
+            _from = self.__bprofilehdl.config.get("report", "from")
         else :
             hostname = socket.gethostname()
             if "." in hostname :
@@ -148,18 +161,18 @@ class SBackupProc(object):
             else :
                 mailsuffix = hostname + ".ext"
             _from = _("NSsbackup Daemon <%(login)s@%(hostname)s>")\
-                    % {'login' : os.getenv("USERNAME"), 'hostname': mailsuffix}
+                    % {'login' : str(system.get_user_from_env()), 'hostname': mailsuffix}
 
-        _to = self.__bm.config.get("report", "to")
+        _to = self.__bprofilehdl.config.get("report", "to")
         _title = _("[NSsbackup] [%(profile)s] Report of %(date)s")\
                     % { 'profile':self.__profilename,
                         'date': datetime.datetime.now() }
-        logf = self.__bm.config.get_current_logfile()
+        logf = self.__bprofilehdl.config.get_current_logfile()
         if logf is None:
             _content = _("No log file specified.")
         else:
-            if file_handling.exists(logf):
-                _content = file_handling.readfile(logf)
+            if local_file_utils.path_exists(logf):
+                _content = local_file_utils.readfile(logf)
             else :
                 _content = _("Unable to find log file.")
 
@@ -178,24 +191,24 @@ class SBackupProc(object):
         msg.attach(msg_content)
 
         # getting the connection
-        if self.__bm.config.has_option("report", "smtpserver") :
-            if self.__bm.config.has_option("report", "smtpport") :
-                server.connect(self.__bm.config.get("report", "smtpserver"),
-                               self.__bm.config.get("report", "smtpport"))
+        if self.__bprofilehdl.config.has_option("report", "smtpserver") :
+            if self.__bprofilehdl.config.has_option("report", "smtpport") :
+                server.connect(self.__bprofilehdl.config.get("report", "smtpserver"),
+                               self.__bprofilehdl.config.get("report", "smtpport"))
             else :
-                server.connect(self.__bm.config.get("report", "smtpserver"))
-        if self.__bm.config.has_option("report", "smtptls") and\
-                    self.__bm.config.get("report", "smtptls") == 1 :
-            if self.__bm.config.has_option("report", "smtpcert") and\
-                    self.__bm.config.has_option("report", "smtpkey") :
-                server.starttls(self.__bm.config.get("report", "smtpkey"),
-                                self.__bm.config.get("report", "smtpcert"))
+                server.connect(self.__bprofilehdl.config.get("report", "smtpserver"))
+        if self.__bprofilehdl.config.has_option("report", "smtptls") and\
+                    self.__bprofilehdl.config.get("report", "smtptls") == 1 :
+            if self.__bprofilehdl.config.has_option("report", "smtpcert") and\
+                    self.__bprofilehdl.config.has_option("report", "smtpkey") :
+                server.starttls(self.__bprofilehdl.config.get("report", "smtpkey"),
+                                self.__bprofilehdl.config.get("report", "smtpcert"))
             else :
                 server.starttls()
-        if self.__bm.config.has_option("report", "smtpuser") and\
-                self.__bm.config.has_option("report", "smtppassword") :
-            server.login(self.__bm.config.get("report", "smtpuser"),
-                         self.__bm.config.get("report", "smtppassword"))
+        if self.__bprofilehdl.config.has_option("report", "smtpuser") and\
+                self.__bprofilehdl.config.has_option("report", "smtppassword") :
+            server.login(self.__bprofilehdl.config.get("report", "smtpuser"),
+                         self.__bprofilehdl.config.get("report", "smtppassword"))
 
         # send and close connection
         server.sendmail(_from, _to, msg.as_string())
@@ -222,7 +235,7 @@ class SBackupProc(object):
         confdir = conffile_hdl.get_profilesdir(conffile)
 
         # create config manager for the default profile and set as current
-        if os.path.exists(conffile):
+        if local_file_utils.path_exists(conffile):
             confm = ConfigManager(conffile)
             self.__profilename = confm.getProfileName()
             self.__confm.append(confm)      # store the created ConfigManager in a collection
@@ -243,7 +256,7 @@ class SBackupProc(object):
     def run(self):
         """Actual main method to make backups using NSsbackup
         
-        - launch BackupManager with the user configuration file
+        - launch BackupProfileHandler with the user configuration file
         - catches all exceptions thrown and logs them
         """
         self.__notify_init_errors()
@@ -253,12 +266,15 @@ class SBackupProc(object):
                 self.__profilename = confm.getProfileName()
                 self.logger = log.LogFactory.getLogger(self.__profilename)
 
-                self.__bm = BackupManager(confm, self.__state, self.__dbus_conn,
+                self.__bprofilehdl = BackupProfileHandler(confm, self.__state, self.__dbus_conn,
                                           self.__use_indicator)
+
                 self.__write_errors_to_log()
-                self.__bm.makeBackup()
-                self.__exitcode = self.__bm.endSBsession()
-                self.__bm = None
+
+                self.__bprofilehdl.prepare()
+                self.__bprofilehdl.process()
+                self.__exitcode = self.__bprofilehdl.finish()
+                self.__bprofilehdl = None
 
             except exceptions.BackupCanceledError:
                 self.__on_backup_canceled()
@@ -274,30 +290,30 @@ class SBackupProc(object):
     def __on_backup_canceled(self):
         self.logger.warning(_("Backup was canceled by user."))
         self.__state.set_state('backup-canceled')
-        if self.__bm is not None:
-            self.__exitcode = self.__bm.endSBsession()
+        if self.__bprofilehdl is not None:
+            self.__exitcode = self.__bprofilehdl.finish()
 
     def __on_error(self, error):
         """Handles errors that occurs during backup process.
         """
         if self.logger.isEnabledFor(10):
-            self.logger.exception(_("An error occured during the backup:\n%s") % (str(error)))
+            self.logger.exception(_("An error occurred during the backup:\n%s") % (str(error)))
         else:
-            self.logger.error(_("An error occured during the backup:\n%s") % (str(error)))
+            self.logger.error(_("An error occurred during the backup: %s") % (str(error)))
         self.__exitcode = constants.EXCODE_BACKUP_ERROR
         self.__state.set_recent_error(error)
         self.__state.set_state('error')
-        if self.__bm is not None:
-            self.__bm.endSBsession()
+        if self.__bprofilehdl is not None:
+            self.__bprofilehdl.finish()
             self.__exitcode = constants.EXCODE_BACKUP_ERROR
 
     def __on_finish(self):
         """Method that is finally called after backup process.
         """
         try:
-            if self.__bm and self.__bm.config:
+            if self.__bprofilehdl and self.__bprofilehdl.config:
                 # send the mail
-                if self.__bm.config.has_section("report") and self.__bm.config.has_option("report", "to") :
+                if self.__bprofilehdl.config.has_section("report") and self.__bprofilehdl.config.has_option("report", "to") :
                     self.__sendEmail()
         except Exception, error:
             self.__exitcode = constants.EXCODE_MAIL_ERROR
@@ -335,7 +351,7 @@ class SBackupApp(object):
     def __init__(self, argv):
         self.__argv = argv
         self.__lock = lock.ApplicationLock(lockfile = constants.LOCKFILE_BACKUP_FULL_PATH,
-                                           processname = constants.BACKUP_COMMAND, pid = os.getpid())
+                                           processname = constants.BACKUP_COMMAND, pid = system.get_pid())
         self.__options_given = None   # do not modify given options
         self.__use_indicator = True
         self.__dbus_avail = False
@@ -344,7 +360,7 @@ class SBackupApp(object):
         self.__backupproc = None
         self.__notifiers = []
         # we establish a connection to ensure its presence for progress action
-        self._dbus_conn = None
+        self.__dbus_conn = None
         self.__exitcode = constants.EXCODE_GENERAL_ERROR
 
     def create_notifiers(self):
@@ -376,14 +392,14 @@ class SBackupApp(object):
         :note: import D-Bus related modules only if using D-Bus is enabled
         """
         from nssbackup.util import dbus_support
-        self._dbus_conn = dbus_support.DBusProviderFacade(constants.BACKUP_PROCESS_NAME)
+        self.__dbus_conn = dbus_support.DBusProviderFacade(constants.BACKUP_PROCESS_NAME)
         try:
-            self._dbus_conn.connect()
-            self._dbus_conn.set_backup_pid(pid = os.getpid())
+            self.__dbus_conn.connect()
+            self.__dbus_conn.set_backup_pid(pid = system.get_pid())
             self.__dbus_avail = True
         except exceptions.DBusException:
             print "Unable to launch DBus service"
-            self._dbus_conn = None
+            self.__dbus_conn = None
             self.__dbus_avail = False
             self.__use_indicator = False
 
@@ -427,8 +443,8 @@ class SBackupApp(object):
         """Cleaning before terminating the application:
         * disconnects if DBus connection was established.
         """
-        if (self.__dbus_avail) and (self._dbus_conn is not None):
-            self._dbus_conn.quit()
+        if (self.__dbus_avail) and (self.__dbus_conn is not None):
+            self.__dbus_conn.quit()
         self.__lock.unlock()
         log.shutdown_logging()
 
@@ -472,7 +488,7 @@ class SBackupApp(object):
             parser.error("You must not provide any non-option argument")
 
         if options.configfile:
-            if not os.path.exists(options.configfile):
+            if not local_file_utils.path_exists(options.configfile):
                 parser.error("Given configuration file does not exist")
             self.__configfile = options.configfile
 
@@ -511,11 +527,12 @@ class SBackupApp(object):
             self.launch_externals()
             self.create_notifiers()
 
-            os.nice(20)
+            system.very_nice()
+            system.set_grp("admin")
 
             self.__backupproc = SBackupProc(self.__notifiers,
                                               self.__configfile,
-                                              self._dbus_conn,
+                                              self.__dbus_conn,
                                               self.__use_indicator)
             self.__exitcode = self.__backupproc.run()
 

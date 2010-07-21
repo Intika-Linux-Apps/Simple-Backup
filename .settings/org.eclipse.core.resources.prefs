@@ -1,3 +1,4 @@
-#Mon Mar 29 20:57:09 CEST 2010
+#Wed Jul 21 17:55:06 CEST 2010
 eclipse.preferences.version=1
+encoding//src/nssbackup/fs_backend/_gio_utils.py=utf-8
 encoding//tests/test_snapshotmanager.py=latin1

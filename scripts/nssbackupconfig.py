@@ -41,7 +41,7 @@ import ConfigParser
 import re
 
 from nssbackup.pkginfo import Infos
-from nssbackup.managers import ConfigManager
+from nssbackup.core import ConfigManager
 
 # definition of error codes
 NO_ERRORS = 0

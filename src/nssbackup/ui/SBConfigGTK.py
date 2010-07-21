@@ -1,26 +1,29 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+#    NSsbackup - Configuration GUI (GTK+)
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
 #
-# Authors :
-#    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
-#   Jean-Peer Lorenz <peer.loz@gmx.net>
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
 
 from gettext import gettext as _
 
 import re
 import subprocess
 import os
+import sys
 import types
 
 import gobject
@@ -28,35 +31,39 @@ import gtk
 
 # project imports
 from nssbackup.util import log
-from nssbackup.plugins import PluginManager
-from nssbackup.managers.FuseFAM import FuseFAM
-from nssbackup.managers.ConfigManager import ConfigManagerStaticData
+from nssbackup.util import system
+from nssbackup.core.ConfigManager import ConfigManagerStaticData
 from nssbackup.util.log import LogFactory
 from nssbackup.util.exceptions import SBException
-from nssbackup.managers.ConfigManager import ConfigManager, ConfigurationFileHandler
+from nssbackup.core.ConfigManager import ConfigManager, ConfigurationFileHandler
 import nssbackup.util as Util
+
 from nssbackup.ui.GladeGnomeApp import GladeGnomeApp
 from nssbackup.ui import misc
+from nssbackup.ui import gtk_rsrc
+
+from nssbackup.fs_backend import fam
+
+from nssbackup.util import exceptions
+from nssbackup.util import pathparse
+
+
+sys.excepthook = misc.except_hook
 
 
 class SBconfigGTK(GladeGnomeApp):
     """
     
     @todo: Unify displaying of error messages/dialog boxes!
-    @todo: Strictly separate UI from core. Don't set defaults from the UI.
-    @todo: The result of 'os.getuid' should be retrieved during the
-       initialization process and stored in a member attribute, so
-       we don't need to use operation system call over and over!
+    @todo: Strictly separate UI from core. Don't set defaults from the UI (business logic in handler).
     @todo: Use functions from ConfigManager to set the paths in
-            a consistent manner.
-            
+            a consistent manner.         
     @todo: Configuration handling must be reviewed. Direct manipulation
             of the configuration from widget's signal handler is *really*
             errorprone and hard to debug (e.g. clearing a text input field
             from the source code/application side before filling it with new
             content currently yields in the removal of the according
             config option and the config is unintentionally changed). 
-
     """
     # why class variables?
     configman = None
@@ -76,6 +83,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.default_conffile = _path_conffile
             self.conffile = self.default_conffile
             self.configman = ConfigManager(self.default_conffile)
+
             # hack to get rid of schedule settings in non-admin profiles
             # we just remove existing schedules from the config files
             # and don't allow new settings by disabling the schedule page
@@ -83,17 +91,29 @@ class SBconfigGTK(GladeGnomeApp):
                 self.configman.remove_schedule()
                 self.configman.saveConf()
             # end of hack
+
             self.orig_configman = ConfigManager(self.default_conffile)
         else :
             self.configman = ConfigManager()
             self.orig_configman = None
 
         self.logger = LogFactory.getLogger()
+        self.__destination_uri_obj = None
+        self.__destination_hdl = None
+        self.__destination_failure = False
 
-        self._init_ui()
+        GladeGnomeApp.__init__(self,
+                               app_name = "NSsbackup",
+                               app_version = "0.2",
+                               filename = Util.get_resource_file(gtk_rsrc.CONFIGGUI_GLADEFILE),
+                               top_window = gtk_rsrc.CONFIGGUI_TOPWINDOW,
+                               widget_list = gtk_rsrc.get_configgui_widgets(),
+                               handlers = gtk_rsrc.get_configgui_handlers())
+
+        self.__get_application_widget().set_icon_from_file(Util.get_resource_file("nssbackup-conf.png"))
 
         # hide the schedule tab if not root
-        if os.geteuid() != 0:
+        if not system.is_superuser():
             self.__enable_schedule_page(enable = False)
             self.widgets['label_schedule_page'].set_tooltip_text(\
             _('Scheduled backups are available for Administrator users only.'))
@@ -142,15 +162,6 @@ class SBconfigGTK(GladeGnomeApp):
         column4 = gtk.TreeViewColumn('Name', cell4, text = 0)
         self.ex_regextv.append_column(column4)
 
-        self.remoteinc = gtk.ListStore(str)
-        self.rem_includetv = self.widgets["remote_includetv"]
-        self.rem_includetv.set_model(self.remoteinc)
-        cell = gtk.CellRendererText()
-        cell.set_property('editable', True)
-        cell.connect('edited', self.cell_remoteinc_edited_callback, (self.remoteinc, "dirconfig", 1))
-        column = gtk.TreeViewColumn(_('Name'), cell, text = 0)
-        self.rem_includetv.append_column(column)
-
         # Profile Manager
         # [ enable , profilename, cfPath ]
         self.profiles = gtk.ListStore(bool, str, str)
@@ -173,285 +184,14 @@ class SBconfigGTK(GladeGnomeApp):
         self.profilestv.append_column(enableCBColumn)
         self.profilestv.append_column(prfNameColumn)
 
-        # The split size coices
-        self.splitSizeLS = gtk.ListStore(str, int)
-        values = []
-        splitsize_dict = ConfigManagerStaticData.get_splitsize_dict()
-        for k in splitsize_dict.keys() :
-            values.append(k)
-        values.sort()
+        # The split size coices        
+        self.splitSizeLS = misc.set_model(widget = self.widgets['splitsizeCB'],
+                                          values = ConfigManagerStaticData.get_splitsize_dict())
 
-        for k in values :
-            self.splitSizeLS.append([splitsize_dict[k], k])
-        self.widgets['splitsizeCB'].set_model(self.splitSizeLS)
-        cell = gtk.CellRendererText()
-        self.widgets['splitsizeCB'].pack_start(cell, True)
-        self.widgets['splitsizeCB'].add_attribute(cell, 'text', 0)
+        self.__model_remote_services = misc.set_model(widget = self.widgets['cmb_set_remote_service'],
+                                                      values = fam.get_remote_services_avail())
 
         self._fill_widgets_from_config(probe_fs = True)
-
-    def _init_ui(self):
-        filename = Util.get_resource_file('nssbackup-config.glade')
-        widget_list = [
-            'nssbackupConfApp',
-            'toolbar',
-            'askSaveDialog',
-            'remote_inc_dialog',
-            'remote_inc_entry',
-            'fusecheckbutton',
-            'remote_inc_okbutton',
-            'pluginscombobox',
-            'fusehelplabel',
-            'regexdialog',
-            'ftypedialog',
-            'dialog-vbox4',
-            'remote_inc_entry',
-            'vbox18',
-            'ftype_st',
-            'ftype_box',
-            'hbox25',
-            'ftype_custom',
-            'ftype_custom_ex',
-            'cancelbutton',
-            'okbutton',
-            'dialog-vbox5',
-            'vbox19',
-            'regex_box',
-            'cancelbutton2',
-            'okbutton2',
-            'statusBar',
-            'vbox17',
-            'save',
-            'save_as',
-            'saveButton',
-            'exit',
-            'imagemenuitem6',
-            'imagemenuitem7',
-            'imagemenuitem8',
-            'imagemenuitem9',
-            'about',
-            'vbox1',
-            'notebook',
-#
-# general/main page
-            'label_general_page',
-            'vbox_general_page',
-            'cformat',
-            'splitsizeCB',
-            'splitsizeSB',
-            'splitsizevbox',
-            'label_splitsize_custom',
-#
-            'vbox3',
-            'scrolledwindow1',
-            'includetv',
-            'inc_addfile',
-            'hbox4',
-            'inc_adddir',
-            'hbox5',
-            'inc_del',
-            'remote_includetv',
-            'remote_inc_add',
-            'remote_inc_del',
-            'test_remote',
-            'notebook2',
-            'vbox4',
-            'scrolledwindow2',
-            'ex_pathstv',
-            'ex_addfile1',
-            'hbox6',
-            'ex_adddir',
-            'hbox7',
-            'ex_delpath',
-            'vbox5',
-            'scrolledwindow3',
-            'ex_ftypetv',
-            'ex_addftype',
-            'ex_delftype',
-            'vbox6',
-            'scrolledwindow4',
-            'ex_regextv',
-            'ex_addregex',
-            'ex_delregex',
-            'vbox7',
-            'hbox8',
-            'ex_max',
-            'ex_maxsize',
-            'vbox8',
-            'dest1',
-            'dest2',
-            'label_default_target',
-            'hbox9',
-            'dest_localpath',
-            'dest3',
-            'hbox10',
-            'dest_remote',
-            'dest_remotetest',
-            'dest_remote_light',
-            'hbox11',
-            'dest_unusable',
-#
-#            schedule page
-            'label_schedule_page',
-            'vbox_schedule_page',
-            'table_schedule',
-            'rdbtn_no_schedule',
-            'rdbtn_simple_schedule',
-            'rdbtn_custom_schedule',
-            'label_simple_schedule_freq',
-            'label_custom_cronline',
-            'txtfld_custom_cronline',
-            'cmbbx_simple_schedule_freq',
-            'lnkbtn_help_schedule',
-            'hbox_schedule_footer',
-            'hbox_schedule_infotext',
-            'img_schedule_infotext',
-            'label_schedule_infotext',
-#
-            'time_maxinc',
-            'purgevbox',
-            'purgecheckbox',
-            'hbox16',
-            'purgeradiobutton',
-            'purgedays',
-            'purgelabel',
-            'hbox17',
-            'logpurgeradiobutton',
-            'purgelabel2',
-            'hbox18',
-            'reportvbox',
-            'hbox19',
-            'table2',
-            'loglevelcombobox',
-            'logfilechooser',
-            'hbox20',
-            'vbox11',
-            'vbox12',
-            'table3',
-            'smtpport',
-            'smtpserver',
-            'smtpto',
-            'smtpfrom',
-            'hbox21',
-            'testMailButton',
-            'vbox13',
-            'vbox14',
-            'smtplogincheckbox',
-            'smtplogininfo',
-            'smtppassword',
-            'smtplogin',
-            'vbox15',
-            'TLScheckbutton',
-            'TLSinfos',
-            'TLSradiobutton',
-            'SSLradiobutton',
-            'crtfilechooser',
-            'keyfilechooser',
-            'label_certificate',
-            'label_key',
-#
-            'pluginscombobox',
-            'ProfileManagerDialog',
-            'profilesListTreeView',
-            'addProfileButton',
-            'removeProfileButton',
-            'editProfileButton',
-            'closeProfileManagerButton',
-            'askNewPrfNameDialog',
-            'enableNewPrfCB',
-            'newPrfNameEntry',
-            'followlinks',
-#
-            'dialog_default_settings',
-            'label_dialog_default_settings_content',
-            'btn_set_default_settings',
-            'btn_cancel_default_settings'
-            ]
-
-        handlers = [
-            'on_ftype_toggled',
-            'on_ftype_st_box_changed',
-            'on_ftype_custom_ex_changed',
-            'on_save_activate',
-            'on_save_as_activate',
-            'on_exit_activate',
-            'on_prfManager_activate',
-            'on_menu_about_activate',
-            'on_menu_help_activate',
-            'on_reload_clicked',
-            'on_save_clicked',
-            'on_backup_clicked',
-            'on_cformat_changed',
-            'on_splitsizeCB_changed',
-            'on_splitsizeSB_value_changed',
-            'on_inc_addfile_clicked',
-            'on_inc_adddir_clicked',
-            'on_inc_del_clicked',
-            'on_remote_inc_add_clicked',
-            'on_remote_inc_del_clicked',
-            'on_test_remote_clicked',
-            'on_ex_addfile_clicked',
-            'on_ex_adddir_clicked',
-            'on_ex_delpath_clicked',
-            'on_ex_addftype_clicked',
-            'on_ex_delftype_clicked',
-            'on_ex_addregex_clicked',
-            'on_ex_delregex_clicked',
-            'on_ex_max_toggled',
-            'on_ex_maxsize_changed',
-            'on_dest1_toggled',
-            'on_dest_localpath_selection_changed',
-            'on_dest_remote_changed',
-            'on_dest_remotetest_clicked',
-#            
-#            scheduling
-            'on_cmbbx_simple_schedule_freq_changed',
-            'on_rdbtn_schedule_toggled',
-            'on_txtfld_custom_cronline_changed',
-#
-            'on_time_maxinc_changed',
-            'on_purgecheckbox_toggled',
-            'on_purgeradiobutton_toggled',
-            'on_purgedays_changed',
-            'on_logfilechooser_selection_changed',
-            'on_loglevelcombobox_changed',
-            'on_smtpfrom_changed',
-            'on_smtpto_changed',
-            'on_smtpserver_changed',
-            'on_smtpport_changed',
-            'on_testMailButton_clicked',
-            'on_smtplogincheckbox_toggled',
-            'on_smtplogin_changed',
-            'on_smtppassword_changed',
-            'on_TLScheckbutton_toggled',
-            'on_TLSradiobutton_toggled',
-            'on_crtfilechooser_selection_changed',
-            'on_keyfilechooser_selection_changed',
-            'on_pluginscombobox_changed',
-            'on_fusecheckbutton_clicked',
-            'on_addProfileButton_clicked',
-            'on_removeProfileButton_clicked',
-            'on_editProfileButton_clicked',
-            'on_closeProfileManagerButton_clicked',
-            'on_includetv_key_press_event',
-            'on_remote_includetv_key_press_event',
-            'on_ex_pathstv_key_press_event',
-            'on_ex_ftypetv_key_press_event',
-            'on_ex_regextv_key_press_event',
-            'on_followlinks_toggled',
-#
-            'on_menu_set_default_settings_activate',
-
-            'on_exit_activate',
-            'on_nssbackupConfApp_delete_event',
-            'on_nssbackupConfApp_destroy'
-            ]
-
-        top_window = 'nssbackupConfApp'
-        GladeGnomeApp.__init__(self, "NSsbackup", "0.2", filename, top_window,
-                                                        widget_list, handlers)
-        self.widgets['nssbackupConfApp'].set_icon_from_file(Util.get_resource_file("nssbackup-conf.png"))
-
 
     def isConfigChanged(self, force_the_change = False):
         """Checks whether the current configuration has changed compared to
@@ -511,25 +251,6 @@ class SBconfigGTK(GladeGnomeApp):
                 elif _value == 0:
                     self.ex_paths.append([_item])
 
-    def __fill_remotedir_widgets_from_config(self):
-        """Fills the remote directory include tab according to
-        the values found in the current configuration.
-        """
-        _section = "dirconfig"
-        _option = "remote"
-        self.remoteinc.clear()
-        if self.configman.has_option(_section, _option):
-            print ">>> remote option found"
-            for _itm, _val in self.configman.get(_section, _option).iteritems():
-                print ">>> _itm: %s  _val: %s" % (_itm, _val)
-                _val = int(_val)
-                if _val == 1:
-                    self.remoteinc.append([_itm])
-                elif _val == 0:
-                    print "TODO: add remote exclude widget"
-                else:
-                    print "Unrecognized value for `%s`: %s" % (_itm, _val)
-
     def __fill_regex_widgets_from_config(self):
         # regexp excludes
         _known_ftypes_dict = ConfigManagerStaticData.get_known_ftypes_dict()
@@ -540,8 +261,8 @@ class SBconfigGTK(GladeGnomeApp):
         if self.configman.has_option("exclude", "regex") :
             r = self.configman.get("exclude", "regex")
             if not Util.is_empty_regexp(r):
-                list = str(r).split(",")
-                for i in list:
+                _list = str(r).split(",")
+                for i in _list:
 # Bugfix LP #258542 
                     if re.match(r"\\\.\w+\$", i):
                         _ftype = i[2:len(i) - 1]
@@ -743,7 +464,7 @@ class SBconfigGTK(GladeGnomeApp):
             raise TypeError("Given parameter 'from_func' must be of type "\
                             "Method. Got %s instead." % (type(from_func)))
 
-        if os.geteuid() == 0 and self.configman.is_default_profile():
+        if system.is_superuser() and self.configman.is_default_profile():
             self.__enable_schedule_page(enable = True)
 
             croninfos = from_func()    # = (isCron, val)
@@ -784,39 +505,52 @@ class SBconfigGTK(GladeGnomeApp):
                 self.widgets["splitsizeCB"].set_active(0)
 
     def __fill_destination_widgets(self):
-        """Local helper function which fills the UI widgets related to
+        """Helper method which fills the UI widgets related to
         the backup target (i.e. destination).
+        
+        :todo: Improve!
         """
-        if self.configman.has_option("general", "target") :
-            ctarget = self.configman.get("general", "target")
-            if ctarget.startswith(os.sep) :
-                if self.__is_target_set_to_default(ctarget):
+        dest_obj = pathparse.UriParser()
+        dest_obj.set_and_parse_uri(uri = self.configman.get_destination_path())
+        self.__destination_uri_obj = dest_obj
+
+        _dest = fam.get_fam_target_handler_facade_instance()
+        _dest.set_destination(dest_obj.uri)
+
+#        if _dest is not None:
+        ctarget = _dest.query_dest_display_name()
+        self.logger.debug("Current destination: %s" % ctarget)
+
+        if _dest.is_local():
+            if self.__is_target_set_to_default(ctarget):
+                self.__set_target_option("default")
+
+            else:
+                if not _dest.dest_eff_path_exists():
+                    self.__set_config_target_to_default()
                     self.__set_target_option("default")
-                else:
-                    if not os.path.exists(ctarget):
-                        self.__set_config_target_to_default()
-                        self.__set_target_option("default")
 
-                        _sec_msg = _("Please make sure the missing directory exists (e.g. by mounting an external disk) or change the specified target to an existing one.")
-                        _message_str = _("Backup target does not exist.\n\nAttention: The target will be set to the default value. Check this on the destination settings page before saving the configuration.")
-                        _headline_str = \
-                        _("Unable to open backup target")
+                    _sec_msg = _("Please make sure the missing directory exists (e.g. by mounting an external disk) or change the specified target to an existing one.")
+                    _message_str = _("Backup target does not exist.\n\nAttention: The target will be set to the default value. Check this on the destination settings page before saving the configuration.")
+                    _headline_str = \
+                    _("Unable to open backup target")
 
-                        gobject.idle_add(misc.show_errdialog,
-                                          _message_str,
-                                          self.__get_application_widget(),
-                                          _headline_str, _sec_msg)
-                        return
+                    gobject.idle_add(misc.show_errdialog,
+                                      _message_str,
+                                      self.__get_application_widget(),
+                                      _headline_str, _sec_msg)
+                    return
 
-                    self.__set_target_option("local")
-                    self.__set_target_value("local", ctarget)
-            else :
-                self.__set_target_option("remote")
-                self.__set_target_value("remote", ctarget)
+                self.__set_target_option("local")
+                self.__set_target_value("local", ctarget)
+
         else:
-            self.__set_config_target_to_default()
-            # target set to default if no config option exists
-            self.__set_target_option("default")
+            self.__set_target_option("remote")
+            self.__set_target_value("remote", ctarget)
+#        else:
+#            # target set to default if no config option exists
+#            self.__set_config_target_to_default()
+#            self.__set_target_option("default")
 
     def _fill_widgets_from_config(self, probe_fs):
         """Prefill the GTK window with config infos.
@@ -829,7 +563,6 @@ class SBconfigGTK(GladeGnomeApp):
         if not isinstance(probe_fs, types.BooleanType):
             raise TypeError("Given parameter must be of boolean type. "\
                             "Got %s instead." % (type(probe_fs)))
-
         # General
         self.__fill_max_inc_widgets_from_config()
         self.__fill_compression_widgets_from_config()
@@ -837,7 +570,6 @@ class SBconfigGTK(GladeGnomeApp):
 
         # dirconfig and excludes
         self.__fill_dir_widgets_from_config()
-        self.__fill_remotedir_widgets_from_config()
         self.__fill_regex_widgets_from_config()
 
         # other exclude reasons
@@ -866,6 +598,9 @@ class SBconfigGTK(GladeGnomeApp):
 #        self.__set_default_focus()
         self.isConfigChanged()
 
+#    def __set_default_focus(self):
+#        self.widgets['label_general_page'].grab_focus()
+
     def __fill_statusbar_from_config(self):
         """Sets the profile name and the user mode.
         """
@@ -873,9 +608,6 @@ class SBconfigGTK(GladeGnomeApp):
         if os.geteuid() == 0:
             stattxt = _("%s   (Administrator mode)") % stattxt
         self.widgets['statusBar'].push(stattxt)
-
-#    def __set_default_focus(self):
-#        self.widgets['label_general_page'].grab_focus()
 
     def __enable_splitsize_custom_option(self, enable = True):
         """Enables resp. disables widgets for setting a custom archive
@@ -907,7 +639,7 @@ class SBconfigGTK(GladeGnomeApp):
             """
             self.widgets["dest_remote_light"].set_sensitive(enable)
             self.widgets["dest_remote"].set_sensitive(enable)
-            self.widgets["dest_remotetest"].set_sensitive(enable)
+            self.widgets["btn_set_remote"].set_sensitive(enable)
 
         if option == "default":
             __enable_default_target(enable = True)
@@ -986,22 +718,22 @@ class SBconfigGTK(GladeGnomeApp):
         # No match found
         return False
 
-    def cell_remoteinc_edited_callback(self, cell, path, new_text, data):
-        # Check if new path is empty
-        if (new_text == None) or (new_text == ""):
-            dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR,
-                        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                        buttons = gtk.BUTTONS_CLOSE,
-                        message_format = _("Empty filename or path. Please enter a valid filename or path."))
-            dialog.run()
-            dialog.destroy()
-            return
-
-        model, section, value = data
-        self.configman.remove_option(section, model[path][0])
-        model[path][0] = new_text
-        self.configman.set(section, "remote", {new_text: value})
-        self.isConfigChanged()
+#    def cell_remoteinc_edited_callback(self, cell, path, new_text, data):
+#        # Check if new path is empty
+#        if (new_text == None) or (new_text == ""):
+#            dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR,
+#                        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+#                        buttons = gtk.BUTTONS_CLOSE,
+#                        message_format = _("Empty filename or path. Please enter a valid filename or path."))
+#            dialog.run()
+#            dialog.destroy()
+#            return
+#
+#        model, section, value = data
+#        self.configman.remove_option(section, model[path][0])
+#        model[path][0] = new_text
+#        self.configman.set(section, "remote", {new_text: value})
+#        self.isConfigChanged()
 
     def cell_regex_edited_callback(self, cell, path, new_text):
         # Check if new path is empty
@@ -1052,7 +784,7 @@ class SBconfigGTK(GladeGnomeApp):
         self.configman.set(section, new_text, value)
         self.isConfigChanged()
 
-    def on_ftype_toggled(self, *args):
+    def on_ftype_toggled(self, *args): #IGNORE:W0613
         if self.widgets["ftype_st"].get_active():
             self.widgets["ftype_box"].set_sensitive(True)
             self.widgets["ftype_custom_ex"].set_sensitive(False)
@@ -1060,14 +792,14 @@ class SBconfigGTK(GladeGnomeApp):
             self.widgets["ftype_box"].set_sensitive(False)
             self.widgets["ftype_custom_ex"].set_sensitive(True)
 
-    def on_ftype_st_box_changed(self, *args):
+    def on_ftype_st_box_changed(self, *args): #IGNORE:W0613
         print("TODO: on_ftype_st_box_changed")
         pass
 
-    def on_save_activate(self, *args):
+    def on_save_activate(self, *args): #IGNORE:W0613
         self.on_save_clicked()
 
-    def on_save_as_activate(self, *args):
+    def on_save_as_activate(self, *args): #IGNORE:W0613
         dialog = gtk.FileChooserDialog(title = _("Save configuration as..."),
                                 parent = self.__get_application_widget(),
                                 action = gtk.FILE_CHOOSER_ACTION_SAVE,
@@ -1084,22 +816,10 @@ class SBconfigGTK(GladeGnomeApp):
     def on_menu_help_activate(self, button):
         misc.open_uri("ghelp:nssbackup")
 
-    def on_menu_about_activate(self, *args):
+    def on_menu_about_activate(self, *args): #IGNORE:W0613
         misc.show_about_dialog(set_transient_for = self.widgets["nssbackupConfApp"])
-#        about = gtk.AboutDialog()
-#        about.set_name(Infos.NAME)
-#        about.set_version(Infos.VERSION)
-#        about.set_comments(Infos.DESCRIPTION)
-#        about.set_transient_for(self.widgets["nssbackupConfApp"])
-#        about.set_copyright(Infos.COPYRIGHT)
-#        about.set_translator_credits(Infos.TRANSLATORS)
-#        about.set_authors(Infos.AUTHORS)
-#        about.set_website(Infos.WEBSITE)
-#        about.set_logo(gtk.gdk.pixbuf_new_from_file(Util.get_resource_file("nssbackup-conf.png")))
-#        about.run()
-#        about.destroy()
 
-    def on_reload_clicked(self, *args):
+    def on_reload_clicked(self, *args): #IGNORE:W0613
         self.configman = ConfigManager(self.conffile)
         # hack to get rid of schedule settings in non-default profiles
         # we just remove existing schedules from the non-default config files
@@ -1113,7 +833,7 @@ class SBconfigGTK(GladeGnomeApp):
         self.isConfigChanged()
         self.logger.debug("Config '%s' loaded" % self.conffile)
 
-    def on_save_clicked(self, *args):
+    def on_save_clicked(self, *args): #IGNORE:W0613
         self.logger.debug("Saving Config")
         self.configman.saveConf()
         self.conffile = self.configman.conffile
@@ -1122,7 +842,7 @@ class SBconfigGTK(GladeGnomeApp):
         self.orig_configman = ConfigManager(self.configman.conffile)
         self.isConfigChanged()
 
-    def on_backup_clicked(self, *args):
+    def on_backup_clicked(self, *args): #IGNORE:W0613
         cancelled = self.ask_save_config()
         if not cancelled:
             try :
@@ -1140,7 +860,7 @@ class SBconfigGTK(GladeGnomeApp):
                 dialog.destroy()
                 raise e
 
-    def on_cformat_changed(self, *args):
+    def on_cformat_changed(self, *args): #IGNORE:W0613
         """
         handle that sets the compression format
         """
@@ -1162,7 +882,32 @@ class SBconfigGTK(GladeGnomeApp):
             self.on_splitsizeCB_changed()
         self.isConfigChanged()
 
-    def on_splitsizeCB_changed(self, *args):
+    def on_cmb_set_remote_service_changed(self, *args): #IGNORE:W0613
+        pass
+#        dialog = self.widgets['dialog_connect_remote']
+#        cmbbx = self.widgets['cmb_set_remote_service']
+#        model = cmbbx.get_model()
+#        label, value = model[cmbbx.get_active()]
+#        print "on_cmb_set_remote_service_changed - label: %s value: %s" % (label, value)
+#        _user = self.widgets['entry_set_remote_user']
+#        _user_lab = self.widgets['label_set_remote_user']
+#        _pass = self.widgets['entry_set_remote_pass']
+#        _pass_lab = self.widgets['label_set_remote_pass']
+#
+#        if value == REMOTE_SERVICE_FTP_PUBLIC:
+#            _user.hide()
+#            _user_lab.hide()
+#            _pass.hide()
+#            _pass_lab.hide()
+#        else:
+#            _user.show()
+#            _user_lab.show()
+#            _pass.show()
+#            _pass_lab.show()
+#        _width, _height = dialog.get_size()
+#        dialog.resize(width = _width, height = 1)
+
+    def on_splitsizeCB_changed(self, *args): #IGNORE:W0613
         """
         """
         model = self.widgets["splitsizeCB"].get_model()
@@ -1177,14 +922,14 @@ class SBconfigGTK(GladeGnomeApp):
             self.configman.set("general", "splitsize", val * 1024)
         self.isConfigChanged()
 
-    def on_splitsizeSB_value_changed(self, *args):
+    def on_splitsizeSB_value_changed(self, *args): #IGNORE:W0613
         """
         """
         val = int(self.widgets['splitsizeSB'].get_value())
         self.configman.set("general", "splitsize", val * 1024)
         self.isConfigChanged()
 
-    def on_inc_addfile_clicked(self, *args):
+    def on_inc_addfile_clicked(self, *args): #IGNORE:W0613
         self.__check_for_section("dirconfig")
         dialog = gtk.FileChooserDialog(title = _("Include file..."),
                                 parent = self.__get_application_widget(),
@@ -1211,7 +956,7 @@ class SBconfigGTK(GladeGnomeApp):
         if not self.configman.has_section(section):
             self.configman.add_section(section)
 
-    def on_inc_adddir_clicked(self, *args):
+    def on_inc_adddir_clicked(self, *args): #IGNORE:W0613
         self.__check_for_section("dirconfig")
         dialog = gtk.FileChooserDialog(title = _("Include folder..."),
                                 parent = self.__get_application_widget(),
@@ -1238,107 +983,6 @@ class SBconfigGTK(GladeGnomeApp):
             self.configman.remove_option("dirconfig", enc_val)
             self.isConfigChanged()
             store.remove(iter)
-
-    def on_remote_inc_add_clicked(self, *args):
-        self.__check_for_section("dirconfig")
-        global plugin_manager
-        question = self.widgets['remote_inc_dialog']
-        #add the plugin list in the dialog
-        if not self.plugin_manager :
-            self.plugin_manager = PluginManager()
-        plist = self.plugin_manager.getPlugins()
-        p_comboList = gtk.ListStore(str)
-        plistCB = self.widgets['pluginscombobox']
-        plistCB.set_model(p_comboList)
-        for pname in plist.iterkeys() :
-            p_comboList.append([pname])
-
-        cell = gtk.CellRendererText()
-        plistCB.pack_start(cell)
-        plistCB.add_attribute(cell, 'text', 0)
-        plistCB.set_active(0)
-
-        response = question.run()
-        question.hide()
-        if response == gtk.RESPONSE_OK:
-            entry = self.widgets["remote_inc_entry"].get_text()
-            self.logger.debug("Entry : '%s'" % entry)
-            self.remoteinc.append([entry])
-            self.configman.set("dirconfig", "remote", {entry:1})
-            self.isConfigChanged()
-            self.logger.debug("Entry in dirconf:'%s' " % self.configman.get("dirconfig", "remote"))
-        elif response == gtk.RESPONSE_CANCEL:
-            pass
-        else :
-            self.logger.debug("Response : '%s'" % str(response))
-
-    def on_pluginscombobox_changed(self, *args):
-        plist = self.plugin_manager.getPlugins()
-        pname = self.widgets['pluginscombobox'].get_active_text()
-        plugin = plist[pname]()
-        # update the help label
-        try :
-            self.widgets['fusehelplabel'].set_text(plugin.getdoc())
-        except SBException, e :
-            self.widgets['fusehelplabel'].set_text(str(e))
-
-    def on_fusecheckbutton_clicked(self, *args):
-        entry = self.widgets["remote_inc_entry"].get_text()
-        plist = self.plugin_manager.getPlugins()
-        pname = self.widgets['pluginscombobox'].get_active_text()
-        plugin = plist[pname]()
-        # update the help label
-        try :
-            if plugin.match_scheme_full(entry) :
-                dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = "Test Succeeded !")
-                dialog.run()
-                dialog.destroy()
-            else :
-                dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = "Test failed, the entry doesn't match the schema")
-                dialog.run()
-                dialog.destroy()
-        except Exception, e :
-            dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-            dialog.run()
-            dialog.destroy()
-
-    def on_remote_inc_del_clicked(self, *args):
-        self.__check_for_section("dirconfig")
-        (store, iter) = self.rem_includetv.get_selection().get_selected()
-        if store and iter:
-            value = store.get_value(iter, 0)
-            self.configman.remove_option("dirconfig", value)
-            self.isConfigChanged()
-            store.remove(iter)
-            self.logger.debug("Entry in dirconf:'%s' " % self.configman.get("dirconfig", "remote"))
-
-    def on_test_remote_clicked(self, *args):
-        if not self.plugin_manager :
-            self.plugin_manager = PluginManager()
-        n = 0
-        _fusefam = FuseFAM()
-        for row in self.remoteinc:
-            try :
-                if not _fusefam.testFusePlugins(row[0]) :
-                    dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE,
-                                            message_format = _("Test on '%s' didn't succeed!") % row[0])
-                    dialog.run()
-                    dialog.destroy()
-                else :
-                    n = n + 1
-            except Exception, e:
-                dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-                dialog.run()
-                dialog.destroy()
-        if n == len(self.remoteinc) :
-            dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = _("Test was successful."))
-            dialog.run()
-            dialog.destroy()
-        else :
-            dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE,
-                                            message_format = _("'%d' test(s) didn't succeed !") % (len(self.remoteinc) - n))
-            dialog.run()
-            dialog.destroy()
 
     def on_ex_addfile_clicked(self, *args):
         self.__check_for_section("dirconfig")
@@ -1427,7 +1071,11 @@ class SBconfigGTK(GladeGnomeApp):
 
         elif self.widgets["dest3"].get_active():
             self.__enable_target_option("remote")
-            self.on_dest_remote_changed()
+#            self.on_dest_remote_changed()
+            if self.__destination_uri_obj is not None:
+                _uri = self.__destination_uri_obj.uri
+                self.configman.set("general", "target", _uri)
+                self.isConfigChanged()
 
         else:
             raise ValueError("Unexpected widget was toggled.")
@@ -1806,27 +1454,23 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
             store.remove(iter)
 
-    def on_includetv_key_press_event(self, widget, event, *args):
+    def on_includetv_key_press_event(self, widget, event, *args): #IGNORE:W0613
         if event.keyval == gtk.keysyms.Delete :
             self.on_inc_del_clicked()
 
-    def on_remote_includetv_key_press_event(self, widget, event, *args):
-        if event.keyval == gtk.keysyms.Delete :
-            self.on_remote_inc_del_clicked()
-
-    def on_ex_pathstv_key_press_event(self, widget, event, *args):
+    def on_ex_pathstv_key_press_event(self, widget, event, *args): #IGNORE:W0613
         if event.keyval == gtk.keysyms.Delete :
             self.on_ex_delpath_clicked()
 
-    def on_ex_ftypetv_key_press_event(self, widget, event, *args):
+    def on_ex_ftypetv_key_press_event(self, widget, event, *args): #IGNORE:W0613
         if event.keyval == gtk.keysyms.Delete :
             self.on_ex_delftype_clicked()
 
-    def on_ex_regextv_key_press_event(self, widget, event, *args):
+    def on_ex_regextv_key_press_event(self, widget, event, *args): #IGNORE:W0613
         if event.keyval == gtk.keysyms.Delete :
             self.on_ex_delregex_clicked()
 
-    def on_ex_max_toggled(self, *args):
+    def on_ex_max_toggled(self, *args): #IGNORE:W0613
         """Signal handler which is called whenever the checkbutton
         'Do not backup files bigger than' is checked resp. unchecked.
         """
@@ -1840,7 +1484,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.configman.remove_option("exclude", "maxsize")
             self.isConfigChanged()
 
-    def on_ex_maxsize_changed(self, *args):
+    def on_ex_maxsize_changed(self, *args): #IGNORE:W0613
         """Signal handler which is called when the value for
         maximum file size is changed. The number (from the text field)
         is interpreted as Megabyte (MB).
@@ -1849,66 +1493,240 @@ class SBconfigGTK(GladeGnomeApp):
         self.configman.set("exclude", "maxsize", str(msize * 1024 * 1024))
         self.isConfigChanged()
 
-    def on_followlinks_toggled(self, *args):
+    def on_followlinks_toggled(self, *args): #IGNORE:W0613
         if self.widgets['followlinks'].get_active():
             self.configman.set("general", "followlinks", 1)
         else :
             self.configman.remove_option("general", "followlinks")
         self.isConfigChanged()
 
-    def on_dest_localpath_selection_changed(self, *args):
+    def on_dest_localpath_selection_changed(self, *args): #IGNORE:W0613
         """
         @todo: Check of accessibility should not take place in the UI.
         """
-        t = self.widgets["dest_localpath"].get_filename()
-        if (os.path.isdir(t) and os.access(t, os.R_OK | os.W_OK | os.X_OK)):
-            self.configman.set("general", "target", t)
+        _locp_widg = self.widgets["dest_localpath"]
+        _target = _locp_widg.get_filename()
+
+        _locp_widg.set_tooltip_text(_target)
+
+        if (os.path.isdir(_target) and os.access(_target, os.R_OK | os.W_OK | os.X_OK)):
+            self.configman.set("general", "target", _target)
             self.isConfigChanged()
             self.widgets["dest_unusable"].hide()
         else:
             self.widgets["dest_unusable"].show()
 
-    def on_dest_remote_changed(self, *args):
-        _icon = self.widgets["dest_remote_light"]
-        _icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
-        _icon.set_tooltip_text(_("Please test writability of the target directory by pressing \"Test\" button on the right."))
+    def on_checkbtn_show_password_toggled(self, *args): #IGNORE:W0613
+        self.__set_entry_remote_pass_visibiliy()
 
-        self.configman.set("general", "target",
-                            self.widgets['dest_remote'].get_text())
-        self.isConfigChanged()
+    def __set_entry_remote_pass_visibiliy(self):
+        _pass_e = self.widgets['entry_set_remote_pass']
+        _pass_e.set_visibility(visible = self.widgets['checkbtn_show_password'].get_active())
 
-    def on_dest_remotetest_clicked(self, *args):
-        _fusefam = FuseFAM()
-        _icon = self.widgets["dest_remote_light"]
-        try :
-            _remote_dest = self.widgets['dest_remote'].get_text()
-            if (_fusefam.testFusePlugins(_remote_dest)) :
-                dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = _("Test Succeeded !"))
-                dialog.run()
-                dialog.destroy()
+    def on_btn_set_remote_clicked(self, *args): #IGNORE:W0613
+        dest_obj = pathparse.UriParser()
+        dest_obj.set_and_parse_uri(uri = self.configman.get_destination_path())
+        if dest_obj is not None:
+            self.__destination_uri_obj = dest_obj
+        gobject.idle_add(self.__show_connect_remote_dialog)
 
-                self.widgets["dest_unusable"].hide()
-                _icon.set_from_stock(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
-                _icon.set_tooltip_text(_("Target directory is writable."))
+    def __show_connect_remote_dialog(self):
+        dialog = self.widgets["dialog_connect_remote"]
+#        btn_cancel = self.widgets['btn_cancel_remote']
+        btn_connect = self.widgets['btn_connect_remote']
 
-        except Exception, e:
-            dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-            dialog.run()
-            dialog.destroy()
+        _server_e = self.widgets['entry_set_remote_server']
+        _port_e = self.widgets['entry_set_remote_port']
+        _dir_e = self.widgets['entry_set_remote_dir']
+        _user_e = self.widgets['entry_set_remote_user']
+        _pass_e = self.widgets['entry_set_remote_pass']
+        _service_b = self.widgets['cmb_set_remote_service']
 
-            _icon.set_from_stock(gtk.STOCK_DIALOG_ERROR,
-                                 gtk.ICON_SIZE_MENU)
-            _icon.set_tooltip_text(_("Please change target directory and test writability of the target directory by pressing \"Test\" button on the right."))
+        dialog.set_transient_for(self.__get_application_widget())
+        self.__set_entry_remote_pass_visibiliy()
+        btn_connect.grab_focus()
 
-            self.widgets["dest_unusable"].show()
+        # default values
+        _rservice = fam.get_default_remote_service()
+        _server = ""
+        _port = ""
+        _dir = ""
+        _user = ""
+        _pass = ""
 
-    def on_logfilechooser_selection_changed(self, *args):
+        # fill entries
+#TODO: wrap use of UriParser into Fam facade        
+        if self.__destination_uri_obj is not None:
+            if not self.__destination_uri_obj.is_local():
+
+                _rservice = fam.get_service_from_scheme(self.__destination_uri_obj.uri_scheme)
+
+                if _rservice is None:
+                    raise SBException("Unable to query remote service")
+
+                _server = self.__destination_uri_obj.hostname
+                _port = self.__destination_uri_obj.port
+                _dir = self.__destination_uri_obj.path
+                _user = self.__destination_uri_obj.username
+                _pass = self.__destination_uri_obj.password
+
+
+        _servmodel = _service_b.get_model()
+        for _idx in range(len(_servmodel)):
+#            print _servmodel[_idx]
+            if _servmodel[_idx][misc.MODEL_COLUMN_INDEX_KEY] == _rservice:
+                _sidx = _idx
+                break
+
+        _service_b.set_active(_sidx)
+        _server_e.set_text(_server)
+        _port_e.set_text(_port)
+        _dir_e.set_text(_dir)
+        _user_e.set_text(_user)
+        _pass_e.set_text(_pass)
+
+        dialog.set_sensitive(True)
+        response = dialog.run()
+
+        if response == gtk.RESPONSE_APPLY:
+            self.logger.info("Connect to remote destination")
+
+            _sidx = _service_b.get_active()
+            _rservice = _servmodel[_sidx][misc.MODEL_COLUMN_INDEX_KEY]
+
+            _server = _server_e.get_text()
+            _port = _port_e.get_text()
+            _dir = _dir_e.get_text()
+            _user = _user_e.get_text()
+            _pass = _pass_e.get_text()
+
+            self.logger.debug("User input in dialog 'connect to host'")
+            self.logger.debug("  Service: %s" % _rservice)
+            self.logger.debug("  Server: %s" % _server)
+            self.logger.debug("  Port: %s" % _port)
+            self.logger.debug("  Path: %s" % _dir)
+            self.logger.debug("  User: %s" % _user)
+            self.logger.debug("  Pass: %s\n" % ("*" * len(_pass)))
+
+            dialog.set_sensitive(False)
+            misc.set_watch_cursor(dialog)
+
+            _scheme = fam.get_scheme_from_service(_rservice)
+            _uri = pathparse.construct_remote_uri_from_tupel(_scheme, _server, _port, _dir, _user, _pass)
+            self.__destination_uri_obj.set_and_parse_uri(_uri)
+
+            self.__destination_hdl = fam.get_fam_target_handler_facade_instance()
+            self.__destination_hdl.set_initialize_callback(self._mount_done_cb)
+            self.__destination_hdl.set_destination(self.__destination_uri_obj.uri)
+            self.__destination_failure = False
+
+            gobject.idle_add(self.__destination_hdl.initialize)
+
+        elif response == gtk.RESPONSE_CANCEL or \
+             response == gtk.RESPONSE_DELETE_EVENT:
+            dialog.hide()
+            _icon = self.widgets["dest_remote_light"]
+            _icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
+
+        else:
+            self.logger.error("Unexpected dialog response: %s" % response)
+            gobject.idle_add(self.__show_connect_remote_dialog)
+
+    def _mount_done_cb(self, error):
+        self.logger.debug("GUI._mount_done_cb: error: %s" % str(error))
+        dialog = self.widgets["dialog_connect_remote"]
+
+        if error is None:
+            self.logger.info("Mount was sucessful (no errors)")
+            gobject.idle_add(self._do_remote_tests)
+        else:
+            misc.unset_cursor(dialog)
+
+            _icon = self.widgets["dest_remote_light"]
+            _icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
+
+            misc.show_warndialog(
+                parent = self.__get_application_widget(),
+                message_str = str(error),
+                headline_str = _("Unable to mount host"))
+            self.__destination_failure = True
+            gobject.idle_add(self.__show_connect_remote_dialog)
+
+    def _umount_done_cb(self, error):
+        self.logger.debug("GUI._umount_done_cb: error: %s" % str(error))
+        dialog = self.widgets["dialog_connect_remote"]
+
+        if error is None:
+            self.logger.info("Umount was sucessful (no errors)")
+        else:
+            misc.unset_cursor(dialog)
+
+            _icon = self.widgets["dest_remote_light"]
+            _icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
+
+            misc.show_warndialog(
+                parent = self.__get_application_widget(),
+                message_str = str(error),
+                headline_str = _("Unable to unmount host"))
+            self.__destination_failure = True
+        gobject.idle_add(self._umount_done)
+
+    def _umount_done(self):
+        self.logger.debug("umount done - failures: %s" % self.__destination_failure)
+        dialog = self.widgets["dialog_connect_remote"]
+        misc.unset_cursor(dialog)
+        dialog.set_sensitive(True)
+        if self.__destination_failure == False:
+            self.__destination_hdl = None
+            dialog.hide()
+
+            _uri = self.__destination_uri_obj.uri
+            _displname = self.__destination_uri_obj.query_display_name()
+            self.configman.set("general", "target", _uri)
+            self.widgets['dest_remote'].set_text(_displname)
+
+            _icon = self.widgets["dest_remote_light"]
+            _icon.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_MENU)
+
+            self.isConfigChanged()
+        else:
+            _icon = self.widgets["dest_remote_light"]
+            _icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
+
+            gobject.idle_add(self.__show_connect_remote_dialog)
+
+    def _do_remote_tests(self):
+        error = None
+        self.logger.info("Perfom tests on remote host")
+        dialog = self.widgets["dialog_connect_remote"]
+        try:
+            self.__destination_hdl.test_destination()
+        except exceptions.RemoteMountTestFailedError, error:
+            misc.unset_cursor(dialog)
+
+            _icon = self.widgets["dest_remote_light"]
+            _icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
+
+            misc.show_warndialog(
+                parent = self.__get_application_widget(),
+                message_str = str(error),
+                headline_str = _("Unable to access remote destination"))
+            misc.set_watch_cursor(dialog)
+            self.__destination_failure = True
+        else:
+            self.logger.info("All tests passed")
+
+        self.__destination_hdl.set_terminate_callback(self._umount_done_cb)
+        gobject.idle_add(self.__destination_hdl.terminate)
+
+
+    def on_logfilechooser_selection_changed(self, *args): #IGNORE:W0613
         self.configman.set_logdir(self.widgets['logfilechooser'].get_filename())
         self.configman.set_logfile_templ_to_config()
         self.isConfigChanged()
         self.logger.debug("Log file set: " + self.configman.get("log", "file"))
 
-    def on_loglevelcombobox_changed(self, *args):
+    def on_loglevelcombobox_changed(self, *args): #IGNORE:W0613
         if self.widgets['loglevelcombobox'].get_active_text() == "Info" :
             self.configman.set("log", "level", "20")
             self.isConfigChanged()
@@ -1926,7 +1744,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
             self.logger.debug("Log level : " + self.configman.get("log", "level"))
 
-    def on_smtpfrom_changed(self, *args):
+    def on_smtpfrom_changed(self, *args): #IGNORE:W0613
         self.__check_for_section("report")
         if self.widgets['smtpfrom'].get_text() != "":
             self.configman.set("report", "from", self.widgets['smtpfrom'].get_text())
@@ -1935,7 +1753,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.configman.remove_option("report", "from")
             self.isConfigChanged()
 
-    def on_smtpto_changed(self, *args):
+    def on_smtpto_changed(self, *args): #IGNORE:W0613
         if self.widgets['smtpto'].get_text() != "":
             self.configman.set("report", "to", self.widgets['smtpto'].get_text())
             self.isConfigChanged()
@@ -1943,7 +1761,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.configman.remove_option("report", "to")
             self.isConfigChanged()
 
-    def on_smtpserver_changed(self, *args):
+    def on_smtpserver_changed(self, *args): #IGNORE:W0613
         if self.widgets['smtpserver'].get_text() != "":
             self.configman.set("report", "smtpserver", self.widgets['smtpserver'].get_text())
             self.isConfigChanged()
@@ -2069,7 +1887,6 @@ class SBconfigGTK(GladeGnomeApp):
 
         if prf_set:
             self.logger.debug("Got new profile name '%s : enable=%r' " % (prfName, enable))
-#            print "Got new profile name '%s : enable=%r' " % (prfName,enable)
             if not enable:
                 prfConf = prfConfDisabled
             confman = ConfigManager()
@@ -2223,6 +2040,7 @@ def _prepare_dirname(path):
 def _prepare_filename(path):
     _res = "%s" % (path.rstrip(os.sep))
     return _res
+
 
 def _escape_path(path):
     _enc_res = path.replace("=", "\\x3d")

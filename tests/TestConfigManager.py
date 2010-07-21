@@ -19,7 +19,7 @@
 import os
 import unittest
 from nssbackup.util.exceptions import SBException, NonValidOptionException
-from nssbackup.managers.ConfigManager import ConfigManager
+from nssbackup.core.ConfigManager import ConfigManager
 
 class TestConfigManager(unittest.TestCase):
 

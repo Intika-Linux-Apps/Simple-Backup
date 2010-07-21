@@ -19,14 +19,15 @@
 #   The code is based on code originally written by Dave Reed (12/15/2002)
 
 
-import os
+from gettext import gettext as _
 import os.path
 
-import gtk
+#import gtk
 import gtk.glade
 import gobject
 
 import nssbackup.ui.misc
+
 
 def search_file(filename, search_path):
     """Given a search path, find file
@@ -70,7 +71,6 @@ class GladeWindow(object):
         '''
         nssbackup.ui.misc.set_default_environment()
 
-#TODO: Needs improvement - not so good style!
         try:
             search_path = GladeWindow.search_path
         except:
@@ -124,15 +124,15 @@ class GladeWindow(object):
         '''
         self.top_window = top_window
 
-    def set_callback_function(self, cb_func, *cb_args, **cb_kwargs):
-
-        '''set_callback_function(cb_func, *cb_args, **cb_kwargs):
-
-        stores the cb_func and its cb_args and cb_kwargs
-        '''
-        self.cb_func = cb_func
-        self.cb_args = cb_args
-        self.cb_kwargs = cb_kwargs
+#    def set_callback_function(self, cb_func, *cb_args, **cb_kwargs):
+#
+#        '''set_callback_function(cb_func, *cb_args, **cb_kwargs):
+#
+#        stores the cb_func and its cb_args and cb_kwargs
+#        '''
+#        self.cb_func = cb_func
+#        self.cb_args = cb_args
+#        self.cb_kwargs = cb_kwargs
 
     def show(self, center = 1, prev_window = None, *args):
 
@@ -143,10 +143,11 @@ class GladeWindow(object):
 
         if prev_window is not None:
             self.prev_window = prev_window
-        if center:
-            self.top_window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-        else:
-            self.top_window.set_position(gtk.WIN_POS_NONE)
+#        if center:
+#            self.top_window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+#        else:
+#            self.top_window.set_position(gtk.WIN_POS_NONE)
+
         self.top_window.show()
 
     def hide(self):
@@ -160,8 +161,8 @@ class GladeWindow(object):
         self.top_window.hide()
         if self.prev_window is not None:
             self.prev_window.show()
-        if self.cb_func is not None:
-            self.cb_func(*self.cb_args, **self.cb_kwargs)
+#        if self.cb_func is not None:
+#            self.cb_func(*self.cb_args, **self.cb_kwargs)
         if self.prev_window is None:
             gtk.main_quit()
 
@@ -196,6 +197,14 @@ class GladeWindow(object):
         dialog.run()
         dialog.destroy()
         gtk.gdk.threads_leave()
+
+    def _show_destination_error(self, error):
+        _sec_msg = _("Please make sure the missing directory exists (e.g. by mounting an external disk) or change the specified target.")
+        self._show_errmessage(message_str = _("While accessing the backup destination following error occurred:\n\n%s.") % error,
+                boxtitle = _("(Not So) Simple Backup error"),
+                headline_str = _("Unable to access backup destination"),
+                secmsg_str = _sec_msg)
+
 
 
 class ProgressbarMixin(object):

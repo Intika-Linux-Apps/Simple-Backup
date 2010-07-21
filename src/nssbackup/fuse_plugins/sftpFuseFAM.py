@@ -14,32 +14,32 @@
 
 # Authors :
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
-#    Jean-Peer Lorenz <peer.loz@gmx.net>
 
-from nssbackup.plugins import pluginFAM
+
+from nssbackup.fuse_plugins import pluginFAM
 import subprocess
 import re
 import os
 from gettext import gettext as _
 from tempfile import mkstemp
-from nssbackup.util import file_handling as FAM
 from nssbackup.util.exceptions import FuseFAMException
+from nssbackup.util import local_file_utils
 
 
-ftp_re = "^ftp://"
-ftpUrlRegex = ftp_re + "(([^:]+):([^@]+)@)?" + "([^/^:^@]+?)" + "(:([0-9]+))?" + "/(.*)"
+sftp_re = "^sftp://"
+sftpUrlRegex = sftp_re + "(([^:]+):([^@]+)@)?" + "([^/^:^@]+?)" + "(:([0-9]+))?" + "/(.*)"
 
-
-class ftpFuseFAM (pluginFAM)  :
-    """The fuseFAM plugin for ftp
-    
-    @requires: curlftpfs
-    @todo: Dependency on 'curlftpfs' must be taken into account for packaging!
+class sftpFuseFAM (pluginFAM)  :
     """
+    The fuseFAM plugin for sftp
+    @requires: curlftpfs
+    """
+    def __init__(self):
+        pluginFAM.__init__(self)
 
     def match_scheme(self, remoteSource):
         _res = False
-        _search_res = re.compile(ftp_re).search(remoteSource)
+        _search_res = re.compile(sftp_re).search(remoteSource)
         if _search_res is not None:
             _res = True
         return _res
@@ -55,7 +55,7 @@ class ftpFuseFAM (pluginFAM)  :
         @todo: The plugins ssh, sftp do not behave if the suggested way! Fix them!
         """
         _res = False
-        _search_res = re.compile(ftpUrlRegex).search(remoteSource)
+        _search_res = re.compile(sftpUrlRegex).search(remoteSource)
         if _search_res is not None:
             _res = True
         return _res
@@ -74,15 +74,15 @@ class ftpFuseFAM (pluginFAM)  :
         spliturl = SplittedURL(source)
         mountpoint = self.__get_mount_dir(mountbase, spliturl)
 
-        if not os.path.exists(mountpoint):
+        if not os.path.exists(mountpoint) :
             os.mkdir(mountpoint)
 
-        # check if it is already mounted first
+        #If the path is already mounted No need to retry
         if not self.checkifmounted(source, mountbase) :
             # Create output log file
-            outptr, outFile = mkstemp(prefix = "ftpFuseFAMmount_output_")
+            outptr, outFile = mkstemp(prefix = "sftpFuseFAMmount_output_")
             # Create error log file
-            errptr, errFile = mkstemp(prefix = "ftpFuseFAMmount_error_")
+            errptr, errFile = mkstemp(prefix = "sftpFuseFAMmount_error_")
 
             # the option 'allow_root' is necessary to grant access
             # if the script is invoked as superuser
@@ -109,14 +109,14 @@ class ftpFuseFAM (pluginFAM)  :
                 retval = subprocess.call(curl_cmd, 0, None, None, outptr, errptr)
             except OSError, _exc:
                 os.rmdir(mountpoint)
-                raise FuseFAMException(_("Couldn't found external application 'curlftpfs' needed for handling of ftp sites: %s") % _exc)
+                raise FuseFAMException(_("Couldn't found external application 'curlftpfs' needed for handling of sftp sites: %s") % _exc)
 
             # Close log handles
             os.close(errptr)
             os.close(outptr)
-            outStr, errStr = FAM.readfile(outFile), FAM.readfile(errFile)
-            FAM.delete(outFile)
-            FAM.delete(errFile)
+            outStr, errStr = local_file_utils.readfile(outFile), local_file_utils.readfile(errFile)
+            local_file_utils.delete(outFile)
+            local_file_utils.delete(errFile)
             if retval != 0:
                 os.rmdir(mountpoint)
                 raise FuseFAMException(_("Couldn't mount '%(server)s' into '%(mountpoint)s' : %(error)s") % {'server' : spliturl.server ,
@@ -125,7 +125,7 @@ class ftpFuseFAM (pluginFAM)  :
         else:
             pass    # it is already mounted, do nothing
 
-        remote_site = "ftp://" + spliturl.server
+        remote_site = "sftp://" + spliturl.server
         if spliturl.port:
             remote_site += ":" + spliturl.port
         return (remote_site, mountpoint, spliturl.pathinside)
@@ -133,7 +133,7 @@ class ftpFuseFAM (pluginFAM)  :
     def getdoc(self):
         """Returns a short documentation of this plugin.
         """
-        doc = _("FTP schema is: ftp://user:pass@server/anything")
+        doc = _("SFTP schema is like : sftp://user:pass@server/anything")
         return doc
 
     def checkifmounted(self, source, mountbase):
@@ -149,7 +149,7 @@ class ftpFuseFAM (pluginFAM)  :
         """
         Helper method that builds the name of the mount directory.
         """
-        dirname = "ftp_"
+        dirname = "sftp_"
         if spliturl.user :
             dirname += spliturl.user + "@"
         dirname += spliturl.server
@@ -165,7 +165,7 @@ class ftpFuseFAM (pluginFAM)  :
 
 class SplittedURL:
     """This will match the RE and give us a group like
-        ('ftp://', 'test:pass@', 'wattazoum-vm.ft.nn', 'ddd/kjlh/klhkl/vvvv')
+        ('sftp://', 'test:pass@', 'wattazoum-vm.ft.nn', 'ddd/kjlh/klhkl/vvvv')
         
         @param remote: the remote site address
         @type remote: String
@@ -177,10 +177,10 @@ class SplittedURL:
 
     def __init__(self, url):
 
-        exp = re.compile(ftpUrlRegex)
+        exp = re.compile(sftpUrlRegex)
         match = exp.search(url)
         if match is None:
-            raise FuseFAMException(_("Error matching the schema 'ftp://user:pass@server/anything' with '%s' (The '/' after server is mandatory)") % url)
+            raise FuseFAMException(_("Error matching the schema 'sftp://user:pass@server/anything' with '%s' (The '/' after server is mandatory)") % url)
 
         self.user = match.group(2)
         self.password = match.group(3)

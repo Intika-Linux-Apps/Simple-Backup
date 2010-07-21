@@ -28,6 +28,7 @@
 
 """
 
+#TODO: Clean up this module!
 
 from gettext import gettext as _
 import os
@@ -40,158 +41,11 @@ import re
 import signal
 
 import nssbackup
-from nssbackup.util import log
+from nssbackup.util import local_file_utils
 from nssbackup.util import exceptions
 from nssbackup.util import constants
 from nssbackup.util import structs
-from nssbackup.util import file_handling
-
-
-def nssb_copytree(src, dst, symlinks = False):
-    """mod of `shutil.copytree`. This doesn't fail if the
-    directory exists, it copies inside.
-
-    :param src: source path for copy operation
-    :param dst: destination
-    :param symlinks: copy symlinks?
-    :type src: string
-    :type dst: string
-
-    """
-    names = os.listdir(src)
-    if not os.path.exists(dst) :
-        os.makedirs(dst)
-    errors = []
-    for name in names:
-        srcname = os.path.join(src, name)
-        dstname = os.path.join(dst, name)
-        try:
-            if symlinks and os.path.islink(srcname):
-                linkto = os.readlink(srcname)
-                os.symlink(linkto, dstname)
-            elif os.path.isdir(srcname):
-                nssb_copytree(srcname, dstname, symlinks)
-            else:
-                shutil.copy2(srcname, dstname)
-            # XXX What about devices, sockets etc.?
-        except (IOError, os.error), why:
-            errors.append((srcname, dstname, str(why)))
-        # catch the Error from the recursive copytree so that we can
-        # continue with other files
-        except shutil.Error, err:
-            errors.extend(err.args[0])
-    try:
-        shutil.copystat(src, dst)
-    except OSError, why:
-        errors.extend((src, dst, str(why)))
-    if errors:
-        raise shutil.Error, errors
-
-
-# this function is no longer used
-# consider removing it
-#def nssb_move(src, dst):
-#    """
-#    mod of shutil.move that uses nssb_copytree
-#    """    
-#    try:
-#        os.rename(src, dst)
-#    except OSError:
-#        if os.path.isdir(src):
-#            if shutil.destinsrc(src, dst):
-#                raise shutil.Error, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
-#            nssb_copytree(src, dst, symlinks=True)
-#            shutil.rmtree(src)
-#        else:
-#            shutil.copy2(src,dst)
-#            os.unlink(src)
-
-
-def force_nssb_move(src, dst):
-    """Modified version of `shutil.move` that uses `nssb_copytree`
-    and even removes read-only files/directories.
-    """
-    try:
-        os.rename(src, dst)
-    except OSError:
-        if os.path.isdir(src):
-            if shutil.destinsrc(src, dst):
-                raise shutil.Error("Cannot move a directory '%s' into itself "\
-                                   "'%s'." % (src, dst))
-            nssb_copytree(src, dst, symlinks = True)
-            file_handling.force_delete(src)
-        else:
-            shutil.copy2(src, dst)
-            file_handling.force_delete(src)
-
-
-def nssb_copy(src, dst):
-    """Customized copy routine that copies the fileobject and afterwards
-    tries to copy the file permissions. If this fails a custom exception
-    is raised. The date and archive bit of the file is not copied. 
-    
-    @param src: an existing file that should be copied
-    @param dst: copy destination - an existing directory or full path to new file (the directory must exist too)
-                
-    @return: None
-    
-    @raise ChmodNotSupportedError: if the permissions could not be copied
-    """
-    prep_src, prep_dst = _prepare_nssb_copy(src, dst)
-    shutil.copyfile(prep_src, prep_dst)
-    try:
-        shutil.copymode(prep_src, prep_dst)
-    except OSError:
-        raise exceptions.ChmodNotSupportedError(\
-                        "Unable to change permissions of file '%s'." % prep_dst)
-
-
-def _prepare_nssb_copy(src, dst):
-    """Helper function that prepares the given paths for copying
-    using 'nssb_copy'.
-    
-    Source must be a file or symbolic link to a file!
-    
-    @todo: Implement test case for symbolic links!
-    """
-    # firstly the types are checked
-    if not isinstance(src, types.StringTypes):
-        raise TypeError("Given parameter must be a string. "\
-                        "Got %s instead." % (type(src)))
-    if not isinstance(dst, types.StringTypes):
-        raise TypeError("Given parameter must be a string. "\
-                        "Got %s instead." % (type(dst)))
-
-    # only absolute paths are supported
-    if not os.path.isabs(src):
-        raise ValueError("Given copy source '%s' must be absolute." % src)
-    if not os.path.isabs(dst):
-        raise ValueError("Given copy destination '%s' must be absolute." % dst)
-
-    # the source must be a file and exist
-    if not os.path.isfile(src):
-        raise IOError("Given copy source '%s' does not exist." % src)
-
-    _src_file = os.path.basename(src)
-    _src_dir = os.path.dirname(src)
-
-    if os.path.isdir(dst):
-        _dst_file = _src_file
-        _dst_dir = dst
-    elif dst.endswith(os.path.sep):
-        _dst_file = _src_file
-        _dst_dir = dst
-    else:
-        _dst_file = os.path.basename(dst)
-        _dst_dir = os.path.dirname(dst)
-
-    if not os.path.isdir(_dst_dir):
-        raise IOError("Given copy destination '%s' does not exist." % _dst_dir)
-
-    _dst_path = os.path.join(_dst_dir, _dst_file)
-    retval = (src, _dst_path)
-
-    return retval
+from nssbackup.util import log
 
 
 def __get_resource(resource_name, is_file = False):
@@ -294,6 +148,7 @@ def launch(cmd, opts, env = None):
     @todo: Implement a Singleton TAR launcher!
     """
     _logger = log.LogFactory.getLogger()
+
     # Create output log file
     outptr, outFile = tempfile.mkstemp(prefix = "output_")
 
@@ -311,10 +166,11 @@ def launch(cmd, opts, env = None):
     os.close(errptr)
     os.close(outptr)
 
-    outStr, errStr = file_handling.readfile(outFile), file_handling.readfile(errFile)
+    outStr = local_file_utils.readfile(outFile)
+    errStr = local_file_utils.readfile(errFile)
 
-    file_handling.delete(outFile)
-    file_handling.delete(errFile)
+    local_file_utils.delete(outFile)
+    local_file_utils.delete(errFile)
 
     return (outStr, errStr, retval)
 
@@ -717,10 +573,10 @@ class GenericBackendLauncherSingleton(object):
 
         os.close(errptr)    # Close log handles
         os.close(outptr)
-        self._stdout = file_handling.readfile(outfile)
-        self._stderr = file_handling.readfile(errfile)
-        file_handling.delete(outfile)
-        file_handling.delete(errfile)
+        self._stdout = local_file_utils.readfile(outfile)
+        self._stderr = local_file_utils.readfile(errfile)
+        local_file_utils.delete(outfile)
+        local_file_utils.delete(errfile)
 
         self._clear_proc()
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,11 +18,14 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import gettext, sys, os, traceback
 from gettext import gettext as _
-from nssbackup.util.log import LogFactory
-from nssbackup.managers.UpgradeManager import UpgradeManager
+import gettext
+import sys
+import os
 import traceback
+
+from nssbackup.util.log import LogFactory
+from nssbackup.core.UpgradeManager import UpgradeManager
 from nssbackup.util import get_resource_dir
 
 if __name__ == "__main__" :

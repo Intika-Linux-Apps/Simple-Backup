@@ -2,8 +2,8 @@
 #
 #    Simple Backup - Launcher script for backup program
 #
-#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,5 +34,4 @@ if __name__ == '__main__':
 
     from nssbackup.nssbackupd import main
     retc = main(sys.argv)
-    print "SBackupd exit code: `%s`" % retc
     sys.exit(retc)
