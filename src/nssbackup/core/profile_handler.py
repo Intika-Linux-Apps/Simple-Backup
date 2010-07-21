@@ -363,6 +363,7 @@ class BackupProfileHandler(object):
         """
         # Get the list of snapshots that matches the latest snapshot format
         listing = self.__snpman.get_snapshots()
+        agelimit = int(self.config.get("general", "maxincrement"))
 
         base = None
         if len(listing) == 0 :
@@ -375,11 +376,13 @@ class BackupProfileHandler(object):
             if listing[0].isfull() :  # Last backup was full backup
                 self.logger.debug("Last (%s) was a full backup" % listing[0].getName())
                 d = listing[0].getDate()
-                if (datetime.date.today() - datetime.date(d["year"], d["month"], d["day"])).days < self.config.get("general", "maxincrement") :
+                age = (datetime.date.today() - datetime.date(d["year"], d["month"], d["day"])).days
+                if  age < agelimit :
                     # Less than maxincrement days passed since that -> make an increment
+                    self.logger.info("Last full backup is %i days old < %s -> make inc backup" % (age, agelimit))
                     increment = True
                 else:
-                    self.logger.info("Last full backup is old -> make a full backup")
+                    self.logger.info("Last full backup is %i days old > %s -> make full backup" % (age, agelimit))
                     increment = False      # Too old -> make full backup
             else: # Last backup was an increment - lets search for the last full one
                 self.logger.debug(" Last snapshot (%s) was incremental. Lookup of latest full snapshot." % listing[0].getName())
@@ -387,7 +390,7 @@ class BackupProfileHandler(object):
                     if i.isfull():
                         d = i.getDate()
                         age = (datetime.date.today() - datetime.date(d["year"], d["month"], d["day"])).days
-                        if  age < int(self.config.get("general", "maxincrement")) :
+                        if  age < agelimit :
                             # Last full backup is fresh -> make an increment
                             self.logger.info("Last full backup is fresh (%d days old )-> make an increment" % age)
                             increment = True
