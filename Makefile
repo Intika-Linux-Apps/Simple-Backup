@@ -2,8 +2,8 @@
 #
 # GNU Makefile for NSsbackup
 #
-#   Copyright (c)2007-2010: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2010: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -29,9 +29,14 @@ VERSION=$(shell grep "^VERSION=" $(METAFILE)|cut -d "=" -f 2 -)
 PKGNAME=$(shell grep "^PKGNAME=" $(METAFILE)|cut -d "=" -f 2 -)
 
 #
-# retrieve used version of Python interpreter/path to Python interpreter
+# retrieve/determine used applications (version of Python interpreter...)
 #
 PYTHON=$(shell which python)
+gconftool=gconftool-2
+gconfd=gconfd-2
+
+gconfdpid=$(shell pgrep $(gconfd))
+export GCONF_CONFIG_SOURCE=$(shell if test -x "$(gconftool)"; then $(gconftool) --get-default-source; fi)
 
 #
 # available languages UI
@@ -43,16 +48,35 @@ PO=ar bg ca cs de en_GB es fi fr gl he hu id it lv ms nb nl oc pl pt pt_BR ru sv
 #
 HELPLANG=C
 
+#
+# definition of paths and filenames
 # installation into /usr/local to be compliant to GNU standards
-PREFIX=/usr/local
-DESTDIR=/usr/local
-DATADIR=$(DESTDIR)/share
-HELPDIR=$(DATADIR)/gnome/help/$(PKGNAME)
-LANGDIR=$(DATADIR)/locale
-BIN=$(DESTDIR)/bin
-SBIN=$(DESTDIR)/sbin
+#
+prefix=/usr/local
+
+destdir=$(prefix)
+datadir=$(destdir)/share
+helpdir=$(datadir)/gnome/help/$(PKGNAME)
+langdir=$(datadir)/locale
+bindir=$(destdir)/bin
+sbindir=$(destdir)/sbin
+gconf_schema_file_dir=$(datadir)/gconf/schemas
 dbus_system_conf_dir=/etc/dbus-1/system.d
 
+gconf_schema_file=apps_sbackup_global-preferences.schemas
+dbus_system_conf_file=org.sbackupteam.SimpleBackup.conf
+
+
+icondir=$(datadir)/icons
+gtk_update_icon_cache=if test "$(DISABLE_MAKEFILE_GTK_UPDATE_ICON_CACHE)" = ""; then \
+						gtk-update-icon-cache -f -t $(icondir)/hicolor; \
+						gtk-update-icon-cache -f -t $(icondir)/ubuntu-mono-light; \
+						gtk-update-icon-cache -f -t $(icondir)/ubuntu-mono-dark; fi
+
+
+#
+# additional options
+#
 SETUP.PY_OPTS=--root=/
 
 # should we add layout option always?
@@ -67,117 +91,174 @@ endif
 ifneq (,$(findstring 10.04,$(UbuntuVersion)))
     LAYOUT=--install-layout=deb
 endif
+ifneq (,$(findstring 10.10,$(UbuntuVersion)))
+    LAYOUT=--install-layout=deb
+endif
 
 
 default: po-data fill-templates
 
-all:
-
-install: install-po install-help install-bin install-sbin install-package install-conf
-	chmod +x $(BIN)/nssbackup*
-	chmod +x $(SBIN)/nssbackup*
-	chmod +x $(DATADIR)/nssbackup/multipleTarScript
-	chmod +x $(DATADIR)/nssbackup/nssbackup
-	chmod +x $(DATADIR)/nssbackup/nssbackup-notify
-
 fill-templates:
-	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/resources.in > src/nssbackup/resources
+	set -e; sed s+@prefix@+$(prefix)+ src/nssbackup/resources.in > src/nssbackup/resources
 
-	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-config.desktop.in > datas/nssbackup-config.desktop	
-	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-config-su.desktop.in > datas/nssbackup-config-su.desktop.tmp
-	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-config-su.desktop.tmp > datas/nssbackup-config-su.desktop
+	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-config.desktop.in > data/desktop/nssbackup-config.desktop	
+	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-config-su.desktop.in > data/desktop/nssbackup-config-su.desktop.tmp
+	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-config-su.desktop.tmp > data/desktop/nssbackup-config-su.desktop
 
-	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-restore.desktop.in > datas/nssbackup-restore.desktop	
-	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-restore-su.desktop.in > datas/nssbackup-restore-su.desktop.tmp
-	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-restore-su.desktop.tmp > datas/nssbackup-restore-su.desktop
+	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-restore.desktop.in > data/desktop/nssbackup-restore.desktop	
+	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-restore-su.desktop.in > data/desktop/nssbackup-restore-su.desktop.tmp
+	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-restore-su.desktop.tmp > data/desktop/nssbackup-restore-su.desktop
 
-	set -e; sed s+@prefix@+$(PREFIX)+ datas/nssbackup-notify.in > datas/nssbackup-notify.tmp
-	set -e; sed s+@python@+$(PYTHON)+ datas/nssbackup-notify.tmp > datas/nssbackup-notify
-	
 	set -e; sed s+@version@+$(VERSION)+ setup.py.in > setup.py.tmp
 	set -e; sed s+@pkgname@+$(PKGNAME)+ setup.py.tmp > setup.py
 	
 	set -e; sed s+@version@+$(VERSION)+ src/nssbackup/metainfo.in > src/nssbackup/metainfo.tmp
 	set -e; sed s+@pkgname@+$(PKGNAME)+ src/nssbackup/metainfo.tmp > src/nssbackup/metainfo
 	
-	rm -f datas/nssbackup-config-su.desktop.tmp
-	rm -f datas/nssbackup-restore-su.desktop.tmp
-	rm -f datas/nssbackup-notify.tmp
+	rm -f data/desktop/nssbackup-config-su.desktop.tmp
+	rm -f data/desktop/nssbackup-restore-su.desktop.tmp
+	rm -f data/desktop/nssbackup-notify.tmp
 	rm -f src/nssbackup/metainfo.tmp
 	rm -f setup.py.tmp
 
+
+install: install-po install-help install-bin install-sbin install-package install-data
+	chmod +x $(datadir)/nssbackup/multipleTarScript
+	chmod +x $(datadir)/nssbackup/nssbackup-launch
+	chmod +x $(datadir)/nssbackup/sbackup-dbusservice
+	chmod +x $(datadir)/nssbackup/sbackup-indicator
+	chmod +x $(datadir)/nssbackup/sbackup-progress
+	chmod +x $(datadir)/nssbackup/sbackup-terminate
+
 # application's binaries
 install-bin:
-	mkdir -p $(BIN)
-	cp -a scripts/nssbackupd.py $(BIN)/nssbackupd
-	cp -a scripts/nssbackup-config-gui.py $(BIN)/nssbackup-config-gui
-	cp -a scripts/nssbackup-restore-gui.py $(BIN)/nssbackup-restore-gui
-	cp -a scripts/nssbackup-upgrade-backups.py $(BIN)/nssbackup-upgrade-backups
+	mkdir -p $(bindir)
+	cp -a scripts/nssbackupd.py $(bindir)/nssbackupd
+	cp -a scripts/nssbackup-config-gui.py $(bindir)/nssbackup-config-gui
+	cp -a scripts/nssbackup-restore-gui.py $(bindir)/nssbackup-restore-gui
+	cp -a scripts/nssbackup-upgrade-backups.py $(bindir)/nssbackup-upgrade-backups
+	chmod +x $(bindir)/nssbackup*
 
 # Configuration and setup tools
 install-sbin:
-	mkdir -p $(SBIN)
-	cp -a scripts/nssbackupconfig.py $(SBIN)/nssbackupconfig
-	
+	mkdir -p $(sbindir)
+	cp -a scripts/nssbackupconfig.py $(sbindir)/nssbackupconfig
+	chmod +x $(sbindir)/nssbackup*
+
+# python package
 install-package:
-	$(PYTHON) setup.py install ${SETUP.PY_OPTS} --prefix=$(PREFIX) $(LAYOUT)
+	$(PYTHON) setup.py install ${SETUP.PY_OPTS} --prefix=$(prefix) $(LAYOUT)
 
+# localization
 install-po:
-	set -e; for lang in $(PO); do install -d $(LANGDIR)/$$lang/LC_MESSAGES/ ; done
-	set -e; for lang in $(PO); do install -m 644 po/$$lang/LC_MESSAGES/* $(LANGDIR)/$$lang/LC_MESSAGES/ ; done
+	set -e; for lang in $(PO); do install -d $(langdir)/$$lang/LC_MESSAGES/ ; done
+	set -e; for lang in $(PO); do install -m 644 po/$$lang/LC_MESSAGES/* $(langdir)/$$lang/LC_MESSAGES/ ; done
 
+# help/manual
 install-help:
-	install -d $(HELPDIR)
+	install -d $(helpdir)
 	set -e; for lang in $(HELPLANG); do \
-	install -d $(HELPDIR)/$$lang/; \
-	install -d $(HELPDIR)/$$lang/figures; \
-	install -m 644 help/$$lang/*.page $(HELPDIR)/$$lang/; \
-	install -m 644 help/$$lang/*.xml $(HELPDIR)/$$lang/; \
-	install -m 644 help/$$lang/figures/*.png $(HELPDIR)/$$lang/figures; \
+	install -d $(helpdir)/$$lang/; \
+	install -d $(helpdir)/$$lang/figures; \
+	install -m 644 help/$$lang/*.page $(helpdir)/$$lang/; \
+	install -m 644 help/$$lang/*.xml $(helpdir)/$$lang/; \
+	install -m 644 help/$$lang/figures/*.png $(helpdir)/$$lang/figures; \
 	done
+
+# additional data/configuration
+install-data: install-icons install-dbus install-gconf
+
+install-icons:
+# implement loop over icon files
+	install -D data/icons/hicolor/24x24/sbackup-panel.png $(icondir)/hicolor/24x24/apps/sbackup-panel.png
+	install -D data/icons/hicolor/24x24/sbackup-attention.png $(icondir)/hicolor/24x24/apps/sbackup-attention.png
+	install -D data/icons/hicolor/24x24/sbackup-success.png $(icondir)/hicolor/24x24/apps/sbackup-success.png
 	
-install-conf: install-dbus
+	install -D data/icons/ubuntu-mono-light/24/sbackup-panel.png $(icondir)/ubuntu-mono-light/apps/24/sbackup-panel.png
+	install -D data/icons/ubuntu-mono-light/24/sbackup-attention.png $(icondir)/ubuntu-mono-light/apps/24/sbackup-attention.png
+	install -D data/icons/ubuntu-mono-light/24/sbackup-success.png $(icondir)/ubuntu-mono-light/apps/24/sbackup-success.png
+
+	install -D data/icons/ubuntu-mono-dark/24/sbackup-panel.png $(icondir)/ubuntu-mono-dark/apps/24/sbackup-panel.png
+	install -D data/icons/ubuntu-mono-dark/24/sbackup-attention.png $(icondir)/ubuntu-mono-dark/apps/24/sbackup-attention.png
+	install -D data/icons/ubuntu-mono-dark/24/sbackup-success.png $(icondir)/ubuntu-mono-dark/apps/24/sbackup-success.png
+	
+	$(gtk_update_icon_cache)
 
 install-dbus:
-	install -m 644 datas/org.sbackupteam.SimpleBackup.conf $(dbus_system_conf_dir)
-	
+	install -m 644 data/$(dbus_system_conf_file) $(dbus_system_conf_dir)
 
+install-gconf:
+	install -m 644 data/$(gconf_schema_file) $(gconf_schema_file_dir)
+	if test "$(GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL)" = ""; then \
+	gconf-schemas --register $(gconf_schema_file_dir)/$(gconf_schema_file); \
+	if test "$(gconfdpid)";then killall $(gconfd); fi; \
+	fi
 
-
+#
 # targets for un-installation
-uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-cron uninstall-help
+#
+uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-help clean-crondata
 
 uninstall-bin:
-	rm -f $(BIN)/nssbackupd
-	rm -f $(BIN)/nssbackup-config-gui
-	rm -f $(BIN)/nssbackup-restore-gui
-	rm -f $(BIN)/nssbackup-upgrade-backups
+	rm -f $(bindir)/nssbackupd
+	rm -f $(bindir)/nssbackup-config-gui
+	rm -f $(bindir)/nssbackup-restore-gui
+	rm -f $(bindir)/nssbackup-upgrade-backups
 
 uninstall-sbin:
-	rm -f $(SBIN)/nssbackupconfig
+	rm -f $(sbindir)/nssbackupconfig
 
 uninstall-package:
-	rm -rf $(DESTDIR)/lib/python*/*/nssbackup*
+	rm -rf $(destdir)/lib/python*/*/nssbackup*
 
-uninstall-conf: uninstall-dbus
+uninstall-data: uninstall-icons uninstall-dbus uninstall-gconf
+	rm -f $(datadir)/pixmaps/nssbackup-restore.png
+	rm -f $(datadir)/pixmaps/nssbackup-conf.png
+	rm -f $(datadir)/pixmaps/nssbackup.png
+	rm -f $(datadir)/pixmaps/nssbackup32x32.png
+	
+	rm -f $(datadir)/applications/nssbackup-config.desktop
+	rm -f $(datadir)/applications/nssbackup-restore.desktop
+	rm -f $(datadir)/applications/nssbackup-config-su.desktop
+	rm -f $(datadir)/applications/nssbackup-restore-su.desktop
+	
+	rm -rf $(datadir)/nssbackup
+	rm -rf $(datadir)/doc/nssbackup
+	set -e; find $(langdir) -name nssbackup.mo -exec rm -f '{}' \;
+
+uninstall-icons:
+# implement loop over icon files
+	rm -f $(icondir)/hicolor/24x24/apps/sbackup-panel.png
+	rm -f $(icondir)/ubuntu-mono-light/apps/24/sbackup-panel.png
+	rm -f $(icondir)/ubuntu-mono-dark/apps/24/sbackup-panel.png
+
+	rm -f $(icondir)/hicolor/24x24/apps/sbackup-attention.png
+	rm -f $(icondir)/ubuntu-mono-light/apps/24/sbackup-attention.png
+	rm -f $(icondir)/ubuntu-mono-dark/apps/24/sbackup-attention.png
+
+	rm -f $(icondir)/hicolor/24x24/apps/sbackup-success.png
+	rm -f $(icondir)/ubuntu-mono-light/apps/24/sbackup-success.png
+	rm -f $(icondir)/ubuntu-mono-dark/apps/24/sbackup-success.png
+
+	$(gtk_update_icon_cache)
 
 uninstall-dbus:
-	rm -f $(dbus_system_conf_dir)/org.sbackupteam.SimpleBackup.conf
+	rm -f $(dbus_system_conf_dir)/$(dbus_system_conf_file)
 
-uninstall-data:
-	rm -f $(DATADIR)/pixmaps/nssbackup-restore.png
-	rm -f $(DATADIR)/pixmaps/nssbackup-conf.png
-	rm -f $(DATADIR)/pixmaps/nssbackup.png
-	rm -f $(DATADIR)/pixmaps/nssbackup32x32.png
-	rm -f $(DATADIR)/applications/nssbackup-config.desktop
-	rm -f $(DATADIR)/applications/nssbackup-restore.desktop
-	rm -f $(DATADIR)/applications/nssbackup-config-su.desktop
-	rm -f $(DATADIR)/applications/nssbackup-restore-su.desktop
-	rm -rf $(DATADIR)/nssbackup
-	rm -rf $(DATADIR)/doc/nssbackup
-	set -e; find $(LANGDIR) -name nssbackup.mo -exec rm -f '{}' \;
-	
-uninstall-cron:
+#FIXME: proper handling in postinst?
+uninstall-gconf:
+	if test "$(GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL)" = ""; then \
+		if test -r "$(gconf_schema_file_dir)/$(gconf_schema_file)"; then \
+			gconf-schemas --unregister $(gconf_schema_file_dir)/$(gconf_schema_file); \
+		fi; \
+		if test "$(gconfdpid)";then killall $(gconfd); fi; \
+		rm -f $(gconf_schema_file_dir)/$(gconf_schema_file); \
+	fi
+#	rm -f $(gconf_schema_file_dir)/$(gconf_schema_file)
+
+
+# remove script/symlinks from cron directory
+clean-crondata:
 	rm -f /etc/cron.d/nssbackup
 	rm -f /etc/cron.hourly/nssbackup
 	rm -f /etc/cron.daily/nssbackup
@@ -185,21 +266,26 @@ uninstall-cron:
 	rm -f /etc/cron.monthly/nssbackup
 
 uninstall-help:
-	rm -rf $(HELPDIR)
-	
+	rm -rf $(helpdir)
+
+#
+#
+#
 reinstall: uninstall install
 
+#
+#
+#
 clean:
 	set -e; find . -name '*.pyc' -exec rm -f '{}' \;
 	set -e; find . -name '*~' -exec rm -f '{}' \;
 	set -e; find . -name '*.bak' -exec rm -f '{}' \;
 	rm -rf build dist setup.py
 	
-	rm -f datas/nssbackup-config-su.desktop
-	rm -f datas/nssbackup-config.desktop
-	rm -f datas/nssbackup-restore-su.desktop
-	rm -f datas/nssbackup-restore.desktop
-	rm -f datas/nssbackup-notify
+	rm -f data/desktop/nssbackup-config-su.desktop
+	rm -f data/desktop/nssbackup-config.desktop
+	rm -f data/desktop/nssbackup-restore-su.desktop
+	rm -f data/desktop/nssbackup-restore.desktop
 	
 	rm -f src/nssbackup/resources
 	rm -f src/nssbackup/metainfo
@@ -227,10 +313,10 @@ show-infos:
 	@echo "  layout       : "$(LAYOUT)
 	@echo
 	@echo "Directories"
-	@echo "  PREFIX      : "$(PREFIX)
-	@echo "  DESTDIR     : "$(DESTDIR)
-	@echo "  DATADIR     : "$(DATADIR)
-	@echo "  HELPDIR     : "$(HELPDIR)
-	@echo "  LANGDIR     : "$(LANGDIR)
-	@echo "  BIN         : "$(BIN)
-	@echo "  SBIN        : "$(SBIN)
+	@echo "  prefix      : "$(prefix)
+	@echo "  destdir     : "$(destdir)
+	@echo "  datadir     : "$(datadir)
+	@echo "  helpdir     : "$(helpdir)
+	@echo "  langdir     : "$(langdir)
+	@echo "  bindir         : "$(bindir)
+	@echo "  sbindir        : "$(sbindir)

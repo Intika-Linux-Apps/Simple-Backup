@@ -26,6 +26,15 @@ endif
 ifneq (,$(findstring 10.04,$(UbuntuVersion)))
     LAYOUT=--install-layout=deb
 endif
+ifneq (,$(findstring 10.10,$(UbuntuVersion)))
+    LAYOUT=--install-layout=deb
+endif
+
+
+# don't register gconf schemas nor update icon cache -> postinst
+export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
+export DISABLE_MAKEFILE_GTK_UPDATE_ICON_CACHE=1
+
 
 clean:
 	dh_testdir
@@ -44,6 +53,7 @@ build-stamp:
 
 	# Add here commands to compile the package.
 	# Debian uses, contrary to GNU standards, the /usr instead of /usr/local
+	
 	$(MAKE) PREFIX=/usr
 
 	touch build-stamp
@@ -70,7 +80,7 @@ binary-common:
 	dh_testroot
 	dh_installchangelogs ChangeLog
 	dh_installdocs
-	dh_installexamples $(CURDIR)/datas/nssbackup.conf.example
+	dh_installexamples $(CURDIR)/data/nssbackup.conf.example
 	dh_installman
 	dh_installmenu
 	dh_link

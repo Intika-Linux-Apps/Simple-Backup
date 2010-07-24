@@ -8,7 +8,6 @@ Installation from Package (the easy way)
 
 Include PPA
 ~~~~~~~~~~~
-
 * If you use Debian or Ubuntu, try apt-get:
  * Install the nssbackup team repository 
   * deb http://ppa.launchpad.net/nssbackup-team/ubuntu intrepid main
@@ -21,13 +20,11 @@ Include PPA
 
 Installation
 ~~~~~~~~~~~~
-
  * sudo apt-get install nssbackup
 
 
 Uninstalling
 ~~~~~~~~~~~~
-
 * If installed via apt: 'sudo apt-get remove nssbackup'
 
 
@@ -36,23 +33,21 @@ Installation from source code
 
 Prerequist
 ~~~~~~~~~~
-
 python (>=2.5)
 pygnome
 pyglade
 pynotify
-fuse
-python-pexpect
-sshfs (for ssh plugin)
-curlftpfs (for ftp and sftp plugins)
 gettext
 python-setuptools
 pyGTK (>= 2.10)
+fuse (for fuse plugins)
+python-pexpect (for ssh fuse plugin)
+sshfs (for ssh plugin)
+curlftpfs (for ftp and sftp fuse plugins)
 
 
 Installation
 ~~~~~~~~~~~~
-
 By default, nssbackup will be installed under "/usr/local" folder.
 
 * Install python and python-gnome2 libraries, fuse-utils and pynotify.
@@ -71,7 +66,7 @@ By default, nssbackup will be installed under "/usr/local" folder.
 
 Uninstalling
 ~~~~~~~~~~~~
-
+* Walk into the source code directory from where the application was installed
 * type 'sudo make uninstall' in the source code folder
 * type 'sudo make clean' in the source code folder
 * you can now remove the source code folder

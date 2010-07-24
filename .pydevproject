@@ -6,7 +6,7 @@
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/nssbackup-devel/src</path>
 <path>/nssbackup-devel/tests</path>
-<path>/nssbackup-devel/datas</path>
+<path>/nssbackup-devel/scripts</path>
 </pydev_pathproperty>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
 </pydev_project>

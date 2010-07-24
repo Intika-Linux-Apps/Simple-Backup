@@ -1,3 +1,15 @@
+nssbackup (0.3.0ppa1~lucid1) lucid; urgency=high
+
+  * new version
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Fri, 23 Jul 2010 23:18:32 +0200
+
+nssbackup (0.2.1ppa1~lucid1) lucid; urgency=high
+
+  * [FIX] LP Bug #588878: Backup unsuccessful due to wrong exit code handling
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 03 Jun 2010 23:55:47 +0200
+ 
 nssbackup (0.2.0ppa1~lucid3) lucid; urgency=high
 
   * [Fix] LP Bug #573733: nssbackup does not prevent itself from running in

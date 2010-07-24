@@ -1092,9 +1092,6 @@ Please enter the new profile name and set the according checkbox in order to ena
               <widget class="GtkToolbar" id="toolbar">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="toolbar_style">both-horiz</property>
-                <property name="icon_size">2</property>
-                <property name="icon_size_set">True</property>
                 <child>
                   <widget class="GtkToolButton" id="toolb_set_default_settings">
                     <property name="visible">True</property>
@@ -1147,7 +1144,7 @@ Please enter the new profile name and set the according checkbox in order to ena
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkToolButton" id="backup">
+                  <widget class="GtkToolButton" id="tbtn_backup">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <property name="tooltip" translatable="yes">Make a backup now</property>
@@ -1175,7 +1172,7 @@ Please enter the new profile name and set the according checkbox in order to ena
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                     <property name="tooltip" translatable="yes">Open the profile manager</property>
                     <property name="label" translatable="yes">Profiles</property>
-                    <property name="stock_id">gtk-home</property>
+                    <property name="stock_id">gtk-copy</property>
                     <signal name="clicked" handler="on_prfManager_activate"/>
                   </widget>
                   <packing>

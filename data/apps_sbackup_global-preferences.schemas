@@ -1,0 +1,24 @@
+<gconfschemafile>
+  <schemalist>
+
+    <!-- Keep the defaults in sync with the emergency fallbacks -->
+
+    <!-- General preferences -->
+
+    <schema>
+      <key>/schemas/apps/sbackup/global-preferences/fs_backend</key>
+      <applyto>/apps/sbackup/global-preferences/fs_backend</applyto>
+      <owner>sbackup</owner>
+      <type>string</type>
+      <default>GIO</default>
+      <locale name="C">
+         <short>What filesystem backend to use for.</short>
+         <long>
+          If set to "GIO", then the GIO/GVFS backend is used for access of files and directories including remote destinations.
+          If set to "FUSE", then Python's native filesystem functions in conjuction with FUSE plugins for access of remote destinations are used.
+         </long>
+      </locale>
+    </schema>
+
+  </schemalist>  
+</gconfschemafile>
