@@ -27,6 +27,7 @@
 """
 
 
+import glib
 import gconf
 
 
@@ -54,8 +55,9 @@ class Preferences(object):
 
         _value = self._get_value(key)
         if _value is None:
+            # return default and set default in database (if possible)                        
             self._set_value(key, _PREFS_DEFAULTS[key])
-            _value = self._get_value(key)
+            _value = _PREFS_DEFAULTS[key]
 
         return _value
 
@@ -64,16 +66,21 @@ class Preferences(object):
         _value = None
 
         if _type == gconf.VALUE_STRING:
-            _value = self._client.get_string(key)
             try:
+                _value = self._client.get_string(key)
                 _value = _value.lower()
+            except glib.GError, error:
+                print "Error while getting gconf setting: %s\nDefault value is used." % error
             except AttributeError:
                 pass
-
         return _value
 
     def _set_value(self, key, value):
         _type = _PREFS_TYPES[key]
 
         if _type == gconf.VALUE_STRING:
-            self._client.set_string(key, value)
+            try:
+                if self._client.key_is_writable(key):
+                    self._client.set_string(key, value)
+            except glib.GError, error:
+                print "Error while setting gconf value: %s\nError can be safely ignored: setting is not being changed." % error

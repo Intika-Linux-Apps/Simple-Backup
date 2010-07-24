@@ -122,6 +122,9 @@ from nssbackup.util import log
 from nssbackup.util import system
 
 
+__LAUNCHER_NAME_CRON = "nssbackup"
+
+
 def is_default_profile(conffile):
     """Checks whether the given configuration file corresponds to the
     default profile.
@@ -1026,26 +1029,26 @@ class ConfigManager(ConfigParser.ConfigParser):
             else:
                 if self.has_option("schedule", "cron") :
                     self.logger.debug("Saving Cron entries")
-                    local_file_utils.writetofile("/etc/cron.d/nssbackup",
+                    local_file_utils.writetofile("/etc/cron.d/%s" % __LAUNCHER_NAME_CRON,
                                     self.__make_cronfile_content())
 
                 if self.has_option("schedule", "anacron"):
                     self.logger.debug("Saving Anacron entries")
                     if self.get("schedule", "anacron") == "hourly":
                         os.symlink(self.__servicefile,
-                                    "/etc/cron.hourly/nssbackup")
+                                    "/etc/cron.hourly/%s" % __LAUNCHER_NAME_CRON)
 
                     elif self.get("schedule", "anacron") == "daily":
                         os.symlink(self.__servicefile,
-                                    "/etc/cron.daily/nssbackup")
+                                    "/etc/cron.daily/%s" % __LAUNCHER_NAME_CRON)
 
                     elif self.get("schedule", "anacron") == "weekly":
                         os.symlink(self.__servicefile,
-                                    "/etc/cron.weekly/nssbackup")
+                                    "/etc/cron.weekly/%s" % __LAUNCHER_NAME_CRON)
 
                     elif self.get("schedule", "anacron") == "monthly":
                         os.symlink(self.__servicefile,
-                                    "/etc/cron.monthly/nssbackup")
+                                    "/etc/cron.monthly/%s" % __LAUNCHER_NAME_CRON)
                     else :
                         self.logger.warning("'%s' is not a valid value" \
                                             % self.get("schedule", "anacron"))
@@ -1227,30 +1230,21 @@ class ConfigurationFileHandler(object):
 
     def get_user_confdir(self):
         """Get the user config dir using the XDG specification.
-        :todo: Use the constants defined in `ConfigManagerStaticData`!
-        
         """
         if self.__super_user:
-            confdir = "/etc/"
-        else :
-            confdir = os.sep.join([os.getenv("XDG_CONFIG_DIR",
-                        os.path.normpath(os.sep.join([os.getenv("HOME"), ".config"]))),
-                            "nssbackup/"])
-        if not os.path.exists(confdir) :
-            os.makedirs(confdir)
-
+            confdir = local_file_utils.normpath("/etc")
+        else:
+            confdir = local_file_utils.normpath(system.get_user_config_dir(), "nssbackup")
+        if not local_file_utils.path_exists(confdir) :
+            local_file_utils.makedirs(confdir)
         return confdir
 
     def get_user_datadir(self):
         """Get the user datas dir using the XDG specification.
-        :todo: Use the constants defined in `ConfigManagerStaticData`!    
-        
         """
-        datadir = os.sep.join([os.getenv("XDG_DATA_HOME",
-                    os.path.normpath(os.sep.join([os.getenv("HOME"), ".local", "share"]))),
-                        "nssbackup/"])
-        if not os.path.exists(datadir) :
-            os.makedirs(datadir)
+        datadir = local_file_utils.normpath(system.get_user_data_dir(), "nssbackup")
+        if not local_file_utils.path_exists(datadir) :
+            local_file_utils.makedirs(datadir)
         return datadir
 
     def get_user_tempdir(self):
@@ -1296,6 +1290,8 @@ class ConfigManagerStaticData(object):
     @todo: Refactor this class into a class containing a default
             configuration, one containing name definitions, and one
             containing path and file names.
+            
+    :todo: Simplify and use properties!
     
     """
     __cronheader = "SHELL=/bin/bash \n"\
@@ -1654,7 +1650,7 @@ class _DefaultConfigurationForUsers(_DefaultConfiguration):
         self._mountdir = os.path.join(_hdl.get_user_datadir(), "mountdir")
         self._target = os.path.join(_hdl.get_user_datadir(), "backups")
 
-        self._dirconf = {    os.getenv("HOME") + os.sep        : '1' }
+        self._dirconf = { "%s%s" % (system.get_user_home_dir(), os.sep) : '1' }
 
         self._logdir = os.path.join(_hdl.get_user_datadir(), "log")
 

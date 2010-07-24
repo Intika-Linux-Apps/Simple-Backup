@@ -41,9 +41,8 @@ from nssbackup.ui import misc
 
 class INotifyMixin(object):
     """Mix-in class that provides the displaying of notifications using the
-    pynotify module. The notifications use the icon 'nssbackup32x32.png'.
+    pynotify module.
     
-    :todo: It would be more general if we give the icon to use as parameter!    
     """
     def __init__(self, logger, iconfile, trayicon = None):
         pass
@@ -82,9 +81,7 @@ class INotifyMixin(object):
 
 class PyNotifyMixin(INotifyMixin):
     """Mix-in class that provides the displaying of notifications using the
-    pynotify module. The notifications use the icon 'nssbackup32x32.png'.
-    
-    :todo: It would be more general if we give the icon to use as parameter!    
+    pynotify module.    
     """
     def __init__(self, logger, iconfile, trayicon = None):
         """Default constructor.

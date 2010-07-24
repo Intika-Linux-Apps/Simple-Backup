@@ -76,8 +76,18 @@ TERMINATE_FILE = "sbackup-terminate"
 BACKUP_COMMAND = "nssbackupd"
 BACKUP_PROCESS_NAME = "Simple Backup Process"
 
+
+# icon filenames
 DEFAULT_ICON_FILENAME = "nssbackup.png"
 NOTIFICATION_ICON_FILENAME = "nssbackup32x32.png"
+CONFIG_ICON_FILENAME = "nssbackup-conf.png"
+RESTORE_ICON_FILENAME = "nssbackup-restore.png"
+
+# icon names (must be registered before using)
+INDICATOR_ATTENTION_ICON = "sbackup-attention"
+INDICATOR_ACTIVE_ICON = "sbackup-panel"
+INDICATOR_SUCCESS_ICON = "sbackup-success"
+
 
 # default values for environment variable if not set
 # see: http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html

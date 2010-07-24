@@ -46,6 +46,7 @@ from nssbackup.fs_backend import fam
 
 from nssbackup.util import exceptions
 from nssbackup.util import pathparse
+from nssbackup.util import constants
 
 
 sys.excepthook = misc.except_hook
@@ -110,7 +111,7 @@ class SBconfigGTK(GladeGnomeApp):
                                widget_list = gtk_rsrc.get_configgui_widgets(),
                                handlers = gtk_rsrc.get_configgui_handlers())
 
-        self.__get_application_widget().set_icon_from_file(Util.get_resource_file("nssbackup-conf.png"))
+        gtk.window_set_default_icon_from_file(Util.get_resource_file(constants.CONFIG_ICON_FILENAME))
 
         # hide the schedule tab if not root
         if not system.is_superuser():

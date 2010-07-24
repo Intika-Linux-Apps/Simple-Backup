@@ -660,6 +660,6 @@ def get_session_name():
         gnome_found = False
 
     if gnome_found and kde_found:
-        raise AssertionError("Unable to get desktop session: Gnome and KDE found")
+        raise AssertionError("Unable to get non-ambiguous desktop session: Gnome *and* KDE found")
 
     return session

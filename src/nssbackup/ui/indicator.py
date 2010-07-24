@@ -41,8 +41,8 @@ class SBackupdIndicator(SBackupdIndicatorBase, PyNotifyMixin):
 
         self.logger = LogFactory.getLogger()
         self._indicator = appindicator.Indicator(constants.INDICATORAPP_NAME,
-                                                  "sbackup-normal-mono",
-                                                  appindicator.CATEGORY_APPLICATION_STATUS)
+                                                 constants.INDICATOR_ACTIVE_ICON,
+                                                 appindicator.CATEGORY_APPLICATION_STATUS)
 
         PyNotifyMixin.__init__(self, logger = self.logger,
                                iconfile = util.get_resource_file(constants.NOTIFICATION_ICON_FILENAME),
@@ -61,7 +61,7 @@ class SBackupdIndicator(SBackupdIndicatorBase, PyNotifyMixin):
 
     def __init_ctrls(self):
         self._indicator.set_status(appindicator.STATUS_ACTIVE)
-        self._indicator.set_attention_icon("system-restart-panel")
+        self._indicator.set_attention_icon(constants.INDICATOR_ATTENTION_ICON)
 
         self._build_menu()
 # TODO: Add option to dictionary: show item initially.
@@ -75,14 +75,14 @@ class SBackupdIndicator(SBackupdIndicatorBase, PyNotifyMixin):
 #                self._menuitems[_item].show()
 
     def set_status_to_normal(self):
-        self._indicator.set_icon("sbackup-normal-mono")
+        self._indicator.set_icon(constants.INDICATOR_ACTIVE_ICON)
         self._indicator.set_status(appindicator.STATUS_ACTIVE)
 
     def set_status_to_attention(self):
         self._indicator.set_status (appindicator.STATUS_ATTENTION)
 
     def set_status_to_finished(self):
-        self._indicator.set_icon("audacious-panel")
+        self._indicator.set_icon(constants.INDICATOR_SUCCESS_ICON)
 
 
 def main(options):

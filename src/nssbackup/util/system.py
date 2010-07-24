@@ -23,6 +23,9 @@ import grp
 import subprocess
 import types
 
+import glib
+
+
 from nssbackup.util import readline_nullsep
 
 
@@ -86,6 +89,22 @@ CLEAN_ENVIRONMENT = {
     "KDE_SESSION_UID" : "",
     "QT_PLUGIN_PATH" : ""
     }
+
+
+def get_user_home_dir():
+    return os.path.expanduser('~')
+
+
+def get_user_config_dir():
+#    _confdir = os.getenv("XDG_CONFIG_DIR", os.path.normpath(os.path.join(os.getenv("HOME"), ".config")))
+    _confdir = glib.get_user_config_dir()
+    return _confdir
+
+
+def get_user_data_dir():
+#    _datadir = os.getenv("XDG_DATA_HOME", os.path.normpath(os.path.join(os.getenv("HOME"), ".local", "share")))
+    _datadir = glib.get_user_data_dir()
+    return _datadir
 
 
 def get_pid():
