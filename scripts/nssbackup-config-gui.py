@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-
-#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
+#
+#    Simple Backup - Launcher script for configuration GUI
+#
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,21 +20,25 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import gettext, sys
-from nssbackup.ui.SBConfigGTK import main
-from nssbackup.util import get_resource_dir
-import gtk
-import gtk.glade
-
 if __name__ == '__main__':
-    # i18n init
-    application = 'nssbackup'
-    locale_dir = get_resource_dir('locale')
 
+    import sys
+
+    from nssbackup.util import system
+    system.set_default_environment()
+    system.set_display_from_session()
+
+    from nssbackup.util import get_locale_dir, get_locale_domain
+    application = get_locale_domain()
+    locale_dir = get_locale_dir()
+
+    import gettext
     gettext.bindtextdomain(application, locale_dir)
     gettext.textdomain(application)
 
+    import gtk, gtk.glade
     gtk.glade.bindtextdomain(application, locale_dir)
     gtk.glade.textdomain(application)
 
+    from nssbackup.ui.SBConfigGTK import main
     main(sys.argv)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#    Simple Backup - Launcher script for backup program
+#    Simple Backup - Launcher script for actual backup application
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -23,6 +23,10 @@
 if __name__ == '__main__':
 
     import sys
+
+    from nssbackup.util import system
+    system.set_default_environment()
+    system.set_display_from_session()
 
     from nssbackup.util import get_locale_dir, get_locale_domain
     application = get_locale_domain()

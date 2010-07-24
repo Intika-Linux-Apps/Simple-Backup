@@ -33,6 +33,12 @@ COMMAND_GREP = "grep"
 COMMAND_PS = "ps"
 
 
+# default values for environment variable if not set
+# see: http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
+ENVVAR_XDG_DATA_DIRS = "XDG_DATA_DIRS"
+DEFAULT_XDG_DATA_DIRS = "/usr/local/share/:/usr/share/"
+
+
 CLEAN_ENVIRONMENT = {
 # default Gnome environment 
     "_" : "",
@@ -178,7 +184,7 @@ def switch_user(uid_name):
 
     final_uid = os.getuid()
     final_gid = os.getgid()
-    print 'drop_privileges: running as %s/%s' % \
+    print 'drop privileges: running as %s/%s' % \
     (pwd.getpwuid(final_uid).pw_name,
     grp.getgrgid(final_gid).gr_name)
 
@@ -199,9 +205,24 @@ def set_grp(groupname):
 def very_nice():
     os.nice(20)
 
+
 def get_environment():
     _env = os.environ
     return _env
+
+
+def set_default_environment():
+    """Sets required environment variables to their specified default
+    values if not defined. This can happen e.g. some root shells where
+    no environment variable for the freedesktop.org base directories
+    are defined.
+    
+    """
+    var = ENVVAR_XDG_DATA_DIRS
+    defval = DEFAULT_XDG_DATA_DIRS
+    val = os.environ.get(var)
+    if val is None:
+        os.environ[var] = defval
 
 
 def get_process_environment(pid):
@@ -211,8 +232,8 @@ def get_process_environment(pid):
         fobj = open(_envfile, "rb")
         _envlst = [_var for _var in readline_nullsep(fobj)]
         fobj.close()
-    except IOError, error:
-        print "Unable to open Gnome session environment:\n%s" % str(error)
+    except (OSError, IOError), error:
+        print "Unable to open Gnome session environment: %s." % error
         _envlst = None
 
     _env = None
@@ -236,6 +257,30 @@ def get_clean_environment():
         if _val != "":
             _clean_env[_var] = _val
     return _clean_env
+
+
+def set_display_from_session():
+    key = 'DISPLAY'
+    _display = os.environ.get(key)
+    print "Display: `%s`" % _display
+    if _display is None:
+        _session = get_session_name()
+        _env = get_session_environment(_session)
+        if _env is not None:
+            _ndisplay = _env.get(key)
+            print "Updating %s to: %s" % (key, _ndisplay)
+            if _ndisplay is not None:
+                os.environ[key] = _ndisplay
+
+
+def get_session_name():
+    _session = ""
+    if grep_pid("gnome-session") is not None:
+        _session = "gnome"
+    elif grep_pid("ksmserver") is not None:
+        _session = "kde"
+#TODO: Cover other DEs (LXDE, KDE...) here and above!
+    return _session
 
 
 def get_session_environment(session):

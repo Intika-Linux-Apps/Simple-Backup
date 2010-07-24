@@ -1,4 +1,4 @@
-#    Simple Backup - definition of common constants
+#    Simple Backup - definition of common constants related to SBackup
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -28,19 +28,19 @@ import signal
 ONE_SECOND = 1
 ONE_SECOND_IN_MILLISEC = 1000
 
-TIMEOUT_RETRY_TARGET_CHECK_SECONDS = 60
+TIMEOUT_RETRY_TARGET_CHECK_SECONDS = 180
 INTERVAL_RETRY_TARGET_CHECK_SECONDS = 5
 
 INDICATOR_LAUNCH_PAUSE_SECONDS = 5
 TIMEOUT_INDICATOR_QUIT_SECONDS = 11 # timeout before quitting the indicator app
 
-DBUS_CHECK_INTERVAL_SECONDS = 5
-DBUS_RECONNECT_INTERVAL_SECONDS = 5
-AUTOEXIT_TIMEOUT_SECONDS = 10
-AUTOEXIT_CHECK_INTERVAL_SECONDS = 10
+DBUS_CHECK_INTERVAL_SECONDS = 120
+DBUS_RECONNECT_INTERVAL_SECONDS = 120
+AUTOEXIT_TIMEOUT_SECONDS = 240
+AUTOEXIT_CHECK_INTERVAL_SECONDS = 240
 
 
-INTERVAL_UNREGISTER_DEAD_CONN = 300000  # milliseconds
+INTERVAL_UNREGISTER_DEAD_CONN = 600000  # milliseconds
 DBUS_SERVICE_QUIT_PAUSE = 500
 
 
@@ -87,12 +87,6 @@ RESTORE_ICON_FILENAME = "nssbackup-restore.png"
 INDICATOR_ATTENTION_ICON = "sbackup-attention"
 INDICATOR_ACTIVE_ICON = "sbackup-panel"
 INDICATOR_SUCCESS_ICON = "sbackup-success"
-
-
-# default values for environment variable if not set
-# see: http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
-ENVVAR_XDG_DATA_DIRS = "XDG_DATA_DIRS"
-DEFAULT_XDG_DATA_DIRS = "/usr/local/share/:/usr/share/"
 
 
 # used in module `util`

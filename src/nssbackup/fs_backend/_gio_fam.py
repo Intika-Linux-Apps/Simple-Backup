@@ -76,7 +76,6 @@ class GioTargetHandler(interfaces.ITargetHandler):
 
     def get_destination(self):
         _path = self._dest.uri
-        print "Destination: %s" % _path
         return _path
 
     def is_local(self):
@@ -137,7 +136,7 @@ class GioTargetHandler(interfaces.ITargetHandler):
         """Callback method that gets called when mounting is finished.
         Takes errors occurred during the mount process as parameter.
         """
-        print ">>> gio_fam._mount_cb"
+#        print ">>> gio_fam._mount_cb"
         try:
             if error is None:
                 _eff_path = self.get_eff_path()
@@ -169,17 +168,17 @@ class GioTargetHandler(interfaces.ITargetHandler):
 
         if error is None:
             self._is_initialized = True
-        print "End of gio_fam._mount_cb"
+#        print "End of gio_fam._mount_cb"
 
     def _umount_cb(self, error):
-        print ">>> gio_fam._umount_cb"
+#        print ">>> gio_fam._umount_cb"
         self._in_progress = False # release lock
         if self._terminate_callback is not None:
             self._logger.debug("Calling additional callback in gio_fam: %s" % self._terminate_callback)
             self._terminate_callback(error)
 
         self._is_initialized = False
-        print "End of gio_fam._umount_cb"
+#        print "End of gio_fam._umount_cb"
 
     def get_eff_path(self):
         _eff_path = self._dest_mount_hdl.get_eff_path()

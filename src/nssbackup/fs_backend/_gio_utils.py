@@ -245,7 +245,7 @@ class GioMountHandler(object):
         return _eff_path
 
     def mount(self):
-        print "Begin of GioMountHandler.mount"
+#        print "Begin of GioMountHandler.mount"
         if self.__uri is None:
             raise ValueError("No URI set")
         path = self.__uri.query_mount_uri()
@@ -261,7 +261,7 @@ class GioMountHandler(object):
         else:
             self._do_mount(_gfileobj)
 
-        print "End of GioMountHandler.mount"
+#        print "End of GioMountHandler.mount"
 
     def umount(self, overwrite_require = False):
         if self.__uri is None:
@@ -292,7 +292,7 @@ class GioMountHandler(object):
                 if self.__umount_finish_callback is not None:
                     self.__umount_finish_callback(error = None)
 
-        print "End of GioMountHandler.umount"
+#        print "End of GioMountHandler.umount"
 
     def _do_mount(self, gfileobj):
         self.__logger.debug("begin of hdl._do_mount")
@@ -300,11 +300,11 @@ class GioMountHandler(object):
         self.__ask_password_cnt = 0
         op.connect('ask-password', self._ask_password_cb)
         try:
-            print "Now calling: mount_enclosing_volume"
+#            print "Now calling: mount_enclosing_volume"
             gfileobj.mount_enclosing_volume(op, self._mount_done_cb)
-            print "mount_enclosing_volume was called"
+#            print "mount_enclosing_volume was called"
             if self.__mainloop is not None:
-                print "run loop"
+#                print "run loop"
                 self.__mainloop.run()
         except gio.Error, error:
             self.__logger.error(get_gio_errmsg(error, "Error in `_do_mount`"))
@@ -312,7 +312,7 @@ class GioMountHandler(object):
         except glib.GError, error:
             self.__logger.error(str(error))
             raise exceptions.RemoteMountFailedError(str(error))
-        print "End of hdl._do_mount"
+#        print "End of hdl._do_mount"
 
     def _do_umount(self, gfileobj):
         _mount = self._get_mount(gfileobj)
@@ -344,7 +344,7 @@ class GioMountHandler(object):
             except glib.GError, error:
                 self.__logger.error(str(error))
                 raise exceptions.RemoteUmountFailedError(str(error))
-        print "End of hdl._do_umount"
+#        print "End of hdl._do_umount"
 
     def _mount_done_cb(self, obj, res):
         self.__logger.debug("Begin of hdl._mount_done_cb")
@@ -371,7 +371,7 @@ class GioMountHandler(object):
         if self.__mount_finish_callback is not None:
             self.__logger.debug("Calling additional callback")
             self.__mount_finish_callback(error)
-        print "End of hdl._mount_done_cb"
+#        print "End of hdl._mount_done_cb"
 
     def _umount_done_cb(self, obj, res, gfile):
         self.__logger.debug("umount done")
@@ -399,7 +399,7 @@ class GioMountHandler(object):
             self.__logger.debug("Calling additional callback")
             self.__umount_finish_callback(error)
 
-        print "End of hdl._umount_done_cb"
+#        print "End of hdl._umount_done_cb"
 
     def test_path(self):
         if self.__uri is None:

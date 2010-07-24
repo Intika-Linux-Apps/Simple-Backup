@@ -419,9 +419,7 @@ class SBackupApp(object):
         # when running in empty environment, it is impossible to connect to D-Bus session server 
         if session == "":
             print "No DE found using D-Bus. Looking for process id."
-            if system.grep_pid("gnome-session") is not None:
-                session = "gnome"
-#TODO: Cover other DEs (LXDE, KDE...) here and above!
+            session = system.get_session_name()
 
         mod_env = system.get_session_environment(session)
 

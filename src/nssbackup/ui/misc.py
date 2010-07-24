@@ -20,7 +20,6 @@
 
 from gettext import gettext as _
 
-import os
 import gtk
 import pango
 import types
@@ -86,18 +85,6 @@ def open_uri(uri, timestamp = 0):
         except ImportError:
             pass
 
-def set_default_environment():
-    """Sets required environment variables to their specified default
-    values if not defined. This can happen e.g. some root shells where
-    no environment variable for the freedesktop.org base directories
-    are defined.
-    
-    """
-    var = constants.ENVVAR_XDG_DATA_DIRS
-    defval = constants.DEFAULT_XDG_DATA_DIRS
-    val = os.getenv(var)
-    if val is None:
-        os.putenv(var, defval)
 
 def label_set_autowrap(widget):
     """Make labels automatically re-wrap if their containers are resized.

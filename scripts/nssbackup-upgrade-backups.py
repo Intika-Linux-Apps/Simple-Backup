@@ -18,23 +18,25 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-from gettext import gettext as _
-import gettext
-import sys
-import os
-import traceback
+if __name__ == "__main__":
 
-from nssbackup.util.log import LogFactory
-from nssbackup.core.UpgradeManager import UpgradeManager
-from nssbackup.util import get_resource_dir
+    import sys
+    import os
 
-if __name__ == "__main__" :
-    # i18n init
-    application = 'nssbackup'
-    locale_dir = get_resource_dir('locale')
+    from nssbackup.util import system
+    system.set_default_environment()
+    system.set_display_from_session()
 
+    from nssbackup.util import get_locale_dir, get_locale_domain
+    application = get_locale_domain()
+    locale_dir = get_locale_dir()
+
+    import gettext
     gettext.bindtextdomain(application, locale_dir)
     gettext.textdomain(application)
+
+    from gettext import gettext as _
+    from nssbackup.core.UpgradeManager import UpgradeManager
 
     if not len(sys.argv) in [2]:
         print _("""
@@ -53,5 +55,7 @@ Use simple-restore-gnome for more ease of use.
         path = os.path.abspath(sys.argv[1])
         u.upgradeAll(path)
     except Exception, e :
-            LogFactory.getLogger().error(str(e))
-            LogFactory.getLogger().error(traceback.format_exc())
+        import traceback
+        from nssbackup.util.log import LogFactory
+        LogFactory.getLogger().error(str(e))
+        LogFactory.getLogger().error(traceback.format_exc())

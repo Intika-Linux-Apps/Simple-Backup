@@ -22,8 +22,6 @@ import gtk.glade
 import gnome
 import gnome.ui # required by GnomeAppBar
 
-import nssbackup.ui.misc
-
 
 def search_file(filename, search_path):
 
@@ -77,8 +75,6 @@ class GladeGnomeApp(object):
         pull_down_dict: a dictionary that maps combo names to a tuple of
             strings to put in the combo
         '''
-        nssbackup.ui.misc.set_default_environment()
-
         self.widget_list = widget_list
 
         try:
