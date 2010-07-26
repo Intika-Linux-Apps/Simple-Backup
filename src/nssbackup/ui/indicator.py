@@ -69,10 +69,6 @@ class SBackupdIndicator(SBackupdIndicatorBase, PyNotifyMixin):
         for _item in self._menuitems:
             self._menuitems[_item].show()
         self._show_showdialogs_menuitem()
-#            if _item == "show_windows":
-#                pass
-#            else:
-#                self._menuitems[_item].show()
 
     def set_status_to_normal(self):
         self._indicator.set_icon(constants.INDICATOR_ACTIVE_ICON)

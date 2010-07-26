@@ -142,8 +142,7 @@ class PyNotifyMixin(INotifyMixin):
                     self.__notif.show()
                 except gobject.GError, exc:
                     # Connection to notification-daemon failed 
-                    self.logger.warning("Connection to notification-daemon "\
-                                        "failed: " + str(exc))
+                    self.logger.warning(_("Connection to notification-daemon failed: %s") % str(exc))
 
     def _notify_warning(self, profilename, message):
         """Shows up a pop-up window to inform the user. The notification
@@ -190,8 +189,7 @@ class PyNotifyMixin(INotifyMixin):
                     notif.show()
                 except gobject.GError, exc:
                     # Connection to notification-daemon failed 
-                    self.logger.warning("Connection to notification-daemon "\
-                                        "failed: " + str(exc))
+                    self.logger.warning(_("Connection to notification-daemon failed: %s") % str(exc))
 
     def __get_notification(self, profilename, message):
         """Returns a notification object but does not display it. The
@@ -219,8 +217,7 @@ class PyNotifyMixin(INotifyMixin):
                 notif = self.__pynotif_mod.Notification(title, message, self.__iconfile)
             except gobject.GError, exc:
                 # Connection to notification-daemon failed 
-                self.logger.warning("Connection to notification-daemon "\
-                                    "failed: " + str(exc))
+                self.logger.warning(_("Connection to notification-daemon failed: %s") % str(exc))
                 notif = None
         return notif
 
@@ -242,8 +239,7 @@ class PyNotifyMixin(INotifyMixin):
                 self.__notif.update(title, message, self.__iconfile)
             except gobject.GError, exc:
                 # Connection to notification-daemon failed 
-                self.logger.warning("Connection to notification-daemon "\
-                                    "failed: " + str(exc))
+                self.logger.warning(_("Connection to notification-daemon failed: %s") % str(exc))
                 self.__notif = None
 
     def __get_notification_title(self, profilename):
@@ -306,7 +302,7 @@ class SBackupdIndicatorBase(INotifyMixin):
     def _build_menu(self):
         _status_msg = self._indicator_hdl.get_unknown_menu_label()
         _menuitems = ({ "name"      : "title",
-                        "title"     : "Simple Backup",
+                        "title"     : _("Simple Backup"),
                         "type"      : "MenuItem",
                         "sensitive" : True,
                         "handler"   : { "activate" : self.on_about_clicked }},
@@ -380,7 +376,6 @@ class SBackupdIndicatorBase(INotifyMixin):
             else:
                 raise ValueError("Unknown item type '%s'." % _item["type"])
 
-
     def _set_menuitems_status(self, func, *args):
         _status_msg = func(*args)
         for _item in _status_msg:
@@ -439,7 +434,7 @@ class SBackupdIndicatorBase(INotifyMixin):
                 self._indicator_hdl.dbus_reconnect()
                 self._indicator_hdl.test_dbus_validity()
                 if self._indicator_hdl.is_dbus_valid():
-                    self.logger.info("re-connection was successful")
+                    self.logger.info(_("re-connection was successful"))
                     self._connect_dbus_signal_handlers()
                     # get new values here
                     self._init_dbus_check_timer()
@@ -532,8 +527,7 @@ class SBackupdIndicatorBase(INotifyMixin):
             self._set_cancel_sensitive(sensitive = False)
 
         elif event == 'needupgrade':
-            msg = _("There are snapshots with old snapshot format."\
-                    " Please upgrade these if you want to use them.")
+            msg = _("There are snapshots with old snapshot format. Please upgrade these using the Restoration tool if you want to use them.")
         else:
             self.logger.warning(_("Unknown D-Bus event `%s` received.") % (event))
 
@@ -554,7 +548,6 @@ class SBackupdIndicatorBase(INotifyMixin):
         if not isinstance(dialog, gtk.Window):
             raise TypeError("GTK window expected.")
         if dialog not in self._current_dialogs:
-#            raise ValueError("Given dialog is already stored.")
             self._current_dialogs.append(dialog)
         self._show_showdialogs_menuitem()
 
@@ -647,7 +640,7 @@ class SBackupdIndicatorBase(INotifyMixin):
                 dialog.present()
                 dialog.set_keep_above(False)
             except AttributeError, error:
-                self.logger.warning("Unable to present window: %s" % error)
+                self.logger.warning(_("Unable to present window: %s") % error)
 
     def on_about_clicked(self, *args): #IGNORE:W0613
         misc.show_about_dialog()
@@ -792,18 +785,15 @@ class SBackupdIndicatorHandler(object):
         self._space_required = self._sbackupd_dbus_obj.get_space_required()
 
     def cancel_backup(self):
-        """
-        :todo: Return result of the cancellation!
-        """
         res = True
         pid = self._sbackupd_dbus_obj.get_backup_pid()
-        self.logger.info("PID of backup process being canceled: %s" % pid)
+        self.logger.info(_("PID of backup process being canceled: %s") % pid)
         if pid != constants.PID_UNKNOWN:
             term_script = util.get_resource_file(constants.TERMINATE_FILE)
             _ret = system.exec_command_returncode([term_script, str(pid)])
             if _ret != 0:
-                self.logger.info("Unable to send signal to process %s" % pid)
-                self.logger.info("Sending signal using gksu to process %s" % pid)
+                self.logger.info(_("Unable to send signal to process %s") % pid)
+                self.logger.info(_("Sending signal using gksu to process %s") % pid)
                 descr = _("Cancel Backup")
                 _ret = system.exec_command_returncode(["gksu", "--description", descr, term_script, str(pid)])
                 if _ret != 0:
@@ -1013,7 +1003,7 @@ def main(options, indicator_class):
         gtk.init_check()
     except RuntimeError, error:
         gtk_avail = False
-        print "Initialization of GTK+ failed: %s" % error
+        print _("Initialization of GTK+ failed: %s") % error
 
     if gtk_avail:
         sbdgui = SBackupdIndicatorApp(options)

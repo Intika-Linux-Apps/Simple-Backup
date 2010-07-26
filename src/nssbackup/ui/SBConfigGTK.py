@@ -47,6 +47,7 @@ from nssbackup.fs_backend import fam
 from nssbackup.util import exceptions
 from nssbackup.util import pathparse
 from nssbackup.util import constants
+from nssbackup.util import local_file_utils
 
 
 sys.excepthook = misc.except_hook
@@ -719,23 +720,6 @@ class SBconfigGTK(GladeGnomeApp):
         # No match found
         return False
 
-#    def cell_remoteinc_edited_callback(self, cell, path, new_text, data):
-#        # Check if new path is empty
-#        if (new_text == None) or (new_text == ""):
-#            dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR,
-#                        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-#                        buttons = gtk.BUTTONS_CLOSE,
-#                        message_format = _("Empty filename or path. Please enter a valid filename or path."))
-#            dialog.run()
-#            dialog.destroy()
-#            return
-#
-#        model, section, value = data
-#        self.configman.remove_option(section, model[path][0])
-#        model[path][0] = new_text
-#        self.configman.set(section, "remote", {new_text: value})
-#        self.isConfigChanged()
-
     def cell_regex_edited_callback(self, cell, path, new_text):
         # Check if new path is empty
         if Util.is_empty_regexp(new_text):
@@ -794,7 +778,8 @@ class SBconfigGTK(GladeGnomeApp):
             self.widgets["ftype_custom_ex"].set_sensitive(True)
 
     def on_ftype_st_box_changed(self, *args): #IGNORE:W0613
-        print("TODO: on_ftype_st_box_changed")
+#TODO: on_ftype_st_box_changed
+#        print("TODO: on_ftype_st_box_changed")
         pass
 
     def on_save_activate(self, *args): #IGNORE:W0613
@@ -1067,7 +1052,6 @@ class SBconfigGTK(GladeGnomeApp):
 
         elif self.widgets["dest3"].get_active():
             self.__enable_target_option("remote")
-#            self.on_dest_remote_changed()
             if self.__destination_uri_obj is not None:
                 _uri = self.__destination_uri_obj.uri
                 self.configman.set("general", "target", _uri)
@@ -1197,7 +1181,7 @@ class SBconfigGTK(GladeGnomeApp):
 
     def on_txtfld_custom_cronline_changed(self, *args):
         _cronline = self.widgets['txtfld_custom_cronline'].get_text()
-        print "WE MUST CHECK THE INPUT!"
+#        print "WE MUST CHECK THE INPUT!"
 #TODO: WE MUST CHECK THE INPUT!
         self.configman.setSchedule(1, _cronline)
         self.isConfigChanged()
@@ -1390,7 +1374,6 @@ class SBconfigGTK(GladeGnomeApp):
                 adding it is required?
         """
         (store, iter) = self.ex_ftypetv.get_selection().get_selected()
-#        print "store: '%s', iter: '%s'" % (store, iter)
         if store and iter:
             value = store.get_value(iter, 1)
             r = self.configman.get("exclude", "regex")
@@ -1435,7 +1418,6 @@ class SBconfigGTK(GladeGnomeApp):
                     misc.show_errdialog(parent = self.__get_application_widget(),
                             message_str = \
                                 _("Provided regular expression is not valid."))
-
         else:
             pass
         self.isConfigChanged()
@@ -1569,7 +1551,6 @@ class SBconfigGTK(GladeGnomeApp):
 
         _servmodel = _service_b.get_model()
         for _idx in range(len(_servmodel)):
-#            print _servmodel[_idx]
             if _servmodel[_idx][misc.MODEL_COLUMN_INDEX_KEY] == _rservice:
                 _sidx = _idx
                 break
@@ -1585,7 +1566,7 @@ class SBconfigGTK(GladeGnomeApp):
         response = dialog.run()
 
         if response == gtk.RESPONSE_APPLY:
-            self.logger.info("Connect to remote destination")
+            self.logger.info(_("Connect to remote destination"))
 
             _sidx = _service_b.get_active()
             _rservice = _servmodel[_sidx][misc.MODEL_COLUMN_INDEX_KEY]
@@ -1625,7 +1606,7 @@ class SBconfigGTK(GladeGnomeApp):
             _icon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)
 
         else:
-            self.logger.error("Unexpected dialog response: %s" % response)
+            self.logger.error(_("Unexpected dialog response: %s") % response)
             gobject.idle_add(self.__show_connect_remote_dialog)
 
     def _mount_done_cb(self, error):
@@ -1633,7 +1614,7 @@ class SBconfigGTK(GladeGnomeApp):
         dialog = self.widgets["dialog_connect_remote"]
 
         if error is None:
-            self.logger.info("Mount was sucessful (no errors)")
+            self.logger.info(_("Mount was sucessful (no errors)"))
             gobject.idle_add(self._do_remote_tests)
         else:
             misc.unset_cursor(dialog)
@@ -1653,7 +1634,7 @@ class SBconfigGTK(GladeGnomeApp):
         dialog = self.widgets["dialog_connect_remote"]
 
         if error is None:
-            self.logger.info("Umount was sucessful (no errors)")
+            self.logger.info(_("Umount was sucessful (no errors)"))
         else:
             misc.unset_cursor(dialog)
 
@@ -1693,7 +1674,7 @@ class SBconfigGTK(GladeGnomeApp):
 
     def _do_remote_tests(self):
         error = None
-        self.logger.info("Perfom tests on remote host")
+        self.logger.info(_("Perfom tests on remote host"))
         dialog = self.widgets["dialog_connect_remote"]
         try:
             self.__destination_hdl.test_destination()
@@ -1710,7 +1691,7 @@ class SBconfigGTK(GladeGnomeApp):
             misc.set_watch_cursor(dialog)
             self.__destination_failure = True
         else:
-            self.logger.info("All tests passed")
+            self.logger.info(_("All tests passed"))
 
         self.__destination_hdl.set_terminate_callback(self._umount_done_cb)
         gobject.idle_add(self.__destination_hdl.terminate)
@@ -1829,7 +1810,9 @@ class SBconfigGTK(GladeGnomeApp):
             self.__terminate_app()
 
     def on_ftype_custom_ex_changed(self, *args):
-        print("TODO: on_ftype_custom_ex_changed")
+#TODO: on_ftype_custom_ex_changed
+#        print("TODO: on_ftype_custom_ex_changed")
+        pass
 
     def on_prfManager_activate(self, *args):
         """Launch Profile manager dialog
@@ -1843,13 +1826,15 @@ class SBconfigGTK(GladeGnomeApp):
     def on_addProfileButton_clicked(self, *args):
         valid_input = False
         prf_set = False
-        while not valid_input:
-            prfDir = self.__configFileHandler.get_user_confdir() + "nssbackup.d/"
-            if not os.path.exists(prfDir):
-                os.makedirs(prfDir)
 
-            dialog = self.widgets['askNewPrfNameDialog']
-            dialog.set_title("")
+        prfDir = local_file_utils.normpath(self.__configFileHandler.get_user_confdir(), "nssbackup.d")
+        if not os.path.exists(prfDir):
+            os.makedirs(prfDir)
+
+        dialog = self.widgets['askNewPrfNameDialog']
+        dialog.set_title("")
+
+        while not valid_input:
             response = dialog.run()
             dialog.hide()
 
@@ -1857,7 +1842,7 @@ class SBconfigGTK(GladeGnomeApp):
                 enable = self.widgets['enableNewPrfCB'].get_active()
                 prfName = self.widgets['newPrfNameEntry'].get_text()
                 prfName = prfName.strip()
-                prfConf = self.__configFileHandler.get_user_confdir() + "nssbackup.d/nssbackup-" + prfName + ".conf"
+                prfConf = local_file_utils.normpath(prfDir, "nssbackup-%s.conf" % prfName)
                 prfConfDisabled = "%s-disable" % prfConf
 
                 if not prfName or prfName is '':
@@ -1892,18 +1877,15 @@ class SBconfigGTK(GladeGnomeApp):
 #            print "Adding of profile canceled."
 
     def on_removeProfileButton_clicked(self, *args):
-
         tm, iter = self.profilestv.get_selection().get_selected()
 
-        if not iter :
-            dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR, flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = _("Please select a Profile !"))
-            dialog.run()
-            dialog.destroy()
+        if iter is None:
+            _show_errmsg_no_profile_selected()
             return
 
         prfName, prfConf = tm.get_value(iter, 1), tm.get_value(iter, 2)
         if prfName == ConfigManagerStaticData.get_default_profilename():
-            _forbid_default_profile_removal(_("remove"))
+            _forbid_default_profile_removal()
         else :
             warning = _("<b>Delete configuration profile?</b>\n\nYou are trying to remove a configuration profile. You will not be able to restore it. If you are not sure, use the 'enable|disable' functionality instead.\n\nDo you really want to delete the profile '%(name)s'?") % {'name': prfName}
             dialog = gtk.MessageDialog(type = gtk.MESSAGE_WARNING, flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_YES_NO)
@@ -1922,10 +1904,8 @@ class SBconfigGTK(GladeGnomeApp):
 
     def on_editProfileButton_clicked(self, *args):
         tm, iter = self.profilestv.get_selection().get_selected()
-        if not iter :
-            dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR, flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = _("Please select a Profile !"))
-            dialog.run()
-            dialog.destroy()
+        if iter is None:
+            _show_errmsg_no_profile_selected()
             return
         prfName, prfConf = tm.get_value(iter, 1), tm.get_value(iter, 2)
         self.logger.debug("Load Profile '%s' configuration" % prfName)
@@ -1945,15 +1925,13 @@ class SBconfigGTK(GladeGnomeApp):
     def on_prfEnableCB_toggled(self, *args):
 
         tm, iter = self.profilestv.get_selection().get_selected()
-        if not iter :
-            dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR, flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = _("Please select a Profile !"))
-            dialog.run()
-            dialog.destroy()
+        if iter is None:
+            _show_errmsg_no_profile_selected()
             return
         enable, prfName, prfConf = tm.get_value(iter, 0), tm.get_value(iter, 1), tm.get_value(iter, 2)
 
         if prfName == ConfigManagerStaticData.get_default_profilename():
-            _forbid_default_profile_removal(_("disable"))
+            _forbid_default_profile_disable()
         else :
             dir, file = prfConf.rsplit(os.sep, 1)
 
@@ -1992,13 +1970,13 @@ class SBconfigGTK(GladeGnomeApp):
         response = dialog.run()
         dialog.hide()
         if response == gtk.RESPONSE_APPLY:
-            self.logger.info("Default settings are being applied.")
+            self.logger.info(_("Default settings are being applied."))
             self._set_default_settings()
         elif response == gtk.RESPONSE_CANCEL or \
              response == gtk.RESPONSE_DELETE_EVENT:
             pass
         else:
-            self.logger.error("Unexpected dialog response: %s" % response)
+            self.logger.error(_("Unexpected dialog response: %s") % response)
             raise ValueError("Unexpected dialog response: %s" % response)
 
     def _set_default_settings(self):
@@ -2006,23 +1984,45 @@ class SBconfigGTK(GladeGnomeApp):
         values for some usecase) for the current profile.
         """
         # implementation note: the values are set in the configuration
-        #     manager and afterwards the according UI widgets are updated
-        #    with these new values.
+        # manager and afterwards the according UI widgets are updated
+        # with these new values.
         self.configman.set_values_to_default()
-        # filesystem is not probed, we want to set new values
+        # filesystem is not probed since we want to apply *new* values
         self._fill_widgets_from_config(probe_fs = False)
 
 
-def _forbid_default_profile_removal(action):
+def _forbid_default_profile_removal():
     """Helper function that shows an info box which states that we are
     not able to do the given action on the default profile.    
     """
-    info = _("<b>Unable to remove default profile</b>\n\nYou cannot %s the default profile. In the case you want to use just a single profile, please set up the default profile accordingly.") % action
+    info = _("<b>Unable to remove default profile</b>\n\nThe default profile cannot be removed. In the case you want to use just a single profile, please set up the default profile accordingly.")
 
     dialog = gtk.MessageDialog(type = gtk.MESSAGE_INFO,
                     flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                     buttons = gtk.BUTTONS_CLOSE)
     dialog.set_markup(info)
+    dialog.run()
+    dialog.destroy()
+
+
+def _forbid_default_profile_disable():
+    """Helper function that shows an info box which states that we are
+    not able to do the given action on the default profile.    
+    """
+    info = _("<b>Unable to remove default profile</b>\n\nThe default profile cannot be disabled. In the case you want to use just a single profile, please set up the default profile accordingly.")
+
+    dialog = gtk.MessageDialog(type = gtk.MESSAGE_INFO,
+                    flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                    buttons = gtk.BUTTONS_CLOSE)
+    dialog.set_markup(info)
+    dialog.run()
+    dialog.destroy()
+
+
+def _show_errmsg_no_profile_selected():
+    dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR,
+                               flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                               buttons = gtk.BUTTONS_CLOSE, message_format = _("Please select a profile."))
     dialog.run()
     dialog.destroy()
 

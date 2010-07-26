@@ -55,6 +55,7 @@ import nssbackup.ar_backend.tar as TAR
 from nssbackup.pkginfo import Infos
 from nssbackup.util import exceptions
 from nssbackup.util import tasks
+from nssbackup.util import constants
 from nssbackup.util import local_file_utils
 from nssbackup.ar_backend.tar import Dumpdir
 
@@ -85,7 +86,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                              parent = parent,
                              pull_down_dict = None)
         self.set_top_window(self.widgets[gtk_rsrc.RESTOREGUI_TOPWINDOW])
-        self.top_window.set_icon_from_file(Util.get_resource_file("nssbackup-restore.png"))
+        gtk.window_set_default_icon_from_file(Util.get_resource_file(constants.RESTORE_ICON_FILENAME))
 
         # setup progress bar
         ProgressbarMixin.__init__(self, self.widgets['progressbar'])
@@ -169,7 +170,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         return False
 
     def __set_destination(self, path):
-        self._make_topwin_busy(True, "Connect to destination...")
+        self._make_topwin_busy(True, _("Connect to destination..."))
         self.__clear_calendar()
 
         try:
@@ -182,7 +183,6 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self._show_destination_error(error)
 
     def __set_destination_done_cb(self, error):
-#        print ">>> __set_destination_done_cb - error: %s" % error
         if error is not None:
             gobject.idle_add(self._make_topwin_busy, False)
             self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error            
@@ -194,7 +194,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.target = self.__fam_target_hdl.get_eff_path()
         if self.__fam_target_hdl.dest_eff_path_exists() is False: # no errors so far
             self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error            
-            gobject.idle_add(self._show_destination_error, "Specified path does not exist")
+            gobject.idle_add(self._show_destination_error, _("Specified path does not exist"))
             self.__fam_target_hdl.set_terminate_callback(self._set_dest_failed_cb)
             gobject.idle_add(self.__fam_target_hdl.terminate)
         else:
@@ -316,8 +316,6 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.snplisttreestore.clear()
         self.flisttreestore.clear()
         self.widgets['box_management'].set_sensitive(False)
-#        self.widgets['buttonspool'].set_sensitive(False)
-#        self.widgets['snpdetails'].set_sensitive(False)
 
     def on_defaultradiob_toggled(self, *args): #IGNORE:W0613
         self._apply_defaultradiob_state()
@@ -335,7 +333,6 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         elif self.widgets['customradiob'].get_active() :
             if self._defaultdest_active:
                 self._defaultdest_active = False
-#                print "Custom destination selected"
 
     def _default_fam_term_cb(self, error):
         if error is not None:
@@ -351,12 +348,11 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         gobject.idle_add(self.__set_destination, self.__default_destination_path)
 
     def on_customapply_clicked(self, *args): #IGNORE:W0613
-        """
-        Reload all backup info from a custom location
+        """Reload all backup info from a custom location
         """
         _ntarget = self.widgets["customentry"].get_text()
         if _ntarget == "":
-            gobject.idle_add(self._show_destination_error, "No destination specified")
+            gobject.idle_add(self._show_destination_error, _("No destination specified"))
 
         else:
             if self.__fam_target_hdl.is_initialized() and\
@@ -390,7 +386,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self.widgets['snpmanExpander'].set_expanded(False)
             self.widgets['box_management'].set_sensitive(False)
 
-            self._make_topwin_busy(True, "Reading snapshots...")
+            self._make_topwin_busy(True, _("Reading snapshots..."))
             _date = self.widgets['calendar'].get_date()
             gobject.idle_add(self.load_snapshotslist, _date)
 #            _task = tasks.WorkerThread(self.load_snapshotslist)
@@ -551,8 +547,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         
         @return: None
         """
-        _statbar_msgid = self.__send_statusbar_msg(\
-                                                _("Reading backup snapshot..."))
+        _statbar_msgid = self.__send_statusbar_msg(_("Reading backup snapshot..."))
         self._start_pulse()
         _task = tasks.WorkerThread(self.currSnpFilesInfos.getFirstItems)
         _task.set_finish_callback(gobject.idle_add, self.__show_filestree,
@@ -571,7 +566,6 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.snplisttreestore.clear()
         self.flisttreestore.clear()
 
-#        gobject.idle_add(self.widgets['box_management'].set_sensitive, True)
         gobject.idle_add(self.widgets['buttonspool'].set_sensitive, False)
         gobject.idle_add(self.widgets['snpdetails'].set_sensitive, True)
 
@@ -591,7 +585,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             if iter:
                 self.currentSnp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter, 0)))
                 if self.currentSnp.getVersion() != Infos.SNPCURVERSION:
-                    message = _("The snapshot version is not supported (Just %(supportedversion)s is supported). Version '%(currentversion)s' found. You should upgrade it. ") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
+                    message = _("Snapshot version is not supported (Only %(supportedversion)s is supported). Version '%(currentversion)s' found. You should upgrade it. ") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
                     self.logger.warning(message)
                     dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = message)
                     dialog.run()
@@ -727,7 +721,6 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
         self.__clean_statusbar_msg(_statbar_msgid)
 
-#        print "Result: %s (%s)" % (_result, type(_result))
         if isinstance(_result, Exception):
             self.logger.error(str(_result))
             self.__restore_dialog.finish_failure(_result)
@@ -737,7 +730,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
     def on_snpmanExpander_activate(self, *args):
         if not self.widgets['snpmanExpander'].get_expanded():
             if self.currentSnp:
-                self._make_topwin_busy(True, "Reading snapshot...")
+                self._make_topwin_busy(True, _("Reading snapshot..."))
                 _ver = self.currentSnp.getVersion()
                 self._make_topwin_busy(False)
                 if _ver == Infos.SNPCURVERSION:
@@ -746,7 +739,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 #                        self.widgets["RebaseBox"].hide()
 #                    else:
 #                        self.widgets["RebaseBox"].show()
-                    self.widgets["txt_current_base"].set_text("%s" % self.currentSnp.getBase())
+                    self.widgets["txt_current_base"].set_text(str(self.currentSnp.getBase()))
                     self.widgets["deleteBox"].show()
                 elif _ver < Infos.SNPCURVERSION :
                     self.widgets["upgradeBox"].show()
@@ -767,16 +760,13 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
     def on_upgradeButton_clicked(self, *args):
         um = UpgradeManager()
-#        self.timer = gobject.timeout_add (100, self.status_callback, um.getStatus)
         try:
             um.upgradeSnapshot(self.currentSnp)
         except Exception, _exc:
-            _message_str = "While attempting to upgrade "\
-                 "snapshot the following error occurred:\n"\
-                 "%s" % str(_exc)
+            _message_str = _("While attempting to upgrade snapshot the following error occurred:\n%s")\
+                                % str(_exc)
             _boxtitle = _("(Not So) Simple Backup restoration error")
-            _headline_str = \
-            _("Unable to upgrade snapshot")
+            _headline_str = _("Unable to upgrade snapshot")
             gobject.idle_add(self._show_errmessage,
                               _message_str, _boxtitle,
                               _headline_str)
@@ -803,7 +793,6 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                     response = dialog.run()
                     dialog.destroy()
                     if response == gtk.RESPONSE_YES:
-#                        self.timer = gobject.timeout_add (100, self.status_callback, self.snpman.getStatus)
                         self.snpman.rebaseSnapshot(self.currentSnp, snp)
                 except Exception, e:
                     self.logger.error(str(e))
@@ -847,7 +836,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
     def gtk_main_quit(self, *args):
 
-        self._make_topwin_busy(True, "Termination in progress")
+        self._make_topwin_busy(True, _("Termination in progress"))
         try:
             self.__fam_target_hdl.set_terminate_callback(self._term_fam_done_cb)
             self.__fam_target_hdl.terminate()
@@ -863,10 +852,10 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
     """
 
     __messages = \
-      { "restore"     : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
+      { "restore"     : { "dialog_titletxt": _("(Not So) Simple Backup restoration"),
                          "msg_headline"    : _("<b>Restoring of selected files</b>"),
                          "msg_progress"    : _("Restoring of <tt>'%s'</tt> is in progress."),
-                         "msg_sucess"         : _("Restoring of <tt>'%s'</tt> was successful."),
+                         "msg_sucess"      : _("Restoring of <tt>'%s'</tt> was successful."),
                          "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not successful.\n\nFollowing error occurred:\n") },
 
         "restore_as" : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
@@ -878,7 +867,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
         "revert"     : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
                          "msg_headline"    : _("<b>Reverting selected files</b>"),
                          "msg_progress"    : _("Reverting of <tt>'%s'</tt> is in progress.\n"),
-                         "msg_sucess"         : _("Reverting of <tt>'%s'</tt> was successful."),
+                         "msg_sucess"      : _("Reverting of <tt>'%s'</tt> was successful."),
                          "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not successful.\n\nFollowing error occurred:\n") },
 
         "revert_as"     : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
