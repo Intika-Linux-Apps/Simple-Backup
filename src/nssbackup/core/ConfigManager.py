@@ -122,7 +122,7 @@ from nssbackup.util import log
 from nssbackup.util import system
 
 
-__LAUNCHER_NAME_CRON = "nssbackup"
+_LAUNCHER_NAME_CRON = "nssbackup"
 
 
 def is_default_profile(conffile):
@@ -1026,26 +1026,26 @@ class ConfigManager(ConfigParser.ConfigParser):
             else:
                 if self.has_option("schedule", "cron") :
                     self.logger.debug("Saving Cron entries")
-                    local_file_utils.writetofile("/etc/cron.d/%s" % __LAUNCHER_NAME_CRON,
+                    local_file_utils.writetofile("/etc/cron.d/%s" % _LAUNCHER_NAME_CRON,
                                     self.__make_cronfile_content())
 
                 if self.has_option("schedule", "anacron"):
                     self.logger.debug("Saving Anacron entries")
                     if self.get("schedule", "anacron") == "hourly":
                         os.symlink(self.__servicefile,
-                                    "/etc/cron.hourly/%s" % __LAUNCHER_NAME_CRON)
+                                    "/etc/cron.hourly/%s" % _LAUNCHER_NAME_CRON)
 
                     elif self.get("schedule", "anacron") == "daily":
                         os.symlink(self.__servicefile,
-                                    "/etc/cron.daily/%s" % __LAUNCHER_NAME_CRON)
+                                    "/etc/cron.daily/%s" % _LAUNCHER_NAME_CRON)
 
                     elif self.get("schedule", "anacron") == "weekly":
                         os.symlink(self.__servicefile,
-                                    "/etc/cron.weekly/%s" % __LAUNCHER_NAME_CRON)
+                                    "/etc/cron.weekly/%s" % _LAUNCHER_NAME_CRON)
 
                     elif self.get("schedule", "anacron") == "monthly":
                         os.symlink(self.__servicefile,
-                                    "/etc/cron.monthly/%s" % __LAUNCHER_NAME_CRON)
+                                    "/etc/cron.monthly/%s" % _LAUNCHER_NAME_CRON)
                     else :
                         self.logger.warning("'%s' is not a valid value" \
                                             % self.get("schedule", "anacron"))

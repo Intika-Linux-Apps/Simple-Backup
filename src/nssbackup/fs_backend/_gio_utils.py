@@ -176,14 +176,14 @@ class GioMountHandler(object):
         except gio.Error, error:
             _mount = None
             if error.code == gio.ERROR_NOT_MOUNTED:
-                self.__logger.info("Unable to get mount: path is not mounted")
+                self.__logger.info(_("Unable to get mount: path is not mounted"))
             elif error.code == gio.ERROR_NOT_FOUND:
-                self.__logger.info("Unable to get mount: path not found when mounting (is probably local)")
+                self.__logger.info(_("Unable to get mount: path not found when mounting (is probably local)"))
             else:
-                self.__logger.info("Unable to get mount: %s" % error)
+                self.__logger.info(_("Unable to get mount: %s") % error)
         except glib.GError, error:
             _mount = None
-            self.__logger.info("Unable to get mount: %s" % error)
+            self.__logger.info(_("Unable to get mount: %s") % error)
 
         return _mount
 
@@ -227,10 +227,9 @@ class GioMountHandler(object):
         if self.__uri is None:
             raise ValueError("No URI set")
         if self.__path_mount_info is None:
-            self.__logger.warning("Unable to unset mount flag: path `%s` not stored")
+            self.__logger.warning(_("Unable to un-set mount flag: path is not stored"))
         else:
             self.__path_mount_info = None
-        self.__logger.debug("Path_mount_info: %s" % str(self.__path_mount_info))
 
     def get_eff_path(self):
         """Returns None in case of not mounted URIs.
@@ -254,7 +253,7 @@ class GioMountHandler(object):
 
         _local = self._is_local(_gfileobj)
         if _local:
-            self.__logger.info("Mounting local path is not required - calling additional callback")
+            self.__logger.debug("Mounting local path is not required - calling additional callback")
 #Note: call additional callbacks anyway              
             if self.__mount_finish_callback is not None:
                 self.__mount_finish_callback(error = None)
@@ -272,7 +271,7 @@ class GioMountHandler(object):
 
         _local = self._is_local(_gfileobj)
         if _local:
-            self.__logger.info("Unmounting local path is not required - calling additional callback")
+            self.__logger.debug("Unmounting local path is not required - calling additional callback")
             if self.__umount_finish_callback is not None:
                 self.__umount_finish_callback(error = None)
         else:
@@ -288,14 +287,14 @@ class GioMountHandler(object):
                 self.__logger.debug("Umount is required")
                 self._do_umount(_gfileobj)
             else:
-                self.__logger.info("Umount is not required - calling additional callback")
+                self.__logger.debug("Umount is not required - calling additional callback")
                 if self.__umount_finish_callback is not None:
                     self.__umount_finish_callback(error = None)
 
 #        print "End of GioMountHandler.umount"
 
     def _do_mount(self, gfileobj):
-        self.__logger.debug("begin of hdl._do_mount")
+#        self.__logger.debug("begin of hdl._do_mount")
         op = gio.MountOperation()
         self.__ask_password_cnt = 0
         op.connect('ask-password', self._ask_password_cb)
@@ -317,7 +316,7 @@ class GioMountHandler(object):
     def _do_umount(self, gfileobj):
         _mount = self._get_mount(gfileobj)
         error = None
-        self.__logger.debug("hdl._do_umount - mount obj: %s" % str(_mount))
+#        self.__logger.debug("hdl._do_umount - mount obj: %s" % str(_mount))
         if _mount is None:
             self.__logger.debug("No mount found.")
 
@@ -355,7 +354,7 @@ class GioMountHandler(object):
         except gio.Error, error:
             self._set_mount_flag(obj = obj, required = False)
             if error.code == gio.ERROR_ALREADY_MOUNTED:
-                self.__logger.info("Path is already mounted.")
+                self.__logger.info(_("Path is already mounted."))
                 error = None
             else:
                 self.__logger.error(get_gio_errmsg(error, "Error in `_do_mount`"))
@@ -374,13 +373,13 @@ class GioMountHandler(object):
 #        print "End of hdl._mount_done_cb"
 
     def _umount_done_cb(self, obj, res, gfile):
-        self.__logger.debug("umount done")
+#        self.__logger.debug("umount done")
         error = None
         try:
             obj.unmount_finish(res)
         except gio.Error, error:
             if error.code == gio.ERROR_NOT_MOUNTED:
-                self.__logger.info("Path is not mounted.")
+                self.__logger.info(_("Path is not mounted."))
                 error = None
             else:
                 self.__logger.error(get_gio_errmsg(error, "Error in `_umount_done_cb`"))
@@ -431,7 +430,7 @@ class GioMountHandler(object):
         try:
             _gfoinfo = _gfo.query_filesystem_info("filesystem::*")
         except gio.Error, error:
-            self.__logger.error(get_gio_errmsg(error, "Error in `query_fs_info`"))
+            self.__logger.warning(get_gio_errmsg(error, "Error in `query_fs_info`"))
         else:
             _size = _gfoinfo.get_attribute_uint64(gio.FILE_ATTRIBUTE_FILESYSTEM_SIZE)
             _free = _gfoinfo.get_attribute_uint64(gio.FILE_ATTRIBUTE_FILESYSTEM_FREE)
@@ -569,7 +568,7 @@ def _test_path(path, testdir_name, testfile_name):
 
     try:
         # test specified path
-        __logger.info("test specified path for existence using GIO")
+        __logger.info(_("test specified path for existence using GIO"))
         _gmpath = gio.File(_mpath)
         _exists = _gmpath.query_exists()
         if bool(_exists) is False:
@@ -582,26 +581,26 @@ def _test_path(path, testdir_name, testfile_name):
         if bool(_exists) is True:
             raise exceptions.RemoteMountTestFailedError("Unable to create directory for testing purpose: Directory already exists.")
 
-        __logger.info("Create testdir")
+        __logger.info(_("Create testdir"))
         _res = _gtdir.make_directory()
         if bool(_res) is False:
             raise exceptions.RemoteMountTestFailedError("Unable to create directory for testing purpose.")
 
-        __logger.info("Test testfile for existence")
+        __logger.info(_("Test testfile for existence"))
         _gtfile = gio.File(testfile)
         _exists = _gtfile.query_exists()
         if bool(_exists) is True:
             raise exceptions.RemoteMountTestFailedError("Unable to create file for testing purpose: File already exists.")
 
         _buffer = "Some arbitrary content: %s" % uuid.uuid4()
-        __logger.info("Create file")
+        __logger.info(_("Create file"))
         _ostr = _gtfile.create()
         __logger.debug("Write buffer: `%s` to file" % _buffer)
         _ostr.write(_buffer)
         _ostr.close()
 
         # and re-read
-        __logger.info("Re-read test file")
+        __logger.info(_("Re-read test file"))
         _gtfile = gio.File(testfile)
         _exists = _gtfile.query_exists()
         if bool(_exists) is False:
@@ -613,9 +612,9 @@ def _test_path(path, testdir_name, testfile_name):
             raise exceptions.RemoteMountTestFailedError("Unable to read content from test file: content differs.")
 
         # clean-up
-        __logger.info("Remove file")
+        __logger.info(_("Remove file"))
         _gtfile.delete()
-        __logger.info("Remove dir")
+        __logger.info(_("Remove dir"))
         _gtdir.delete()
 
     except (gio.Error, glib.GError), error:
@@ -635,7 +634,6 @@ def get_scheme_from_service(service):
 
 
 def get_service_from_scheme(scheme):
-#    _uri_scheme = self.__uri.uri_scheme
     try:
         _service = URI_SCHEME_TO_REMOTE_SERVICE[scheme]
     except KeyError:

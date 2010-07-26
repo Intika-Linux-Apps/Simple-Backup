@@ -93,7 +93,6 @@ class BackupProfileHandler(object):
             self.__fam_target_hdl.set_destination(_uri)
             self.__fam_target_hdl.set_configuration_ref(self.config)
             self.__fam_target_hdl.set_use_mainloop(use = True)
-#            self.__fam_target_hdl.set_initialize_callback(self.__set_destination_done_cb)
             self.__fam_target_hdl.initialize()
         except exceptions.FileAccessException:
             self.__fam_target_hdl.terminate()
@@ -126,7 +125,6 @@ class BackupProfileHandler(object):
         needupgrade = False
         try:
             needupgrade = self.__um.need_upgrade(self.config.get_destination_path())
-#            needupgrade = self.__um.need_upgrade(self.__fam_target_hdl)
         except exceptions.SBException, exc:
             self.logger.warning(str(exc))
 
@@ -137,13 +135,6 @@ class BackupProfileHandler(object):
 
         self.logger.info(_("Backup process is being started."))
         self.__state.set_state('start')
-
-#        # purge
-#        purge = None
-#        if self.config.has_option("general", "purge"):
-#            purge = self.config.get("general", "purge")
-#        if purge :
-#            self.__snpman.purge(purge)
 
         # get basic informations about new snapshot
         (snppath, base) = self.__retrieve_basic_infos()
@@ -203,9 +194,7 @@ class BackupProfileHandler(object):
         self.__state.set_state('commit')
         self.__snapshot.commit()
 
-        self.logger.info(_("Backup process finished."))
-        self.__state.set_state('finish')
-
+#TODO: add state purging
 #TODO: Files are not entirely written to some FS now! Improve this.
         # purge
         purge = None
@@ -216,6 +205,9 @@ class BackupProfileHandler(object):
                 self.__snpman.purge(purge, self.__snapshot.getName()) # do not purge cre snapshot
             except exceptions.SBException, sberror:
                 self.logger.error(_("Error while purging old snapshots: %s") % sberror)
+
+        self.logger.info(_("Backup process finished."))
+        self.__state.set_state('finish')
 
     def __collect_files(self):
         """Fill snapshot's include and exclude lists and retrieve some information
@@ -414,5 +406,3 @@ class BackupProfileHandler(object):
         tdir = os.path.join(self.config.get("general", "target"), snpname)
 
         return (tdir, base)
-
-
