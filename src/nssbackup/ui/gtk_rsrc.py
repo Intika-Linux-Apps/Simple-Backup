@@ -78,10 +78,6 @@ def get_configgui_widgets():
         'inc_adddir',
         'hbox5',
         'inc_del',
-#            'remote_includetv',
-#            'remote_inc_add',
-#            'remote_inc_del',
-#            'test_remote',
         'notebook2',
         'vbox4',
         'scrolledwindow2',
@@ -326,14 +322,16 @@ def get_restoregui_widgets():
         'upgradeBox',
         'upgradeButton',
         'RebaseBox',
-        'rebaseLabel',
+        'txt_current_base',
         'rebaseButton',
         'deleteBox',
         'deleteButton',
         'snphistoryFrame',
         'historytv',
         'statusbar',
-        'progressbar'
+        'progressbar',
+        'box_management',
+        'box_restorewin_content'
         ]
     return widget_list
 

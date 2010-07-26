@@ -55,14 +55,14 @@ import nssbackup.ar_backend.tar as TAR
 from nssbackup.pkginfo import Infos
 from nssbackup.util import exceptions
 from nssbackup.util import tasks
-from nssbackup.util import system
+from nssbackup.util import local_file_utils
 from nssbackup.ar_backend.tar import Dumpdir
 
 from nssbackup.ui import misc
 from nssbackup.ui import gtk_rsrc
 
 
-sys.excepthook = misc.except_hook
+sys.excepthook = misc.except_hook_threaded
 
 # initialize threading before running a main loop
 gtk.gdk.threads_init()
@@ -119,7 +119,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self._defaultdest_active = True
         self.widgets['defaultradiob'].set_active(True)
         self._apply_defaultradiob_state()
-        self.widgets['defaultfolderlabel'].set_text("")
+        self.widgets['defaultfolderlabel'].set_text(_("n.a."))
         self._defaultdest_active = True
         gobject.idle_add(self.__set_destination, self.__default_destination_path)
 
@@ -128,16 +128,11 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
     def __get_configuration(self):
         _configfile_hdl = ConfigurationFileHandler()
         _config = None
-        if system.is_superuser():
-            if os.path.exists("/etc/nssbackup.conf") :
-                _config = ConfigManager("/etc/nssbackup.conf")
-            else :
-                _config = ConfigManager()
+        _configfile = _configfile_hdl.get_conffile()
+        if local_file_utils.path_exists(_configfile):
+            _config = ConfigManager(_configfile)
         else:
-            if os.path.exists(_configfile_hdl.get_user_confdir() + "nssbackup.conf") :
-                _config = ConfigManager(_configfile_hdl.get_user_confdir() + "nssbackup.conf")
-            else :
-                _config = ConfigManager()
+            _config = ConfigManager()
         return _config
 
     def __init_treeviews(self):
@@ -162,20 +157,18 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         acolumn3 = gtk.TreeViewColumn(_("Snapshots"), gtk.CellRendererText(), text = 0)
         self.widgets['historytv'].append_column(acolumn3)
 
-    def _make_topwin_busy(self, busy, message, message_id = None):
-        _mid = None
+    def _make_topwin_busy(self, busy, message = None):
         if busy:
             misc.set_watch_cursor(widget = self.top_window)
-            self.top_window.set_sensitive(False)
-            _mid = self.__send_statusbar_msg(message)
+            self.widgets['box_restorewin_content'].set_sensitive(False)
+            self.__send_statusbar_msg(message)
         else:
-            self.top_window.set_sensitive(True)
+            self.widgets['box_restorewin_content'].set_sensitive(True)
             misc.unset_cursor(widget = self.top_window)
-            self.__clean_statusbar_msg(message_id)
+            self.__clean_statusbar_msg()
         return False
 
     def __set_destination(self, path):
-        print ">>> __set_destination"
         self._make_topwin_busy(True, "Connect to destination...")
         self.__clear_calendar()
 
@@ -184,14 +177,14 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self.__fam_target_hdl.set_initialize_callback(self.__set_destination_done_cb)
             self.__fam_target_hdl.initialize()
         except exceptions.FileAccessException, error:
-            gobject.idle_add(self._make_topwin_busy, False, None)
+            gobject.idle_add(self._make_topwin_busy, False)
             self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error
             self._show_destination_error(error)
 
     def __set_destination_done_cb(self, error):
-        print ">>> __set_destination_done_cb - error: %s" % error
+#        print ">>> __set_destination_done_cb - error: %s" % error
         if error is not None:
-            gobject.idle_add(self._make_topwin_busy, False, None)
+            gobject.idle_add(self._make_topwin_busy, False)
             self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error            
             self._show_destination_error(error)
         else:
@@ -216,10 +209,10 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self.widgets["calendar"].select_day(today[2])
             self.on_calendar_day_selected()
 
-        gobject.idle_add(self._make_topwin_busy, False, None)
+        gobject.idle_add(self._make_topwin_busy, False)
 
     def _set_dest_failed_cb(self, error):
-        self._make_topwin_busy(False, None)
+        self._make_topwin_busy(False)
         if error is not None:
             self._show_destination_error(error)
 
@@ -229,7 +222,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         pass
 
     def _term_fam_done_cb(self, error):
-        self._make_topwin_busy(False, None)
+        self._make_topwin_busy(False)
         if error is not None:
             self._show_destination_error(error)
 
@@ -260,7 +253,6 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
     
         @raise AssertionError: if the statusbar is not initialized
         """
-        print "__send_statusbar_msg: %s" % message
         if self.__context_id is None:
             raise AssertionError("Please initialize statusbar first!")
         message_id = self.widgets['statusbar'].push(self.__context_id, message)
@@ -285,7 +277,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         if message_id is None:
             self.widgets['statusbar'].pop(self.__context_id)
         else:
-            self.widgets['statusbar'].remove(self.__context_id, message_id)
+            self.widgets['statusbar'].remove_message(self.__context_id, message_id)
 
 #    def status_callback(self, getstatus):
 #        """
@@ -323,8 +315,9 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.widgets['calendar'].clear_marks()
         self.snplisttreestore.clear()
         self.flisttreestore.clear()
-        self.widgets['buttonspool'].set_sensitive(False)
-        self.widgets['snpdetails'].set_sensitive(False)
+        self.widgets['box_management'].set_sensitive(False)
+#        self.widgets['buttonspool'].set_sensitive(False)
+#        self.widgets['snpdetails'].set_sensitive(False)
 
     def on_defaultradiob_toggled(self, *args): #IGNORE:W0613
         self._apply_defaultradiob_state()
@@ -342,7 +335,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         elif self.widgets['customradiob'].get_active() :
             if self._defaultdest_active:
                 self._defaultdest_active = False
-                print "Custom destination selected"
+#                print "Custom destination selected"
 
     def _default_fam_term_cb(self, error):
         if error is not None:
@@ -395,6 +388,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self.currentSnp = None
             self.widgets["restoreExpander"].set_expanded(False)
             self.widgets['snpmanExpander'].set_expanded(False)
+            self.widgets['box_management'].set_sensitive(False)
 
             self._make_topwin_busy(True, "Reading snapshots...")
             _date = self.widgets['calendar'].get_date()
@@ -408,7 +402,9 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.widgets["restoreExpander"].set_expanded(False)
         self.widgets['snpmanExpander'].set_expanded(False)
         tstore, iter = self.widgets['snplisttreeview'].get_selection().get_selected()
-        self.currentSnp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter, 0)))
+        if iter is not None:
+            self.currentSnp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter, 0)))
+            self.widgets['box_management'].set_sensitive(True)
 
     def on_filelisttreeview_row_expanded(self, tv, iter, path, user_data = None):
         """
@@ -574,6 +570,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
         self.snplisttreestore.clear()
         self.flisttreestore.clear()
+
+#        gobject.idle_add(self.widgets['box_management'].set_sensitive, True)
         gobject.idle_add(self.widgets['buttonspool'].set_sensitive, False)
         gobject.idle_add(self.widgets['snpdetails'].set_sensitive, True)
 
@@ -585,7 +583,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             for snapshot in snplist:
                 self.snplisttreestore.append(None, [snapshot.getName(), snapshot.getVersion()])
 
-        self._make_topwin_busy(False, None)
+        self._make_topwin_busy(False)
 
     def on_restoreExpander_activate(self, *args): #IGNORE:W0613
         if not self.widgets["restoreExpander"].get_expanded():
@@ -729,7 +727,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
         self.__clean_statusbar_msg(_statbar_msgid)
 
-        print "Result: %s (%s)" % (_result, type(_result))
+#        print "Result: %s (%s)" % (_result, type(_result))
         if isinstance(_result, Exception):
             self.logger.error(str(_result))
             self.__restore_dialog.finish_failure(_result)
@@ -739,21 +737,24 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
     def on_snpmanExpander_activate(self, *args):
         if not self.widgets['snpmanExpander'].get_expanded():
             if self.currentSnp:
-                if self.currentSnp.getVersion() == Infos.SNPCURVERSION:
+                self._make_topwin_busy(True, "Reading snapshot...")
+                _ver = self.currentSnp.getVersion()
+                self._make_topwin_busy(False)
+                if _ver == Infos.SNPCURVERSION:
                     self.widgets["upgradeBox"].hide()
-                    if self.currentSnp.isfull():
-                        self.widgets["RebaseBox"].hide()
-                    else:
-                        self.widgets["RebaseBox"].show()
-                    self.widgets["rebaseLabel"].set_markup(_("Actual base : <b>%s</b>") % self.currentSnp.getBase())
+#                    if self.currentSnp.isfull():
+#                        self.widgets["RebaseBox"].hide()
+#                    else:
+#                        self.widgets["RebaseBox"].show()
+                    self.widgets["txt_current_base"].set_text("%s" % self.currentSnp.getBase())
                     self.widgets["deleteBox"].show()
-                elif self.currentSnp.getVersion() < Infos.SNPCURVERSION :
+                elif _ver < Infos.SNPCURVERSION :
                     self.widgets["upgradeBox"].show()
-                    self.widgets["RebaseBox"].hide()
+#                    self.widgets["RebaseBox"].hide()
                     self.widgets["deleteBox"].hide()
                 else :
                     self.widgets["upgradeBox"].hide()
-                    self.widgets["RebaseBox"].hide()
+#                    self.widgets["RebaseBox"].hide()
                     self.widgets["deleteBox"].hide()
                     message = _("The version of the snapshot is greater than the supported one!")
                     dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = message)
@@ -761,7 +762,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                     dialog.destroy()
             else:
                 self.widgets["upgradeBox"].hide()
-                self.widgets["RebaseBox"].hide()
+#                self.widgets["RebaseBox"].hide()
                 self.widgets["deleteBox"].hide()
 
     def on_upgradeButton_clicked(self, *args):
@@ -814,22 +815,31 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self.historylisttreestore.clear()
 
     def on_deleteButton_clicked(self, *args):
-        message = _("Are you sure that you want to remove snapshot '%s'?\n\nThis may take a while - be patient.") % self.currentSnp
-        dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = message)
-        response = dialog.run()
-        dialog.destroy()
-        if response == gtk.RESPONSE_YES:
-            try:
-                self.logger.debug("Trying to remove snapshot '%s'" % self.currentSnp.getName())
-                self.snpman.removeSnapshot(self.currentSnp)
-            except Exception, e:
-                self.logger.error(str(e))
-                self.logger.error(traceback.format_exc())
-                dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-                dialog.run()
+        if self.currentSnp is not None:
+            if self.snpman.is_standalone_snapshot(self.currentSnp):
+                message = _("Deleting the selected snapshot `%s` will remove your backup for this particular point in time. You cannot undo this operation.\n\nAre you sure that you want to remove the snapshot permanently?")\
+                            % self.currentSnp
+                dialog = misc.msgdialog(message_str = message, msgtype = gtk.MESSAGE_QUESTION,
+                                        parent = self.top_window, buttons = gtk.BUTTONS_YES_NO,
+                                        headline_str = _("Do you really want to remove snapshot?"))
+                response = dialog.run()
                 dialog.destroy()
-            self.snpman.get_snapshots_allformats(forceReload = True)
-            self.on_calendar_day_selected()
+                if response == gtk.RESPONSE_YES:
+                    try:
+                        self.logger.debug("Trying to remove snapshot '%s'" % self.currentSnp.getName())
+                        self.snpman.removeSnapshot(self.currentSnp)
+                    except exceptions.SBackupError, error:
+                        self.logger.error(str(error))
+                        self.logger.error(traceback.format_exc())
+                        dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(error))
+                        dialog.run()
+                        dialog.destroy()
+                    self.snpman.get_snapshots_allformats(forceReload = True)
+                    self.on_calendar_day_selected()
+            else:
+                message = _("The selected snapshot '%s' is referenced by more recent snapshots as base snapshot.\n\nRemove all of these child snapshots in order to delete this snapshot.")\
+                            % self.currentSnp
+                misc.show_infodialog(message_str = message, parent = self.top_window, headline_str = _("Unable to remove snapshot"))
 
     def on_exportmanExpander_activate(self, *args):
         print("TODO: on_exportmanExpander_activate")
@@ -844,11 +854,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         except AttributeError:
             pass
 
-
     def main(self):
-        print "Just entering gtk.main"
         gtk.main()
-        print "Just leaving gtk.main"
 
 
 class RestoreDialog(GladeWindow, ProgressbarMixin):

@@ -54,7 +54,7 @@ from nssbackup.util.exceptions import NotValidSnapshotException
 from nssbackup.util.exceptions import NotValidSnapshotNameException
 from nssbackup.util.exceptions import RebaseSnpException
 from nssbackup.util.exceptions import RebaseFullSnpForbidden
-from nssbackup.util.exceptions import RemoveFullSnpForbidden
+from nssbackup.util.exceptions import RemoveSnapshotHasChildsError
 from nssbackup.util.exceptions import NotSupportedError
 
 
@@ -841,12 +841,18 @@ class SnapshotManager(object):
         return child_snps
 
     def _remove_standalone_snapshot(self, snapshot):
-        _childs = self._retrieve_childsnps(snapshot = snapshot)
-        if len(_childs) != 0:
-            raise AssertionError("The given snapshot '%s' is not stand-alone." % snapshot)
+        if not self.is_standalone_snapshot(snapshot):
+            raise RemoveSnapshotHasChildsError("The given snapshot '%s' is not stand-alone." % snapshot)
         self.logger.debug("Removing '%s'" % snapshot.getName())
         self._fop.delete(snapshot.getPath())
         self.get_snapshots(forceReload = True)
+
+    def is_standalone_snapshot(self, snapshot):
+        _res = False
+        _childs = self._retrieve_childsnps(snapshot = snapshot)
+        if len(_childs) == 0:
+            _res = True
+        return _res
 
     def removeSnapshot(self, snapshot):
         """Public method that removes a given snapshot safely. The removal
@@ -860,19 +866,20 @@ class SnapshotManager(object):
         
         :todo: Refactor by using method `_retrieve_childsnps`!
         """
-        _this_snp_name = snapshot.getName()
-
-        self.logger.info(_("Deleting snapshot: '%(snp)s'.") % {'snp' : snapshot})
-        if snapshot.isfull():
-            self.__remove_full_snapshot(snapshot)
-        else:
-            # rebase all child snapshots to the base of this snapshot
-            listing = self.get_snapshots(forceReload = True)
-            for snp in listing:
-                if snp.getBase() == _this_snp_name:
-                    self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
-            self._remove_standalone_snapshot(snapshot)
-            listing = self.get_snapshots(forceReload = True)
+#        _this_snp_name = snapshot.getName()
+#
+#        self.logger.info(_("Deleting snapshot: '%(snp)s'.") % {'snp' : snapshot})
+#        if snapshot.isfull():
+#            self.__remove_full_snapshot(snapshot)
+#        else:
+#            # rebase all child snapshots to the base of this snapshot
+#            listing = self.get_snapshots(forceReload = True)
+#            for snp in listing:
+#                if snp.getBase() == _this_snp_name:
+#                    self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
+#            self._remove_standalone_snapshot(snapshot)
+#            listing = self.get_snapshots(forceReload = True)
+        self._remove_standalone_snapshot(snapshot)
 
     def __remove_full_snapshot(self, snapshot):
         """Method that removes the given full backup snapshot. The removal of
@@ -907,7 +914,7 @@ class SnapshotManager(object):
         if is_standalone:
             self._remove_standalone_snapshot(snapshot)
         else:
-            raise RemoveFullSnpForbidden("The removal of a full snapshot is "\
+            raise RemoveSnapshotHasChildsError("The removal of a full snapshot is "\
                 "not possible as long as this is the base of other snapshots.")
 
     def compareSnapshots(self, snap1, snap2):
@@ -985,7 +992,7 @@ class SnapshotManager(object):
                         self.logger.debug("Snapshot '%s' -> will be removed!" % (snp))
                         try:
                             self.removeSnapshot(snp)
-                        except RemoveFullSnpForbidden, exc:
+                        except RemoveSnapshotHasChildsError, exc:
                             self.logger.info("%s Continue with next one." % exc)
                             continue
 

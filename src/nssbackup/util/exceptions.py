@@ -51,6 +51,8 @@ class SBException(Exception):
     programming errors (Python Exceptions).
     """
 
+SBackupError = SBException
+
 class InstanceRunningError(SBException) :
     """This Exception is thrown if another application instance is
     already running.
@@ -106,10 +108,8 @@ class RebaseFullSnpForbidden(RebaseSnpException):
 
     """
 
-class RemoveFullSnpForbidden(RebaseSnpException):
-    """Thrown when trying to remove a full snapshot.
-    :todo: Check whether this exception is unused and can be removed!
-    
+class RemoveSnapshotHasChildsError(SBackupError):
+    """Is raised if snapshot removal fails.
     """
 
 class ChmodNotSupportedError(SBException):
