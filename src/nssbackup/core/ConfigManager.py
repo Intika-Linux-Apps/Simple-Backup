@@ -473,7 +473,6 @@ class ConfigManager(ConfigParser.ConfigParser):
         _res = None
         if self.has_section(_section):
             _items = self.items(_section)
-            print ">>> Dirconfig items: ", str(_items)
             if len(_items) > 0:
                 _res = []
                 for _item in _items:
@@ -482,8 +481,6 @@ class ConfigManager(ConfigParser.ConfigParser):
                         pass
                     else:
                         _res.append((_item[0].replace("\\x3d", "="), int(_item[1])))
-
-        print ">>> Result: ", str(_res)
         return _res
 
     def get_followlinks(self):

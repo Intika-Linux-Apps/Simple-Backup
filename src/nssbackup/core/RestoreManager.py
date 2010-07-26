@@ -49,7 +49,7 @@ class RestoreManager(object):
         @param snapshot: 
         @param file : 
         """
-        self.restoreAs(snapshot, _file, None)
+        self.restoreAs(snapshot = snapshot, _file = _file, target = None)
 
     def restoreAs(self, snapshot, _file, target, backupFlag = True, failOnNotFound = True) :
         """
@@ -68,13 +68,13 @@ class RestoreManager(object):
             raise exceptions.SBException("Please provide a File/directory")
 
         _file = self._fop.pathsep + _file.lstrip(self._fop.pathsep)
-        print "restore as: %s" % _file
+#        print "restore as: %s" % _file
 
         # restore
         if not snapshot.getSnapshotFileInfos().hasPath(_file) and not snapshot.getSnapshotFileInfos().hasFile(_file):
-            if failOnNotFound :
+            if failOnNotFound:
                 raise exceptions.SBException(_("File '%s' not found in the backup snapshot files list") % _file)
-            else :
+            else:
                 self.logger.warning(_("File '%(filename)s' not found in snapshot's [%(snapshotname)s] files list, Skipped.")\
                                     % {"filename": _file, "snapshotname" : snapshot.getName()})
                 return
@@ -156,7 +156,6 @@ class RestoreManager(object):
         if not directory:
             raise exceptions.SBException("Please provide a File/directory")
 
-        #dir = self._fop.pathsep+dir.lstrip(self._fop.pathsep)
         snpman = SnapshotManager.SnapshotManager(self._fop.get_dirname(snapshot.getPath()))
         history = snpman.getSnpHistory(snapshot)
         history.reverse()
@@ -164,4 +163,4 @@ class RestoreManager(object):
         for snp in history :
             self.logger.debug("Restoring '%(dirname)s' from snapshot '%(snapshotname)s'"\
                               % { "dirname" : directory, "snapshotname" : snp.getName() })
-            self.restoreAs(snp, directory, targetdir, False, False)
+            self.restoreAs(snapshot = snp, _file = directory, target = targetdir, backupFlag = False, failOnNotFound = False)

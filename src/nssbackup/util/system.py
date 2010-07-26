@@ -262,7 +262,6 @@ def get_clean_environment():
 def set_display_from_session():
     key = 'DISPLAY'
     _display = os.environ.get(key)
-    print "Display: `%s`" % _display
     if _display is None:
         _session = get_session_name()
         _env = get_session_environment(_session)
@@ -295,7 +294,7 @@ def get_session_environment(session):
 
     else:
         mod_env = None
-        print "Neither Gnome nor KDE session providing D-Bus is running"
+        print "Neither Gnome nor KDE session is running"
     return mod_env
 
 

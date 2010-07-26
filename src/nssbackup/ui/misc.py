@@ -21,6 +21,7 @@
 from gettext import gettext as _
 
 import gtk
+import gobject
 import pango
 import types
 import traceback
@@ -152,6 +153,13 @@ def show_errdialog(message_str, parent, headline_str = "", secmsg_str = ""):
     __show_msgdialog(message_str = message_str, msgtype = gtk.MESSAGE_ERROR,
                     parent = parent, boxtitle = "",
                     headline_str = headline_str, secmsg_str = secmsg_str)
+
+def show_errdialog_threaded(message_str, parent, headline_str = "", secmsg_str = ""):
+    gtk.gdk.threads_enter()
+    __show_msgdialog(message_str = message_str, msgtype = gtk.MESSAGE_ERROR,
+                    parent = parent, boxtitle = "",
+                    headline_str = headline_str, secmsg_str = secmsg_str)
+    gtk.gdk.threads_leave()
 
 def __show_msgdialog(message_str, msgtype, parent, boxtitle = "",
                     headline_str = "", secmsg_str = ""):
@@ -293,17 +301,28 @@ def unset_cursor(widget):
         print "Ignored error when un-setting cursor: %s" % error
 
 
-def except_hook(etype, evalue, etb):
+def _common_except_hook(etype, evalue, etb):
     _logger = log.LogFactory.getLogger()
-
     _lines = traceback.format_exception(etype, evalue, etb)
     _lines = "".join(_lines)
-
+    _lines.strip()
     _logger.error("Uncaught exception: %s" % evalue)
     _logger.error(_lines)
+    _message_str = _("An uncaught error occurred. Close this message window and restart the application.\n\nPlease report this error on https://bugs.launchpad.net/nssbackup.\n\n%s") % (evalue)
+    _headline_str = _("Sorry, this should not have happened")
+    _secmsg_str = "%s" % _lines
+    return (_headline_str, _message_str, _secmsg_str)
 
-    show_errdialog(message_str = _("Following unexpected error occurred:\n\n%s\n\n%s") % (evalue, _lines),
-                        parent = None, headline_str = _("An uncaught exception occurred"),
-                        secmsg_str = _("Please report this error on https://bugs.launchpad.net/nssbackup"))
+
+def except_hook(etype, evalue, etb):
+    _headline_str, _message_str, _secmsg_str = _common_except_hook(etype, evalue, etb)
+    show_errdialog(message_str = _message_str,
+                     parent = None, headline_str = _headline_str,
+                     secmsg_str = _secmsg_str)
 
 
+def except_hook_threaded(etype, evalue, etb):
+    _headline_str, _message_str, _secmsg_str = _common_except_hook(etype, evalue, etb)
+    gobject.idle_add(show_errdialog_threaded, _message_str,
+                     None, _headline_str,
+                     _secmsg_str)

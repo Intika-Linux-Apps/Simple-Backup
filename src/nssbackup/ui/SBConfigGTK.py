@@ -847,19 +847,14 @@ class SBconfigGTK(GladeGnomeApp):
         cancelled = self.ask_save_config()
         if not cancelled:
             try :
-                pid = subprocess.Popen(["nssbackupd"]).pid
+                pid = subprocess.Popen([constants.BACKUP_COMMAND]).pid
 
-                dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | \
-                                    gtk.DIALOG_DESTROY_WITH_PARENT,
-                                    buttons = gtk.BUTTONS_CLOSE,
-                                    message_format = _("A backup run is initiated in the background.\nThe process id is: %s.") % str(pid))
-                dialog.run()
-                dialog.destroy()
-            except Exception, e:
-                dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR, flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-                dialog.run()
-                dialog.destroy()
-                raise e
+                misc.show_infodialog(message_str = _("A backup process is initiated in the background."),
+                                     parent = self.top_window, headline_str = _("Backup process started"), secmsg_str = _("The process id is: %s.") % str(pid))
+            except Exception, error:
+                _msg = _("An error occurred while starting backup process:\n\n%s") % error
+                misc.show_errdialog(message_str = _msg, parent = self.top_window,
+                                    headline_str = _("Error while starting backup"))
 
     def on_cformat_changed(self, *args): #IGNORE:W0613
         """
