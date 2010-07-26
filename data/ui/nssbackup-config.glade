@@ -566,6 +566,7 @@ Do you want to save the configuration now?</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="ProfileManagerDialog">
+    <property name="height_request">320</property>
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">6</property>
     <property name="title" translatable="yes">Configuration Profile Manager</property>
@@ -586,10 +587,11 @@ Do you want to save the configuration now?</property>
             <property name="spacing">12</property>
             <child>
               <widget class="GtkLabel" id="label56">
+                <property name="width_request">400</property>
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">This dialogue helps you to manage your configuration profiles. You can set up a number of configuration profiles that will be run by NSsbackup when it starts the backup. Thanks to this you can configure backups of different kinds to different places.</property>
+                <property name="label" translatable="yes">You can set up multiple configuration profiles which are processed when performing a backup. Each profile has its own set of settings including backup destination, backup format etc.</property>
                 <property name="use_markup">True</property>
                 <property name="wrap">True</property>
                 <property name="width_chars">0</property>
@@ -640,7 +642,6 @@ Do you want to save the configuration now?</property>
                                 <property name="can_focus">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                                 <property name="enable_search">False</property>
-                                <property name="enable_grid_lines">horizontal</property>
                               </widget>
                             </child>
                           </widget>
@@ -1229,6 +1230,7 @@ Please enter the new profile name and set the according checkbox in order to ena
             <child>
               <widget class="GtkNotebook" id="notebook">
                 <property name="visible">True</property>
+                <property name="border_width">6</property>
                 <property name="tab_border">0</property>
                 <property name="tab_hborder">3</property>
                 <property name="tab_vborder">3</property>
@@ -1248,7 +1250,7 @@ Please enter the new profile name and set the according checkbox in order to ena
                           <widget class="GtkComboBox" id="cformat">
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                            <property name="active">1</property>
+                            <property name="active">0</property>
                             <property name="items" translatable="yes">none
 gzip
 bzip2</property>
@@ -1267,8 +1269,8 @@ bzip2</property>
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                             <property name="xalign">0</property>
-                            <property name="label" translatable="yes">Choose the compression format that you want to apply.
-Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
+                            <property name="label" translatable="yes">Compression format
+Default is set to uncompressed backups.</property>
                             <property name="use_markup">True</property>
                             <property name="justify">fill</property>
                           </widget>
@@ -1286,6 +1288,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                               <widget class="GtkComboBox" id="splitsizeCB">
                                 <property name="visible">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                <property name="tooltip" translatable="yes">You can split the snapshot to make backup on some filesystem that doesn't support large files. This functionality can not be used if the backup is compressed.</property>
                                 <property name="column_span_column">0</property>
                                 <signal name="changed" handler="on_splitsizeCB_changed"/>
                               </widget>
@@ -1400,9 +1403,7 @@ Default is &lt;b&gt;gzip&lt;/b&gt;.</property>
                                 <property name="has_tooltip">True</property>
                                 <property name="tooltip" translatable="yes">You can split the snapshot to make backup on some filesystem that doesn't support large files. This functionality can not be used if the backup is compressed.</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">Split the backup archive into small pieces (value in MiB).
-&lt;b&gt;Important note:&lt;/b&gt; This functionality is not compatible with compressed backups!</property>
-                                <property name="use_markup">True</property>
+                                <property name="label" translatable="yes">Split backup archives into several chunks</property>
                                 <property name="wrap">True</property>
                                 <property name="max_width_chars">0</property>
                               </widget>

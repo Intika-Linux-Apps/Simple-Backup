@@ -76,7 +76,7 @@ class Snapshot(object):
         # Attributes
         self.__name = False
         self.__base = None
-        self.__format = "gzip" # default value
+        self.__format = "none" # default value
 
         self.__followlinks = False
 
@@ -235,7 +235,7 @@ class Snapshot(object):
 
     def getFormat(self):
         """
-        Returns the compression format of the snapshot (from the "format" file or default to "gzip")
+        Returns the compression format of the snapshot (from the "format" file or default value)
         """
         _formatf = self._fop.normpath(self.getPath(), "format")
         if self._fop.path_exists(_formatf):

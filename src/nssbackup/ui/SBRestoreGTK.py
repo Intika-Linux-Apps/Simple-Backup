@@ -446,10 +446,10 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self.flisttreestore.remove(dummy)
 
     def on_filelisttreeview_cursor_changed(self, *args): #IGNORE:W0613
-        self.widgets['buttonspool'].set_sensitive(True)
-        # deactivate restore buttons if the selection is not included in 
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
-        if iter :
+        if iter is not None:
+            self.widgets['buttonspool'].set_sensitive(True)
+            # deactivate restore buttons if the selection is not included in 
             state = tstore.get_value(iter, 1)
             if state == Dumpdir.getHRCtrls()['N'] :
                 self.widgets['restore'].set_sensitive(False)

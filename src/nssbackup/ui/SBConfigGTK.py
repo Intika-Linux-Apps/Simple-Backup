@@ -327,7 +327,7 @@ class SBconfigGTK(GladeGnomeApp):
         if self.configman.has_option("general", "format") :
             cformatOpt = self.configman.get("general", "format")
             if cformatOpt not in cformats:
-                cformatOpt = 'gzip'
+                cformatOpt = 'none'
             cformatIndex = cformats.index(cformatOpt)
             self.widgets["cformat"].set_active(cformatIndex)
 
@@ -1905,8 +1905,7 @@ class SBconfigGTK(GladeGnomeApp):
         if prfName == ConfigManagerStaticData.get_default_profilename():
             _forbid_default_profile_removal(_("remove"))
         else :
-            warning = _("You are trying to remove a profile. You will not be able to restore it .\n If you are not sure of what you are doing, please use the 'enable|disable' functionality.\n<b>Are you sure to want to delete the '%(name)s' profile?</b>") % {'name': prfName}
-
+            warning = _("<b>Delete configuration profile?</b>\n\nYou are trying to remove a configuration profile. You will not be able to restore it. If you are not sure, use the 'enable|disable' functionality instead.\n\nDo you really want to delete the profile '%(name)s'?") % {'name': prfName}
             dialog = gtk.MessageDialog(type = gtk.MESSAGE_WARNING, flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_YES_NO)
             dialog.set_markup(warning)
             response = dialog.run()
@@ -2018,7 +2017,7 @@ def _forbid_default_profile_removal(action):
     """Helper function that shows an info box which states that we are
     not able to do the given action on the default profile.    
     """
-    info = _("You can't %s the Default Profile. Please use it if you need only one profile.") % action
+    info = _("<b>Unable to remove default profile</b>\n\nYou cannot %s the default profile. In the case you want to use just a single profile, please set up the default profile accordingly.") % action
 
     dialog = gtk.MessageDialog(type = gtk.MESSAGE_INFO,
                     flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,

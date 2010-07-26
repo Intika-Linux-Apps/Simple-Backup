@@ -28,6 +28,7 @@ RESTOREGUI_GLADEFILE = 'nssbackup-restore.glade'
 def get_configgui_widgets():
     widget_list = [
         'nssbackupConfApp',
+        'menubar',
         'toolbar',
         'askSaveDialog',
         'fusehelplabel',

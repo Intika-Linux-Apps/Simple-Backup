@@ -186,6 +186,7 @@ install-icons:
 
 install-dbus:
 	install -m 644 data/$(dbus_system_conf_file) $(dbus_system_conf_dir)
+	touch $(dbus_system_conf_dir)/$(dbus_system_conf_file)
 
 install-gconf:
 	install -m 644 data/$(gconf_schema_file) $(gconf_schema_file_dir)

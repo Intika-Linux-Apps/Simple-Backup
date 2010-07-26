@@ -1582,7 +1582,7 @@ class _DefaultConfiguration(Configuration):
                                "~$"
 
         self._maxinc = 7
-        self._cformat = 'gzip'
+        self._cformat = 'none'
         self._follow_links = False
         self._splitsize = 0
         self._max_filesize = -1 #Bugfix LP #146618

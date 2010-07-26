@@ -86,6 +86,7 @@
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                        <property name="tooltip" translatable="yes">Set backup destination to the place specified in default configuration profile</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
                                         <signal name="toggled" handler="on_defaultradiob_toggled"/>
@@ -179,6 +180,7 @@
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                                    <property name="tooltip" translatable="yes">Choose a destination folder. For remote sites fill URI in text field</property>
                                                     <property name="use_stock">True</property>
                                                     <signal name="clicked" handler="on_customchooser_clicked"/>
                                                   </widget>
@@ -195,6 +197,7 @@
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                                                    <property name="tooltip" translatable="yes">Change destination to path specified in left text field</property>
                                                     <property name="use_stock">True</property>
                                                     <signal name="clicked" handler="on_customapply_clicked"/>
                                                   </widget>

@@ -246,10 +246,8 @@ def __prepare_common_opts(snapshot):
         archivename += ".bz2"
     elif snapshot.getFormat() == "none":
         pass
-    else :
-        LogFactory.getLogger().debug("Setting compression to default 'gzip'.")
-        options.insert(0, "--gzip")
-        archivename += ".gz"
+    else:
+        LogFactory.getLogger().debug("Setting compression to default 'none'")
 
     options.append("--file=" + _FOP.normpath(tdir, archivename))
 
