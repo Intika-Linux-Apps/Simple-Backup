@@ -41,7 +41,7 @@ export GCONF_CONFIG_SOURCE=$(shell if test -x "$(gconftool)"; then $(gconftool) 
 #
 # available languages UI
 #
-PO=ar bg ca cs de en_GB es fi fr gl he hu id it lv ms nb nl oc pl pt pt_BR ru sv tr uk zh_CN zh_TW
+PO=ar bg ca cs de en_AU en_CA en_GB es fi fr gl he hu id it lv ms nb nl oc pl pt pt_BR ru sv tr uk zh_CN zh_TW
 
 #
 # available languages Help/Manual
@@ -106,8 +106,9 @@ po-dir:
 po-data: po-dir
 	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
 
+#TODO: use intltool and scan *.desktop...
 po-gen:
-	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.py scripts/*.py
+	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py data/ui/*.glade scripts/*.py
 	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/nssbackup.pot; done
 
 fill-templates:
