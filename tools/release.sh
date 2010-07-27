@@ -147,18 +147,18 @@ echo "==========================================================================
 echo "Summary of parameters"
 echo "  From Metafile:"
 echo "    VERFULL: "$VERFULL
-echo "    VERNUM: "$VERNUM
-echo "    VERPOST: "$VERPOST
-echo "    VERNUMMAJOR: "$VERNUMMAJOR
-echo "    VERNUMMINOR: "$VERNUMMINOR
+#echo "    VERNUM: "$VERNUM
+#echo "    VERPOST: "$VERPOST
+#echo "    VERNUMMAJOR: "$VERNUMMAJOR
+#echo "    VERNUMMINOR: "$VERNUMMINOR
 echo "    PKGNAME: "$PKGNAME
 echo
 echo "  package: "$appname
 echo "  building version: "$version_pack
 echo "    full : "$VERFULL
-echo "    major: "$VERNUMMAJOR
-echo "    minor: "$VERNUMMINOR
-echo "    post : "$VERPOST; echo
+#echo "    major: "$VERNUMMAJOR
+#echo "    minor: "$VERNUMMINOR
+#echo "    post : "$VERPOST; echo
 echo "  source path: $SRC"
 echo "  packaging path: $PACKDIR"
 echo "  destination: "$destdir
@@ -208,6 +208,7 @@ cp -rf $SRC $exportdestdir
 
 echo; echo "clean exported sources"
 find $destdir -name '*.pyc' -exec rm -f '{}' \;
+find $destdir -name '*.pyo' -exec rm -f '{}' \;
 find $destdir -name '*~' -exec rm -f '{}' \;
 find $destdir -name '*.bak' -exec rm -f '{}' \;
 rm -rf "$exportdestdir/.bzr"
@@ -218,13 +219,13 @@ rm -rf "$exportdestdir/.settings"
 rm -rf "$exportdestdir/setup.py"
 rm -rf "$exportdestdir/src/nssbackup/resources"
 rm -rf "$exportdestdir/src/nssbackup/metainfo"
-rm -rf "$exportdestdir/datas/nssbackup-config-su.desktop"
-rm -rf "$exportdestdir/datas/nssbackup-config.desktop"
-rm -rf "$exportdestdir/datas/nssbackup-restore-su.desktop"
-rm -rf "$exportdestdir/datas/nssbackup-restore.desktop"
-rm -rf "$exportdestdir/datas/nssbackup-notify"
+rm -rf "$exportdestdir/data/desktop/nssbackup-config-su.desktop"
+rm -rf "$exportdestdir/data/desktop/nssbackup-config.desktop"
+rm -rf "$exportdestdir/data/desktop/nssbackup-restore-su.desktop"
+rm -rf "$exportdestdir/data/desktop/nssbackup-restore.desktop"
 
-# 'tests', 'tools', and 'doc' are removed; later re-add 'doc' when build
+# 'tests', 'tools', and 'doc' are removed
+#FIXME: re-add 'doc' in later releases
 rm -rf "$exportdestdir/tests"
 rm -rf "$exportdestdir/doc"
 rm -rf "$exportdestdir/tools"
@@ -245,6 +246,8 @@ case "$1" in
         tar -czf $TARNAME $REL_DESTAPPDIR
         mv -f $TARNAME $TARBALLDIR
         echo "Release tarball '$TARNAME' created in '$TARBALLDIR'"
+        echo; echo "cleaning of destination directory $destdir"
+        rm -rf $destdir
         cd $TARBALLDIR
         md5sum "$TARNAME" > "$TARNAME.md5"
         md5sum -c "$TARNAME.md5"
@@ -276,7 +279,7 @@ case "$1" in
         cd $exportdestdir
         echo; echo "Working directory changed to "$PWD
 
-        debuild -S -sd --lintian-opts --color always
+        debuild -S --lintian-opts --color always
     ;;
     
     update)
@@ -297,8 +300,8 @@ case "$1" in
 
     binary)
         echo; echo "building binary packages"
-        tar -czf $ORIGTARNAME $REL_DESTAPPDIR
-
+        rm -f "$ORIGTARNAME"
+        
         # we move the Debian directory back into the exported source in order
         # to build the deb packages
         mv -f $REL_DEBIANDIR $exportdestdir
@@ -308,11 +311,13 @@ case "$1" in
 
         debuild --lintian-opts --color always
 
-        echo; echo "Publishing debs in local repository "$LOCALPPA
-        cd $destdir
-        cp -f *.deb $LOCALPPA
-        cd $LOCALPPA
-        dpkg-scanpackages ./ /dev/null | gzip > Packages.gz
+        if [ $? -eq 0 ]; then
+            echo; echo "Publishing debs in local repository "$LOCALPPA
+            cd $destdir
+            cp -f *.deb $LOCALPPA
+            cd $LOCALPPA
+            dpkg-scanpackages ./ /dev/null | gzip > Packages.gz
+        fi
     ;;
 
     *)

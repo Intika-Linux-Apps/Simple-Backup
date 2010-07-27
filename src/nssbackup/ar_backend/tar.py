@@ -214,7 +214,7 @@ def appendToTarFile(desttar, fileslist, workingdir, additionalOpts):
     LogFactory.getLogger().debug("output was: " + outStr)
 
 
-def __prepare_common_opts(snapshot):
+def __prepare_common_opts(snapshot, publish_progress):
     """Prepares common TAR options used when full or incremental
     backups are being made.  
     
@@ -251,24 +251,24 @@ def __prepare_common_opts(snapshot):
 
     options.append("--file=" + _FOP.normpath(tdir, archivename))
 
-    _snpsize = snapshot.get_space_required()
-    if _snpsize < 5000000:
-        _ncheckp = 10
-    elif _snpsize < 100000000:
-        _ncheckp = 100
-    elif _snpsize < 1000000000:
-        _ncheckp = 500
-    else:
-        _ncheckp = 1000
+    # progress signal
+    if publish_progress is True:
+        _snpsize = snapshot.get_space_required()
+        if _snpsize < 10000000:
+            _ncheckp = 10
+        elif _snpsize < 200000000:
+            _ncheckp = 100
+        elif _snpsize < 2000000000:
+            _ncheckp = 500
+        else:
+            _ncheckp = 1000
 
-    _checkpsize = _snpsize / _ncheckp
-    _checkp = int(_checkpsize / constants.TAR_RECORDSIZE)
-#    print "Snpsize: %s\nncheckpoints: %s" % (_snpsize, _ncheckp)
-#    print "Size between checks: %s\n--checkpoint=%s" % (_checkpsize, _checkp)
-    if _checkp > 0:
-        options.append("--checkpoint=%s" % _checkp)
-        _progessf = util.get_resource_file(resource_name = "sbackup-progress")
-        options.append('--checkpoint-action=exec=%s' % _progessf)
+        _checkpsize = _snpsize / _ncheckp
+        _checkp = int(_checkpsize / constants.TAR_RECORDSIZE)
+        if _checkp > 0:
+            options.append("--checkpoint=%s" % _checkp)
+            _progessf = util.get_resource_file(resource_name = "sbackup-progress")
+            options.append('--checkpoint-action=exec=%s' % _progessf)
 
     LogFactory.getLogger().debug("Common TAR options: %s" % str(options))
     return options
@@ -309,7 +309,7 @@ def __remove_temp_snarfile(tmp_snarfile):
                                         % error)
 
 
-def makeTarIncBackup(snapshot):
+def makeTarIncBackup(snapshot, publish_progress):
     """
     Launch a TAR incremental backup
     @param snapshot: the snapshot in which to make the backup
@@ -317,7 +317,7 @@ def makeTarIncBackup(snapshot):
     """
     LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 
-    options = __prepare_common_opts(snapshot)
+    options = __prepare_common_opts(snapshot, publish_progress)
 
     splitSize = snapshot.getSplitedSize()
     if splitSize :
@@ -336,7 +336,7 @@ def makeTarIncBackup(snapshot):
     if not _FOP.path_exists(base_snarfile) :
         LogFactory.getLogger().error(_("Unable to find the SNAR file to make an incremental backup."))
         LogFactory.getLogger().error(_("Falling back to full backup."))
-        makeTarFullBackup(snapshot)
+        makeTarFullBackup(snapshot, publish_progress)
     else:
 #        shutil.copy(base_snarfile, tmp_snarfile)
 #        # check (and set) the permission bits; necessary if the file's origin
@@ -374,7 +374,7 @@ def makeTarIncBackup(snapshot):
             __remove_temp_snarfile(tmp_snarfile)
 
 
-def makeTarFullBackup(snapshot):
+def makeTarFullBackup(snapshot, publish_progress):
     """Convenience function that launches TAR to create a full backup.
 
     @param snapshot: the snapshot in which to make the backup
@@ -383,7 +383,7 @@ def makeTarFullBackup(snapshot):
     """
     LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 
-    options = __prepare_common_opts(snapshot)
+    options = __prepare_common_opts(snapshot, publish_progress)
 
     splitSize = snapshot.getSplitedSize()
     if splitSize :

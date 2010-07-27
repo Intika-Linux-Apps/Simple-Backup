@@ -410,7 +410,7 @@ class Snapshot(object):
     def isFollowLinks(self):
         return self.__followlinks
 
-    def commit (self) :
+    def commit(self, publish_progress = False):
         "Commit the snapshot infos ( write to the disk )"
         try:
             if not self.isfull():
@@ -419,7 +419,7 @@ class Snapshot(object):
             self.commitexcludefile()
             self.commitpackagefile()
             self.commitflistFiles()
-            self.__makebackup()
+            self.__makebackup(publish_progress)
         finally:
             self.__clean()
         self.commitverfile()
@@ -653,13 +653,13 @@ class Snapshot(object):
         fe.close()
         return _res
 
-    def __makebackup(self):
+    def __makebackup(self, publish_progress):
         " Make the backup on the disk "
 
-        if self.isfull() :
-            tar.makeTarFullBackup(self)
-        else :
-            tar.makeTarIncBackup(self)
+        if self.isfull():
+            tar.makeTarFullBackup(self, publish_progress)
+        else:
+            tar.makeTarIncBackup(self, publish_progress)
 
     def __clean(self):
         """

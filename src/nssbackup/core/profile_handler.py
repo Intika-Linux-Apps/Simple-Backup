@@ -176,12 +176,15 @@ class BackupProfileHandler(object):
         self.__snapshot.setExcludes(gexclude)
 
         if self.config.has_option("general", "format"):
-            self.logger.info(_("Setting compression format."))
-            self.__snapshot.setFormat(self.config.get("general", "format"))
+            _compr = self.config.get("general", "format")
+            self.logger.info(_("Setting compression format to `%s`") % _compr)
+            self.__snapshot.setFormat(_compr)
 
         if self.config.has_option("general", "splitsize"):
-            self.logger.info(_("Setting split size."))
-            self.__snapshot.setSplitedSize(int(self.config.get("general", "splitsize")))
+            _chunks = int(self.config.get("general", "splitsize"))
+            self.logger.info(_("Setting size of archive chunks to %s")\
+                        % util.get_humanreadable_size_str(size_in_bytes = _chunks, binary_prefixes = True))
+            self.__snapshot.setSplitedSize(_chunks)
 
         # set followlinks
         self.__snapshot.setFollowLinks(self.config.get_followlinks())
@@ -191,11 +194,15 @@ class BackupProfileHandler(object):
             self.logger.info(_("Option 'Follow symbolic links' is disabled."))
 
         self.__collect_files()
+
         self.__state.set_state('commit')
-        self.__snapshot.commit()
+        _publish_progress = True
+        if self.__dbus_conn is None:
+            _publish_progress = False
+        self.__snapshot.commit(_publish_progress)
 
 #TODO: add state purging
-#TODO: Files are not entirely written to some FS now! Improve this.
+#FIXME: Files are not entirely written to some FS now! Improve this.
         # purge
         purge = None
         if self.config.has_option("general", "purge"):

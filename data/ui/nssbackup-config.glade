@@ -1230,7 +1230,6 @@ Please enter the new profile name and set the according checkbox in order to ena
             <child>
               <widget class="GtkNotebook" id="notebook">
                 <property name="visible">True</property>
-                <property name="border_width">6</property>
                 <property name="tab_border">0</property>
                 <property name="tab_hborder">3</property>
                 <property name="tab_vborder">3</property>
