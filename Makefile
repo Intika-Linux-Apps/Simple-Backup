@@ -52,22 +52,24 @@ HELPLANG=C
 # definition of paths and filenames
 # installation into /usr/local to be compliant to GNU standards
 #
-prefix=/usr/local
+PREFIX=/usr/local
+DESTDIR=/usr/local
 
-destdir=$(prefix)
-datadir=$(destdir)/share
+datadir=$(DESTDIR)/share
+bindir=$(DESTDIR)/bin
+sbindir=$(DESTDIR)/sbin
+
 helpdir=$(datadir)/gnome/help/$(PKGNAME)
 langdir=$(datadir)/locale
-bindir=$(destdir)/bin
-sbindir=$(destdir)/sbin
+icondir=$(datadir)/icons
 gconf_schema_file_dir=$(datadir)/gconf/schemas
-dbus_system_conf_dir=/etc/dbus-1/system.d
+
+sysconf_dir=/etc
+dbus_system_conf_dir=$(sysconf_dir)/dbus-1/system.d
 
 gconf_schema_file=apps_sbackup_global-preferences.schemas
 dbus_system_conf_file=org.sbackupteam.SimpleBackup.conf
 
-
-icondir=$(datadir)/icons
 gtk_update_icon_cache=if test "$(DISABLE_MAKEFILE_GTK_UPDATE_ICON_CACHE)" = ""; then \
 						gtk-update-icon-cache -f -t $(icondir)/hicolor; \
 						gtk-update-icon-cache -f -t $(icondir)/ubuntu-mono-light; \
@@ -79,7 +81,7 @@ gtk_update_icon_cache=if test "$(DISABLE_MAKEFILE_GTK_UPDATE_ICON_CACHE)" = ""; 
 #
 SETUP.PY_OPTS=--root=/
 
-# should we add layout option always?
+#FIXME: should we add layout option as default?
 UbuntuVersion=$(shell lsb_release -rs)
 # if we use jaunty or karmic
 ifneq (,$(findstring 9.04,$(UbuntuVersion)))
@@ -98,16 +100,26 @@ endif
 
 default: po-data fill-templates
 
+po-dir:
+	set -e; for lang in $(PO); do mkdir -p po/$$lang/LC_MESSAGES/ ; done
+
+po-data: po-dir
+	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
+
+po-gen:
+	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.py scripts/*.py
+	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/nssbackup.pot; done
+
 fill-templates:
-	set -e; sed s+@prefix@+$(prefix)+ src/nssbackup/resources.in > src/nssbackup/resources
+	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/resources.in > src/nssbackup/resources
 
-	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-config.desktop.in > data/desktop/nssbackup-config.desktop	
-	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-config-su.desktop.in > data/desktop/nssbackup-config-su.desktop.tmp
-	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-config-su.desktop.tmp > data/desktop/nssbackup-config-su.desktop
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-config.desktop.in > data/desktop/nssbackup-config.desktop
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-config-su.desktop.in > data/desktop/nssbackup-config-su.desktop.tmp
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-config-su.desktop.tmp > data/desktop/nssbackup-config-su.desktop
 
-	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-restore.desktop.in > data/desktop/nssbackup-restore.desktop	
-	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-restore-su.desktop.in > data/desktop/nssbackup-restore-su.desktop.tmp
-	set -e; sed s+@prefix@+$(prefix)+ data/desktop/nssbackup-restore-su.desktop.tmp > data/desktop/nssbackup-restore-su.desktop
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-restore.desktop.in > data/desktop/nssbackup-restore.desktop
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-restore-su.desktop.in > data/desktop/nssbackup-restore-su.desktop.tmp
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-restore-su.desktop.tmp > data/desktop/nssbackup-restore-su.desktop
 
 	set -e; sed s+@version@+$(VERSION)+ setup.py.in > setup.py.tmp
 	set -e; sed s+@pkgname@+$(PKGNAME)+ setup.py.tmp > setup.py
@@ -137,17 +149,20 @@ install-bin:
 	cp -a scripts/nssbackup-config-gui.py $(bindir)/nssbackup-config-gui
 	cp -a scripts/nssbackup-restore-gui.py $(bindir)/nssbackup-restore-gui
 	cp -a scripts/nssbackup-upgrade-backups.py $(bindir)/nssbackup-upgrade-backups
-	chmod +x $(bindir)/nssbackup*
-
+	chmod +x $(bindir)/nssbackupd
+	chmod +x $(bindir)/nssbackup-config-gui
+	chmod +x $(bindir)/nssbackup-restore-gui
+	chmod +x $(bindir)/nssbackup-upgrade-backups
+	
 # Configuration and setup tools
 install-sbin:
 	mkdir -p $(sbindir)
 	cp -a scripts/nssbackupconfig.py $(sbindir)/nssbackupconfig
-	chmod +x $(sbindir)/nssbackup*
+	chmod +x $(sbindir)/nssbackupconfig
 
 # python package
 install-package:
-	$(PYTHON) setup.py install ${SETUP.PY_OPTS} --prefix=$(prefix) $(LAYOUT)
+	$(PYTHON) setup.py install ${SETUP.PY_OPTS} --prefix=$(PREFIX) $(LAYOUT)
 
 # localization
 install-po:
@@ -170,25 +185,31 @@ install-data: install-icons install-dbus install-gconf
 
 install-icons:
 # implement loop over icon files
-	install -D data/icons/hicolor/24x24/sbackup-panel.png $(icondir)/hicolor/24x24/apps/sbackup-panel.png
-	install -D data/icons/hicolor/24x24/sbackup-attention.png $(icondir)/hicolor/24x24/apps/sbackup-attention.png
-	install -D data/icons/hicolor/24x24/sbackup-success.png $(icondir)/hicolor/24x24/apps/sbackup-success.png
+	install -d $(icondir)/hicolor/24x24/apps/
+	install -d $(icondir)/ubuntu-mono-light/apps/24/
+	install -d $(icondir)/ubuntu-mono-dark/apps/24/
 	
-	install -D data/icons/ubuntu-mono-light/24/sbackup-panel.png $(icondir)/ubuntu-mono-light/apps/24/sbackup-panel.png
-	install -D data/icons/ubuntu-mono-light/24/sbackup-attention.png $(icondir)/ubuntu-mono-light/apps/24/sbackup-attention.png
-	install -D data/icons/ubuntu-mono-light/24/sbackup-success.png $(icondir)/ubuntu-mono-light/apps/24/sbackup-success.png
+	install -m 644 data/icons/hicolor/24x24/sbackup-panel.png $(icondir)/hicolor/24x24/apps/
+	install -m 644 data/icons/hicolor/24x24/sbackup-attention.png $(icondir)/hicolor/24x24/apps/
+	install -m 644 data/icons/hicolor/24x24/sbackup-success.png $(icondir)/hicolor/24x24/apps/
+	
+	install -m 644 data/icons/ubuntu-mono-light/24/sbackup-panel.png $(icondir)/ubuntu-mono-light/apps/24/
+	install -m 644 data/icons/ubuntu-mono-light/24/sbackup-attention.png $(icondir)/ubuntu-mono-light/apps/24/
+	install -m 644 data/icons/ubuntu-mono-light/24/sbackup-success.png $(icondir)/ubuntu-mono-light/apps/24/
 
-	install -D data/icons/ubuntu-mono-dark/24/sbackup-panel.png $(icondir)/ubuntu-mono-dark/apps/24/sbackup-panel.png
-	install -D data/icons/ubuntu-mono-dark/24/sbackup-attention.png $(icondir)/ubuntu-mono-dark/apps/24/sbackup-attention.png
-	install -D data/icons/ubuntu-mono-dark/24/sbackup-success.png $(icondir)/ubuntu-mono-dark/apps/24/sbackup-success.png
+	install -m 644 data/icons/ubuntu-mono-dark/24/sbackup-panel.png $(icondir)/ubuntu-mono-dark/apps/24/
+	install -m 644 data/icons/ubuntu-mono-dark/24/sbackup-attention.png $(icondir)/ubuntu-mono-dark/apps/24/
+	install -m 644 data/icons/ubuntu-mono-dark/24/sbackup-success.png $(icondir)/ubuntu-mono-dark/apps/24/
 	
 	$(gtk_update_icon_cache)
 
 install-dbus:
+	install -d $(dbus_system_conf_dir)
 	install -m 644 data/$(dbus_system_conf_file) $(dbus_system_conf_dir)
 	touch $(dbus_system_conf_dir)/$(dbus_system_conf_file)
 
 install-gconf:
+	install -d $(gconf_schema_file_dir)
 	install -m 644 data/$(gconf_schema_file) $(gconf_schema_file_dir)
 	if test "$(GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL)" = ""; then \
 	gconf-schemas --register $(gconf_schema_file_dir)/$(gconf_schema_file); \
@@ -198,7 +219,7 @@ install-gconf:
 #
 # targets for un-installation
 #
-uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-help clean-crondata
+uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-help clean-data
 
 uninstall-bin:
 	rm -f $(bindir)/nssbackupd
@@ -210,7 +231,7 @@ uninstall-sbin:
 	rm -f $(sbindir)/nssbackupconfig
 
 uninstall-package:
-	rm -rf $(destdir)/lib/python*/*/nssbackup*
+	rm -rf $(DESTDIR)/lib/python*/*/nssbackup*
 
 uninstall-data: uninstall-icons uninstall-dbus uninstall-gconf
 	rm -f $(datadir)/pixmaps/nssbackup-restore.png
@@ -246,28 +267,46 @@ uninstall-icons:
 uninstall-dbus:
 	rm -f $(dbus_system_conf_dir)/$(dbus_system_conf_file)
 
-#FIXME: proper handling in postinst?
+#FIXME: treat gconf schema file as proper conffile?
 uninstall-gconf:
 	if test "$(GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL)" = ""; then \
-		if test -r "$(gconf_schema_file_dir)/$(gconf_schema_file)"; then \
-			gconf-schemas --unregister $(gconf_schema_file_dir)/$(gconf_schema_file); \
-		fi; \
-		if test "$(gconfdpid)";then killall $(gconfd); fi; \
-		rm -f $(gconf_schema_file_dir)/$(gconf_schema_file); \
-	fi
-#	rm -f $(gconf_schema_file_dir)/$(gconf_schema_file)
+	if test -r "$(gconf_schema_file_dir)/$(gconf_schema_file)"; then \
+	gconf-schemas --unregister $(gconf_schema_file_dir)/$(gconf_schema_file); fi; \
+	if test "$(gconfdpid)";then killall $(gconfd); fi; fi
+	rm -f $(gconf_schema_file_dir)/$(gconf_schema_file)
 
-
-# remove script/symlinks from cron directory
-clean-crondata:
-	rm -f /etc/cron.d/nssbackup
-	rm -f /etc/cron.hourly/nssbackup
-	rm -f /etc/cron.daily/nssbackup
-	rm -f /etc/cron.weekly/nssbackup
-	rm -f /etc/cron.monthly/nssbackup
 
 uninstall-help:
 	rm -rf $(helpdir)
+
+clean-data: clean-crondata clean-tmpdata
+
+# remove script/symlinks from cron directory
+clean-crondata:
+	if test "$(DISABLE_MAKEFILE_CLEAN_DATA)" = ""; then \
+	rm -f /etc/cron.d/nssbackup; \
+	rm -f /etc/cron.hourly/nssbackup; \
+	rm -f /etc/cron.daily/nssbackup; \
+	rm -f /etc/cron.weekly/nssbackup; \
+	rm -f /etc/cron.monthly/nssbackup; fi
+
+clean-tmpdata:
+	if test "$(DISABLE_MAKEFILE_CLEAN_DATA)" = ""; then \
+	rm -rf /home/*/.local/share/nssbackup/tmp; \
+	rm -rf /home/*/.local/share/nssbackup/log; \
+	rm -f /home/*/.local/share/nssbackup/nssbackup-*.log; \
+	rm -f /home/*/.local/share/nssbackup/nssbackup-*.log.*.gz; \
+	rm -rf /var/log/nssbackup; \
+	rm -f /var/log/nssbackup-*.log; \
+	rm -f /var/log/nssbackup-*.log.*.gz; \
+	rm -rf /tmp/nssbackup; fi
+
+
+purge-user-config:
+	rm -f /etc/nssbackup.conf
+	rm -rf /etc/nssbackup.d
+	rm -rf /home/*/.config/nssbackup
+
 
 #
 #
@@ -275,10 +314,11 @@ uninstall-help:
 reinstall: uninstall install
 
 #
-#
+# clean source code directory
 #
 clean:
 	set -e; find . -name '*.pyc' -exec rm -f '{}' \;
+	set -e; find . -name '*.pyo' -exec rm -f '{}' \;
 	set -e; find . -name '*~' -exec rm -f '{}' \;
 	set -e; find . -name '*.bak' -exec rm -f '{}' \;
 	rm -rf build dist setup.py
@@ -292,16 +332,6 @@ clean:
 	rm -f src/nssbackup/metainfo
 	rm -rf src/nssbackup.egg-info
 	set -e; for lang in $(PO); do rm -rf po/$$lang ; done
-	
-po-dir:
-	set -e; for lang in $(PO); do mkdir -p po/$$lang/LC_MESSAGES/ ; done
-
-po-data: po-dir
-	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
-	
-po-gen:
-	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py datas/*.glade datas/*.py scripts/*.py
-	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/nssbackup.pot; done
 
 # Purpose of this target is to print some informational data
 show-infos:
@@ -314,10 +344,10 @@ show-infos:
 	@echo "  layout       : "$(LAYOUT)
 	@echo
 	@echo "Directories"
-	@echo "  prefix      : "$(prefix)
-	@echo "  destdir     : "$(destdir)
+	@echo "  PREFIX      : "$(PREFIX)
+	@echo "  DESTDIR     : "$(DESTDIR)
 	@echo "  datadir     : "$(datadir)
 	@echo "  helpdir     : "$(helpdir)
 	@echo "  langdir     : "$(langdir)
-	@echo "  bindir         : "$(bindir)
-	@echo "  sbindir        : "$(sbindir)
+	@echo "  bindir      : "$(bindir)
+	@echo "  sbindir     : "$(sbindir)

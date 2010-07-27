@@ -32,8 +32,10 @@ endif
 
 
 # don't register gconf schemas nor update icon cache -> postinst
+# don't clean crondata -> postrm
 export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
 export DISABLE_MAKEFILE_GTK_UPDATE_ICON_CACHE=1
+export DISABLE_MAKEFILE_CLEAN_DATA=1
 
 
 clean:
@@ -63,12 +65,12 @@ install: build install-indep
 install-indep:
 	dh_testdir
 	dh_testroot
-	dh_clean -k -i 
+	dh_prep -i 
 	dh_installdirs -i
 
 	# Add here commands to install the indep part of the package into
 	# debian/<package>-doc.
-	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/tmp/usr SETUP.PY_OPTS="--root=$(CURDIR)/debian/tmp/ $(LAYOUT)" install
+	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/tmp/usr sysconf_dir=$(CURDIR)/debian/tmp/etc SETUP.PY_OPTS="--root=$(CURDIR)/debian/tmp/ $(LAYOUT)" install
 
 	dh_install -i
 
@@ -76,6 +78,7 @@ install-indep:
 # binary-arch/binary-indep
 # in another 'make' thread.
 binary-common:
+#	dh_pysupport # installs to pyshared
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs ChangeLog

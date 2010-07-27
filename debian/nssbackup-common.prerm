@@ -18,18 +18,34 @@ set -e
 # the debian-policy package
 
 
+
+# unregister gconf schema before it is removed
+
+DESTDIR=/usr
+datadir=$DESTDIR/share
+gconf_schema_file_dir=$datadir/gconf/schemas
+gconf_schema_file=apps_sbackup_global-preferences.schemas
+
+gconfd=gconfd-2
+gconfdpid=$(pgrep $gconfd)
+
+
 case "$1" in
     remove|deconfigure)
       find /usr/lib/python*/*/nssbackup -name '*.pyc' -exec rm -f '{}' \;
-      rm -f /etc/cron.d/nssbackup;
-      rm -f /etc/cron.hourly/nssbackup;
-      rm -f /etc/cron.daily/nssbackup;
-      rm -f /etc/cron.weekly/nssbackup;
-      rm -f /etc/cron.monthly/nssbackup;
+      find /usr/lib/python*/*/nssbackup -name '*.pyo' -exec rm -f '{}' \;
+      find /usr/share/nssbackup -name '*.pyc' -exec rm -f '{}' \;
+      find /usr/share/nssbackup -name '*.pyo' -exec rm -f '{}' \;
+      
+      gconf-schemas --unregister $gconf_schema_file_dir/$gconf_schema_file
+      test "$gconfdpid" && killall $gconfd
     ;;
 
     upgrade)
       find /usr/lib/python*/*/nssbackup -name '*.pyc' -exec rm -f '{}' \;
+      find /usr/lib/python*/*/nssbackup -name '*.pyo' -exec rm -f '{}' \;
+      find /usr/share/nssbackup -name '*.pyc' -exec rm -f '{}' \;
+      find /usr/share/nssbackup -name '*.pyo' -exec rm -f '{}' \;
     ;;
 
     failed-upgrade)

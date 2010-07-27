@@ -18,9 +18,37 @@ set -e
 # the debian-policy package
 #
 
+DESTDIR=/usr
+datadir=$DESTDIR/share
+sbindir=$DESTDIR/sbin
+
+icondir=$datadir/icons
+gconf_schema_file_dir=$datadir/gconf/schemas
+
+sysconf_dir=/etc
+dbus_system_conf_dir=$sysconf_dir/dbus-1/system.d
+
+gconf_schema_file=apps_sbackup_global-preferences.schemas
+dbus_system_conf_file=org.sbackupteam.SimpleBackup.conf
+
+gconfd=gconfd-2
+gconfdpid=$(pgrep $gconfd)
+
+confscript=$sbindir/nssbackupconfig
+
 case "$1" in
     configure)
-	set -e; if [ -x /usr/sbin/nssbackupconfig ]; then /usr/sbin/nssbackupconfig; fi
+        gtk-update-icon-cache -f -t $icondir/hicolor
+        gtk-update-icon-cache -f -t $icondir/ubuntu-mono-light
+        gtk-update-icon-cache -f -t $icondir/ubuntu-mono-dark
+
+        gconf-schemas --register $gconf_schema_file_dir/$gconf_schema_file
+        test "$gconfdpid" && killall $gconfd
+        
+        # byte-compile: deb package does not ship compiled files
+        python -m compileall /usr/lib/python*/*/nssbackup
+        
+        [ -x $confscript ] && $confscript
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
