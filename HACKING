@@ -21,7 +21,7 @@ Summary of style guide
 * Use 4 spaces per indentation level.
 * Never mix tabs and spaces.
 * Use spaces instead of tabs (set this in your IDE). 
-* Limit line length to 80 characters.
+* Limit line length to 80-120 characters.
 * Modules should have short, all-lowercase names.  Underscores can be used
   in the module name if it improves readability.
 * Function names, method names and instance variables should be lowercase, with

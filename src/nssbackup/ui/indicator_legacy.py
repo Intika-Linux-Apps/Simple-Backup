@@ -17,7 +17,7 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
+import sys
 import gtk
 
 
@@ -27,6 +27,10 @@ from nssbackup.util import constants
 
 from nssbackup.ui import indicator_core
 from nssbackup.ui.indicator_core import PyNotifyMixin, SBackupdIndicatorHandler, SBackupdIndicatorBase
+from nssbackup.ui import misc
+
+
+sys.excepthook = misc.except_hook
 
 
 class SBackupdIndicatorLegacy(SBackupdIndicatorBase, PyNotifyMixin):

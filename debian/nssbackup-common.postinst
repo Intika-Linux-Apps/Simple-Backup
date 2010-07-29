@@ -45,6 +45,11 @@ case "$1" in
         gconf-schemas --register $gconf_schema_file_dir/$gconf_schema_file
         test "$gconfdpid" && killall $gconfd
         
+        if [ -x /usr/sbin/service ]; then
+        /usr/sbin/service dbus force-reload
+        else if [ -r /etc/init.d/dbus ]; then
+        invoke-rc.d dbus force-reload; fi; fi
+        
         # byte-compile: deb package does not ship compiled files
         python -m compileall /usr/lib/python*/*/nssbackup
         

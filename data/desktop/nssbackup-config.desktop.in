@@ -22,6 +22,6 @@ Exec=@prefix@/bin/nssbackup-config-gui
 #
 Terminal=false
 Categories=Utility;
-StartupNotify=false
+StartupNotify=true
 Icon=nssbackup-conf
 X-Ubuntu-Gettext-Domain=nssbackup

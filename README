@@ -1,16 +1,18 @@
 Install
 =======
 
-make
-sudo make install
+make && sudo make install
+sudo nssbackupconfig
 
 * See the INSTALL file for more information.
 
 
 Uninstall
 =========
+To remove (Not So) Simple Backup Suite and created user
+configuration files type:
 
-sudo make uninstall
+sudo make uninstall && sudo make clean && sudo make purge-user-config
 
 
 Configuration Hint
@@ -19,8 +21,9 @@ Configuration Hint
 Follow links 
 ------------
 
-use the option in general->backuplinks=1 to activate and general->backuplinks=0 to deactivate
-see the example configuration file for more infos.
+use the option in general->backuplinks=1 to activate and
+general->backuplinks=0 to deactivate.
+See the example configuration file for more infos.
 
 
 Notes on Upgrade to 0.2.0-RC3

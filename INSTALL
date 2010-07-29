@@ -59,15 +59,16 @@ By default, nssbackup will be installed under "/usr/local" folder.
                           python-gtk
 
 * Walk into the same directory as this README file
-* Run 'make'
-* Run 'sudo make install'
-* Run 'sudo nssbackupconfig'
+* Type:
+ make && sudo make install
+ sudo nssbackupconfig
 
 
 Uninstalling
 ~~~~~~~~~~~~
 * Walk into the source code directory from where the application was installed
-* type 'sudo make uninstall' in the source code folder
-* type 'sudo make clean' in the source code folder
+* type:
+ sudo make uninstall && sudo make clean && sudo make purge-user-config
+* this will remove installed files as well as user configurations created
 * you can now remove the source code folder
 

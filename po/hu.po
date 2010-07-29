@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-27 22:20+0200\n"
+"POT-Creation-Date: 2010-07-29 15:09+0200\n"
 "PO-Revision-Date: 2010-05-21 17:04+0000\n"
 "Last-Translator: Krasznecz Zoltán <zoltan.krasznecz@gmail.com>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
@@ -92,132 +92,132 @@ msgstr ""
 msgid "Invalid archive type."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:290
+#: src/nssbackup/ar_backend/tar.py:293
 msgid ""
 "For the moment split functionality is not compatible with compress option."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:299
+#: src/nssbackup/ar_backend/tar.py:302
 #: src/nssbackup/core/profile_handler.py:283
 #, python-format
 msgid "Unable to change permissions for file '%s'."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:308
+#: src/nssbackup/ar_backend/tar.py:311
 #, python-format
 msgid "Unable to remove temporary snar file: %s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:318
+#: src/nssbackup/ar_backend/tar.py:321
 msgid "Launching TAR to make incremental backup."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:337
+#: src/nssbackup/ar_backend/tar.py:340
 msgid "Unable to find the SNAR file to make an incremental backup."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:338
+#: src/nssbackup/ar_backend/tar.py:341
 msgid "Falling back to full backup."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:384
+#: src/nssbackup/ar_backend/tar.py:387
 msgid "Launching TAR to make a full backup."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:434
+#: src/nssbackup/ar_backend/tar.py:437
 #, python-format
 msgid ""
 "TAR returned following output:\n"
 "%s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:441
+#: src/nssbackup/ar_backend/tar.py:444
 msgid "Leading '/' from member names were removed."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:443
+#: src/nssbackup/ar_backend/tar.py:446
 msgid "Leading '/' from hard link targets were removed."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:452
+#: src/nssbackup/ar_backend/tar.py:455
 #, python-format
 msgid "TAR returned a message: %s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:454
+#: src/nssbackup/ar_backend/tar.py:457
 #, python-format
 msgid ""
 "TAR returned messages:\n"
 "%s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:457
+#: src/nssbackup/ar_backend/tar.py:460
 msgid "TAR has been finished successfully."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:461
+#: src/nssbackup/ar_backend/tar.py:464
 #, python-format
 msgid "TAR returned a warning: %s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:463
+#: src/nssbackup/ar_backend/tar.py:466
 #, python-format
 msgid ""
 "TAR returned warnings:\n"
 "%s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:466
+#: src/nssbackup/ar_backend/tar.py:469
 msgid "TAR returned warnings but has been finished successfully."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:470
+#: src/nssbackup/ar_backend/tar.py:473
 msgid "Unable to make a proper backup. TAR terminated with errors."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:545
+#: src/nssbackup/ar_backend/tar.py:548
 msgid "Included"
 msgstr "Csatolva"
 
-#: src/nssbackup/ar_backend/tar.py:545
+#: src/nssbackup/ar_backend/tar.py:548
 msgid "Not changed"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:545
+#: src/nssbackup/ar_backend/tar.py:548
 msgid "Directory"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:573
+#: src/nssbackup/ar_backend/tar.py:576
 msgid "Line must be a string"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:589
+#: src/nssbackup/ar_backend/tar.py:592
 msgid "Dumpdir inconsistancy : 'filename' is empty"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:602
+#: src/nssbackup/ar_backend/tar.py:605
 msgid "Dumpdir inconsistancy : 'control' is empty"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:677
+#: src/nssbackup/ar_backend/tar.py:680
 #, python-format
 msgid "File '%s' does not exist."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:806 src/nssbackup/ar_backend/tar.py:842
+#: src/nssbackup/ar_backend/tar.py:809 src/nssbackup/ar_backend/tar.py:845
 msgid "The snarfile header is incomplete."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:941
+#: src/nssbackup/ar_backend/tar.py:944
 #: src/nssbackup/core/SnapshotManager.py:578
 msgid "The snarfile header is incomplete !"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:1107
+#: src/nssbackup/ar_backend/tar.py:1110
 msgid "A SnapshotFile is required"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:1207
+#: src/nssbackup/ar_backend/tar.py:1210
 #, python-format
 msgid "Directory does not exist: %s."
 msgstr ""
@@ -1435,7 +1435,7 @@ msgid "Show message windows"
 msgstr ""
 
 #: src/nssbackup/ui/indicator_core.py:353
-#: src/nssbackup/ui/indicator_core.py:797
+#: src/nssbackup/ui/indicator_core.py:803
 msgid "Cancel Backup"
 msgstr ""
 
@@ -1453,94 +1453,94 @@ msgid ""
 "Indicator is being terminated."
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:508
+#: src/nssbackup/ui/indicator_core.py:509
 msgid "Starting backup Session"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:517
+#: src/nssbackup/ui/indicator_core.py:518
 msgid "Ending Backup Session"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:530
+#: src/nssbackup/ui/indicator_core.py:531
 msgid ""
 "There are snapshots with old snapshot format. Please upgrade these using the "
 "Restoration tool if you want to use them."
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:532
+#: src/nssbackup/ui/indicator_core.py:533
 #, python-format
 msgid "Unknown D-Bus event `%s` received."
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:572
+#: src/nssbackup/ui/indicator_core.py:574
 msgid "Try again"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:633
+#: src/nssbackup/ui/indicator_core.py:638
 msgid ""
 "Attempt of starting another instance of Simple Backup while this one is "
 "already running."
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:643
+#: src/nssbackup/ui/indicator_core.py:648
 #, python-format
 msgid "Unable to present window: %s"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:659
+#: src/nssbackup/ui/indicator_core.py:664
 #, python-format
 msgid "Do you really want to cancel the backup process of profile '%s'?"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:663
+#: src/nssbackup/ui/indicator_core.py:668
 msgid "Cancel running backup process?"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:680
+#: src/nssbackup/ui/indicator_core.py:685
 msgid "Unable to cancel backup process."
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:741
+#: src/nssbackup/ui/indicator_core.py:747
 #, python-format
 msgid "Profile: %s"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:742
+#: src/nssbackup/ui/indicator_core.py:748
 #, python-format
 msgid "Size of backup: %s"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:743
+#: src/nssbackup/ui/indicator_core.py:749
 #, python-format
 msgid "%.1f%% processed"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:744
+#: src/nssbackup/ui/indicator_core.py:750
 #, python-format
 msgid "Remaining time: %s"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:790
+#: src/nssbackup/ui/indicator_core.py:796
 #, python-format
 msgid "PID of backup process being canceled: %s"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:795
+#: src/nssbackup/ui/indicator_core.py:801
 #, python-format
 msgid "Unable to send signal to process %s"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:796
+#: src/nssbackup/ui/indicator_core.py:802
 #, python-format
 msgid "Sending signal using gksu to process %s"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:800
+#: src/nssbackup/ui/indicator_core.py:806
 #, python-format
 msgid "Sending signal using gksu to process %s failed"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:835
+#: src/nssbackup/ui/indicator_core.py:841
 #, python-format
 msgid ""
 "<b>Unable to find specified target directory</b>\n"
@@ -1549,71 +1549,71 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:836
+#: src/nssbackup/ui/indicator_core.py:842
 #, python-format
 msgid ""
 "You can try to use the specified target again or cancel the profile "
 "execution. The profile execution is canceled automatically in %s seconds."
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:862
-#: src/nssbackup/ui/indicator_core.py:903
-#: src/nssbackup/ui/indicator_core.py:921
-#: src/nssbackup/ui/indicator_core.py:938
+#: src/nssbackup/ui/indicator_core.py:868
+#: src/nssbackup/ui/indicator_core.py:909
+#: src/nssbackup/ui/indicator_core.py:927
+#: src/nssbackup/ui/indicator_core.py:944
 msgid "unknown"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:882
+#: src/nssbackup/ui/indicator_core.py:888
 msgid "less than 1 minute"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:884
+#: src/nssbackup/ui/indicator_core.py:890
 msgid "about 2 minutes"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:886
+#: src/nssbackup/ui/indicator_core.py:892
 msgid "about 3 minutes"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:888
+#: src/nssbackup/ui/indicator_core.py:894
 msgid "about 4 minutes"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:890
+#: src/nssbackup/ui/indicator_core.py:896
 msgid "about 5 minutes"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:892
+#: src/nssbackup/ui/indicator_core.py:898
 #, python-format
 msgid "about %.0f minutes"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:902
+#: src/nssbackup/ui/indicator_core.py:908
 msgid "In progress"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:912
-#: src/nssbackup/ui/indicator_core.py:930
+#: src/nssbackup/ui/indicator_core.py:918
+#: src/nssbackup/ui/indicator_core.py:936
 msgid "finished"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:920
+#: src/nssbackup/ui/indicator_core.py:926
 msgid "Progress: unknown"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:929
+#: src/nssbackup/ui/indicator_core.py:935
 msgid "Progress: canceled"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:949
+#: src/nssbackup/ui/indicator_core.py:955
 msgid "An error occurred"
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:982
+#: src/nssbackup/ui/indicator_core.py:988
 msgid "Another `Simple Backup Indicator` is already running."
 msgstr ""
 
-#: src/nssbackup/ui/indicator_core.py:1006
+#: src/nssbackup/ui/indicator_core.py:1012
 #, python-format
 msgid "Initialization of GTK+ failed: %s"
 msgstr ""

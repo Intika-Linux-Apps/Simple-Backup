@@ -22,7 +22,7 @@ Exec=gksu --description @prefix@/share/applications/nssbackup-restore-su.desktop
 #
 Terminal=false
 Categories=GTK;GNOME;System;
-StartupNotify=false
+StartupNotify=true
 Icon=nssbackup-restore
 #
 X-KDE-SubstituteUID = true

@@ -207,7 +207,12 @@ install-icons:
 install-dbus:
 	install -d $(dbus_system_conf_dir)
 	install -m 644 data/$(dbus_system_conf_file) $(dbus_system_conf_dir)
-	touch $(dbus_system_conf_dir)/$(dbus_system_conf_file)
+	if test "$(DISABLE_MAKEFILE_DBUS_RELOAD)" = ""; then \
+	if [ -x /usr/sbin/service ]; then \
+	/usr/sbin/service dbus force-reload; \
+	else if [ -r /etc/init.d/dbus ]; then \
+	invoke-rc.d dbus force-reload; fi; fi; \
+	fi
 
 install-gconf:
 	install -d $(gconf_schema_file_dir)

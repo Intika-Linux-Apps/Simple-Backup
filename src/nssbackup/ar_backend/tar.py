@@ -252,16 +252,19 @@ def __prepare_common_opts(snapshot, publish_progress):
     options.append("--file=" + _FOP.normpath(tdir, archivename))
 
     # progress signal
+#TODO: improve calculation of number of checkpoints based on estimated transfer rate.
     if publish_progress is True:
+        one_mb = 1000000
+        one_gb = 1000 * one_mb
         _snpsize = snapshot.get_space_required()
-        if _snpsize < 10000000:
+        if _snpsize < (50 * one_mb):
             _ncheckp = 10
-        elif _snpsize < 200000000:
-            _ncheckp = 100
-        elif _snpsize < 2000000000:
-            _ncheckp = 500
+        elif _snpsize < (500 * one_mb):
+            _ncheckp = 50
+        elif _snpsize < (5 * one_gb):
+            _ncheckp = 250
         else:
-            _ncheckp = 1000
+            _ncheckp = 500
 
         _checkpsize = _snpsize / _ncheckp
         _checkp = int(_checkpsize / constants.TAR_RECORDSIZE)

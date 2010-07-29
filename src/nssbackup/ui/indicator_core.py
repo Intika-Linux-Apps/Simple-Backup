@@ -406,39 +406,39 @@ class SBackupdIndicatorBase(INotifyMixin):
 
     def _dbus_check(self):
         _res = True
-        if self._exit is False:
+#        if self._exit is False:
+        self._indicator_hdl.test_dbus_validity()
+        if not self._indicator_hdl.is_dbus_valid():
+            self._notify_info(profilename = "", message = _("Connection to D-Bus service lost."))
+
+            self._set_menuitems_status_unknown()
+            self._menuitems["cancel"].set_sensitive(False)
+
+            self._indicator_hdl.dbus_reconnect()
             self._indicator_hdl.test_dbus_validity()
-            if not self._indicator_hdl.is_dbus_valid():
-                self._notify_info(profilename = "", message = _("Connection to D-Bus service lost."))
-
-                self._set_menuitems_status_unknown()
-                self._menuitems["cancel"].set_sensitive(False)
-
-                self._indicator_hdl.dbus_reconnect()
-                self._indicator_hdl.test_dbus_validity()
-                if self._indicator_hdl.is_dbus_valid():    # re-connection successful?                    
-                    self._connect_dbus_signal_handlers()
+            if self._indicator_hdl.is_dbus_valid():    # re-connection successful?                    
+                self._connect_dbus_signal_handlers()
 #TODO: get new values here!
-                else:
-                    self._init_dbus_reconnect_timer()
-                    _res = False
+            else:
+                self._init_dbus_reconnect_timer()
+                _res = False
         return _res
 
     def _dbus_reconnect(self):
         _res = True
-        if self._exit is False:    # do not re-connect when quit was already called
+#        if self._exit is False:    # do not re-connect when quit was already called
+        self._indicator_hdl.test_dbus_validity()
+        if self._indicator_hdl.is_dbus_valid():
+            _res = False    # already re-connected
+        else:
+            self._indicator_hdl.dbus_reconnect()
             self._indicator_hdl.test_dbus_validity()
             if self._indicator_hdl.is_dbus_valid():
-                _res = False    # already re-connected
-            else:
-                self._indicator_hdl.dbus_reconnect()
-                self._indicator_hdl.test_dbus_validity()
-                if self._indicator_hdl.is_dbus_valid():
-                    self.logger.info(_("re-connection was successful"))
-                    self._connect_dbus_signal_handlers()
-                    # get new values here
-                    self._init_dbus_check_timer()
-                    _res = False
+                self.logger.info(_("re-connection was successful"))
+                self._connect_dbus_signal_handlers()
+                # get new values here
+                self._init_dbus_check_timer()
+                _res = False
         return _res
 
     def _autoexitcheck(self):
@@ -498,6 +498,7 @@ class SBackupdIndicatorBase(INotifyMixin):
         :todo: Implement methods for setting 'finished status' etc. (set menu, disable cancel, hide show
                messages, set icon...
         """
+        self._exit = False # eventually interrupt termination
         msg = ""
 
         if event == 'prepare':
@@ -559,6 +560,7 @@ class SBackupdIndicatorBase(INotifyMixin):
         self._show_showdialogs_menuitem()
 
     def dbus_targetnotfound_signal_hdl(self):
+        self._exit = False # eventually interrupt termination
         self.set_status_to_attention()
         msg = self._indicator_hdl.prepare_targetnotfound_handling()
 
@@ -619,6 +621,7 @@ class SBackupdIndicatorBase(INotifyMixin):
             raise ValueError("Unknown urgency!")
 
     def dbus_error_signal_hdl(self, error):
+        self._exit = False # eventually interrupt termination
         self.set_status_to_attention()
         msg = self._indicator_hdl.get_error_msg(error)
         self._show_errormsg(headline = msg[0], message = msg[1])
@@ -626,9 +629,11 @@ class SBackupdIndicatorBase(INotifyMixin):
         self.set_status_to_normal()
 
     def dbus_progress_signal_hdl(self, checkpoint):
+        self._exit = False # eventually interrupt termination
         self._set_menuitems_status_progress(checkpoint)
 
     def dbus_alreadyrunning_signal_hdl(self):
+        self._exit = False # eventually interrupt termination 
         self._notify_info(profilename = "",
                           message = _("Attempt of starting another instance of Simple Backup while this one is already running."))
 
@@ -711,7 +716,8 @@ class SBackupdIndicatorBase(INotifyMixin):
     def _terminate(self):
         """Internal method that actually quits the indicator.
         """
-        self._mainloop.quit()
+        if self._exit is True:
+            self._mainloop.quit()
         return False
 
     def main(self):

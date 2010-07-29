@@ -18,6 +18,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+import sys
 import appindicator
 
 
@@ -27,6 +28,10 @@ from nssbackup.util import constants
 
 from nssbackup.ui import indicator_core
 from nssbackup.ui.indicator_core import PyNotifyMixin, SBackupdIndicatorHandler, SBackupdIndicatorBase
+from nssbackup.ui import misc
+
+
+sys.excepthook = misc.except_hook
 
 
 class SBackupdIndicator(SBackupdIndicatorBase, PyNotifyMixin):

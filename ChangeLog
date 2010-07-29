@@ -16,6 +16,7 @@ nssbackup (0.3.0)
                    and legacy status icon implemented
   * [Enhancement]: GUI features implemented: cancel backup, progress of backup,
                    retry if target is not accessable
+  * Launchpad translations merged
 
 nssbackup (0.2.1)
   * [FIX] LP Bug #588878: Backup unsuccessful due to wrong exit code handling
