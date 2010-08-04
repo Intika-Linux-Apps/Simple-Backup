@@ -58,19 +58,22 @@ class RestoreManager(object):
         All existing files must be moved to a "*.before_restore_$time" files.
         @param snapshot:
         @param file :  
-        @param target: 
+        @param target: where to restore given file/dir (not the backup destination/snapshot dir)
         @param backupFlag: Set to false to make no backup when restoring (default = True)
         @param failOnNotFound: set to False if we don't want to fail if a file is not found (default is True)
+        
+        :todo: Re-factor and simplify!
         """
         if snapshot is None:
             raise exceptions.SBException("Please provide a Snapshot")
         if _file is None:
             raise exceptions.SBException("Please provide a File/directory")
 
-        _file = self._fop.pathsep + _file.lstrip(self._fop.pathsep)
-#        print "restore as: %s" % _file
+        _file = "%s%s" % (self._fop.pathsep, _file.lstrip(self._fop.pathsep))
 
-        # restore
+        self.logger.debug("Restore as\n\tsnapshot: `%s`\n\tfile (path in snapshot): `%s`\n\trestore target: `%s`"\
+                          % (snapshot, _file, target))
+
         if not snapshot.getSnapshotFileInfos().hasPath(_file) and not snapshot.getSnapshotFileInfos().hasFile(_file):
             if failOnNotFound:
                 raise exceptions.SBException(_("File '%s' not found in the backup snapshot files list") % _file)
@@ -85,34 +88,37 @@ class RestoreManager(object):
             suffix = ".before_restore_" + now
 
         if target and self._fop.path_exists(target):
-            # The target is given and exists
-            if self._fop.is_dir(target):
-                # the target is a dir     
-                #create a temp file , extract inside then move the content
-                tmpdir = tempfile.mkdtemp(dir = target,
-                                          prefix = 'nssbackup-restore_')
+            self.logger.debug("Restore target is given and exists")
+            if self._fop.is_dir(target) is True:
+                self.logger.debug("Restore target is a directory (i.e. we extract into a directory)")
 
-                tar.extract(snapshot.getArchive(),
-                            _file,
-                            tmpdir,
-                            bckupsuffix = suffix,
-                            splitsize = snapshot.getSplitedSize())
+                #create a temp dir, extract inside then move the content
+                _tmpdir = tempfile.mkdtemp(dir = target, prefix = 'nssbackup-restore_')
+                self.logger.debug("Restore tempdir: `%s`" % _tmpdir)
 
-                if self._fop.path_exists(target + self._fop.pathsep + self._fop.get_basename(_file))  and backupFlag :
-                    self._fop.force_move(target + self._fop.pathsep + self._fop.get_basename(_file),
-                                   target + self._fop.pathsep + self._fop.get_basename(_file) + suffix)
+                tar.extract(snapshot.getArchive(), _file, _tmpdir,
+                            bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
 
-                self._fop.force_move(tmpdir + _file, target + self._fop.pathsep + self._fop.get_basename(_file))
-                self._fop.force_delete(tmpdir)
+                _file_in_target = self._fop.joinpath(target, self._fop.get_basename(_file))
+                _file_in_tmpdir = self._fop.joinpath(_tmpdir, _file)
+
+                self.logger.debug("File in restore target: `%s`" % _file_in_target)
+                self.logger.debug("File in restore tempdir: `%s`" % _file_in_tmpdir)
+
+                if backupFlag:
+                    if self._fop.path_exists(_file_in_target):
+                        self._fop.force_move(_file_in_target, "%s%s" % (_file_in_target, suffix))
+
+                self._fop.force_move(_file_in_tmpdir, _file_in_target)
+                self._fop.force_delete(_tmpdir)
             else:
-                #the target is a file
+                #the target is a file (i.e. the backuped file is restored under new name
                 parent = self._fop.get_dirname(target)
                 tar.extract(snapshot.getArchive(), _file, parent, bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
         else:
             # target is set to None or target not exists
             if target and not self._fop.path_exists(target) :
                 #target != None but target doesn't exists
-#TODO: should we use makedir?
                 self._fop.makedirs(target)
                 tar.extract(snapshot.getArchive(), _file, target, splitsize = snapshot.getSplitedSize())
             else :
@@ -123,7 +129,6 @@ class RestoreManager(object):
                 else :
                     # file doesn't exist nothing to move, just extract
                     tar.extract(snapshot.getArchive(), _file, target, splitsize = snapshot.getSplitedSize())
-
 
     def revert(self, snapshot, directory):
         """
@@ -159,8 +164,15 @@ class RestoreManager(object):
         snpman = SnapshotManager.SnapshotManager(self._fop.get_dirname(snapshot.getPath()))
         history = snpman.getSnpHistory(snapshot)
         history.reverse()
-
-        for snp in history :
+        _cnt = 0
+        for snp in history:
             self.logger.debug("Restoring '%(dirname)s' from snapshot '%(snapshotname)s'"\
                               % { "dirname" : directory, "snapshotname" : snp.getName() })
-            self.restoreAs(snapshot = snp, _file = directory, target = targetdir, backupFlag = False, failOnNotFound = False)
+            _bak = False
+            if _cnt == 0:
+                _bak = True
+            _cnt += 1
+
+            self.restoreAs(snapshot = snp, _file = directory, target = targetdir, backupFlag = _bak,
+                           failOnNotFound = False)
+

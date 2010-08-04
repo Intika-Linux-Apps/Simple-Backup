@@ -29,12 +29,20 @@
 """
 
 from gettext import gettext as _
-import re
 import time
+import os
+import subprocess
+import tempfile
+import shutil
+import re
+
 from datetime import datetime
 
+
 from nssbackup.core.ConfigManager import ConfigurationFileHandler
+
 from nssbackup.fs_backend import fam
+
 from nssbackup.util.log import LogFactory
 from nssbackup.util.structs import SBdict
 from nssbackup.util.exceptions import SBException
@@ -42,7 +50,9 @@ from nssbackup.util import exceptions
 from nssbackup.util import constants
 from nssbackup.util import system
 from nssbackup import util
-#from nssbackup.util import snapshot  # removed to avoid circular reference
+from nssbackup.util import local_file_utils
+from nssbackup.util import structs
+from nssbackup.util import log
 
 
 _FOP = fam.get_file_operations_facade_instance()
@@ -68,7 +78,7 @@ def getArchiveType(archive):
     return _res
 
 
-def extract(sourcear, file, dest , bckupsuffix = None, splitsize = None):
+def extract(sourcear, restore_file, dest , bckupsuffix = None, splitsize = None):
     """Extract from source archive the file "file" to dest.
     
     @param sourcear: path of archive
@@ -78,11 +88,10 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize = None):
     @param splitsize: If set the split options are added supposing the size of the archives is this variable
     @type splitsize: Integer in KB
     """
-    print "tar.extract"
-    # strip leading sep
-    file = file.lstrip(_FOP.pathsep)
+    restore_file = restore_file.lstrip(_FOP.pathsep)    # strip leading separator (as TAR did before)
     # tar option  -p, --same-permissions, --preserve-permissions:
     # ignore umask when extracting files (the default for root)
+
     options = ["-xp", "--ignore-failed-read", '--backup=existing']
 
     archType = getArchiveType(sourcear)
@@ -107,16 +116,16 @@ def extract(sourcear, file, dest , bckupsuffix = None, splitsize = None):
     if splitsize :
         options.extend(["-L " + str(splitsize) , "-F " + util.get_resource_file("multipleTarScript")])
 
-    options.extend(['--file=' + sourcear, file])
+    options.append(restore_file)
 
-    LogFactory.getLogger().debug("Launching TAR with options: %s." % options)
-    outStr, errStr, retval = util.launch("tar", options)
-    if retval != 0 :
-        LogFactory.getLogger().debug("output was: " + outStr)
-        raise SBException("Error when extracting: " + errStr)
-    if outStr.strip() == "":
-        outStr = "(nothing)"
-    LogFactory.getLogger().debug("output was: " + outStr)
+    _launcher = TarBackendLauncherSingleton()
+    _launcher.set_stdin_file(sourcear)
+
+    _launcher.launch_sync(options, env = {})
+    retVal = _launcher.get_returncode()
+    errStr = _launcher.get_stderr()
+
+    __finish_tar(retVal, errStr)
 
 
 # extract2 is currently (series 0.2) only used in SnapshotManager.makeTmpTAR
@@ -161,8 +170,6 @@ def extract2(sourcear, fileslist, dest, bckupsuffix = None, additionalOpts = Non
     if additionalOpts and type(additionalOpts) == list:
         options.extend(additionalOpts)
 
-#    options.extend(['--file=' + sourcear, '--null',
-#                    '--files-from=' + os.path.normpath(fileslist)])
     options.extend(['--file=' + sourcear, '--null',
                     '--files-from=' + _FOP.normpath(fileslist)])
 
@@ -230,9 +237,24 @@ def __prepare_common_opts(snapshot, publish_progress):
     tdir = snapshot.getPath()
     options = ["-cS", "--directory=" + _FOP.pathsep,
                "--ignore-failed-read",
-               "--blocking-factor", str(constants.TAR_BLOCKING_FACTOR),
-               "--files-from=" + snapshot.getIncludeFListFile() + ".tmp"]
-    options.append ("--exclude-from=" + snapshot.getExcludeFListFile() + ".tmp")
+               "--blocking-factor", str(constants.TAR_BLOCKING_FACTOR)]
+
+    # includes and excludes
+    tmp_incl = _FOP.normpath(ConfigurationFileHandler().get_user_tempdir(),
+                                 _FOP.get_basename(snapshot.getIncludeFListFile()))
+    tmp_excl = _FOP.normpath(ConfigurationFileHandler().get_user_tempdir(),
+                                 _FOP.get_basename(snapshot.getExcludeFListFile()))
+
+    LogFactory.getLogger().debug("Temporary includes file: `%s`" % tmp_incl)
+    LogFactory.getLogger().debug("Temporary excludes file: `%s`" % tmp_excl)
+
+    if not _FOP.path_exists(tmp_incl):
+        raise SBException("Temporary includes.list does not exist")
+    if not _FOP.path_exists(tmp_excl):
+        raise SBException("Temporary excludes.list does not exist")
+
+    options.append("--files-from=%s" % tmp_incl)
+    options.append("--exclude-from=%s" % tmp_excl)
 
     if snapshot.isFollowLinks() :
         options.append("--dereference")
@@ -249,7 +271,7 @@ def __prepare_common_opts(snapshot, publish_progress):
     else:
         LogFactory.getLogger().debug("Setting compression to default 'none'")
 
-    options.append("--file=" + _FOP.normpath(tdir, archivename))
+    _ar_path = _FOP.normpath(tdir, archivename)
 
     # progress signal
 #TODO: improve calculation of number of checkpoints based on estimated transfer rate.
@@ -273,8 +295,7 @@ def __prepare_common_opts(snapshot, publish_progress):
             _progessf = util.get_resource_file(resource_name = "sbackup-progress")
             options.append('--checkpoint-action=exec=%s' % _progessf)
 
-    LogFactory.getLogger().debug("Common TAR options: %s" % str(options))
-    return options
+    return (options, _ar_path, tmp_incl, tmp_excl)
 
 
 def __add_split_opts(snapshot, options, size):
@@ -295,21 +316,21 @@ def __add_split_opts(snapshot, options, size):
     return options
 
 
-def __move_temp_snarfile(tmp_snarfile, snarfile):
+def __copy_temp_snarfile_into_snapshot(tmp_snarfile, snarfile):
     try:
-        _FOP.copy(tmp_snarfile, snarfile)
-    except exceptions.ChmodNotSupportedError:
+        _FOP.copyfile(tmp_snarfile, snarfile)
+    except exceptions.CopyFileAttributesError:
         LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
                                     % snarfile)
 
 
-def __remove_temp_snarfile(tmp_snarfile):
+def __remove_tempfiles(tmp_files):
     #TODO: Use fam.delete_ignore_errors()!
-    try:
-        _FOP.delete(tmp_snarfile)
-    except OSError, error:
-        LogFactory.getLogger().warning(_("Unable to remove temporary snar file: %s")\
-                                        % error)
+    for _tmpf in tmp_files:
+        try:
+            _FOP.delete(_tmpf)
+        except (OSError, IOError), error:
+            LogFactory.getLogger().warning(_("Unable to remove temporary file `%s`: %s") % (_tmpf, error))
 
 
 def makeTarIncBackup(snapshot, publish_progress):
@@ -320,10 +341,10 @@ def makeTarIncBackup(snapshot, publish_progress):
     """
     LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 
-    options = __prepare_common_opts(snapshot, publish_progress)
+    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress)
 
     splitSize = snapshot.getSplitedSize()
-    if splitSize :
+    if splitSize: # > 0
         options = __add_split_opts(snapshot, options, splitSize)
 
     base_snarfile = snapshot.getBaseSnapshot().getSnarFile()
@@ -341,18 +362,12 @@ def makeTarIncBackup(snapshot, publish_progress):
         LogFactory.getLogger().error(_("Falling back to full backup."))
         makeTarFullBackup(snapshot, publish_progress)
     else:
-#        shutil.copy(base_snarfile, tmp_snarfile)
-#        # check (and set) the permission bits; necessary if the file's origin
-#        # does not support user rights (e.g. some FTP servers, file systems...)
-#        if not os.access(tmp_snarfile, os.W_OK):
-#            os.chmod(tmp_snarfile, 0644)
-        _FOP.copy(base_snarfile, tmp_snarfile)
+        _FOP.copyfile(base_snarfile, tmp_snarfile)
         # check (and set) the permission bits; necessary if the file's origin
         # does not support user rights (e.g. some FTP servers, file systems...)
-        if not _FOP.path_writeable(tmp_snarfile):
-            _FOP.chmod(tmp_snarfile, 0644)
-
-
+#FIXME: use generalized File operations here!
+        if not local_file_utils.path_writeable(tmp_snarfile):
+            local_file_utils.chmod(tmp_snarfile, 0644)
         # create the snarfile within a local directory; necessary if the
         # backup target does not support 'open' within the TAR process and
         # would fail
@@ -360,21 +375,17 @@ def makeTarIncBackup(snapshot, publish_progress):
 
         # launch TAR with empty environment
         _launcher = TarBackendLauncherSingleton()
+        _launcher.set_stdout_file(ar_path)
 
         try:
             _launcher.launch_sync(options, env = {})
-
             retVal = _launcher.get_returncode()
-            outStr = _launcher.get_stdout()
             errStr = _launcher.get_stderr()
-
-            __finish_tar(retVal, outStr, errStr)
-
-            # and move the temporary snarfile back into the backup directory
-            __move_temp_snarfile(tmp_snarfile, snarfile)
+            __finish_tar(retVal, errStr)
+            __copy_temp_snarfile_into_snapshot(tmp_snarfile, snarfile)
 
         finally:
-            __remove_temp_snarfile(tmp_snarfile)
+            __remove_tempfiles([tmp_snarfile, tmp_incl, tmp_excl])
 
 
 def makeTarFullBackup(snapshot, publish_progress):
@@ -386,10 +397,10 @@ def makeTarFullBackup(snapshot, publish_progress):
     """
     LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 
-    options = __prepare_common_opts(snapshot, publish_progress)
+    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress)
 
     splitSize = snapshot.getSplitedSize()
-    if splitSize :
+    if splitSize:   # > 0
         options = __add_split_opts(snapshot, options, splitSize)
 
     snarfile = snapshot.getSnarFile()
@@ -409,32 +420,26 @@ def makeTarFullBackup(snapshot, publish_progress):
 
     # launch TAR with empty environment
     _launcher = TarBackendLauncherSingleton()
-
+    _launcher.set_stdout_file(ar_path)
     try:
         _launcher.launch_sync(options, env = {})
         retVal = _launcher.get_returncode()
-        outStr = _launcher.get_stdout()
         errStr = _launcher.get_stderr()
-
-        __finish_tar(retVal, outStr, errStr)
-
-        # and move the temporary snarfile into the backup directory
-        __move_temp_snarfile(tmp_snarfile, snarfile)
+        __finish_tar(retVal, errStr)
+        __copy_temp_snarfile_into_snapshot(tmp_snarfile, snarfile)
     finally:
-        __remove_temp_snarfile(tmp_snarfile)
+        __remove_tempfiles([tmp_snarfile, tmp_incl, tmp_excl])
 
-
-def __finish_tar(exitcode, out_str, error_str):
+def __finish_tar(exitcode, error_str):
     """
     @todo: Catch failing child process (e.g. gzip) in proper way.
     """
     _logger = LogFactory.getLogger()
     _logger.debug("Exit code: %s" % exitcode)
-    _logger.debug("Standard out: %s" % out_str)
     _logger.debug("Error out: %s" % error_str)
 
-    if out_str != "":
-        _logger.info(_("TAR returned following output:\n%s") % out_str)
+    if error_str is None:
+        error_str = ""
 
     _res_err = []
     if error_str != "":
@@ -470,7 +475,7 @@ def __finish_tar(exitcode, out_str, error_str):
 
     else:
         # list-incremental is not compatible with ignore failed read
-        _errmsg = _("Unable to make a proper backup. TAR terminated with errors.")
+        _errmsg = _("Unable to finish successfully. TAR terminated with errors.")
         _logger.error("%s\n%s(exit code: %s)" % (_errmsg, error_str, exitcode))
         raise SBException(_errmsg)
 
@@ -486,7 +491,6 @@ def get_dumpdir_from_list(lst_dumpdirs, filename):
 #    print "  List of dumpdirs:"
 #    for _ddir in lst_dumpdirs:
 #        print "    %s" % _ddir
-
     _res = None
 
     if not isinstance(lst_dumpdirs, list):
@@ -507,12 +511,126 @@ def get_dumpdir_from_list(lst_dumpdirs, filename):
     return _res
 
 
-class TarBackendLauncherSingleton(util.GenericBackendLauncherSingleton):
+class TarBackendLauncherSingleton(object):
+    __metaclass__ = structs.Singleton
 
     _cmd = "/bin/tar"
 
     def __init__(self):
-        util.GenericBackendLauncherSingleton.__init__(self)
+        self._logger = log.LogFactory.getLogger()
+        self._proc = None
+        self._argv = []
+
+        # input/output pipes
+        self._stdout = None
+        self._stdin = None
+
+        # results
+        self._stderr = None
+        self._returncode = None
+
+    def set_stdin_file(self, path):
+        if self._stdout is not None:
+            raise AssertionError("Redirecting stdin and stdout is not supported")
+        self._stdin = path
+
+    def set_stdout_file(self, path):
+        if self._stdin is not None:
+            raise AssertionError("Redirecting stdin and stdout is not supported")
+        self._stdout = path
+
+    def get_pid(self):
+        _pid = None
+        if self._proc is not None:
+            _pid = self._proc.pid
+        return _pid
+
+    def launch_sync(self, opts, env = None):
+        if self._proc is not None:
+            raise AssertionError("Another process is already running")
+
+        self._argv = opts
+        self._argv.insert(0, self._cmd)
+        errptr, errfile = tempfile.mkstemp(prefix = "error_")
+        self._clear_returns()
+
+        _stdout_param = None
+        _stdin_param = None
+
+        try:
+            self._logger.debug("Lauching: %s" % (" ".join(self._argv)))
+
+            if self._stdout is not None:
+                assert self._stdin is None
+                self._logger.debug("Output archive: %s" % self._stdout)
+                _stdout_param = subprocess.PIPE
+                _ardst = _FOP.openfile_for_write(self._stdout)
+
+            if self._stdin is not None:
+                assert self._stdout is None
+                self._logger.debug("Input archive: %s" % self._stdin)
+                _stdin_param = subprocess.PIPE
+                _arsrc = _FOP.openfile_for_read(self._stdin)
+
+            self._proc = subprocess.Popen(self._argv, stdin = _stdin_param, stdout = _stdout_param,
+                                          stderr = errptr, env = env)
+
+            if self._stdout is not None:
+                _arsrc = self._proc.stdout
+            if self._stdin is not None:
+                _ardst = self._proc.stdin
+
+            if (self._stdin is not None) or (self._stdout is not None):
+                shutil.copyfileobj(_arsrc, _ardst)
+                _arsrc.close()
+                _ardst.close()
+
+            self._proc.wait()
+        except (exceptions.BackupCanceledError, exceptions.SigTerminatedError), error:
+            self.terminate()
+            self._clear_proc()
+            raise error
+
+        self._returncode = self._proc.returncode
+
+        os.close(errptr)    # Close log handle
+        self._stderr = local_file_utils.readfile(errfile)
+        local_file_utils.delete(errfile)
+
+        self._clear_proc()
+
+    def _clear_returns(self):
+        self._stderr = None
+        self._returncode = None
+
+    def _clear_proc(self):
+        self._proc = None
+        self._stdin = None
+        self._stdout = None
+        self._argv = []
+
+    def is_running(self):
+        """
+        :todo: Add more tests whether the process is running or not!
+        """
+        _res = False
+        if self._proc is not None:
+            # more tests here
+            _res = True
+        return _res
+
+    def get_stderr(self):
+        return self._stderr
+
+    def get_returncode(self):
+        return self._returncode
+
+    def terminate(self):
+        if self.is_running():
+            try:
+                self._proc.terminate()
+            except OSError, error:
+                self._logger.warning(_("Unable to terminate backend process: %s") % error)
 
 
 class Dumpdir(object):
@@ -834,19 +952,18 @@ class SnapshotFile(object):
         @return: the header (a string) or None if the file was empty
         @raise SBException: if the header is incomplete
         """
-        fd = open(self.snpfile)
-        header = fd.readline()
-        if header != "":
-            #Snarfile not empty
-            n = 0
-            while n < 2 :
-                c = fd.read(1)
-                if len(c) != 1:
-                    raise SBException(_("The snarfile header is incomplete."))
-                if c == '\0' : n += 1
-                header += c
-        else :
-            header = None
+        fd = _FOP.openfile_for_read(self.snpfile)
+#TODO: Handle empty files properly
+        header = ""
+        n = 0
+        while n < 2 :
+            c = fd.read(1)
+            if len(c) != 1:
+                raise SBException(_("The snarfile header is incomplete."))
+            if c == '\0':
+                n += 1
+            header += c
+        fd.close()
 
         return header
 
@@ -932,41 +1049,42 @@ class SnapshotFile(object):
         """
         _snardict = {}
 
-        fd = open(self.snpfile)
-        # skip header which is the first line and 2 entries separated with NULL in this case
-        l = fd.readline()
-        if l != "":
-            #Snarfile not empty
-            n = 0
-            while n < 2 :
-                c = fd.read(1)
-                if len(c) != 1:
-                    raise SBException(_("The snarfile header is incomplete !"))
-                if c == '\0':
-                    n += 1
-
-            currentline = ""
-            last_c = ''
+        fd = _FOP.openfile_for_read(self.snpfile)
+#TODO: Handle empty files properly
+        header = ""
+        n = 0
+        while n < 2 :
             c = fd.read(1)
-            while c:
-                currentline += c
-                if c == '\0' and last_c == '\0' :
-                    # we got a line
-                    nfs, mtime_sec, mtime_nano, dev_no, i_no, _dirname, \
-                        _content = currentline.lstrip("\0").split("\0", 6)
-                    _snardict[_dirname] = Dumpdir.DIRECTORY
-                    _content_t = _content.rstrip('\0').split('\0')
-                    for _entry in _content_t:
-                        _entry = _entry.strip("\0")
-                        if _entry:
-                            _epath = _FOP.normpath(_dirname, _entry[1:])
-                            _snardict[_epath] = _entry[0]
+            if len(c) != 1:
+                raise SBException(_("The snarfile header is incomplete."))
+            if c == '\0':
+                n += 1
+            header += c
+        # skip header which is the first line and 2 entries separated with NULL in this case
+#FIXME: remove code duplication here and in `getHeader`
 
-                    currentline = ''
-                    last_c = ''
-                else :
-                    last_c = c
-                c = fd.read(1)
+        currentline = ""
+        last_c = ''
+        c = fd.read(1)
+        while c:
+            currentline += c
+            if c == '\0' and last_c == '\0' :
+                # we got a line
+                nfs, mtime_sec, mtime_nano, dev_no, i_no, _dirname, \
+                    _content = currentline.lstrip("\0").split("\0", 6)
+                _snardict[_dirname] = Dumpdir.DIRECTORY
+                _content_t = _content.rstrip('\0').split('\0')
+                for _entry in _content_t:
+                    _entry = _entry.strip("\0")
+                    if _entry:
+                        _epath = _FOP.joinpath(_dirname, _entry[1:])
+                        _snardict[_epath] = _entry[0]
+
+                currentline = ''
+                last_c = ''
+            else :
+                last_c = c
+            c = fd.read(1)
 
         fd.close
         return _snardict
@@ -994,7 +1112,7 @@ class SnapshotFile(object):
 ##                print "Type: %s name: '%s' control: '%s'" %(type(_entry),
 ##                                                        _entry.getFilename(),
 ##                                                        _entry.getControl())
-#                _epath = fam.normpath(_dirname, _entry.getFilename())
+#                _epath = fam.joinpath(_dirname, _entry.getFilename())
 #                _snardict[_epath] = _entry.getControl()
 #            
 #

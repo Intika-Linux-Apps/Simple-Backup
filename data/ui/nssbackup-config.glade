@@ -4238,4 +4238,131 @@ Error</property>
       </widget>
     </child>
   </widget>
+  <widget class="GtkDialog" id="dialog_make_backup">
+    <property name="border_width">6</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="has_separator">False</property>
+    <child internal-child="vbox">
+      <widget class="GtkVBox" id="dialog-vbox10">
+        <property name="visible">True</property>
+        <child>
+          <widget class="GtkHBox" id="hbox1">
+            <property name="visible">True</property>
+            <property name="border_width">6</property>
+            <property name="spacing">12</property>
+            <child>
+              <widget class="GtkImage" id="image1">
+                <property name="visible">True</property>
+                <property name="stock">gtk-dialog-question</property>
+                <property name="icon-size">6</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkVBox" id="vbox1">
+                <property name="visible">True</property>
+                <property name="spacing">6</property>
+                <child>
+                  <widget class="GtkLabel" id="label_dialog_make_backup_content">
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="label">&lt;b&gt;Create a backup now?&lt;/b&gt;
+
+Initiates a backup process in the background. Each of the enabled profiles are executed. You can force the creation of a full snapshot by enabling the option below.
+
+Do want to create a backup now?</property>
+                    <property name="use_markup">True</property>
+                    <property name="wrap">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkHBox" id="hbox2">
+                    <property name="visible">True</property>
+                    <child>
+                      <widget class="GtkCheckButton" id="checkbtn_make_backup_full">
+                        <property name="label" translatable="yes">Make a full backup</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <widget class="GtkHButtonBox" id="dialog-action_area10">
+            <property name="visible">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <widget class="GtkButton" id="btn_make_backup">
+                <property name="label">gtk-yes</property>
+                <property name="response_id">-10</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_underline">True</property>
+                <property name="use_stock">True</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="btn_cancel_make_backup">
+                <property name="label">gtk-no</property>
+                <property name="response_id">-6</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="has_default">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_underline">True</property>
+                <property name="use_stock">True</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">end</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
 </glade-interface>

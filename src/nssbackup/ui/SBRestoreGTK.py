@@ -31,7 +31,6 @@
 
 from gettext import gettext as _
 import traceback
-import os.path
 import sys
 import time
 
@@ -56,14 +55,17 @@ from nssbackup.pkginfo import Infos
 from nssbackup.util import exceptions
 from nssbackup.util import tasks
 from nssbackup.util import constants
+from nssbackup.util import pathparse
 from nssbackup.util import local_file_utils
 from nssbackup.ar_backend.tar import Dumpdir
+from nssbackup.util import system
 
 from nssbackup.ui import misc
 from nssbackup.ui import gtk_rsrc
 
 
 sys.excepthook = misc.except_hook_threaded
+system.set_dbus_session_bus_from_session()
 
 # initialize threading before running a main loop
 gtk.gdk.threads_init()
@@ -103,6 +105,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.snpman = None
         self.target = None
         self.__fam_target_hdl = fam.get_fam_target_handler_facade_instance()
+        self.__fop = fam.get_file_operations_facade_instance()
 
         # tree stores
         self.snplisttreestore = gtk.TreeStore(str, str)
@@ -255,6 +258,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         """
         if self.__context_id is None:
             raise AssertionError("Please initialize statusbar first!")
+        message = misc.get_statusbar_msg_mode(message)
         message_id = self.widgets['statusbar'].push(self.__context_id, message)
         return message_id
 
@@ -420,7 +424,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         p = ""
         while g != []:
             i = self.flisttreestore.get_iter(self.flisttreesort.convert_path_to_child_path(tuple(g)))
-            p = os.sep + (self.flisttreestore.get_value(i, 0) + p).lstrip(os.sep)
+            p = pathparse.ensure_leading_sep((self.flisttreestore.get_value(i, 0) + p))
             g = g[:-1]
         return p
 
@@ -432,11 +436,11 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         # hack to get the dir filled with some "loading"
         dummy = self.flisttreestore.iter_children(rootiter)
 
-        son = self.currentsbdict.getSon(os.path.normpath(path))
+        son = self.currentsbdict.getSon(self.__fop.joinpath(path))
         if son :
-            for d in dict.iterkeys(self.currentsbdict.getSon(os.path.normpath(path))):
+            for d in dict.iterkeys(self.currentsbdict.getSon(self.__fop.joinpath(path))):
                 iter = self.flisttreestore.append(rootiter, [d])
-                if self.currentsbdict.getSon(os.sep.join([os.path.normpath(path), d])) :
+                if self.currentsbdict.getSon(self.__fop.joinpath(path), d):
                     self.flisttreestore.append(iter, [_("Loading ...")])
         if dummy :
             self.flisttreestore.remove(dummy)

@@ -186,7 +186,7 @@ def get_configgui_widgets():
         'enableNewPrfCB',
         'newPrfNameEntry',
         'followlinks',
-#
+# dialog set default settings
         'dialog_default_settings',
         'label_dialog_default_settings_content',
         'btn_set_default_settings',
@@ -205,7 +205,12 @@ def get_configgui_widgets():
         'entry_set_remote_pass',
         'label_set_remote_user',
         'label_set_remote_pass',
-        'checkbtn_show_password'
+        'checkbtn_show_password',
+# dialog make backup
+        'dialog_make_backup',
+        'checkbtn_make_backup_full',
+        'btn_make_backup',
+        'btn_cancel_make_backup'
         ]
     return widget_list
 
@@ -230,9 +235,6 @@ def get_configgui_handlers():
         'on_inc_addfile_clicked',
         'on_inc_adddir_clicked',
         'on_inc_del_clicked',
-#            'on_remote_inc_add_clicked',
-#            'on_remote_inc_del_clicked',
-#            'on_test_remote_clicked',
         'on_ex_addfile_clicked',
         'on_ex_adddir_clicked',
         'on_ex_delpath_clicked',
@@ -244,13 +246,10 @@ def get_configgui_handlers():
         'on_ex_maxsize_changed',
         'on_dest1_toggled',
         'on_dest_localpath_selection_changed',
-#            'on_dest_remote_changed',
-#            'on_dest_remotetest_clicked',
 #     connect to remote host
         'on_btn_set_remote_clicked',
         'on_cmb_set_remote_service_changed',
         'on_checkbtn_show_password_toggled',
-#            
 #     scheduling
         'on_cmbbx_simple_schedule_freq_changed',
         'on_rdbtn_schedule_toggled',
@@ -274,14 +273,11 @@ def get_configgui_handlers():
         'on_TLSradiobutton_toggled',
         'on_crtfilechooser_selection_changed',
         'on_keyfilechooser_selection_changed',
-#            'on_pluginscombobox_changed',
-#            'on_fusecheckbutton_clicked',
         'on_addProfileButton_clicked',
         'on_removeProfileButton_clicked',
         'on_editProfileButton_clicked',
         'on_closeProfileManagerButton_clicked',
         'on_includetv_key_press_event',
-#            'on_remote_includetv_key_press_event',
         'on_ex_pathstv_key_press_event',
         'on_ex_ftypetv_key_press_event',
         'on_ex_regextv_key_press_event',

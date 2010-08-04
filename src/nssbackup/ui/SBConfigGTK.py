@@ -51,6 +51,7 @@ from nssbackup.util import local_file_utils
 
 
 sys.excepthook = misc.except_hook
+system.set_dbus_session_bus_from_session()
 
 
 class SBconfigGTK(GladeGnomeApp):
@@ -607,8 +608,7 @@ class SBconfigGTK(GladeGnomeApp):
         """Sets the profile name and the user mode.
         """
         stattxt = _("Current profile: %s") % self.configman.getProfileName()
-        if os.geteuid() == 0:
-            stattxt = _("%s   (Administrator mode)") % stattxt
+        stattxt = misc.get_statusbar_msg_mode(stattxt)
         self.widgets['statusBar'].push(stattxt)
 
     def __enable_splitsize_custom_option(self, enable = True):
@@ -831,15 +831,36 @@ class SBconfigGTK(GladeGnomeApp):
     def on_backup_clicked(self, *args): #IGNORE:W0613
         cancelled = self.ask_save_config()
         if not cancelled:
-            try :
-                pid = subprocess.Popen([constants.BACKUP_COMMAND]).pid
+            dialog = self.widgets["dialog_make_backup"]
+            chkbtn_full_bak = self.widgets["checkbtn_make_backup_full"]
+            btn_cancel = self.widgets['btn_cancel_make_backup']
+            btn_cancel.grab_focus()
 
-                misc.show_infodialog(message_str = _("A backup process is initiated in the background."),
-                                     parent = self.top_window, headline_str = _("Backup process started"), secmsg_str = _("The process id is: %s.") % str(pid))
-            except Exception, error:
-                _msg = _("An error occurred while starting backup process:\n\n%s") % error
-                misc.show_errdialog(message_str = _msg, parent = self.top_window,
-                                    headline_str = _("Error while starting backup"))
+            response = dialog.run()
+            _full_bak = chkbtn_full_bak.get_active()
+            dialog.hide()
+
+            if response == gtk.RESPONSE_APPLY:
+                _path_to_app = Util.get_resource_file(constants.BACKUP_COMMAND)
+                _cmd = [_path_to_app]
+
+                if _full_bak is True:
+                    _cmd.append("--full")
+
+                print _cmd
+
+                _env = None
+                if system.is_superuser():
+                    _env = {}   # clear environment
+                system.exec_command_async(args = _cmd, env = _env)
+                misc.show_infodialog(message_str = _("A backup process is now executed in the background.\n\nYou can monitor the progress of the backup by means of the status indicator displayed in the notification area."),
+                                     parent = self.top_window, headline_str = _("Backup process started"))
+            elif response == gtk.RESPONSE_CANCEL or \
+                 response == gtk.RESPONSE_DELETE_EVENT:
+                pass
+            else:
+                self.logger.error(_("Unexpected dialog response: %s") % response)
+                raise ValueError("Unexpected dialog response: %s" % response)
 
     def on_cformat_changed(self, *args): #IGNORE:W0613
         """

@@ -34,10 +34,6 @@ _PREFS = prefs.Preferences()
 FS_BACKEND = _PREFS.get(key = prefs.PREFS_FS_BACKEND)
 
 
-#if FS_BACKEND == prefs.FS_BACKEND_GIO:
-#    print ">>> GIO"
-
-
 # factory methods
 def get_fam_target_handler_facade_instance():
     _fam = None

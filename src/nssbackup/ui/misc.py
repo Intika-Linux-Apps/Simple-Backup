@@ -286,6 +286,14 @@ def show_about_dialog(set_transient_for = None):
     about.destroy()
 
 
+def get_statusbar_msg_mode(statusmessage):
+    if system.is_superuser():
+        stattxt = _("%s   (Administrator mode)") % statusmessage
+    else:
+        stattxt = statusmessage
+    return stattxt
+
+
 def set_watch_cursor(widget):
     watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
     try:

@@ -175,12 +175,6 @@ def launch(cmd, opts, env = None):
     return (outStr, errStr, retval)
 
 
-
-# defined in module 'tar'
-#def extract(sourcetgz, file, dest , bckupsuffix = None):
-#def extract2(sourcetgz, fileslist, dest, bckupsuffix = None ):
-
-
 def readlineNULSep(fd, fd1):
     """
     Iterator that read a NUL separeted file as lines 
@@ -223,33 +217,6 @@ def readlineNULSep(fd, fd1):
             raise exceptions.SBException(\
                                 "The length of flist and Fprops are not equals")
         yield (currentline, currentline1)
-
-
-def readline_nullsep(fd):
-    """
-    Iterator that read a NUL separeted file as lines 
-    @param fd: File descriptor
-    @return: the gotten line
-    @rtype: String
-    """
-    _continue = True
-
-    while _continue is True:
-        c = fd.read(1)
-        currentline = ''
-
-        while c:
-            if c == '\0'  :
-                # we got a line
-                break
-            currentline += c
-            c = fd.read(1)
-        else:
-            # c is None
-            _continue = False
-
-        yield currentline
-
 
 
 def is_valid_regexp(aregex):
@@ -528,92 +495,3 @@ def sigcancel_handler(signum, stack_frame): #IGNORE:W0613
     see `man 7 signal`
     """
     raise exceptions.BackupCanceledError
-
-
-class GenericBackendLauncherSingleton(object):
-    __metaclass__ = structs.Singleton
-
-    _cmd = None
-
-    def __init__(self):
-        self._logger = log.LogFactory.getLogger()
-        self._proc = None
-        self._argv = []
-        self._stdout = None
-        self._stderr = None
-        self._returncode = None
-
-    def get_pid(self):
-        _pid = None
-        if self._proc is not None:
-            _pid = self._proc.pid
-        return _pid
-
-    def launch_sync(self, opts, env = None):
-        if self._proc is not None:
-            raise AssertionError("Another process is already running")
-
-        self._argv = opts
-        self._argv.insert(0, self._cmd)
-
-        outptr, outfile = tempfile.mkstemp(prefix = "output_")
-        errptr, errfile = tempfile.mkstemp(prefix = "error_")
-
-        self._clear_returns()
-
-        try:
-            self._logger.debug("Lauching: %s" % (" ".join(self._argv)))
-            self._proc = subprocess.Popen(self._argv, stdin = None,
-                                          stdout = outptr,
-                                          stderr = errptr, env = env)
-            self._proc.communicate(input = None)   # waits for termination
-        except (exceptions.BackupCanceledError, exceptions.SigTerminatedError), error:
-            self.terminate()
-            self._clear_proc()
-            raise error
-
-        self._returncode = self._proc.returncode
-
-        os.close(errptr)    # Close log handles
-        os.close(outptr)
-        self._stdout = local_file_utils.readfile(outfile)
-        self._stderr = local_file_utils.readfile(errfile)
-        local_file_utils.delete(outfile)
-        local_file_utils.delete(errfile)
-
-        self._clear_proc()
-
-    def _clear_returns(self):
-        self._stdout = None
-        self._stderr = None
-        self._returncode = None
-
-    def _clear_proc(self):
-        self._proc = None
-        self._argv = []
-
-    def is_running(self):
-        """
-        :todo: Add more tests whether the process is running or not!
-        """
-        _res = False
-        if self._proc is not None:
-            # more tests here
-            _res = True
-        return _res
-
-    def get_stdout(self):
-        return self._stdout
-
-    def get_stderr(self):
-        return self._stderr
-
-    def get_returncode(self):
-        return self._returncode
-
-    def terminate(self):
-        if self.is_running():
-            try:
-                self._proc.terminate()
-            except OSError, error:
-                self._logger.warning(_("Unable to terminate backend process: %s") % error)
