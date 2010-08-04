@@ -15,7 +15,7 @@ nssbackup (0.3.0)
   * [Enhancement]: Indicator application using libappindicator (for Ubuntu)
                    and legacy status icon implemented
   * [Enhancement]: GUI features implemented: cancel backup, progress of backup,
-                   retry if target is not accessable
+                   retry if target is not accessible, make full backup
   * Launchpad translations merged
 
 nssbackup (0.2.1)

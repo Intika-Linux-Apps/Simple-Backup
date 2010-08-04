@@ -183,6 +183,8 @@ install-help:
 
 # additional data/configuration
 install-data: install-icons install-dbus install-gconf
+	if test "$(DISABLE_MAKEFILE_DESKTOP_DATABASE_RELOAD)" = ""; then \
+	update-desktop-database; fi
 
 install-icons:
 # implement loop over icon files

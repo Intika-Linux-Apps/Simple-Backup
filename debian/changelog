@@ -16,10 +16,10 @@ nssbackup (0.3.0ppa1~lucid1) lucid; urgency=high
   * [Enhancement]: Indicator application using libappindicator (for Ubuntu)
                    and legacy status icon implemented
   * [Enhancement]: GUI features implemented: cancel backup, progress of backup,
-                   retry if target is not accessable
+                   retry if target is not accessible, make full backup
   * Launchpad translations merged
 
- -- Jean-Peer Lorenz <peer.loz@gmx.net>  Tue, 27 Jul 2010 22:26:16 +0200
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Wed, 04 Aug 2010 19:34:57 +0200
 
 nssbackup (0.2.1ppa1~lucid1) lucid; urgency=high
 

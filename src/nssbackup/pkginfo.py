@@ -50,8 +50,7 @@ class Infos(object):
 
     AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
                "Jean-Peer Lorenz <peer.loz@gmx.net>",
-               "Aigars Mahinovs <aigarius@debian.org>",
-               "Mathias Houngbo <mathias.houngbo@gmail.com>"
+               "Aigars Mahinovs <aigarius@debian.org>"
               ]
     TRANSLATORS = _("translator-credits")
 

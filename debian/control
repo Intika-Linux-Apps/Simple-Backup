@@ -28,7 +28,8 @@ Package: nssbackup-common
 Architecture: all
 Depends: python ( >= 2.5 ), python (<< 3.0),
          ${misc:Depends},
-         python-gobject
+         python-gobject,
+         gvfs
 Conflicts: sbackup
 Description: (Not So) Simple Backup Suite core functionality
  (Not So) Simple Backup Suite common files package. This package contains
