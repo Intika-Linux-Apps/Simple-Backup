@@ -85,84 +85,86 @@ class IOperations(object):
     def path_exists(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "path_exists"))
 
-    def path_writeable(self, path):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "path_writeable"))
+#    @classmethod
+#    def copy(cls, src, dst):
+#        raise NotImplementedError(_get_notimplemented_msg("IOperations", "copy"))
 
-    def chmod(self, path, mode):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "chmod"))
-
-    def copy(self, src, dst):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "copy"))
-
-    def copy_no_permissions(self, src, dst):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "copy_no_permissions"))
-
-    def delete(self, uri):
+    @classmethod
+    def delete(cls, uri):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "delete"))
 
-    def force_delete(self, path):
+    @classmethod
+    def force_delete(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "force_delete"))
 
-    def makedir(self, path):
+    @classmethod
+    def makedir(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "makedir"))
 
-    def makedirs(self, path):
+    @classmethod
+    def makedirs(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "makedirs"))
 
     @classmethod
     def normpath(cls, *args):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "normpath"))
 
-    def openfile(self, uri, write = False):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "openfile"))
+    @classmethod
+    def openfile_for_write(cls, path):
+        raise NotImplementedError(_get_notimplemented_msg("IOperations", "openfile_for_write"))
 
-    def get_dirname(self, path):
+    @classmethod
+    def openfile_for_read(cls, path):
+        raise NotImplementedError(_get_notimplemented_msg("IOperations", "openfile_for_read"))
+
+    @classmethod
+    def get_dirname(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "get_dirname"))
 
-    def get_basename(self, path):
+    @classmethod
+    def get_basename(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "get_basename"))
 
-    def pickleload(self, path):
+    @classmethod
+    def pickleload(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "pickleload"))
 
-    def pickledump(self, datas, path):
+    @classmethod
+    def pickledump(cls, datas, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "pickledump"))
 
-    def rename(self, src, dst):
+    @classmethod
+    def rename(cls, src, dst):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "rename"))
 
-    def readfile(self, uri):
+    @classmethod
+    def readfile(cls, uri):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "readfile"))
 
-    def writetofile(self, path, content):
+    @classmethod
+    def writetofile(cls, path, content):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "writetofile"))
 
-    def copyfile(self, src, dest):
+    @classmethod
+    def copyfile(cls, src, dest):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "copyfile"))
 
-    def listdir(self, target) :
+    @classmethod
+    def listdir(cls, target) :
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "listdir"))
 
-    def listdir_fullpath(self, target) :
+    @classmethod
+    def listdir_fullpath(cls, target) :
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "listdir_fullpath"))
 
-    def createfile(self, filepath):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "createfile"))
-
-    def force_move(self, src, dst):
+    @classmethod
+    def force_move(cls, src, dst):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "force_move"))
 
-    def is_link(self, path):
+    @classmethod
+    def is_link(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "is_link"))
 
-    def get_link(self, path):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "get_link"))
-
-    def get_link_abs(self, path):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "get_link_abs"))
-
-    def is_dir(self, path):
+    @classmethod
+    def is_dir(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "is_dir"))
-
-    def rename_errors_ignored(self, src, dst):
-        raise NotImplementedError(_get_notimplemented_msg("IOperations", "rename_errors_ignored"))

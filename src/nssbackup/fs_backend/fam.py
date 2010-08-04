@@ -34,6 +34,10 @@ _PREFS = prefs.Preferences()
 FS_BACKEND = _PREFS.get(key = prefs.PREFS_FS_BACKEND)
 
 
+#if FS_BACKEND == prefs.FS_BACKEND_GIO:
+#    print ">>> GIO"
+
+
 # factory methods
 def get_fam_target_handler_facade_instance():
     _fam = None
@@ -50,26 +54,6 @@ def get_fam_target_handler_facade_instance():
         raise ValueError("Given filesystem backend `%s` is not supported" % FS_BACKEND)
 
     return _fam
-
-
-def isinstance_of_fam_target_handler_facade(obj):
-    _fam_cls = None
-    _res = False
-
-    if FS_BACKEND == prefs.FS_BACKEND_GIO:
-        from nssbackup.fs_backend import _gio_fam
-        _fam_cls = _gio_fam.GioTargetHandler
-
-    elif FS_BACKEND == prefs.FS_BACKEND_FUSE:
-        from nssbackup.fs_backend import _fuse_fam
-        _fam_cls = _fuse_fam.FuseTargetHandler
-
-    else:
-        raise ValueError("Given filesystem backend `%s` is not supported" % FS_BACKEND)
-
-    _res = isinstance(obj, _fam_cls)
-    return _res
-
 
 
 def get_file_operations_facade_instance():

@@ -114,7 +114,9 @@ import os.path
 import re
 
 from nssbackup.pkginfo import Infos
+
 from nssbackup import util
+
 from nssbackup.util import local_file_utils
 from nssbackup.util import exceptions
 from nssbackup.util import pathparse

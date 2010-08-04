@@ -2,4 +2,5 @@
 @prefix@/share/pixmaps
 @prefix@/share/applications
 @prefix@/share/nssbackup
+@prefix@/bin
 @prefix@/share/doc/nssbackup

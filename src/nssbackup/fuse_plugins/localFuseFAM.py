@@ -30,7 +30,7 @@ class localFuseFAM (pluginFAM):
         pluginFAM.__init__(self)
 
     def match_scheme(self, remoteSource):
-        return remoteSource.startswith(local_file_utils.pathsep)
+        return remoteSource.startswith(local_file_utils.PATHSEP)
 
     def match_scheme_full(self, remoteSource):
         """
@@ -39,7 +39,7 @@ class localFuseFAM (pluginFAM):
         @return: True if the scheme matches the one for this 
         @rtype: boolean
         """
-        return remoteSource.startswith(local_file_utils.pathsep)
+        return remoteSource.startswith(local_file_utils.PATHSEP)
 
     def mount(self, source, mountbase):
         """
@@ -50,7 +50,7 @@ class localFuseFAM (pluginFAM):
         @rtype: str
         """
         self.logger.debug("Nothing to do for '%s'" % source)
-        return (local_file_utils.pathsep, "", source.lstrip(local_file_utils.pathsep))
+        return (local_file_utils.PATHSEP, "", source.lstrip(local_file_utils.PATHSEP))
 
     def umount(self, mounteddir):
         """

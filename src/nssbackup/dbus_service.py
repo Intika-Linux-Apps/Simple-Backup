@@ -42,6 +42,7 @@ import dbus.mainloop.glib
 from nssbackup.pkginfo import Infos
 from nssbackup.util import log
 from nssbackup.util import constants
+from nssbackup.util import exceptions
 from nssbackup.util.system import drop_privileges
 from nssbackup.util.system import pid_exists
 
@@ -328,16 +329,20 @@ def is_running():
     :todo: Retrieve the PID of the running service!
     """
     res = False
-    bus = dbus.SystemBus()
-    dbus_object = bus.get_object('org.freedesktop.DBus',
-                                 '/org/freedesktop/DBus')
-    dbus_iface = dbus.Interface(dbus_object, 'org.freedesktop.DBus')
-    services = dbus_iface.ListNames()
-    services.sort()
-    for service in services:
-        if service == constants.DBUS_SERVICE:
-            res = True
-            break
+    try:
+        bus = dbus.SystemBus()
+        dbus_object = bus.get_object('org.freedesktop.DBus',
+                                     '/org/freedesktop/DBus')
+        dbus_iface = dbus.Interface(dbus_object, 'org.freedesktop.DBus')
+        services = dbus_iface.ListNames()
+    except dbus.DBusException, error:
+        raise exceptions.DBusException(str(error))
+    else:
+        services.sort()
+        for service in services:
+            if service == constants.DBUS_SERVICE:
+                res = True
+                break
     return res
 
 
@@ -390,17 +395,17 @@ def run(args):
 
         _running = is_running()
         if _cmd == "start":
-            if _running:
+            if _running is True:
                 print "Simple Backup DBus service is already running"
             else:
                 __launch_service(keep_alive = _options.keep_alive)
         elif _cmd == "stop":
-            if _running:
+            if _running is True:
                 __stop_service()
             else:
                 print "Simple Backup DBus service is not running"
         elif _cmd == "restart":
-            if _running:
+            if _running is True:
                 __stop_service()
             __launch_service(keep_alive = _options.keep_alive)
 

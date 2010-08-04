@@ -17,16 +17,22 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+# UNIX specific implementations/definitions
+
 import os
 import pwd
 import grp
+import stat
 import subprocess
 import types
+import atexit
+import signal
 
 import glib
 
 
-from nssbackup.util import readline_nullsep
+PATHSEP = os.sep
+UNIX_PERM_ALL_WRITE = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
 
 
 COMMAND_GREP = "grep"
@@ -102,13 +108,11 @@ def get_user_home_dir():
 
 
 def get_user_config_dir():
-#    _confdir = os.getenv("XDG_CONFIG_DIR", os.path.normpath(os.path.join(os.getenv("HOME"), ".config")))
     _confdir = glib.get_user_config_dir()
     return _confdir
 
 
 def get_user_data_dir():
-#    _datadir = os.getenv("XDG_DATA_HOME", os.path.normpath(os.path.join(os.getenv("HOME"), ".local", "share")))
     _datadir = glib.get_user_data_dir()
     return _datadir
 
@@ -230,7 +234,7 @@ def get_process_environment(pid):
     _envfile = "/proc/%s/environ" % pid
     try:
         fobj = open(_envfile, "rb")
-        _envlst = [_var for _var in readline_nullsep(fobj)]
+        _envlst = [_var for _var in _readline_nullsep(fobj)]
         fobj.close()
     except (OSError, IOError), error:
         print "Unable to open Gnome session environment: %s." % error
@@ -259,17 +263,60 @@ def get_clean_environment():
     return _clean_env
 
 
+def is_dbus_session_bus_set():
+    key = 'DBUS_SESSION_BUS_ADDRESS'
+    _res = False
+    _value = os.environ.get(key)
+    if _value is not None:
+        _res = True
+    return _res
+
+
+def launch_dbus_if_required():
+    # launches a dbus session bus for GIO
+    #
+    # inspired by code from Duplicity/giobackend
+    # originally written by Michael Terry (2009)
+    #
+    if not is_dbus_session_bus_set():
+        output = exec_command_stdout(['dbus-launch'])
+        print "D-Bus session bus launched"
+        for _line in output.split('\n'):
+            print "\t%s" % _line
+            _var = _line.split('=', 1)
+            if len(_var) != 2:
+                print "Unable to read environment variable '%s'. Skipped." % _line
+            else:
+                os.environ[_var[0]] = _var[1]
+                if _var[0] == 'DBUS_SESSION_BUS_PID':
+                    # we need to kill the launched bus at termination
+                    try:
+                        _pid = int(_var[1])
+                        atexit.register(os.kill, _pid, signal.SIGTERM)
+                    except ValueError, error:
+                        print "Unable to register dbus clean-up action: %s" % error
+
+
+def set_dbus_session_bus_from_session():
+    """Update dbus session bus address in order to connect to gvfsd from root consoles
+    """
+    _set_envvar_from_session(key = 'DBUS_SESSION_BUS_ADDRESS')
+
+
 def set_display_from_session():
-    key = 'DISPLAY'
-    _display = os.environ.get(key)
-    if _display is None:
+    _set_envvar_from_session(key = 'DISPLAY')
+
+
+def _set_envvar_from_session(key):
+    _value = os.environ.get(key)
+    if _value is None:
         _session = get_session_name()
         _env = get_session_environment(_session)
         if _env is not None:
-            _ndisplay = _env.get(key)
-            print "Updating %s to: %s" % (key, _ndisplay)
-            if _ndisplay is not None:
-                os.environ[key] = _ndisplay
+            _nvalue = _env.get(key)
+            print "Updating %s to: %s" % (key, _nvalue)
+            if _nvalue is not None:
+                os.environ[key] = _nvalue
 
 
 def get_session_name():
@@ -281,7 +328,7 @@ def get_session_name():
 #TODO: Cover other DEs (LXDE, KDE...) here and above!
     return _session
 
-
+#TODO: implement Singleton class for access to environment
 def get_session_environment(session):
     mod_env = None
     if session == "gnome":
@@ -410,3 +457,30 @@ def proc_exists(processname, env = None):
     if _output != "":
         _exists = True
     return _exists
+
+
+def _readline_nullsep(fd):
+    """
+    Iterator that read a NUL separeted file as lines 
+    @param fd: File descriptor
+    @return: the gotten line
+    @rtype: String
+    """
+    _continue = True
+
+    while _continue is True:
+        c = fd.read(1)
+        currentline = ''
+
+        while c:
+            if c == '\0'  :
+                # we got a line
+                break
+            currentline += c
+            c = fd.read(1)
+        else:
+            # c is None
+            _continue = False
+
+        yield currentline
+

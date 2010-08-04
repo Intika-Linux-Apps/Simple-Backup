@@ -70,16 +70,13 @@ if __name__ == '__main__':
     application = get_locale_domain()
     locale_dir = get_locale_dir()
 
-
     import gettext
     gettext.bindtextdomain(application, locale_dir)
     gettext.textdomain(application)
 
-
     import gtk.glade
     gtk.glade.bindtextdomain(application, locale_dir)
     gtk.glade.textdomain(application)
-
 
     try:
         import appindicator

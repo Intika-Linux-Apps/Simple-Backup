@@ -166,10 +166,10 @@ class UpgradeManager(object):
         """
         self.statusMessage = _("Upgrading from v1.0 to v1.2: %s") % str(snapshot)
         self.logger.info(self.statusMessage)
-        i = self._fop.openfile(snapshot.getPath() + self._fop.pathsep + "tree")
+        i = self._fop.openfile_for_read(snapshot.getPath() + self._fop.pathsep + "tree")
         bfiles = pickle.load(i)
-        n = self._fop.openfile(snapshot.getPath() + self._fop.pathsep + "flist", True)
-        p = self._fop.openfile(snapshot.getPath() + self._fop.pathsep + "fprops", True)
+        n = self._fop.openfile_for_write(snapshot.getPath() + self._fop.pathsep + "flist")
+        p = self._fop.openfile_for_write(snapshot.getPath() + self._fop.pathsep + "fprops")
         for item in bfiles:
             n.write(str(item[0]) + "\n")
             p.write(str(item[1]) + str(item[2]) + str(item[3]) + str(item[4]) + str(item[5]) + "\n")
@@ -188,8 +188,8 @@ class UpgradeManager(object):
         fprops = self._fop.readfile(snapshot.getPath() + self._fop.pathsep + "fprops").split("\n")
         if len(flist) == len(fprops) :
             if len(flist) > 1:
-                l = self._fop.openfile(snapshot.getPath() + self._fop.pathsep + "flist.v13", True)
-                p = self._fop.openfile(snapshot.getPath() + self._fop.pathsep + "fprops.v13", True)
+                l = self._fop.openfile_for_write(snapshot.getPath() + self._fop.pathsep + "flist.v13")
+                p = self._fop.openfile_for_write(snapshot.getPath() + self._fop.pathsep + "fprops.v13")
                 for a, b in zip(flist, fprops):
                     l.write(a + "\000")
                     p.write(b + "\000")

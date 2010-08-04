@@ -60,76 +60,85 @@ class FuseOperations(interfaces.IOperations):
     """
     __metaclass__ = structs.Singleton
 
+    pathsep = local_file_utils.PATHSEP
+
     def __init__(self):
         interfaces.IOperations.__init__(self)
-        self.pathsep = local_file_utils.pathsep
 
     @classmethod
     def path_exists(cls, path):
         return local_file_utils.path_exists(path)
 
-    def path_writeable(self, path):
-        return local_file_utils.path_writeable(path)
-
-    def rename(self, src, dst):
+    @classmethod
+    def rename(cls, src, dst):
         local_file_utils.rename(src, dst)
 
-    def chmod(self, path, mode):
-        local_file_utils.chmod(path, mode)
-
-    def copy(self, src, dst):
-        local_file_utils.copy(src, dst)
-
-    def copy_no_permissions(self, src, dst):
-        local_file_utils.copy_no_permissions(src, dst)
-
-    def readfile(self, path):
+    @classmethod
+    def readfile(cls, path):
         return local_file_utils.readfile(path)
 
     @classmethod
     def normpath(cls, *args):
         return local_file_utils.normpath(*args)
 
-    def get_dirname(self, path):
+    @classmethod
+    def joinpath(cls, *args):
+        return pathparse.joinpath(*args)
+
+    @classmethod
+    def get_dirname(cls, path):
         return local_file_utils.get_dirname(path)
 
-    def get_basename(self, path):
+    @classmethod
+    def get_basename(cls, path):
         return local_file_utils.get_basename(path)
 
-    def openfile(self, uri, write = False):
-        return local_file_utils.openfile(uri, write)
+    @classmethod
+    def openfile_for_write(cls, path):
+        return local_file_utils.openfile(path, write = True)
 
-    def pickleload(self, path):
+    @classmethod
+    def openfile_for_read(cls, path):
+        return local_file_utils.openfile(path, write = False)
+
+    @classmethod
+    def pickleload(cls, path):
         return local_file_utils.pickleload(path)
 
-    def pickledump(self, datas, path):
+    @classmethod
+    def pickledump(cls, datas, path):
         local_file_utils.pickledump(datas, path)
 
-    def delete(self, uri):
+    @classmethod
+    def delete(cls, uri):
         local_file_utils.delete(uri)
 
-    def force_delete(self, path):
+    @classmethod
+    def force_delete(cls, path):
         local_file_utils.force_delete(path)
 
-    def copyfile(self, src, dest):
+    @classmethod
+    def copyfile(cls, src, dest):
         local_file_utils.copyfile(src, dest)
 
-    def listdir(self, path):
+    @classmethod
+    def listdir(cls, path):
         return local_file_utils.listdir(path)
 
-    def listdir_fullpath(self, path) :
+    @classmethod
+    def listdir_fullpath(cls, path) :
         return local_file_utils.listdir_fullpath(path)
 
-    def makedir(self, target):
+    @classmethod
+    def makedir(cls, target):
         local_file_utils.makedir(target)
 
-    def makedirs(self, target) :
+    @classmethod
+    def makedirs(cls, target) :
         local_file_utils.makedirs(target) #, 0750)
 
-    def createfile(self, filepath):
-        local_file_utils.createfile(filepath)
-
-    def writetofile(self, path, content) :
+    @classmethod
+    def writetofile(cls, path, content) :
         """
         Write a String to a file. You don't have to open and close the file.
         - File = path to the file
@@ -137,23 +146,17 @@ class FuseOperations(interfaces.IOperations):
         """
         local_file_utils.writetofile(path, content)
 
-    def force_move(self, src, dst):
+    @classmethod
+    def force_move(cls, src, dst):
         local_file_utils.force_move(src, dst)
 
-    def is_link(self, path):
+    @classmethod
+    def is_link(cls, path):
         return local_file_utils.is_link(path)
 
-    def get_link(self, path):
-        return local_file_utils.get_link(path)
-
-    def get_link_abs(self, path):
-        return local_file_utils.get_link_abs(path)
-
-    def is_dir(self, path):
+    @classmethod
+    def is_dir(cls, path):
         return local_file_utils.is_dir(path)
-
-    def rename_errors_ignored(self, src, dst):
-        local_file_utils.rename_errors_ignored(src, dst)
 
 
 def get_scheme_from_service(service):

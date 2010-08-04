@@ -33,6 +33,7 @@ import types
 
 
 from nssbackup.util import log
+from nssbackup.util import system
 from nssbackup.util import exceptions
 
 
@@ -363,3 +364,34 @@ def append_str_to_filename(filename, str_to_append, filetype = ""):
     return _res
 
 
+def remove_trailing_sep(path):
+    spath = path.rstrip(system.PATHSEP)
+    return spath
+
+
+def remove_leading_sep(path):
+    spath = path.lstrip(system.PATHSEP)
+    return spath
+
+
+def ensure_leading_sep(path):
+    spath = "%s%s" % (system.PATHSEP, remove_leading_sep(path))
+    return spath
+
+
+def joinpath(*args):
+    """Concatenates given paths (i.e. concatenates them and removes trailing
+    separators).
+    """
+    if len(args) == 0:
+        _path = system.PATHSEP
+    else:
+        _path = ""
+        for _arg in args:
+            _path = "%s%s%s" % (_path, system.PATHSEP, remove_leading_sep(_arg))
+
+        if not args[0].startswith(system.PATHSEP):
+            _path = remove_leading_sep(_path)
+
+        _path = remove_trailing_sep(_path)
+    return _path

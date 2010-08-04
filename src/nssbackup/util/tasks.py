@@ -21,6 +21,8 @@ worker tasks within separate threads.
 
 import threading
 
+from nssbackup.util import log
+
 
 class WorkerThread(object):
     """Class that encapsulates a single (long running) thread.
@@ -103,6 +105,7 @@ class WorkerThread(object):
             result = self.__task(*args, **kwargs)
         except Exception, exc:
             # if an exception was raised, use it as the result
+            log.LogFactory.getLogger().exception(exc)
             result = exc
 
         final_args_lst = []

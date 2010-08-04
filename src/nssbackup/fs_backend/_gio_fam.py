@@ -21,15 +21,13 @@
 from gettext import gettext as _
 import types
 
-from nssbackup.util import local_file_utils
-from nssbackup.util import exceptions
-from nssbackup.util import interfaces
-
-from nssbackup.util import log
-from nssbackup.util import pathparse
-
 from nssbackup.fs_backend import _gio_utils as gio_utils
 from nssbackup.fs_backend._gio_utils import GioOperations
+
+from nssbackup.util import exceptions
+from nssbackup.util import interfaces
+from nssbackup.util import pathparse
+from nssbackup.util import log
 
 
 class GioTargetHandler(interfaces.ITargetHandler):
@@ -136,7 +134,6 @@ class GioTargetHandler(interfaces.ITargetHandler):
         """Callback method that gets called when mounting is finished.
         Takes errors occurred during the mount process as parameter.
         """
-#        print ">>> gio_fam._mount_cb"
         try:
             if error is None:
                 _eff_path = self.get_eff_path()
@@ -168,17 +165,14 @@ class GioTargetHandler(interfaces.ITargetHandler):
 
         if error is None:
             self._is_initialized = True
-#        print "End of gio_fam._mount_cb"
 
     def _umount_cb(self, error):
-#        print ">>> gio_fam._umount_cb"
         self._in_progress = False # release lock
         if self._terminate_callback is not None:
             self._logger.debug("Calling additional callback in gio_fam: %s" % self._terminate_callback)
             self._terminate_callback(error)
 
         self._is_initialized = False
-#        print "End of gio_fam._umount_cb"
 
     def get_eff_path(self):
         _eff_path = self._dest_mount_hdl.get_eff_path()
@@ -196,27 +190,9 @@ class GioTargetHandler(interfaces.ITargetHandler):
         It is required in order to give it to TAR as parameter (tar does not support gio).
         It is checked using GIO and native access functions.
         """
-        _res = False
         _effpath = self.get_eff_path()
-
         _res_gio = GioOperations.path_exists(_effpath)
-        _res_nat = local_file_utils.path_exists(_effpath)
-
-        if (_res_gio is True) and (_res_nat is True):
-            _res = True
-
-        return _res
+        return _res_gio
 
     def test_destination(self):
         self._dest_mount_hdl.test_path()
-
-#    def dest_listdir(self):
-##        _fop = gio_utils.GioOperations()
-#
-#        _deffpath = self._config.get_destination_eff_path()
-#        _lsd = _local_fop.listdir(_deffpath)
-#        _res = []
-#        for _dir in _lsd:
-#            _res.append(_local_fop.normpath(_deffpath, _dir))
-#
-#        return _res

@@ -327,7 +327,7 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
 
         assert _effpath != ""
         assert _effpath is not None
-        assert _effpath.startswith(local_file_utils.pathsep)
+        assert _effpath.startswith(local_file_utils.PATHSEP)
 
         return _effpath
 
@@ -352,7 +352,7 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
 
         assert _effpath != ""
         assert _effpath is not None
-        assert _effpath.startswith(local_file_utils.pathsep)
+        assert _effpath.startswith(local_file_utils.PATHSEP)
 
         _res = local_file_utils.path_exists(_effpath)
         return _res
@@ -362,7 +362,7 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
 
         assert _effpath != ""
         assert _effpath is not None
-        assert _effpath.startswith(local_file_utils.pathsep)
+        assert _effpath.startswith(local_file_utils.PATHSEP)
 
         dname = "%s-%s-%s.tmp" % ("sbackup-dir", time.time(), uuid.uuid4())
         tfilen = "%s-%s-%s.tmp" % ("sbackup", time.time(), uuid.uuid4())

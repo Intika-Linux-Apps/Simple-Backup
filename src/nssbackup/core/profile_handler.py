@@ -54,7 +54,7 @@ class BackupProfileHandler(object):
     """
 
     def __init__(self, configmanager, backupstate, dbus_connection = None,
-                 use_indicator = False):
+                 use_indicator = False, full_snapshot = False):
         """The `BackupProfileHandler` Constructor.
 
         :param configmanager : The current configuration manager
@@ -68,6 +68,7 @@ class BackupProfileHandler(object):
 #TODO: Simplify/refactor these attributes.
         self.__dbus_conn = dbus_connection
         self.__use_indicator = use_indicator
+        self.__full_snp = full_snapshot
 
         self.config = configmanager
         self.__state = backupstate
@@ -137,7 +138,7 @@ class BackupProfileHandler(object):
         self.__state.set_state('start')
 
         # get basic informations about new snapshot
-        (snppath, base) = self.__retrieve_basic_infos()
+        (snppath, base) = self.__retrieve_basic_infos(force_full_snp = self.__full_snp)
 
         # Create a new snapshot
         self.__snapshot = snapshot.Snapshot(snppath)
@@ -182,9 +183,11 @@ class BackupProfileHandler(object):
 
         if self.config.has_option("general", "splitsize"):
             _chunks = int(self.config.get("general", "splitsize"))
-            self.logger.info(_("Setting size of archive chunks to %s")\
-                        % util.get_humanreadable_size_str(size_in_bytes = _chunks, binary_prefixes = True))
             self.__snapshot.setSplitedSize(_chunks)
+            if _chunks:
+                self.logger.info(_("Setting size of archive chunks to %s")\
+                            % util.get_humanreadable_size_str(size_in_bytes = (_chunks * 1024),
+                                                              binary_prefixes = True))
 
         # set followlinks
         self.__snapshot.setFollowLinks(self.config.get_followlinks())
@@ -272,41 +275,51 @@ class BackupProfileHandler(object):
                 if logf_src is None:
                     self.logger.warning(_("No log file specified."))
                 else:
-                    logf_name = os.path.basename(logf_src)
-                    logf_target = os.path.join(self.__snapshot.getPath(),
+                    logf_name = _op.get_basename(logf_src)
+                    logf_target = _op.joinpath(self.__snapshot.getPath(),
                                                 logf_name)
 
                     if _op.path_exists(logf_src):
                         try:
-                            _op.copy(logf_src, logf_target)
-                        except exceptions.ChmodNotSupportedError:
+                            _op.copyfile(logf_src, logf_target)
+                        except exceptions.CopyFileAttributesError:
                             self.logger.warning(_("Unable to change permissions for file '%s'.")\
                                             % logf_target)
+                        except (OSError, IOError), error:
+                            self.logger.warning(_("Unable to copy log file: %s") % error)
                     else :
                         self.logger.warning(_("Unable to find logfile to copy into snapshot."))
             else:
                 self.logger.warning(_("No snapshot to copy logfile."))
 
-    def finish(self):
+    def finish(self, error = None):
         """End nssbackup session :
         
         - copy the log file into the snapshot dir
         
         Might be called multiple times.
         
-        :attention: When calling this method is unsure whether the backup
-                    was successful or not.
+        :note: When this method is called no exceptions were raised during the backup.
         """
         self.__copylogfile()
         self.__fam_target_hdl.terminate()
-        self.logger.info(_("Processing of profile is finished."))
-        return constants.EXCODE_SUCCESS
+
+        if error is None:
+            self.logger.info(_("Processing of profile successfully finished (no errors)"))
+            _excode = constants.EXCODE_SUCCESS
+        else:
+            err_str = str(error)
+            if err_str == "":
+                err_str = str(type(error))
+            self.logger.info(_("Processing of profile failed with error: %s") % err_str)
+            _excode = constants.EXCODE_BACKUP_ERROR
+
+        return _excode
 
     def __check_target(self):
-        assert self.__fam_target_hdl.is_initialized()
+        assert self.__fam_target_hdl.is_initialized(), "File access manager not initialized"
 
-# TODO: Improve handling of original and modified target paths. Support display names for state (and therefore user interaction)
-#        _target = self.config.get_destination_eff_path()
+# TODO: Improve handling of original and modified target paths. Support display names for state (improved user interaction)
         _target_display_name = self.__fam_target_hdl.query_dest_display_name()
         self.__state.set_target(_target_display_name)
 
@@ -348,7 +361,7 @@ class BackupProfileHandler(object):
             self.logger.error(_("Unable to access destination: %s") % (error))
             raise error
 
-    def __retrieve_basic_infos(self):
+    def __retrieve_basic_infos(self, force_full_snp = False):
         """Retrieves basic informations about the snapshot that is going
         to be created. This informations include:
         1. the path of the new snapshot
@@ -360,13 +373,14 @@ class BackupProfileHandler(object):
         :rtype: a tuple
         
         """
+        _fop = fam.get_file_operations_facade_instance()
         # Get the list of snapshots that matches the latest snapshot format
         listing = self.__snpman.get_snapshots()
         agelimit = int(self.config.get("general", "maxincrement"))
+        increment = False
 
         base = None
-        if len(listing) == 0 :
-            #no snapshots
+        if (len(listing) == 0) or (force_full_snp is True):
             increment = False
         else:
             # we got some snaphots 
@@ -405,11 +419,11 @@ class BackupProfileHandler(object):
         hostname = socket.gethostname()
         snpname = "%s.%s" % (datetime.datetime.now().isoformat("_").replace(":", "."),
                              hostname)
-        if increment:
+        if increment is True:
             snpname = "%s.inc" % snpname
         else:
             snpname = "%s.ful" % snpname
 
-        tdir = os.path.join(self.config.get("general", "target"), snpname)
+        tdir = _fop.joinpath(self.config.get("general", "target"), snpname)
 
         return (tdir, base)

@@ -42,24 +42,23 @@ import uuid
 from nssbackup.util import pathparse
 from nssbackup.util import exceptions
 from nssbackup.util import constants
+from nssbackup.util import system
 from nssbackup.util import log
 
 
 
 #TODO: make these functions module functions? See article: Python is not Java
 
-pathsep = os.sep
+PATHSEP = system.PATHSEP
 
 path_exists = os.path.exists
 is_dir = os.path.isdir
-rename = os.rename
 listdir = os.listdir
 makedir = os.mkdir #, 0750)
 makedirs = os.makedirs #, 0750)
 chmod = os.chmod
 get_dirname = os.path.dirname
 get_basename = os.path.basename
-copy_no_permissions = shutil.copy
 is_mount = os.path.ismount
 
 # TDOD: Evaluate alternate implementations:
@@ -67,25 +66,33 @@ is_mount = os.path.ismount
 # os.path.exists(path)
 # os.access(uri, os.F_OK)
 
-def copy(src, dst):
-    """Customized copy routine that copies the fileobject and afterwards
-    tries to copy the file permissions. If this fails a custom exception
-    is raised. The date and archive bit of the file is not copied. 
+#def copyfile(src, dest):
+#    """Copies given file and metadata
+#    """
+#    if os.path.isdir(src):
+#        raise ValueError("Given copy source is a directory, not a file")
+##TODO: What happens if `dest` already exists?
+#    if os.path.isfile(src):
+#        shutil.copy2(src, dest)
+
+def copyfile(src, dst):
+    """Copies given file and metadata including file permissions.
+    If this fails a custom exception is raised. 
     
     @param src: an existing file that should be copied
-    @param dst: copy destination - an existing directory or full path to new file (the directory must exist too)
+    @param dst: copy destination - an existing directory or full path to new file
                 
     @return: None
     
-    @raise ChmodNotSupportedError: if the permissions could not be copied
+    @raise CopyFileAttributesError: if the permissions could not be copied
     """
     prep_src, prep_dst = _prepare_copy(src, dst)
     shutil.copyfile(prep_src, prep_dst)
     try:
-        shutil.copymode(prep_src, prep_dst)
+        shutil.copystat(prep_src, prep_dst)
     except OSError:
-        raise exceptions.ChmodNotSupportedError(\
-                        "Unable to change permissions of file '%s'." % prep_dst)
+        raise exceptions.CopyFileAttributesError(\
+                        "Unable to copy file attributes (permissions etc.) of file '%s'." % prep_dst)
 
 def _prepare_copy(src, dst):
     """Helper function that prepares the given paths for copying
@@ -98,22 +105,22 @@ def _prepare_copy(src, dst):
     # firstly the types are checked
     if not isinstance(src, types.StringTypes):
         raise TypeError("Given parameter must be a string. "\
-                        "Got %s instead." % (type(src)))
+                        "Got %s instead" % (type(src)))
     if not isinstance(dst, types.StringTypes):
         raise TypeError("Given parameter must be a string. "\
-                        "Got %s instead." % (type(dst)))
+                        "Got %s instead" % (type(dst)))
 
     # only absolute paths are supported
     if not os.path.isabs(src):
-        raise ValueError("Given copy source '%s' must be absolute." % src)
+        raise ValueError("Given copy source '%s' must be absolute" % src)
     if not os.path.isabs(dst):
-        raise ValueError("Given copy destination '%s' must be absolute." % dst)
+        raise ValueError("Given copy destination '%s' must be absolute" % dst)
 
     # the source must be a file and exist
-    if not os.path.isfile(src):
-        raise IOError("Given copy source '%s' is not a file." % src)
     if not os.path.exists(src):
-        raise IOError("Given copy source '%s' does not exist." % src)
+        raise IOError("Given copy source '%s' does not exist" % src)
+    if not os.path.isfile(src):
+        raise IOError("Given copy source '%s' is not a file" % src)
 
     _src_file = os.path.basename(src)
     _src_dir = os.path.dirname(src)
@@ -129,9 +136,9 @@ def _prepare_copy(src, dst):
         _dst_dir = os.path.dirname(dst)
 
     if not os.path.isdir(_dst_dir):
-        raise IOError("Given copy destination '%s' does not exist." % _dst_dir)
+        raise IOError("Given copy destination '%s' does not exist" % _dst_dir)
 
-    _dst_path = os.path.join(_dst_dir, _dst_file)
+    _dst_path = joinpath(_dst_dir, _dst_file)
     retval = (src, _dst_path)
 
     return retval
@@ -142,7 +149,7 @@ def listdir_fullpath(path) :
     _lst = listdir(path)
     _res = []
     for _ent in _lst:
-        _res.append(normpath(path, _ent))
+        _res.append(joinpath(path, _ent))
     return _res
 
 
@@ -156,14 +163,19 @@ def normpath(*args):
     
     @todo: Consistent handling of `normpath` (Quote: os.path.normpath - It should be understood
     that this may change the meaning of the path if it contains symbolic links!)
+    
+    :note: Be careful when using `normpath`. Consider `joinpath` instead.
     """
     _path = os.path.join(*args)
-    _path = _remove_trailing_sep(_path)
+    _path = pathparse.remove_trailing_sep(_path)
 #    _path = os.path.normpath(_path)
     return _path
 
+def joinpath(*args):
+    return pathparse.joinpath(*args)
+
 def is_link(path):
-    spath = _remove_trailing_sep(path)
+    spath = pathparse.remove_trailing_sep(path)
     res = os.path.islink(spath)
     return res
 
@@ -205,6 +217,8 @@ def force_delete(path):
 def force_move(src, dst):
     """Modified version of `shutil.move` that uses `nssb_copytree`
     and even removes read-only files/directories.
+    :note: it does not work (and won't never) if the `src` is located within a read-only
+            directory. We'd need to manipulate the parent dir in that case.
     """
     try:
         os.rename(src, dst)
@@ -213,17 +227,13 @@ def force_move(src, dst):
             if shutil.destinsrc(src, dst):
                 raise shutil.Error("Cannot move a directory '%s' into itself "\
                                    "'%s'." % (src, dst))
-            _copytree(src, dst, symlinks = True)
+#            _copytree(src, dst, symlinks = True)
+#FIXME: copy symlinks (not the target)
+            _copytree(src, dst, symlinks = False)
             force_delete(src)
         else:
             shutil.copy2(src, dst)
             force_delete(src)
-
-def copyfile(src, dest):
-    "copy the source file to the dest one"
-    if os.path.isfile(src):
-        shutil.copy2(src, dest)
-# TODO: add warning/exception when `src` is not a file?
 
 def _copytree(src, dst, symlinks = False):
     """mod of `shutil.copytree`. This doesn't fail if the
@@ -252,7 +262,7 @@ def _copytree(src, dst, symlinks = False):
             else:
                 shutil.copy2(srcname, dstname)
             # XXX What about devices, sockets etc.?
-        except (IOError, os.error), why:
+        except (IOError, OSError), why:
             errors.append((srcname, dstname, str(why)))
         # catch the Error from the recursive copytree so that we can
         # continue with other files
@@ -262,7 +272,7 @@ def _copytree(src, dst, symlinks = False):
         shutil.copystat(src, dst)
     except OSError, why:
         errors.extend((src, dst, str(why)))
-    if errors:
+    if len(errors) > 0:
         raise shutil.Error, errors
 
 def createfile(filepath):
@@ -331,17 +341,14 @@ def pickledump(datas, path):
     pickle.dump(datas , f)
     f.close()
 
-def _remove_trailing_sep(path):
-    spath = path.rstrip(os.sep)
-    return spath
-
 def _add_write_permission(path, recursive = True):
     """Sets write permissions for user, group, and others for
     given directory or file (recursive). 
     """
+    print path
     fstats = os.stat(path)
     fmode = fstats.st_mode
-    fmode = fmode | stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
+    fmode = fmode | system.UNIX_PERM_ALL_WRITE
     os.chmod(path, fmode)
 
     if os.path.isdir(path) and recursive is True:
@@ -350,7 +357,12 @@ def _add_write_permission(path, recursive = True):
             if os.path.isdir(_entrypath)  and not os.path.islink(_entrypath):
                 _add_write_permission(_entrypath)
             else:
-                _add_write_permission(path, recursive = False)
+                _add_write_permission(_entrypath, recursive = False)
+
+def rename(src, dst):
+    # avoids (misused) move operations using `rename`
+    _dstf = joinpath(get_dirname(src), get_basename(dst))
+    os.rename(src, _dstf)
 
 def rename_errors_ignored(src, dst):
     try:
@@ -433,8 +445,9 @@ def test_path(path, testdir_name, testfile_name, test_read = True):
     testdir = os.path.join(path, testdir_name)
     testfile = os.path.join(testdir, testfile_name)
 
+    __logger.info("Perform tests at specified location")
     try:
-        __logger.info("test access to specified path using native functions")
+        __logger.debug("test access to specified path using native functions")
         _exists = path_exists(path)
         if bool(_exists) is False:
             raise exceptions.RemoteMountTestFailedError("Specified remote path is not accessable.")
@@ -445,10 +458,10 @@ def test_path(path, testdir_name, testfile_name, test_read = True):
         if bool(_exists) is True:
             raise exceptions.RemoteMountTestFailedError("Unable to create directory for testing purpose: Directory already exists.")
 
-        __logger.info("Create testdir")
+        __logger.debug("Create testdir")
         makedir(testdir)
 
-        __logger.info("Test testfile for existence")
+        __logger.debug("Test testfile for existence")
         _exists = path_exists(testfile)
         if bool(_exists) is True:
             raise exceptions.RemoteMountTestFailedError("Unable to create file for testing purpose: File already exists.")
@@ -459,7 +472,7 @@ def test_path(path, testdir_name, testfile_name, test_read = True):
 
         if test_read is True:
             # and re-read
-            __logger.info("Re-read test file")
+            __logger.debug("Re-read test file")
             _exists = path_exists(testfile)
             if bool(_exists) is False:
                 raise exceptions.RemoteMountTestFailedError("Unable to open file for testing purpose: File does not exists.")
@@ -468,14 +481,12 @@ def test_path(path, testdir_name, testfile_name, test_read = True):
                 raise exceptions.RemoteMountTestFailedError("Unable to read content from test file: content differs.")
 
         # clean-up
-        __logger.info("Remove file")
+        __logger.debug("Remove file")
         delete(testfile)
-        __logger.info("Remove dir")
+        __logger.debug("Remove dir")
         delete(testdir)
     except (OSError, IOError), error:
         raise exceptions.RemoteMountTestFailedError(str(error))
-
-
 
 
 def query_fs_info(path):

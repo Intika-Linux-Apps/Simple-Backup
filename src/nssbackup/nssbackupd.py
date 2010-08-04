@@ -33,29 +33,30 @@ from gettext import gettext as _
 import traceback
 import sys
 import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 import socket
 import datetime
 import optparse
 import time
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 
 from nssbackup.pkginfo import Infos
 
 from nssbackup.core.ConfigManager import ConfigManager, get_profiles
-from nssbackup.core.profile_handler import BackupProfileHandler
 from nssbackup.core.ConfigManager import ConfigurationFileHandler
+from nssbackup.core.profile_handler import BackupProfileHandler
 
-from nssbackup.util import log
-from nssbackup.util import exceptions
-from nssbackup.util import get_resource_file
-from nssbackup.util import notifier
-from nssbackup.util import system
-from nssbackup.util import constants
-from nssbackup.util import lock
 from nssbackup.util import enable_backup_cancel_signal, enable_termsignal
+from nssbackup.util import get_resource_file
 from nssbackup.util import local_file_utils
+from nssbackup.util import exceptions
+from nssbackup.util import constants
+from nssbackup.util import system
+from nssbackup.util import notifier
+from nssbackup.util import lock
+from nssbackup.util import log
 
 
 def except_hook(etype, evalue, etb):
@@ -67,6 +68,9 @@ def except_hook(etype, evalue, etb):
 
 
 sys.excepthook = except_hook
+#TODO: move the following into GIO backend: should be executed in case of enabled gio backend only!
+system.set_dbus_session_bus_from_session()
+system.launch_dbus_if_required()
 
 
 class SBackupProc(object):
@@ -82,7 +86,8 @@ class SBackupProc(object):
     
     """
 
-    def __init__(self, notifiers, configfile, dbus_connection = None, use_indicator = False):
+    def __init__(self, notifiers, configfile, dbus_connection = None,
+                 use_indicator = False, full_snapshot = False):
         """Default constructor. Basic initializations are done here.
 
         :param notifiers: instances of notifiers that should be used
@@ -99,6 +104,7 @@ class SBackupProc(object):
         """
         self.__dbus_conn = dbus_connection
         self.__use_indicator = use_indicator
+        self.__full_snp = full_snapshot
 
         self.__exitcode = constants.EXCODE_GENERAL_ERROR
         self.__errors = []
@@ -267,7 +273,7 @@ class SBackupProc(object):
                 self.logger = log.LogFactory.getLogger(self.__profilename)
 
                 self.__bprofilehdl = BackupProfileHandler(confm, self.__state, self.__dbus_conn,
-                                          self.__use_indicator)
+                                          self.__use_indicator, self.__full_snp)
 
                 self.__write_errors_to_log()
 
@@ -304,8 +310,7 @@ class SBackupProc(object):
         self.__state.set_recent_error(error)
         self.__state.set_state('error')
         if self.__bprofilehdl is not None:
-            self.__bprofilehdl.finish()
-            self.__exitcode = constants.EXCODE_BACKUP_ERROR
+            self.__exitcode = self.__bprofilehdl.finish(error)
 
     def __on_finish(self):
         """Method that is finally called after backup process.
@@ -383,6 +388,8 @@ class SBackupApp(object):
         if (self.__use_indicator == True) and (self.__dbus_avail == True):
             self._launch_indicator()
 
+
+
     def _launch_dbusservice(self):
         """Launches the DBus service and establishes a placeholder
         connection in order to keep the service alive as long as this
@@ -414,16 +421,14 @@ class SBackupApp(object):
         print "Now launching indicator application (status icon)."
         _path_to_app = get_resource_file(constants.INDICATORAPP_FILE)
 
-        # a full DE is supposed
-        session = dbus_support.get_session_name()
-        # when running in empty environment, it is impossible to connect to D-Bus session server 
-        if session == "":
+        session = dbus_support.get_session_name()   # a full DE is supposed         
+        if session == "":   # in empty environments, it might impossible to connect to D-Bus session server
             print "No DE found using D-Bus. Looking for process id."
             session = system.get_session_name()
 
-        mod_env = system.get_session_environment(session)
+        session_env = system.get_session_environment(session)
 
-        if mod_env is None:
+        if session_env is None:
             print "No desktop session found. Indicator application is not started."
         else:
             _cmd = [_path_to_app]
@@ -431,7 +436,7 @@ class SBackupApp(object):
                 _cmd.append("--legacy")
 
             if not system.is_superuser():
-                if system.get_user_from_uid() != mod_env["USER"]:
+                if system.get_user_from_uid() != session_env["USER"]:
                     _cmd = None
                     print "Unable to launch indicator application as current user.\n"\
                           "You must own current desktop session."
@@ -439,7 +444,7 @@ class SBackupApp(object):
             if _cmd is None:
                 print "Unable to launch indicator application"
             else:
-                pid = system.exec_command_async(args = _cmd, env = mod_env)
+                pid = system.exec_command_async(args = _cmd, env = session_env)
                 print "Indicator application started (PID: %s)" % pid
                 time.sleep(constants.INDICATOR_LAUNCH_PAUSE_SECONDS)
 
@@ -487,6 +492,10 @@ class SBackupApp(object):
         parser.add_option("--legacy-indicator",
               action = "store_true", dest = "legacy_appindicator", default = False,
               help = "use legacy status icon instead of `libappindicator`")
+
+        parser.add_option("--full",
+              action = "store_true", dest = "full_snapshot", default = False,
+              help = "create full snapshot")
 
         (options, args) = parser.parse_args(self.__argv[1:])
         if len(args) > 0:
@@ -538,7 +547,8 @@ class SBackupApp(object):
             self.__backupproc = SBackupProc(self.__notifiers,
                                               self.__configfile,
                                               self.__dbus_conn,
-                                              self.__use_indicator)
+                                              self.__use_indicator,
+                                              self.__options_given.full_snapshot)
             self.__exitcode = self.__backupproc.run()
 
         except exceptions.InstanceRunningError, error:

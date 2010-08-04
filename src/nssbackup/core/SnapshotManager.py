@@ -81,11 +81,6 @@ class SnapshotManager(object):
         if not isinstance(target_eff_path, types.StringTypes):
             raise TypeError("Effective target path of type string expected. Got %s instead"\
                             % type(target_eff_path))
-#        if not fam.isinstance_of_fam_target_handler_facade(fam_target_handler):
-#            raise TypeError("Instance of FAM target handler expected")
-#
-#        if not fam_target_handler.is_initialized():
-#            raise AssertionError("FAM target handler is not initialized")
 
         self.logger = LogFactory.getLogger()
 
@@ -492,7 +487,7 @@ class SnapshotManager(object):
             self.statusNumber = 0.00
 
             # create a temporary directory within the target snapshot
-            tmpdir = self._fop.normpath(snapshot.getPath(), self.REBASEDIR)
+            tmpdir = self._fop.joinpath(snapshot.getPath(), self.REBASEDIR)
             if self._fop.path_exists(tmpdir):
                 self._fop.force_delete(tmpdir) # to ensure we have write permissions
             self._fop.makedir(tmpdir)
@@ -661,7 +656,7 @@ class SnapshotManager(object):
                     # Item was explicitly excluded and is therefore not included in child
 #                    _filenfull = os.path.join(_curdir, _filen)
 #                    print "Full path: %s" % (_filenfull)
-                    if self._fop.normpath(_curdir, _filen) in target_excludes:
+                    if self._fop.joinpath(_curdir, _filen) in target_excludes:
                         self.logger.debug("Path '%s' was excluded. Not merged." % _filen)
                         _was_excluded = True
                     else:
@@ -677,7 +672,7 @@ class SnapshotManager(object):
 
                         elif _base_ctrl == Dumpdir.INCLUDED:
                             _ddir_final = _basedumpd
-                            files_to_extract.append(self._fop.normpath(_curdir,
+                            files_to_extract.append(self._fop.joinpath(_curdir,
                                                                  _filen))
                         else:
                             raise SBException("Found unexpected control code "\
@@ -776,7 +771,7 @@ class SnapshotManager(object):
                     _snp.commitbasefile()
 
             path = snapshot.getPath()
-            self._fop.rename(self._fop.normpath(path, 'base'), self._fop.normpath(path, 'base.old'))
+            self._fop.rename(self._fop.joinpath(path, 'base'), self._fop.joinpath(path, 'base.old'))
             self._fop.rename(path, path[:-3] + 'ful')
             res_snp = Snapshot(path[:-3] + 'ful')
 
@@ -805,16 +800,16 @@ class SnapshotManager(object):
         
         """
         self.logger.info(_("Cancelling pull of snapshot '%s'") % snapshot.getName())
-        path = self._fop.normpath(snapshot.getPath(), self.REBASEDIR)
+        path = self._fop.joinpath(snapshot.getPath(), self.REBASEDIR)
 #        shutil.rmtree(path)
         self._fop.delete(path)
 
-        if self._fop.path_exists(self._fop.normpath(snapshot.getPath(), "files.tar")):
+        if self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "files.tar")):
             format = snapshot.getFormat()
             if format == "gzip":
-                Util.launch("gzip", [self._fop.normpath(snapshot.getPath(), "files.tar")])
+                Util.launch("gzip", [self._fop.joinpath(snapshot.getPath(), "files.tar")])
             elif format == "bzip2":
-                Util.launch("bzip2", [self._fop.normpath(snapshot.getPath(), "files.tar")])
+                Util.launch("bzip2", [self._fop.joinpath(snapshot.getPath(), "files.tar")])
         snapshot.commitverfile()
 
     def _retrieve_childsnps(self, snapshot):

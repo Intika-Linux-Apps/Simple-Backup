@@ -112,7 +112,7 @@ class RemoveSnapshotHasChildsError(SBackupError):
     """Is raised if snapshot removal fails.
     """
 
-class ChmodNotSupportedError(SBException):
+class CopyFileAttributesError(SBException):
     """Thrown when a destination does not support file modes (e.g. some
     ftp servers or FAT filesystems).
     

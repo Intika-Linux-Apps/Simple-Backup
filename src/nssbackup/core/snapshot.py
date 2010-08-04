@@ -36,6 +36,8 @@ import types
 
 from nssbackup.fs_backend import fam
 
+from nssbackup.core.ConfigManager import ConfigurationFileHandler
+
 from nssbackup.util.exceptions import NotValidSnapshotNameException
 from nssbackup.util.exceptions import SBException
 from nssbackup.util.exceptions import NotValidSnapshotException
@@ -205,7 +207,7 @@ class Snapshot(object):
         @return: the path to the exclude file list file
         """
         if not self.__excludeFlistFile :
-            self.__excludeFlistFile = self._fop.normpath(self.getPath(), "excludes.list")
+            self.__excludeFlistFile = self._fop.joinpath(self.getPath(), "excludes.list")
 
         return self.__excludeFlistFile
 
@@ -214,7 +216,7 @@ class Snapshot(object):
         @return: the path to the include file list file
         """
         if not self.__includeFlistFile :
-            self.__includeFlistFile = self._fop.normpath(self.getPath(), "includes.list")
+            self.__includeFlistFile = self._fop.joinpath(self.getPath(), "includes.list")
 
         return self.__includeFlistFile
 
@@ -223,7 +225,7 @@ class Snapshot(object):
         @return: the path to the TAR SNAR file
         """
         if not self.__snarfile :
-            self.__snarfile = self._fop.normpath(self.getPath(), "files.snar")
+            self.__snarfile = self._fop.joinpath(self.getPath(), "files.snar")
         return self.__snarfile
 
     def getPath(self) :
@@ -237,7 +239,7 @@ class Snapshot(object):
         """
         Returns the compression format of the snapshot (from the "format" file or default value)
         """
-        _formatf = self._fop.normpath(self.getPath(), "format")
+        _formatf = self._fop.joinpath(self.getPath(), "format")
         if self._fop.path_exists(_formatf):
             self.__format = self._fop.readfile(_formatf).split('\n')[0]
         return self.__format
@@ -251,7 +253,7 @@ class Snapshot(object):
         
         """
         if not self.__base:
-            basefile = self._fop.normpath(self.__snapshotpath, "base")
+            basefile = self._fop.joinpath(self.__snapshotpath, "base")
             if not self._fop.path_exists(basefile):
                 self.__base = None
             else:
@@ -271,7 +273,7 @@ class Snapshot(object):
             if not self.isfull():
                 if self.getBase():
                     _path = self._fop.get_dirname(self.getPath())
-                    _basef = self._fop.normpath(_path, self.getBase())
+                    _basef = self._fop.joinpath(_path, self.getBase())
                     self.__baseSnapshot = Snapshot(_basef)
         return self.__baseSnapshot
 
@@ -284,20 +286,20 @@ class Snapshot(object):
         problem = False
 
         if self.getFormat() == "none" :
-            _arn = self._fop.normpath(self.getPath(), "files.tar")
+            _arn = self._fop.joinpath(self.getPath(), "files.tar")
             if self._fop.path_exists(_arn) :
                 return _arn
             else :
                 problem = True
 
         elif self.getFormat() == "gzip" :
-            _arn = self._fop.normpath(self.getPath(), "files.tar.gz")
+            _arn = self._fop.joinpath(self.getPath(), "files.tar.gz")
             if self._fop.path_exists(_arn) :
                 return _arn
 
             elif self.getVersion() == "1.4":
                 self.logger.warning("The tgz name is deprecated, please upgrade Snapshot to Version 1.5")
-                _arn = self._fop.normpath(self.getPath(), "files.tgz")
+                _arn = self._fop.joinpath(self.getPath(), "files.tgz")
                 if self._fop.path_exists(_arn):
                     return _arn
                 else :
@@ -306,7 +308,7 @@ class Snapshot(object):
                 problem = True
 
         elif self.getFormat() == "bzip2":
-            _arn = self._fop.normpath(self.getPath(), "files.tar.bz2")
+            _arn = self._fop.joinpath(self.getPath(), "files.tar.bz2")
             if self._fop.path_exists(_arn) :
                 return _arn
             else :
@@ -328,7 +330,7 @@ class Snapshot(object):
             self.__version = "1.0"
             return self.__version
         else:
-            verfile = self._fop.normpath(self.getPath(), "ver")
+            verfile = self._fop.joinpath(self.getPath(), "ver")
             if not self._fop.path_exists(verfile):
                 return False
             else :
@@ -348,7 +350,7 @@ class Snapshot(object):
         "Return the content of excludes (the list of Regex excludes)"
         if self.__excludes : return self.__excludes
         else :
-            excludefile = self._fop.normpath(self.getPath(), "excludes")
+            excludefile = self._fop.joinpath(self.getPath(), "excludes")
             if not self._fop.path_exists(excludefile):
                 return False
             else :
@@ -359,7 +361,7 @@ class Snapshot(object):
         "Return the packages"
         if self.__packages : return self.__packages
         else :
-            packagesfile = self._fop.normpath(self.getPath(), "packages")
+            packagesfile = self._fop.joinpath(self.getPath(), "packages")
             if not self._fop.path_exists(packagesfile):
                 return False
             else :
@@ -395,7 +397,7 @@ class Snapshot(object):
 
         @todo: Implement CQS pattern !
         """
-        _formatf = self._fop.normpath(self.getPath(), "format")
+        _formatf = self._fop.joinpath(self.getPath(), "format")
         if self._fop.path_exists(_formatf):
             self.__splitedSize = int(self._fop.readfile(_formatf).split('\n')[1])
         return self.__splitedSize
@@ -516,7 +518,7 @@ class Snapshot(object):
         @param size: The size in KiB to set
         
         """
-        if type(size) != int :
+        if type(size) != int:
             raise TypeError("The size parameter must be an integer")
         self.__splitedSize = size
 
@@ -539,7 +541,7 @@ class Snapshot(object):
         if not self.__isValidName(self.__name) :
             raise NotValidSnapshotNameException(_("Invalid name of snapshot: %s") % self.__name)
 
-        _verf = self._fop.normpath(self.getPath(), "ver")
+        _verf = self._fop.joinpath(self.getPath(), "ver")
         if  not self._fop.path_exists(_verf):
             raise NotValidSnapshotException(_("Unable to read mandatory file `ver`"))
 
@@ -558,7 +560,7 @@ class Snapshot(object):
         formatInfos = self.getFormat() + "\n"
         formatInfos += str(self.getSplitedSize())
 
-        _formatf = self._fop.normpath(self.getPath(), "format")
+        _formatf = self._fop.joinpath(self.getPath(), "format")
         self._fop.writetofile(_formatf, formatInfos)
 
     def commitverfile(self) :
@@ -567,7 +569,7 @@ class Snapshot(object):
         if not self.getVersion():
             self.setVersion()
         _ver = self.getVersion()
-        _verf = self._fop.normpath(self.getPath(), "ver")
+        _verf = self._fop.joinpath(self.getPath(), "ver")
         self._fop.writetofile(_verf, _ver)
         self.logger.debug("Commit `ver` file `%s` with info `%s`" % (_verf, _ver))
 
@@ -582,7 +584,7 @@ class Snapshot(object):
                               "full snapshot ' % s'." % self.getName())
         else:
             if self.getBase():
-                _basef = self._fop.normpath(self.getPath(), "base")
+                _basef = self._fop.joinpath(self.getPath(), "base")
                 self._fop.writetofile(_basef, self.getBase())
             else:
             # base file was not found or base wasn't set. It MUST be full backup
@@ -593,7 +595,7 @@ class Snapshot(object):
         Commit exclude file on the disk (the list of Regex excludes).
         @raise SBException: if excludes hasn't been set 
         """
-        _exf = self._fop.normpath(self.getPath(), "excludes")
+        _exf = self._fop.joinpath(self.getPath(), "excludes")
         self._fop.pickledump(self.__excludes, _exf)
 
     def commitflistFiles(self):
@@ -606,42 +608,31 @@ class Snapshot(object):
         if self._fop.path_exists(self.getExcludeFListFile()):
             raise SBException("excludes.list should not exist at this stage")
 
-#        fi = open(self.getIncludeFListFile() + ".tmp", "w")
-#        for f in self.__includeFlist.get_eff_filelist_not_nested() :
-#            fi.write(str(f) + "\n")
-#        fi.close()
-#        fi = open(self.getIncludeFListFile(), "w")
-#        for f in self.__includeFlist.getEffectiveFileList() :
-#            fi.write(str(f) + "\n")
-#        fi.close()
-#        fe = open(self.getExcludeFListFile() + ".tmp", "w")
-#        for f in self.__excludeFlist.getEffectiveFileList() :
-#            fe.write(str(f) + "\n")
-#        fe.close()
-#        fe = open(self.getExcludeFListFile(), "w")
-#        for f in self.__excludeFlist.getEffectiveFileList() :
-#            fe.write(str(f) + "\n")
-#        fe.close()
-
-        # commit include.list.tmp
-        self._fop.writetofile(self.getIncludeFListFile() + ".tmp",
-                              "\n".join(self.__includeFlist.get_eff_filelist_not_nested()))
-
-        # commit include.list
         self._fop.writetofile(self.getIncludeFListFile(),
                               "\n".join(self.__includeFlist.getEffectiveFileList()))
-
-        # commit exclude.list.tmp
-        self._fop.writetofile(self.getExcludeFListFile() + ".tmp",
-                              "\n".join(self.__excludeFlist.getEffectiveFileList()))
-
-        # commit exclude.list
         self._fop.writetofile(self.getExcludeFListFile(),
                               "\n".join(self.__excludeFlist.getEffectiveFileList()))
 
+        # commit temporary lists
+#FIXME: unify creation and storage of tmp. files and names
+        tmp_incl = self._fop.normpath(ConfigurationFileHandler().get_user_tempdir(),
+                                     self._fop.get_basename(self.getIncludeFListFile()))
+        tmp_excl = self._fop.normpath(ConfigurationFileHandler().get_user_tempdir(),
+                                     self._fop.get_basename(self.getExcludeFListFile()))
+
+        self._fop.writetofile(tmp_incl,
+                              "\n".join(self.__includeFlist.get_eff_filelist_not_nested()))
+        self._fop.writetofile(tmp_excl,
+                              "\n".join(self.__excludeFlist.getEffectiveFileList()))
+
+#        self._fop.writetofile(self.getExcludeFListFile() + ".tmp",
+#                              "\n".join(self.__excludeFlist.getEffectiveFileList()))
+#        self._fop.writetofile(self.getIncludeFListFile() + ".tmp",
+#                              "\n".join(self.__includeFlist.get_eff_filelist_not_nested()))
+
     def commitpackagefile(self):
         " Commit packages file on the disk"
-        _packf = self._fop.normpath(self.getPath(), "packages")
+        _packf = self._fop.joinpath(self.getPath(), "packages")
         if not self.getPackages() :
             self._fop.writetofile(_packf, "")
         else:
@@ -665,8 +656,10 @@ class Snapshot(object):
         """
         Clean operational temporary files
         """
-        if self._fop.path_exists(self.getIncludeFListFile() + ".tmp"):
-            self._fop.delete(self.getIncludeFListFile() + ".tmp")
-
-        if self._fop.path_exists(self.getExcludeFListFile() + ".tmp"):
-            self._fop.delete(self.getExcludeFListFile() + ".tmp")
+        # moved into TAR backend
+        pass
+#        if self._fop.path_exists(self.getIncludeFListFile() + ".tmp"):
+#            self._fop.delete(self.getIncludeFListFile() + ".tmp")
+#
+#        if self._fop.path_exists(self.getExcludeFListFile() + ".tmp"):
+#            self._fop.delete(self.getExcludeFListFile() + ".tmp")

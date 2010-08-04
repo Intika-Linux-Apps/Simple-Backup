@@ -24,14 +24,6 @@
    :synopsis: Provides support of DBus functionality
 .. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
 
-
-If you want to launch it automatically, add a service file in
-'peer@ayida:/usr/share/dbus-1/services$':
-
-[D-BUS Service]
-Name=org.launchpad.nssbackupService
-Exec=/home/peer/programming/python/nssb/local_modified/0.2/src/nssbackup_dbus_service.py
-
 """
 
 import os
@@ -151,26 +143,27 @@ class _DBusConnection(object):
                 self._logger.info("Connection is already established.")
         else:
             _failure = False
-            self._system_bus = dbus.SystemBus()
-            self._backup_obj = self.__do_connect(constants.DBUS_SERVICE,
-                                                 constants.DBUS_OBJ_PATH,
-                                                 silent)
-            self._connection_obj = self.__do_connect(constants.DBUS_SERVICE,
-                                                 constants.DBUS_CONNECTION_OBJ_PATH,
-                                                 silent)
+            try:
+                self._system_bus = dbus.SystemBus()
+                self._backup_obj = self.__do_connect(constants.DBUS_SERVICE,
+                                                     constants.DBUS_OBJ_PATH,
+                                                     silent)
+                self._connection_obj = self.__do_connect(constants.DBUS_SERVICE,
+                                                     constants.DBUS_CONNECTION_OBJ_PATH,
+                                                     silent)
 
-            if (self._connection_obj is not None) and (self._backup_obj is not None):
-                pid = os.getpid()
-                try:
+                if (self._connection_obj is not None) and (self._backup_obj is not None):
+                    pid = os.getpid()
                     self._id = self._connection_obj.register_connection(self._name, str(pid))
                     self._dbus_id = self._connection_obj.get_id()
                     self._logger.debug("Registered with id: %s" % self._id)
                     self._connected = True
-                except dbus.DBusException, error:
+                else:
                     _failure = True
-            else:
+                    error = "Unable to get remote object"
+
+            except dbus.DBusException, error:
                 _failure = True
-                error = "Unable to get remote object"
 
             if _failure is True:
                 self.__clear()
@@ -291,7 +284,7 @@ class DBusProviderFacade(_DBusConnection):
         If necessary, the service is being launched. The service id is stored for later
         checks of the validity of the connection.        
         """
-        if not dbus_service.is_running():
+        if dbus_service.is_running() is False:
             self._launch_dbusservice()
         _DBusConnection.connect(self)
 

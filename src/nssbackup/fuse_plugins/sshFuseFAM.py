@@ -87,7 +87,7 @@ class sshFuseFAM (pluginFAM)  :
             remoteSource += "/"
 
             user = match.group(1)
-            mountpoint = local_file_utils.normpath(mountbase, self._defineMountDirName(source))
+            mountpoint = local_file_utils.joinpath(mountbase, self._defineMountDirName(source))
             if match.group(7) :
                 pathinside = match.group(7)
             else :
@@ -144,7 +144,7 @@ class sshFuseFAM (pluginFAM)  :
         """
         @return: True if mounted, False if not
         """
-        mountpoint = local_file_utils.normpath(mountbase, self._defineMountDirName(source))
+        mountpoint = local_file_utils.joinpath(mountbase, self._defineMountDirName(source))
         return local_file_utils.is_mount(mountpoint)
 
     def _defineMountDirName(self, remote):
