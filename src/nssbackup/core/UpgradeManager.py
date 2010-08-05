@@ -1,5 +1,6 @@
 #    NSsbackup - upgrade handling
 #
+#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2007: Aigars Mahinovs <aigarius@debian.org>
 #
@@ -29,21 +30,25 @@
 """
 
 
+from gettext import gettext as _
+
 import time
 import datetime
 import cPickle as pickle
-from gettext import gettext as _
 
 from nssbackup.pkginfo import Infos
+
 from nssbackup.fs_backend import fam
-from nssbackup import util
-from nssbackup.core import SnapshotManager
-from nssbackup.util.exceptions import SBException
-from nssbackup.core import snapshot as snapshot_    # due to parameters named `snapshot`
 from nssbackup.ar_backend import tar
+
+from nssbackup.core import SnapshotManager
+from nssbackup.core import snapshot as snapshot_    # due to parameters named `snapshot`
+
+from nssbackup import util
 from nssbackup.util import structs
 from nssbackup.util import log
 from nssbackup.util import local_file_utils
+from nssbackup.util.exceptions import SBException
 
 
 class UpgradeManager(object):
@@ -94,11 +99,11 @@ class UpgradeManager(object):
                             self._fop.rename(snapshot.getPath(), newname)
                             snapshot = snapshot_.Snapshot(self._fop.get_dirname(snapshot.getPath()) + self._fop.pathsep + newname)
                         self.__upgrade_v12(snapshot)
-                    elif snapshot.getVersion() < "1.3" :
+                    elif snapshot.getVersion() < "1.3":
                         self.__upgrade_v13(snapshot)
-                    elif snapshot.getVersion() < "1.4" :
+                    elif snapshot.getVersion() < "1.4":
                         self.__upgrade_v14(snapshot)
-                    elif snapshot.getVersion() < "1.5" :
+                    elif snapshot.getVersion() < "1.5":
                         self.__upgrade_v15(snapshot)
                 self.statusMessage = None
                 self.substatusMessage = None
@@ -166,57 +171,56 @@ class UpgradeManager(object):
         """
         self.statusMessage = _("Upgrading from v1.0 to v1.2: %s") % str(snapshot)
         self.logger.info(self.statusMessage)
-        i = self._fop.openfile_for_read(snapshot.getPath() + self._fop.pathsep + "tree")
+        i = self._fop.openfile_for_read(self._fop.joinpath(snapshot.getPath(), "tree"))
         bfiles = pickle.load(i)
-        n = self._fop.openfile_for_write(snapshot.getPath() + self._fop.pathsep + "flist")
-        p = self._fop.openfile_for_write(snapshot.getPath() + self._fop.pathsep + "fprops")
+        n = self._fop.openfile_for_write(self._fop.joinpath(snapshot.getPath(), "flist"))
+        p = self._fop.openfile_for_write(self._fop.joinpath(snapshot.getPath(), "fprops"))
         for item in bfiles:
             n.write(str(item[0]) + "\n")
             p.write(str(item[1]) + str(item[2]) + str(item[3]) + str(item[4]) + str(item[5]) + "\n")
         p.close()
         n.close()
         i.close()
-        self._fop.writetofile(snapshot.getPath() + self._fop.pathsep + "ver", "1.2\n")
+        self._fop.writetofile(self._fop.joinpath(snapshot.getPath(), "ver"), "1.2\n")
         snapshot.setVersion("1.2")
         self.statusNumber = 0.40
-
 
     def __upgrade_v13(self, snapshot):
         self.statusMessage = _("Upgrading to v1.3: %s") % str(snapshot)
         self.logger.info(self.statusMessage)
-        flist = self._fop.readfile(snapshot.getPath() + self._fop.pathsep + "flist").split("\n")
-        fprops = self._fop.readfile(snapshot.getPath() + self._fop.pathsep + "fprops").split("\n")
+        flist = self._fop.readfile(self._fop.joinpath(snapshot.getPath(), "flist")).split("\n")
+        fprops = self._fop.readfile(self._fop.joinpath(snapshot.getPath(), "fprops")).split("\n")
         if len(flist) == len(fprops) :
             if len(flist) > 1:
-                l = self._fop.openfile_for_write(snapshot.getPath() + self._fop.pathsep + "flist.v13")
-                p = self._fop.openfile_for_write(snapshot.getPath() + self._fop.pathsep + "fprops.v13")
+                l = self._fop.openfile_for_write(self._fop.joinpath(snapshot.getPath(), "flist.v13"))
+                p = self._fop.openfile_for_write(self._fop.joinpath(snapshot.getPath(), "fprops.v13"))
                 for a, b in zip(flist, fprops):
                     l.write(a + "\000")
                     p.write(b + "\000")
                 l.close()
                 p.close()
-                self._fop.rename(snapshot.getPath() + self._fop.pathsep + "flist", "flist.old")
-                self._fop.rename(snapshot.getPath() + self._fop.pathsep + "flist.v13", "flist")
-                self._fop.rename(snapshot.getPath() + self._fop.pathsep + "fprops", "fprops.old")
-                self._fop.rename(snapshot.getPath() + self._fop.pathsep + "fprops.v13", "fprops")
-                self._fop.writetofile(snapshot.getPath() + self._fop.pathsep + "ver", "1.3\n")
+                self._fop.rename(self._fop.joinpath(snapshot.getPath(), "flist"), "flist.old")
+                self._fop.rename(self._fop.joinpath(snapshot.getPath(), "flist.v13"), "flist")
+                self._fop.rename(self._fop.joinpath(snapshot.getPath() , "fprops"), "fprops.old")
+                self._fop.rename(self._fop.joinpath(snapshot.getPath() , "fprops.v13"), "fprops")
+                self._fop.writetofile(self._fop.joinpath(snapshot.getPath(), "ver"), "1.3\n")
                 snapshot.setVersion("1.3")
         else:
-            self._fop.delete(snapshot.getPath() + self._fop.pathsep + "ver")
+            self._fop.delete(self._fop.joinpath(snapshot.getPath(), "ver"))
             raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath())
         self.statusNumber = 0.60
 
     def __upgrade_v14(self, snapshot):
         self.statusMessage = _("Upgrading to v1.4: %s") % str(snapshot)
         self.logger.info(self.statusMessage)
-        self._fop.delete(snapshot.getPath() + self._fop.pathsep + "ver")
+        self._fop.delete(self._fop.joinpath(snapshot.getPath(), "ver"))
 
-        if not self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "flist")\
-           or not self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "fprops")\
-           or not self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "files.tgz")\
-           or not self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "excludes"):
+        if not self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "flist"))\
+           or not self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "fprops"))\
+           or not self._fop.path_exists(self._fop.joinpath(snapshot.getPath() , "files.tgz"))\
+           or not self._fop.path_exists(self._fop.joinpath(snapshot.getPath() , "excludes")):
             raise SBException("Snapshot is invalid! One of the essential files does not exist.")
-        self._fop.writetofile(snapshot.getPath() + self._fop.pathsep + "ver", "1.4\n")
+        self._fop.writetofile(self._fop.joinpath(snapshot.getPath(), "ver"), "1.4\n")
         snapshot.setVersion("1.4")
         self.statusNumber = 0.80
 
@@ -225,27 +229,27 @@ class UpgradeManager(object):
         self.logger.info(self.statusMessage)
         self.statusNumber = 0.80
         self.logger.info(self.statusMessage)
-        self._fop.delete(snapshot.getPath() + self._fop.pathsep + "ver")
+        self._fop.delete(self._fop.joinpath(snapshot.getPath(), "ver"))
 
-        if not self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "flist"):
+        if not self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "flist")):
             raise SBException("Snapshot is invalid! The essential file 'flist' does not exist.")
-        if not self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "fprops"):
+        if not self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "fprops")):
             raise SBException("Snapshot is invalid! The essential file 'fprops' does not exist.")
-        if not self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "files.tgz"):
+        if not self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "files.tgz")):
             raise SBException("Snapshot is invalid! The essential file 'files.tgz' does not exist.")
-        if not self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "excludes"):
+        if not self._fop.path_exists(self._fop.joinpath(snapshot.getPath() , "excludes")):
             raise SBException("Snapshot is invalid! The essential file 'excludes' does not exist.")
 
         self.logger.info("renaming file.tgz to file.tar.gz")
-        self._fop.rename(snapshot.getPath() + self._fop.pathsep + "files.tgz", snapshot.getPath() + self._fop.pathsep + "files.tar.gz")
+        self._fop.rename(self._fop.joinpath(snapshot.getPath(), "files.tgz"), "files.tar.gz")
         self.statusNumber = 0.82
         #TODO:
         self.logger.info("Creating includes.list")
-        flist = snapshot.getPath() + self._fop.pathsep + "flist"
-        fprops = snapshot.getPath() + self._fop.pathsep + "fprops"
+        flist = self._fop.joinpath(snapshot.getPath(), "flist")
+        fprops = self._fop.joinpath(snapshot.getPath() , "fprops")
 
-        f1 = open(flist, 'r')
-        f2 = open(fprops, 'r')
+        f1 = self._fop.openfile_for_read(flist)
+        f2 = self._fop.openfile_for_read(fprops)
 
         isEmpty = True
 
@@ -256,24 +260,24 @@ class UpgradeManager(object):
                         isEmpty = False
                     snapshot.addToIncludeFlist(f)
         # commit include.list
-        fi = open(snapshot.getIncludeFListFile(), "w")
+        fi = self._fop.openfile_for_write(snapshot.getIncludeFListFile())
         for f in snapshot.getIncludeFlist().getEffectiveFileList() :
             fi.write(str(f) + "\n")
         fi.close()
 
         self.statusNumber = 0.85
         self.logger.info("Creating empty excludes.list")
-        f1 = open(snapshot.getExcludeFListFile(), 'w')
+        f1 = self._fop.openfile_for_write(snapshot.getExcludeFListFile())
         f1.close()
 
         self.statusNumber = 0.87
-        self.logger.info("creating 'format' file .")
-        formatInfos = snapshot.getFormat() + "\n"
-        formatInfos += str(snapshot.getSplitedSize())
-        self._fop.writetofile(snapshot.getPath() + self._fop.pathsep + "format", formatInfos)
+        self.logger.info("Creating 'format' file")
+        # hardcoded format: gzip without splitting is supported by 1.4 only 
+        formatInfos = "%s\n%s" % ("gzip", 0)
+        self._fop.writetofile(self._fop.joinpath(snapshot.getPath(), "format"), formatInfos)
 
         self.statusNumber = 0.90
-        self.logger.info("Creating the SNAR file ")
+        self.logger.info("Creating the SNAR file")
         if self._fop.path_exists(snapshot.getSnarFile()) :
             self.logger.warning(_("The SNAR file already exist for snapshot '%s'. It is not overwritten.") % str(snapshot))
         else :
@@ -290,7 +294,7 @@ class UpgradeManager(object):
 
                         parentdir = self._fop.get_dirname(f)
                         if parentdir == last_parentdir :
-                            self.logger.debug("[LastParentDir] already processed '%s'" % parentdir)
+#                            self.logger.debug("[LastParentDir] already processed '%s'" % parentdir)
                             continue
                         last_parentdir = parentdir
 
@@ -299,10 +303,10 @@ class UpgradeManager(object):
                         result = ["0", _time, _time]
 
                         if snarfileinfo.hasPath(parentdir) :
-                            self.logger.debug("[SNARFileInfo] already processed '%s'" % parentdir)
+#                            self.logger.debug("[SNARFileInfo] already processed '%s'" % parentdir)
                             continue
 
-                        self.logger.debug("processing '%s'" % parentdir)
+#                        self.logger.debug("processing '%s'" % parentdir)
 
                         if self._fop.path_exists(parentdir) :
                             result.append(str(local_file_utils.stat_device(parentdir)))
@@ -312,15 +316,15 @@ class UpgradeManager(object):
 
                         result.append(parentdir)
 
-                        fname = self._fop.get_basename(f)
+#                        fname = self._fop.get_basename(f)
                         dumpdirs = list()
 
                         #get the parent dir content
                         cSBdict = snapshot.getIncludeFlist().getSon(parentdir)
                         for k, v in dict.iteritems(cSBdict):
                             # determine if it's a dir or a file
-                            if self._fop.path_exists(parentdir + self._fop.pathsep + k) :
-                                if self._fop.is_dir(parentdir + self._fop.pathsep + k) :
+                            if self._fop.path_exists(self._fop.joinpath(parentdir, k)) :
+                                if self._fop.is_dir(self._fop.joinpath(parentdir , k)) :
                                     control = tar.Dumpdir.DIRECTORY
                                 else :
                                     control = tar.Dumpdir.INCLUDED
@@ -338,10 +342,10 @@ class UpgradeManager(object):
                         snarfileinfo.addRecord(result)
 
         self.statusNumber = 0.97
-        self.logger.info("creating 'ver' file .")
-        self._fop.writetofile(snapshot.getPath() + self._fop.pathsep + "ver", "1.5\n")
+        self.logger.info("Creating 'ver' file")
+        self._fop.writetofile(self._fop.joinpath(snapshot.getPath(), "ver"), "1.5\n")
         snapshot.setVersion("1.5")
-        if self._fop.path_exists(snapshot.getPath() + self._fop.pathsep + "ver") :
+        if self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "ver")):
             self.logger.debug("'ver' file created.")
         self.statusNumber = 1.00
 

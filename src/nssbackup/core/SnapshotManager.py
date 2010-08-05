@@ -67,6 +67,8 @@ class SnapshotManager(object):
     :todo: Remove instance variables 'status' and implement an observer\
            pattern or progress function hooks! 
     
+    :note: Rebasing of snapshots is currently disabled due to severe performance issues.
+            Adapt to use FAM before re-enabling!
     """
 
     REBASEDIR = "rebasetmp"
@@ -87,7 +89,6 @@ class SnapshotManager(object):
         self._fop = fam.get_file_operations_facade_instance()
         # This is the current directory used by this SnapshotManager
         self.__target_eff_path = target_eff_path
-#        self._fam_target_hdl = fam_target_handler
 
         # The list of the snapshots is stored the first time it's used,
         # so we don't have to re-get it later
@@ -97,12 +98,6 @@ class SnapshotManager(object):
         self.statusMessage = None
         self.substatusMessage = None
         self.statusNumber = None
-
-# Done during initialization of target handler
-#        if not target_dir or not FAM.exists(target_dir) :
-#            raise SBException(_("Invalid value of the target directory : ")\
-#                                + str(target_dir))
-#        self.__targetDir = target_dir
 
 #TODO: Wrap it.
         if not self.__target_eff_path.startswith(self._fop.pathsep):
@@ -860,6 +855,8 @@ class SnapshotManager(object):
         :type snapshot: `Snapshot`
         
         :todo: Refactor by using method `_retrieve_childsnps`!
+        
+        :note; Currently removal of freestanding snapshots is supported only.
         """
 #        _this_snp_name = snapshot.getName()
 #

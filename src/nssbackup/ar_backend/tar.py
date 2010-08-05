@@ -78,7 +78,7 @@ def getArchiveType(archive):
     return _res
 
 
-def extract(sourcear, restore_file, dest , bckupsuffix = None, splitsize = None):
+def extract(sourcear, restore_file, dest , use_io_pipe, bckupsuffix = None, splitsize = None):
     """Extract from source archive the file "file" to dest.
     
     @param sourcear: path of archive
@@ -116,16 +116,20 @@ def extract(sourcear, restore_file, dest , bckupsuffix = None, splitsize = None)
     if splitsize :
         options.extend(["-L " + str(splitsize) , "-F " + util.get_resource_file("multipleTarScript")])
 
-    options.append(restore_file)
-
     _launcher = TarBackendLauncherSingleton()
-    _launcher.set_stdin_file(sourcear)
+    if use_io_pipe:
+        _launcher.set_stdin_file(sourcear)
+    else:
+        options.append("--file=%s" % sourcear)
+
+    options.append(restore_file)
 
     _launcher.launch_sync(options, env = {})
     retVal = _launcher.get_returncode()
+    outstr = _launcher.get_stdout()
     errStr = _launcher.get_stderr()
 
-    __finish_tar(retVal, errStr)
+    __finish_tar(retVal, outstr, errStr)
 
 
 # extract2 is currently (series 0.2) only used in SnapshotManager.makeTmpTAR
@@ -221,7 +225,7 @@ def appendToTarFile(desttar, fileslist, workingdir, additionalOpts):
     LogFactory.getLogger().debug("output was: " + outStr)
 
 
-def __prepare_common_opts(snapshot, publish_progress):
+def __prepare_common_opts(snapshot, publish_progress, use_io_pipe):
     """Prepares common TAR options used when full or incremental
     backups are being made.  
     
@@ -272,6 +276,8 @@ def __prepare_common_opts(snapshot, publish_progress):
         LogFactory.getLogger().debug("Setting compression to default 'none'")
 
     _ar_path = _FOP.normpath(tdir, archivename)
+    if not use_io_pipe:
+        options.append("--file=%s" % _ar_path)
 
     # progress signal
 #TODO: improve calculation of number of checkpoints based on estimated transfer rate.
@@ -333,7 +339,7 @@ def __remove_tempfiles(tmp_files):
             LogFactory.getLogger().warning(_("Unable to remove temporary file `%s`: %s") % (_tmpf, error))
 
 
-def makeTarIncBackup(snapshot, publish_progress):
+def makeTarIncBackup(snapshot, publish_progress, use_io_pipe):
     """
     Launch a TAR incremental backup
     @param snapshot: the snapshot in which to make the backup
@@ -341,7 +347,7 @@ def makeTarIncBackup(snapshot, publish_progress):
     """
     LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 
-    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress)
+    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress, use_io_pipe)
 
     splitSize = snapshot.getSplitedSize()
     if splitSize: # > 0
@@ -360,7 +366,7 @@ def makeTarIncBackup(snapshot, publish_progress):
     if not _FOP.path_exists(base_snarfile) :
         LogFactory.getLogger().error(_("Unable to find the SNAR file to make an incremental backup."))
         LogFactory.getLogger().error(_("Falling back to full backup."))
-        makeTarFullBackup(snapshot, publish_progress)
+        makeTarFullBackup(snapshot, publish_progress, use_io_pipe)
     else:
         _FOP.copyfile(base_snarfile, tmp_snarfile)
         # check (and set) the permission bits; necessary if the file's origin
@@ -375,20 +381,21 @@ def makeTarIncBackup(snapshot, publish_progress):
 
         # launch TAR with empty environment
         _launcher = TarBackendLauncherSingleton()
-        _launcher.set_stdout_file(ar_path)
-
+        if use_io_pipe:
+            _launcher.set_stdout_file(ar_path)
         try:
             _launcher.launch_sync(options, env = {})
             retVal = _launcher.get_returncode()
+            outstr = _launcher.get_stdout()
             errStr = _launcher.get_stderr()
-            __finish_tar(retVal, errStr)
+            __finish_tar(retVal, outstr, errStr)
             __copy_temp_snarfile_into_snapshot(tmp_snarfile, snarfile)
 
         finally:
             __remove_tempfiles([tmp_snarfile, tmp_incl, tmp_excl])
 
 
-def makeTarFullBackup(snapshot, publish_progress):
+def makeTarFullBackup(snapshot, publish_progress, use_io_pipe):
     """Convenience function that launches TAR to create a full backup.
 
     @param snapshot: the snapshot in which to make the backup
@@ -397,7 +404,7 @@ def makeTarFullBackup(snapshot, publish_progress):
     """
     LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 
-    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress)
+    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress, use_io_pipe)
 
     splitSize = snapshot.getSplitedSize()
     if splitSize:   # > 0
@@ -420,26 +427,31 @@ def makeTarFullBackup(snapshot, publish_progress):
 
     # launch TAR with empty environment
     _launcher = TarBackendLauncherSingleton()
-    _launcher.set_stdout_file(ar_path)
+    if use_io_pipe:
+        _launcher.set_stdout_file(ar_path)
     try:
         _launcher.launch_sync(options, env = {})
         retVal = _launcher.get_returncode()
+        outstr = _launcher.get_stdout()
         errStr = _launcher.get_stderr()
-        __finish_tar(retVal, errStr)
+        __finish_tar(retVal, outstr, errStr)
         __copy_temp_snarfile_into_snapshot(tmp_snarfile, snarfile)
     finally:
         __remove_tempfiles([tmp_snarfile, tmp_incl, tmp_excl])
 
-def __finish_tar(exitcode, error_str):
+def __finish_tar(exitcode, output_str, error_str):
     """
     @todo: Catch failing child process (e.g. gzip) in proper way.
     """
-    _logger = LogFactory.getLogger()
-    _logger.debug("Exit code: %s" % exitcode)
-    _logger.debug("Error out: %s" % error_str)
-
+    if output_str is None:
+        output_str = ""
     if error_str is None:
         error_str = ""
+
+    _logger = LogFactory.getLogger()
+    _logger.debug("Exit code: %s" % exitcode)
+    _logger.debug("Standard out: %s" % output_str)
+    _logger.debug("Error out: %s" % error_str)
 
     _res_err = []
     if error_str != "":
@@ -521,23 +533,24 @@ class TarBackendLauncherSingleton(object):
         self._proc = None
         self._argv = []
 
-        # input/output pipes
-        self._stdout = None
-        self._stdin = None
+        # files used for input/output piping
+        self._stdout_f = None
+        self._stdin_f = None
 
         # results
+        self._stdout = None
         self._stderr = None
         self._returncode = None
 
     def set_stdin_file(self, path):
-        if self._stdout is not None:
+        if self._stdout_f is not None:
             raise AssertionError("Redirecting stdin and stdout is not supported")
-        self._stdin = path
+        self._stdin_f = path
 
     def set_stdout_file(self, path):
-        if self._stdin is not None:
+        if self._stdin_f is not None:
             raise AssertionError("Redirecting stdin and stdout is not supported")
-        self._stdout = path
+        self._stdout_f = path
 
     def get_pid(self):
         _pid = None
@@ -549,10 +562,10 @@ class TarBackendLauncherSingleton(object):
         if self._proc is not None:
             raise AssertionError("Another process is already running")
 
+        self._clear_returns()
         self._argv = opts
         self._argv.insert(0, self._cmd)
         errptr, errfile = tempfile.mkstemp(prefix = "error_")
-        self._clear_returns()
 
         _stdout_param = None
         _stdin_param = None
@@ -560,32 +573,37 @@ class TarBackendLauncherSingleton(object):
         try:
             self._logger.debug("Lauching: %s" % (" ".join(self._argv)))
 
-            if self._stdout is not None:
-                assert self._stdin is None
-                self._logger.debug("Output archive: %s" % self._stdout)
+            if self._stdout_f is None:
+                outptr, outfile = tempfile.mkstemp(prefix = "output_")
+                _stdout_param = outptr
+            else:
+                assert self._stdin_f is None
+                self._logger.debug("Output archive: %s" % self._stdout_f)
                 _stdout_param = subprocess.PIPE
-                _ardst = _FOP.openfile_for_write(self._stdout)
+                _ardst = _FOP.openfile_for_write(self._stdout_f)
 
-            if self._stdin is not None:
-                assert self._stdout is None
-                self._logger.debug("Input archive: %s" % self._stdin)
+            if self._stdin_f is not None:
+                assert self._stdout_f is None
+                self._logger.debug("Input archive: %s" % self._stdin_f)
                 _stdin_param = subprocess.PIPE
-                _arsrc = _FOP.openfile_for_read(self._stdin)
+                _arsrc = _FOP.openfile_for_read(self._stdin_f)
 
             self._proc = subprocess.Popen(self._argv, stdin = _stdin_param, stdout = _stdout_param,
                                           stderr = errptr, env = env)
 
-            if self._stdout is not None:
+            if self._stdout_f is not None:
                 _arsrc = self._proc.stdout
-            if self._stdin is not None:
+            if self._stdin_f is not None:
                 _ardst = self._proc.stdin
 
-            if (self._stdin is not None) or (self._stdout is not None):
+            if (self._stdin_f is not None) or (self._stdout_f is not None):
                 shutil.copyfileobj(_arsrc, _ardst)
                 _arsrc.close()
                 _ardst.close()
+                self._proc.wait()
+            else:
+                self._proc.communicate(input = None)
 
-            self._proc.wait()
         except (exceptions.BackupCanceledError, exceptions.SigTerminatedError), error:
             self.terminate()
             self._clear_proc()
@@ -595,18 +613,22 @@ class TarBackendLauncherSingleton(object):
 
         os.close(errptr)    # Close log handle
         self._stderr = local_file_utils.readfile(errfile)
+        if self._stdout_f is None:
+            os.close(outptr)
+            self._stdout = local_file_utils.readfile(outfile)
         local_file_utils.delete(errfile)
 
         self._clear_proc()
 
     def _clear_returns(self):
+        self._stdout = None
         self._stderr = None
         self._returncode = None
 
     def _clear_proc(self):
         self._proc = None
-        self._stdin = None
-        self._stdout = None
+        self._stdin_f = None
+        self._stdout_f = None
         self._argv = []
 
     def is_running(self):
@@ -618,6 +640,9 @@ class TarBackendLauncherSingleton(object):
             # more tests here
             _res = True
         return _res
+
+    def get_stdout(self):
+        return self._stdout
 
     def get_stderr(self):
         return self._stderr
@@ -785,14 +810,12 @@ class SnapshotFile(object):
         self.snpfile = None
         self.version = None
 
-        if _FOP.path_exists(filename) :
-#            self.snpfile = os.path.abspath(filename)
+        if _FOP.path_exists(filename):
             self.snpfile = filename
         else :
             if writeFlag :
-#                self.snpfile = os.path.abspath(filename)
                 self.snpfile = filename
-                fd = open(self.snpfile, 'a+')
+                fd = _FOP.openfile_for_append(self.snpfile)
                 fd.close()
             else :
                 raise SBException(_("File '%s' does not exist.") % filename)
@@ -800,7 +823,7 @@ class SnapshotFile(object):
     def __str__(self):
         _str = [ "Snapshot file",
                  " Header: %s" % self.getHeader(),
-                 " Version: %s" % self.getFormatVersion(),
+#                 " Version: %s" % self.getFormatVersion(),
                  " file name: %s" % self.snpfile,
                  " Content:"
                ]
@@ -812,77 +835,80 @@ class SnapshotFile(object):
     def get_filename(self):
         return self.snpfile
 
-    def getFormatVersion(self):
-        """
-        Get the format version
-        @return: the version 
-        @rtype: int 
-        """
-        if self.version :
-            return self.version
+# (actually) not used: marked for removal
+#    def getFormatVersion(self):
+#        """
+#        Get the format version
+#        @return: the version 
+#        @rtype: int 
+#        """
+#        if self.version :
+#            return self.version
+#
+#        self.header = self.__getHeaderInfos()
+#        m = self.versionRE.match(self.header)
+#        if m :
+#            # we are version 1 or 2
+#            # check for version 2 first
+#            self.version = m.group(2)
+#        else :
+#            # we are version 0
+#            self.version = 0
+#
+#        return int(self.version)
+#
+#    def __getHeaderInfos(self):
+#        """
+#        Get the first line of the snapshot file
+#        @return: the first line content
+#        """
+#        fd = open(self.snpfile)
+#        header = fd.readline()
+#        fd.close()
+#        return header.strip()
 
-        self.header = self.__getHeaderInfos()
-        m = self.versionRE.match(self.header)
-        if m :
-            # we are version 1 or 2
-            # check for version 2 first
-            self.version = m.group(2)
-        else :
-            # we are version 0
-            self.version = 0
+# not used: marked for removal
+#    def parseFormat0(self):
+#        """
+#        Iterator method that gives each line entry
+#        @warning: only compatible tar version 0 of Tar format
+#        @return: [nfs,dev,inode,name]
+#        """
+#        fd = open(self.snpfile)
+#        # skip header which is the first line in this case
+#        fd.readline()
+#
+#        for line in fd.readlines():
+#            line = line.rstrip()
+#
+#            nfs = line[0] # can be a + or a single white space
+#
+#            dev, inode, name = line[1:].split(' ', 2)
+#            yield [nfs, dev, inode, name]
+#
+#        fd.close()
 
-        return int(self.version)
-
-    def __getHeaderInfos(self):
-        """
-        Get the first line of the snapshot file
-        @return: the first line content
-        """
-        fd = open(self.snpfile)
-        header = fd.readline()
-        fd.close()
-        return header.strip()
-
-    def parseFormat0(self):
-        """
-        Iterator method that gives each line entry
-        @warning: only compatible tar version 0 of Tar format
-        @return: [nfs,dev,inode,name]
-        """
-        fd = open(self.snpfile)
-        # skip header which is the first line in this case
-        fd.readline()
-
-        for line in fd.readlines():
-            line = line.rstrip()
-
-            nfs = line[0] # can be a + or a single white space
-
-            dev, inode, name = line[1:].split(' ', 2)
-            yield [nfs, dev, inode, name]
-
-        fd.close()
-
-    def parseFormat1(self):
-        """
-        Iterator method that gives each line entry
-        @warning: only compatible tar version 1 of Tar format
-        @return: [nfs,mtime_sec,mtime_nsec,dev,inode,name]
-        """
-        fd = open(self.snpfile)
-        # skip header which is the 2 first lines in this case
-        fd.readline()
-        fd.readline()
-
-        for line in fd.readlines() :
-            line = line.rstrip()
-
-            nfs = line[0] # can be a + or a single white space
-
-            mtime_sec, mtime_nsec, dev, inode, name = line[1:].split(' ', 4)
-            yield [nfs, mtime_sec, mtime_nsec, dev, inode, name]
-
-        fd.close()
+# not used: marked for removal
+#    def parseFormat1(self):
+#        """
+#        Iterator method that gives each line entry
+#        @warning: only compatible tar version 1 of Tar format
+#        @return: [nfs,mtime_sec,mtime_nsec,dev,inode,name]
+#        """
+#        fd = open(self.snpfile)
+#        # skip header which is the 2 first lines in this case
+#        fd.readline()
+#        fd.readline()
+#
+#        for line in fd.readlines() :
+#            line = line.rstrip()
+#
+#            nfs = line[0] # can be a + or a single white space
+#
+#            mtime_sec, mtime_nsec, dev, inode, name = line[1:].split(' ', 4)
+#            yield [nfs, mtime_sec, mtime_nsec, dev, inode, name]
+#
+#        fd.close()
 
     def parseFormat2(self):
         """Iterator method that gives each line entry in SNAR-file.
@@ -915,36 +941,33 @@ class SnapshotFile(object):
             return [nfs, mtime_sec, mtime_nano, dev_no, i_no, name, formatDumpDirs(contents)]
 
 
-        fd = open(self.snpfile)
+        fd = _FOP.openfile_for_read(self.snpfile)
         # skip header which is the first line and 2 entries separated with NULL in this case
-        l = fd.readline()
-        if l != "":
-            #Snarfile not empty
-            n = 0
-            while n < 2 :
-                c = fd.read(1)
-                if len(c) != 1:
-                    raise SBException(_("The snarfile header is incomplete."))
-                if c == '\0' : n += 1
-
-            currentline = ""
-
+#TODO: Handle empty files properly
+        n = 0
+        while n < 2 :
             c = fd.read(1)
-            last_c = ''
+            if len(c) != 1:
+                raise SBException(_("The snarfile header is incomplete."))
+            if c == '\0':
+                n += 1
 
-            while c :
-                currentline += c
-                if c == '\0' and last_c == '\0' :
-                    # we got a line
-                    yield format(currentline)
+        currentline = ""
+        c = fd.read(1)
+        last_c = ''
 
-                    currentline = ''
-                    last_c = ''
-                else :
-                    last_c = c
-                c = fd.read(1)
+        while c:
+            currentline += c
+            if c == '\0' and last_c == '\0' :
+                # we got a line
+                yield format(currentline)
 
-            fd.close
+                currentline = ''
+                last_c = ''
+            else :
+                last_c = c
+            c = fd.read(1)
+        fd.close
 
     def getHeader(self):
         """
@@ -993,12 +1016,11 @@ class SnapshotFile(object):
             raise ValueError("Record must contain of 7 elments. Got %s instead." % str(len(record)))
 
         woContent, contents = record[:-1], record[-1]
-        # compute contents
-        strContent = self.createContent(contents)
-        toAdd = self.__SEP.join(woContent) + self.__SEP + strContent
+        strContent = self.createContent(contents)   # compute contents
+        toAdd = "%s%s%s" % (self.__SEP.join(woContent), self.__SEP, strContent)
 
-        fd = open(self.snpfile, 'a+')
-        fd.write(toAdd + self.__entrySEP)
+        fd = _FOP.openfile_for_append(self.snpfile)
+        fd.write("%s%s" % (toAdd, self.__entrySEP))
         fd.close()
 
 
@@ -1019,7 +1041,8 @@ class SnapshotFile(object):
             if not isinstance(dumpdir, Dumpdir):
                 raise TypeError("Contentlist must contain elements of type "\
                                 "'Dumdir'. Got %s instead." % type(dumpdir))
-            result += dumpdir.getControl() + dumpdir.getFilename() + self.__SEP
+#            result += dumpdir.getControl() + dumpdir.getFilename() + self.__SEP
+            result = "%s%s%s%s" % (result, dumpdir.getControl(), dumpdir.getFilename(), self.__SEP)
 
         return result
 

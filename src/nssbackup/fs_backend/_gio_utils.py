@@ -196,6 +196,9 @@ class GioMountHandler(object):
         return _mount
 
     def _is_local(self, gfileobj):
+        """
+        :todo: Consolidate with `pathparse.is_local`
+        """
         _uri_scheme = gfileobj.get_uri_scheme()
         if _uri_scheme == "file":
             _res = True
@@ -460,6 +463,12 @@ class GioOperations(interfaces.IOperations):
         _gfile = gio.File(path)
         _istr = _gfile.read()
         return _istr
+
+    @classmethod
+    def openfile_for_append(cls, path):
+        _gfileobj = gio.File(path)
+        _ostr = _gfileobj.append_to()
+        return _ostr
 
     @classmethod
     def copyfile(cls, src, dest):

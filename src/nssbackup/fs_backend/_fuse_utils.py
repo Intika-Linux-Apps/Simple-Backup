@@ -102,6 +102,10 @@ class FuseOperations(interfaces.IOperations):
         return local_file_utils.openfile(path, write = False)
 
     @classmethod
+    def openfile_for_append(cls, path):
+        return local_file_utils.openfile_for_append(path)
+
+    @classmethod
     def pickleload(cls, path):
         return local_file_utils.pickleload(path)
 

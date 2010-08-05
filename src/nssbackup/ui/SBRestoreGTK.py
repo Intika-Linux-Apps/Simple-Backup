@@ -695,10 +695,11 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         _task.set_finish_callback(gobject.idle_add, self.__restore_finished,
                                    statbar_msgid)
 
+        _pipe_io = self.__fam_target_hdl.get_use_io_pipe()
         if dirname is None:
-            _task.start(snapshot, source)
+            _task.start(snapshot, source, _pipe_io)
         else:
-            _task.start(snapshot, source, dirname)
+            _task.start(snapshot, source, dirname, _pipe_io)
 
     def __restore_finished(self, *args):
         """Callback method that is called after finishing of a restoration
@@ -762,23 +763,31 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 #                self.widgets["RebaseBox"].hide()
                 self.widgets["deleteBox"].hide()
 
-    def on_upgradeButton_clicked(self, *args):
-        um = UpgradeManager()
-        try:
-            um.upgradeSnapshot(self.currentSnp)
-        except Exception, _exc:
-            _message_str = _("While attempting to upgrade snapshot the following error occurred:\n%s")\
-                                % str(_exc)
-            _boxtitle = _("(Not So) Simple Backup restoration error")
-            _headline_str = _("Unable to upgrade snapshot")
-            gobject.idle_add(self._show_errmessage,
-                              _message_str, _boxtitle,
-                              _headline_str)
+    def on_upgradeButton_clicked(self, *args): #IGNORE:W0613
+        message = _("Upgrading the selected snapshot `%s` might corrupt your backup for this particular point in time. You cannot undo this operation. It is recommended to create a copy of the snapshot directory before upgrading it. The upgrade process takes a while - be patient.\n\nAre you sure that you want to upgrade the snapshot now?")\
+                    % self.currentSnp
+        dialog = misc.msgdialog(message_str = message, msgtype = gtk.MESSAGE_QUESTION,
+                                parent = self.top_window, buttons = gtk.BUTTONS_YES_NO,
+                                headline_str = _("Do you really want to upgrade snapshot?"))
+        response = dialog.run()
+        dialog.destroy()
+        if response == gtk.RESPONSE_YES:
+            um = UpgradeManager()
+            try:
+                self.logger.debug("Upgrade snapshot '%s'" % self.currentSnp.getName())
+                um.upgradeSnapshot(self.currentSnp)
+            except Exception, error:
+                self.logger.exception("Error while upgrade snapshot: %s" % error)
+                _message_str = _("While attempting to upgrade snapshot the following error occurred:\n%s")\
+                                    % error
+                _boxtitle = _("(Not So) Simple Backup error")
+                _headline_str = _("Unable to upgrade snapshot")
+                gobject.idle_add(self._show_errmessage, _message_str, _boxtitle, _headline_str)
 
-        self.load_snapshotslist(self.widgets['calendar'].get_date())
-        self.widgets['snpmanExpander'].set_expanded(False)
-        self.on_snpmanExpander_activate()
-        self.widgets['snpmanExpander'].set_expanded(True)
+            self.load_snapshotslist(self.widgets['calendar'].get_date())
+            self.widgets['snpmanExpander'].set_expanded(False)
+            self.on_snpmanExpander_activate()
+            self.widgets['snpmanExpander'].set_expanded(True)
 
     def on_rebaseButton_toggled(self, *args):
         if self.widgets['rebaseButton'].get_active():
@@ -822,11 +831,13 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                         self.logger.debug("Trying to remove snapshot '%s'" % self.currentSnp.getName())
                         self.snpman.removeSnapshot(self.currentSnp)
                     except exceptions.SBackupError, error:
-                        self.logger.error(str(error))
-                        self.logger.error(traceback.format_exc())
-                        dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(error))
-                        dialog.run()
-                        dialog.destroy()
+                        self.logger.exception("Error while delete snapshot: %s" % error)
+                        _message_str = _("While attempting to delete snapshot the following error occurred:\n%s")\
+                                            % error
+                        _boxtitle = _("(Not So) Simple Backup error")
+                        _headline_str = _("Unable to delete snapshot")
+                        gobject.idle_add(self._show_errmessage, _message_str, _boxtitle, _headline_str)
+
                     self.snpman.get_snapshots_allformats(forceReload = True)
                     self.on_calendar_day_selected()
             else:
@@ -835,7 +846,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                 misc.show_infodialog(message_str = message, parent = self.top_window, headline_str = _("Unable to remove snapshot"))
 
     def on_exportmanExpander_activate(self, *args):
-        print("TODO: on_exportmanExpander_activate")
+#TODO: on_exportmanExpander_activate
         pass
 
     def gtk_main_quit(self, *args):

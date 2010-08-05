@@ -70,10 +70,11 @@ class ITargetHandler(object):
     def is_local(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "is_local"))
 
+    def get_use_io_pipe(self):
+        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "get_use_io_pipe"))
+
     def set_use_mainloop(self, use):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "set_use_mainloop"))
-
-#    def dest_listdir(self):
 
 
 class IOperations(object):
@@ -84,10 +85,6 @@ class IOperations(object):
     @classmethod
     def path_exists(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "path_exists"))
-
-#    @classmethod
-#    def copy(cls, src, dst):
-#        raise NotImplementedError(_get_notimplemented_msg("IOperations", "copy"))
 
     @classmethod
     def delete(cls, uri):
@@ -116,6 +113,10 @@ class IOperations(object):
     @classmethod
     def openfile_for_read(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "openfile_for_read"))
+
+    @classmethod
+    def openfile_for_append(cls, path):
+        raise NotImplementedError(_get_notimplemented_msg("IOperations", "openfile_for_append"))
 
     @classmethod
     def get_dirname(cls, path):

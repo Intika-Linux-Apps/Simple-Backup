@@ -321,6 +321,9 @@ def openfile(uri, write = False):
     else:
         return open(uri, "r")
 
+def openfile_for_append(path):
+    return open(path, "a+")
+
 def pickleload(path):
     """
     Load a python object from the given pickle file

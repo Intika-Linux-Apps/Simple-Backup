@@ -2,7 +2,6 @@
 Not So Simple Backup Suite
 **************************
 
-
 Installation from Package (the easy way)
 ========================================
 
@@ -49,6 +48,8 @@ curlftpfs (for ftp and sftp fuse plugins)
 Installation
 ~~~~~~~~~~~~
 By default, nssbackup will be installed under "/usr/local" folder.
+
+* Remove previously installed versions (using make or .deb packages)
 
 * Install python and python-gnome2 libraries, fuse-utils and pynotify.
   - probably it's already installed in your dist

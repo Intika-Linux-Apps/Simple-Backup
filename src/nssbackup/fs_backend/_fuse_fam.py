@@ -342,6 +342,10 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
         _loc = self._dest.is_local()
         return _loc
 
+    def get_use_io_pipe(self):
+        _res = False
+        return _res
+
     def dest_eff_path_exists(self):
         """The effective path denotes the local mountpoint of the actual remote or local target.
         It is required in order to give it to TAR as parameter (tar does not support gio).

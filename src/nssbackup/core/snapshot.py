@@ -35,6 +35,7 @@ import types
 
 
 from nssbackup.fs_backend import fam
+from nssbackup.ar_backend import tar
 
 from nssbackup.core.ConfigManager import ConfigurationFileHandler
 
@@ -44,7 +45,6 @@ from nssbackup.util.exceptions import NotValidSnapshotException
 
 from nssbackup.util import constants
 from nssbackup.util import structs
-from nssbackup.ar_backend import tar
 from nssbackup.util import log
 
 
@@ -285,16 +285,16 @@ class Snapshot(object):
         """
         problem = False
 
-        if self.getFormat() == "none" :
+        if self.getFormat() == "none":
             _arn = self._fop.joinpath(self.getPath(), "files.tar")
-            if self._fop.path_exists(_arn) :
+            if self._fop.path_exists(_arn):
                 return _arn
             else :
                 problem = True
 
-        elif self.getFormat() == "gzip" :
+        elif self.getFormat() == "gzip":
             _arn = self._fop.joinpath(self.getPath(), "files.tar.gz")
-            if self._fop.path_exists(_arn) :
+            if self._fop.path_exists(_arn):
                 return _arn
 
             elif self.getVersion() == "1.4":
@@ -412,18 +412,22 @@ class Snapshot(object):
     def isFollowLinks(self):
         return self.__followlinks
 
-    def commit(self, publish_progress = False):
-        "Commit the snapshot infos ( write to the disk )"
-        try:
-            if not self.isfull():
-                self.commitbasefile()
-            self.commitFormatfile()
-            self.commitexcludefile()
-            self.commitpackagefile()
-            self.commitflistFiles()
-            self.__makebackup(publish_progress)
-        finally:
-            self.__clean()
+    def commit(self, publish_progress = False, use_io_pipe = False):
+        """Commit snapshot data (i.e. write to disk)
+        
+        :param publish_progress: Flag whether to call checkpoint script
+        :param use_io_pipe: Flag whether to use pipes instead of files defined as parameters for archive
+                            writing (should be hidden in FAM)
+        
+        :todo: Hide implementation detail `use_io_pipe`. 
+        """
+        if not self.isfull():
+            self.commitbasefile()
+        self.commitFormatfile()
+        self.commitexcludefile()
+        self.commitpackagefile()
+        self.commitflistFiles()
+        self.__makebackup(publish_progress, use_io_pipe)
         self.commitverfile()
 
     def addToIncludeFlist (self, item) :
@@ -625,11 +629,6 @@ class Snapshot(object):
         self._fop.writetofile(tmp_excl,
                               "\n".join(self.__excludeFlist.getEffectiveFileList()))
 
-#        self._fop.writetofile(self.getExcludeFListFile() + ".tmp",
-#                              "\n".join(self.__excludeFlist.getEffectiveFileList()))
-#        self._fop.writetofile(self.getIncludeFListFile() + ".tmp",
-#                              "\n".join(self.__includeFlist.get_eff_filelist_not_nested()))
-
     def commitpackagefile(self):
         " Commit packages file on the disk"
         _packf = self._fop.joinpath(self.getPath(), "packages")
@@ -639,27 +638,21 @@ class Snapshot(object):
             self._fop.writetofile(_packf, self.getPackages())
 
     def read_excludeflist_from_file(self):
-        fe = open(self.getExcludeFListFile(), "r")
+        fe = self._fop.openfile_for_read(self.getExcludeFListFile())
         _res = set(line.strip("\n") for line in fe)
         fe.close()
         return _res
 
-    def __makebackup(self, publish_progress):
+    def __makebackup(self, publish_progress, use_io_pipe):
         " Make the backup on the disk "
-
         if self.isfull():
-            tar.makeTarFullBackup(self, publish_progress)
+            tar.makeTarFullBackup(self, publish_progress, use_io_pipe)
         else:
-            tar.makeTarIncBackup(self, publish_progress)
+            tar.makeTarIncBackup(self, publish_progress, use_io_pipe)
 
-    def __clean(self):
-        """
-        Clean operational temporary files
-        """
-        # moved into TAR backend
-        pass
-#        if self._fop.path_exists(self.getIncludeFListFile() + ".tmp"):
-#            self._fop.delete(self.getIncludeFListFile() + ".tmp")
-#
-#        if self._fop.path_exists(self.getExcludeFListFile() + ".tmp"):
-#            self._fop.delete(self.getExcludeFListFile() + ".tmp")
+#    def __clean(self):
+#        """
+#        Clean operational temporary files
+#        """
+#        # moved into TAR backend
+#        pass

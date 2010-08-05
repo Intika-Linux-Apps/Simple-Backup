@@ -80,6 +80,12 @@ class GioTargetHandler(interfaces.ITargetHandler):
         _loc = self._dest.is_local()
         return _loc
 
+    def get_use_io_pipe(self):
+        _res = True
+        if self.is_local():
+            _res = False
+        return _res
+
     def set_configuration_ref(self, configuration):
         self._configuration = configuration
 

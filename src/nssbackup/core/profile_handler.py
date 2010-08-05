@@ -202,7 +202,10 @@ class BackupProfileHandler(object):
         _publish_progress = True
         if self.__dbus_conn is None:
             _publish_progress = False
-        self.__snapshot.commit(_publish_progress)
+        _pipe_io = self.__fam_target_hdl.get_use_io_pipe()
+
+        self.__snapshot.commit(_publish_progress, _pipe_io)
+
 
 #TODO: add state purging
 #FIXME: Files are not entirely written to some FS now! Improve this.
