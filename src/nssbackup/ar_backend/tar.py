@@ -369,7 +369,12 @@ def makeTarIncBackup(snapshot, publish_progress, use_io_pipe):
         LogFactory.getLogger().error(_("Falling back to full backup."))
         makeTarFullBackup(snapshot, publish_progress, use_io_pipe)
     else:
-        _FOP.copyfile(base_snarfile, tmp_snarfile)
+        try:
+            _FOP.copyfile(base_snarfile, tmp_snarfile)
+        except exceptions.CopyFileAttributesError:
+            LogFactory.getLogger().warning(_("Unable to change permissions for file '%s'.")\
+                                    % tmp_snarfile)
+
         # check (and set) the permission bits; necessary if the file's origin
         # does not support user rights (e.g. some FTP servers, file systems...)
 #FIXME: use generalized File operations here!

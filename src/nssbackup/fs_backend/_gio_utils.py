@@ -479,7 +479,11 @@ class GioOperations(interfaces.IOperations):
         _dest = gio.File(dest)
         _src, _dest = cls._prepare_copy(_src, _dest)
         _src.copy(_dest, flags = gio.FILE_COPY_OVERWRITE)
-        _src.copy_attributes(_dest, flags = gio.FILE_COPY_ALL_METADATA)
+        try:
+            _src.copy_attributes(_dest, flags = gio.FILE_COPY_ALL_METADATA)
+        except gio.Error:
+            raise exceptions.CopyFileAttributesError(\
+                            "Unable to copy file attributes (permissions etc.) of file '%s'." % dest)
 
     @classmethod
     def _prepare_copy(cls, src_gfile, dst_gfile):
