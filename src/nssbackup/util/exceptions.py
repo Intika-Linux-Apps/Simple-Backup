@@ -53,6 +53,12 @@ class SBException(Exception):
 
 SBackupError = SBException
 
+
+class ResourceFileNotFoundError(SBackupError) :
+    """This Exception is thrown if another application instance is
+    already running.
+    """
+
 class InstanceRunningError(SBException) :
     """This Exception is thrown if another application instance is
     already running.

@@ -23,7 +23,10 @@ Description: (Not So) Simple Backup Suite for desktop use
  GIO/GVFS technology. A fine control is possible regarding what
  folders and files to backup. Files can be excluded even with a set
  of regular expressions. Regular backups can be scheduled.
-
+ .
+ This meta package installs required packages to use (Not So) Simple Backup
+ Suite.
+ 
 Package: nssbackup-common
 Architecture: all
 Depends: python ( >= 2.5 ), python (<< 3.0),
@@ -52,21 +55,36 @@ Description: (Not So) Simple Backup Suite GTK+ graphical user interface
  GTK+. This package installs the GTK+ GUI of (Not So) Simple Backup Suite
  including a status indicator placed in panel when running backups.
 
-Package: nssbackup-plugins-fuse
+Package: nssbackup-ftp
 Architecture: all
 Depends: nssbackup-common(= ${binary:Version}),
          python ( >= 2.5 ), python (<< 3.0),
          ${misc:Depends},
          fuse-utils,
-         curlftpfs,
+         curlftpfs
+Description: (Not So) Simple Backup Suite FTP FUSE plugins
+ (Not So) Simple Backup Suite plugins that use FUSE file systems. This
+ optional package enables storage of backups on FTP/SFTP locations
+ using FUSE.
+ .
+ Please note, that the core package already enables remote access by means of
+ GIO/GVFS. This package is required only in case of explicit need
+ for mounting external sites using CURLFTPFS.
+
+Package: nssbackup-ssh
+Architecture: all
+Depends: nssbackup-common(= ${binary:Version}),
+         python ( >= 2.5 ), python (<< 3.0),
+         ${misc:Depends},
+         fuse-utils,
          sshfs,
          python-pexpect
-Description: (Not So) Simple Backup Suite FUSE plugins
+Description: (Not So) Simple Backup Suite SSH FUSE plugins
  (Not So) Simple Backup Suite plugins that use FUSE file systems. This
- optional package enables backups from and over FTP/SFTP/SSH locations
- using FUSE. The core package already enables remote access by means of
- GIO/GVFS.
+ optional package enables storage of backups on SSH locations
+ using FUSE.
  .
- This package is required only in case of explicit need
- for mounting external sites using SSHFS or CURLFTPFS.
+ Please note, that the core package already enables remote access by means of
+ GIO/GVFS. This package is required only in case of explicit need
+ for mounting external sites using SSHFS.
 

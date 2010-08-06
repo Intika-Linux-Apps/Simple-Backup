@@ -336,7 +336,8 @@ def __remove_tempfiles(tmp_files):
         try:
             _FOP.delete(_tmpf)
         except (OSError, IOError), error:
-            LogFactory.getLogger().warning(_("Unable to remove temporary file `%s`: %s") % (_tmpf, error))
+            LogFactory.getLogger().warning(_("Unable to remove temporary file `%(file)s`: %(error)s")\
+                                            % { 'file' : _tmpf, 'error': error })
 
 
 def makeTarIncBackup(snapshot, publish_progress, use_io_pipe):

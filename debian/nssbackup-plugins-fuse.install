@@ -1,5 +1,0 @@
-debian/tmp/usr/lib/python*/*/nssbackup/fuse_plugins/__init__.py
-debian/tmp/usr/lib/python*/*/nssbackup/fuse_plugins/localFuseFAM.py
-debian/tmp/usr/lib/python*/*/nssbackup/fuse_plugins/ftpFuseFAM.py
-debian/tmp/usr/lib/python*/*/nssbackup/fuse_plugins/sftpFuseFAM.py
-debian/tmp/usr/lib/python*/*/nssbackup/fuse_plugins/sshFuseFAM.py

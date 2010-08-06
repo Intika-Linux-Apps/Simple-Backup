@@ -9,6 +9,8 @@ debian/tmp/usr/lib/python*/*/nssbackup/core/*.py
 debian/tmp/usr/lib/python*/*/nssbackup/fs_backend/*.py
 debian/tmp/usr/lib/python*/*/nssbackup/util/*.py
 debian/tmp/usr/lib/python*/*/nssbackup/ui/__init__.py
+debian/tmp/usr/lib/python*/*/nssbackup/fuse_plugins/__init__.py
+debian/tmp/usr/lib/python*/*/nssbackup/fuse_plugins/localFuseFAM.py
 debian/tmp/usr/share/nssbackup/multipleTarScript
 debian/tmp/usr/share/nssbackup/nssbackup-launch
 debian/tmp/usr/share/nssbackup/sbackup-dbusservice

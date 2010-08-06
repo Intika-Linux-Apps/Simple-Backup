@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-05 15:30+0200\n"
+"POT-Creation-Date: 2010-08-06 14:29+0200\n"
 "PO-Revision-Date: 2010-04-18 01:34+0000\n"
 "Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
@@ -62,7 +62,7 @@ msgstr ""
 msgid "The following error(s) occurred before:"
 msgstr ""
 
-#: src/nssbackup/nssbackupd.py:521
+#: src/nssbackup/nssbackupd.py:522
 #, python-format
 msgid ""
 "Backup is not being started.\n"
@@ -103,113 +103,113 @@ msgstr ""
 
 #: src/nssbackup/ar_backend/tar.py:339
 #, python-format
-msgid "Unable to remove temporary file `%s`: %s"
+msgid "Unable to remove temporary file `%(file)s`: %(error)s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:348
+#: src/nssbackup/ar_backend/tar.py:349
 msgid "Launching TAR to make incremental backup."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:367
+#: src/nssbackup/ar_backend/tar.py:368
 msgid "Unable to find the SNAR file to make an incremental backup."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:368
+#: src/nssbackup/ar_backend/tar.py:369
 msgid "Falling back to full backup."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:405
+#: src/nssbackup/ar_backend/tar.py:406
 msgid "Launching TAR to make a full backup."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:461
+#: src/nssbackup/ar_backend/tar.py:462
 msgid "Leading '/' from member names were removed."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:463
+#: src/nssbackup/ar_backend/tar.py:464
 msgid "Leading '/' from hard link targets were removed."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:472
+#: src/nssbackup/ar_backend/tar.py:473
 #, python-format
 msgid "TAR returned a message: %s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:474
+#: src/nssbackup/ar_backend/tar.py:475
 #, python-format
 msgid ""
 "TAR returned messages:\n"
 "%s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:477
+#: src/nssbackup/ar_backend/tar.py:478
 msgid "TAR has been finished successfully."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:481
+#: src/nssbackup/ar_backend/tar.py:482
 #, python-format
 msgid "TAR returned a warning: %s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:483
+#: src/nssbackup/ar_backend/tar.py:484
 #, python-format
 msgid ""
 "TAR returned warnings:\n"
 "%s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:486
+#: src/nssbackup/ar_backend/tar.py:487
 msgid "TAR returned warnings but has been finished successfully."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:490
+#: src/nssbackup/ar_backend/tar.py:491
 msgid "Unable to finish successfully. TAR terminated with errors."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:658
+#: src/nssbackup/ar_backend/tar.py:659
 #, python-format
 msgid "Unable to terminate backend process: %s"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:691
+#: src/nssbackup/ar_backend/tar.py:692
 msgid "Included"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:691
+#: src/nssbackup/ar_backend/tar.py:692
 msgid "Not changed"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:691
+#: src/nssbackup/ar_backend/tar.py:692
 msgid "Directory"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:719
+#: src/nssbackup/ar_backend/tar.py:720
 msgid "Line must be a string"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:735
+#: src/nssbackup/ar_backend/tar.py:736
 msgid "Dumpdir inconsistancy : 'filename' is empty"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:748
+#: src/nssbackup/ar_backend/tar.py:749
 msgid "Dumpdir inconsistancy : 'control' is empty"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:821
+#: src/nssbackup/ar_backend/tar.py:822
 #, python-format
 msgid "File '%s' does not exist."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:951 src/nssbackup/ar_backend/tar.py:985
-#: src/nssbackup/ar_backend/tar.py:1082
+#: src/nssbackup/ar_backend/tar.py:952 src/nssbackup/ar_backend/tar.py:986
+#: src/nssbackup/ar_backend/tar.py:1083
 msgid "The snarfile header is incomplete."
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:1251
+#: src/nssbackup/ar_backend/tar.py:1252
 msgid "A SnapshotFile is required"
 msgstr ""
 
-#: src/nssbackup/ar_backend/tar.py:1351
+#: src/nssbackup/ar_backend/tar.py:1352
 #, python-format
 msgid "Directory does not exist: %s."
 msgstr ""
@@ -1646,22 +1646,22 @@ msgstr ""
 msgid "Sorry, this should not have happened"
 msgstr ""
 
-#: src/nssbackup/util/__init__.py:441
+#: src/nssbackup/util/__init__.py:440
 #, python-format
 msgid "%(mb)d MiB %(kb)d KiB"
 msgstr ""
 
-#: src/nssbackup/util/__init__.py:444
+#: src/nssbackup/util/__init__.py:443
 #, python-format
 msgid "%(mb)d MiB %(kb)d KiB %(bytes)d"
 msgstr ""
 
-#: src/nssbackup/util/__init__.py:449
+#: src/nssbackup/util/__init__.py:448
 #, python-format
 msgid "%(mb)d MB %(kb)d kB"
 msgstr ""
 
-#: src/nssbackup/util/__init__.py:452
+#: src/nssbackup/util/__init__.py:451
 #, python-format
 msgid "%(mb)d MB %(kb)d kB %(bytes)d"
 msgstr ""

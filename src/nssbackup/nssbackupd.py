@@ -386,9 +386,10 @@ class SBackupApp(object):
             self._launch_dbusservice()
 
         if (self.__use_indicator == True) and (self.__dbus_avail == True):
-            self._launch_indicator()
-
-
+            try:
+                self._launch_indicator()
+            except exceptions.ResourceFileNotFoundError:
+                self.__use_indicator = False
 
     def _launch_dbusservice(self):
         """Launches the DBus service and establishes a placeholder

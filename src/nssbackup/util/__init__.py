@@ -90,8 +90,7 @@ def __get_resource(resource_name, is_file = False):
 #                            print "Debug: File found in '%s'" % _path
                             return _path
 
-    raise exceptions.SBException(\
-                "'%s' hasn't been found in the ressource list" % resource_name)
+    raise exceptions.ResourceFileNotFoundError("Unable to find `%s` in the resources list" % resource_name)
 
 
 def get_resource_file(resource_name):

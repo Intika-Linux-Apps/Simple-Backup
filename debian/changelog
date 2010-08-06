@@ -1,16 +1,21 @@
-nssbackup (0.3.0ppa1~lucid1) lucid; urgency=high
+nssbackup (0.3.0ppa1~lucid1) lucid; urgency=low
 
+  * [Fix] LP #130856: Show remaining time till backup is finished in UI
+  * [Fix] LP #146619: Make a full backup now button
   * [Fix] LP #412934: escape local filename containing an equal sign
+  * [Fix] LP #584294: Restoration GUI revamped
+  * [Fix] LP #599865: Link to launchpad start root firefox
   * [Fix] LP #604479: Thanks to Florian Achleitner (value returned is a
                       string and was not converted before comparison)
-  * [Fix] LP #584294: Restoration GUI revamped
+  * [Fix] LP #613746: added commandline option to force full backup
+  * [Fix] LP #601574: Changes to the "Do a full backup" text box are not noticed
   * [Change]: do purge after backup
   * [Change]: delete snapshots from restoration gui only if standalone
   * [Change]: default value for backup compression set to `none`
   * [Enhancement]: improved error handling
   * [Enhancement]: added support for GIO backend (Fuse backend can be enabled
                    by gconf setting)
-  * [Enhancement]: package/module structure re-organized
+  * [Enhancement]: module structure re-organized
   * [Enhancement]: code formatting and clean-up
   * [Enhancement]: D-Bus notification service implemented
   * [Enhancement]: Indicator application using libappindicator (for Ubuntu)
@@ -19,7 +24,7 @@ nssbackup (0.3.0ppa1~lucid1) lucid; urgency=high
                    retry if target is not accessible, make full backup
   * Launchpad translations merged
 
- -- Jean-Peer Lorenz <peer.loz@gmx.net>  Wed, 04 Aug 2010 19:34:57 +0200
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 05 Aug 2010 19:07:13 +0200
 
 nssbackup (0.2.1ppa1~lucid1) lucid; urgency=high
 

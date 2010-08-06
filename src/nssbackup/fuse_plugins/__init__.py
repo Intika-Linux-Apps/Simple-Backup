@@ -41,7 +41,7 @@ class pluginFAM(object):
         self.logger = log.LogFactory.getLogger()
 
     def match_scheme(self, remoteSource):
-        raise exceptions.SBException("'match_scheme_full' Not implemented for this plugin")
+        raise exceptions.SBException("'match_scheme' Not implemented for this plugin")
 
     def match_scheme_full(self, remoteSource):
         """
