@@ -263,6 +263,28 @@ def get_clean_environment():
     return _clean_env
 
 
+def set_gio_env_from_session():
+    _set_envvar_from_session(key = 'SSH_AUTH_SOCK')
+    _set_envvar_from_session(key = 'GNOME_KEYRING_CONTROL')
+    _set_envvar_from_session(key = 'GNOME_KEYRING_PID')
+    _set_envvar_from_session(key = 'XAUTHORITY')
+    _set_envvar_from_session(key = 'GPG_AGENT_INFO')
+    #===========================================================================
+    # key_kr = 'GNOME_KEYRING_CONTROL'
+    # key_ssh = 'SSH_AUTH_SOCK'
+    # _value = os.environ.get(key_kr)
+    # if _value is None:
+    #    _session = get_session_name()
+    #    _env = get_session_environment(_session)
+    #    if _env is not None:
+    #        _nvalue = _env.get(key_kr)
+    #        if _nvalue is not None:
+    #            _nvalue = "%s/ssh" % _nvalue
+    #            print "Updating %s to: %s" % (key_ssh, _nvalue)
+    #            os.environ[key_ssh] = _nvalue
+    #===========================================================================
+   
+    
 def is_dbus_session_bus_set():
     key = 'DBUS_SESSION_BUS_ADDRESS'
     _res = False
@@ -368,15 +390,15 @@ def _get_session_env(session):
             _mod_env = None
         else:
             _mod_env.update(_session_env)
+#    debug_print_environment(_mod_env, "modified from desktop session")
     return _mod_env
 
 
-def debug_print_environment():
-    _env = os.environ
-    print "\nCurrent environment:"
+def debug_print_environment(env, description):
+    print "\nEnvironment `%s`:" % description
     print "-----------------------------------------------------------------------------"
-    for _var in _env:
-        print "%s: %s" % (_var, _env[_var])
+    for _var in env:
+        print "%s: %s" % (_var, env[_var])
     print "-----------------------------------------------------------------------------"
 
 

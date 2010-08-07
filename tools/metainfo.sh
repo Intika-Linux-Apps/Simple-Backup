@@ -40,8 +40,8 @@ fi
 VERFULL=$(grep "^VERSION=" $METAFILE|cut -d "=" -f 2 -)
 VERNUM=$(echo $VERFULL|cut -d "~" -f 1 -)
 VERPOST=$(echo $VERFULL|cut -d "~" -f 2 -)
-VERNUMMAJOR=$(echo $VERNUM|cut -d "-" -f 1 -)
-VERNUMMINOR=$(echo $VERNUM|cut -d "-" -f 2 -)
+VERNUMMAJOR=$(echo $VERNUM|cut -d "." -f 1,2 -)
+VERNUMMINOR=$(echo $VERNUM|cut -d "." -f 3 -)
 
 PKGNAME=$(grep "^PKGNAME=" $METAFILE|cut -d "=" -f 2 -)
 

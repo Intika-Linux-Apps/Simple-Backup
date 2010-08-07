@@ -328,7 +328,7 @@ class GioMountHandler(object):
 
         else:
             try:
-                _mount.unmount(self._umount_done_cb, gio.MOUNT_UNMOUNT_NONE, None, gfileobj)
+                _mount.unmount(self._umount_done_cb, gio.MOUNT_UNMOUNT_FORCE, None, gfileobj)
     #            gobject.timeout_add(15000, self._umount_done_cb, _mount, None, gfileobj)
     # remaining issues:
     # * how to cancel a timeout if mount was successful?

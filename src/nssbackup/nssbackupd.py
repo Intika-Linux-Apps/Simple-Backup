@@ -69,6 +69,7 @@ def except_hook(etype, evalue, etb):
 
 sys.excepthook = except_hook
 #TODO: move the following into GIO backend: should be executed in case of enabled gio backend only!
+system.set_gio_env_from_session()
 system.set_dbus_session_bus_from_session()
 system.launch_dbus_if_required()
 

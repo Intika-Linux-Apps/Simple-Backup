@@ -612,11 +612,26 @@ class TarBackendLauncherSingleton(object):
 
         except (exceptions.BackupCanceledError, exceptions.SigTerminatedError), error:
             self.terminate()
+
+            if (self._stdin_f is not None) or (self._stdout_f is not None):
+                _arsrc.close()
+                _ardst.close()
+            # todo: remove code duplication
+            self._returncode = self._proc.returncode
+            os.close(errptr)    # Close log handle
+            self._stderr = local_file_utils.readfile(errfile)
+            self._logger.debug("TAR exit code: %s" % self._returncode)
+            self._logger.debug("TAR errout: %s" % self._stderr)
+            if self._stdout_f is None:
+                os.close(outptr)
+                self._stdout = local_file_utils.readfile(outfile)
+                self._logger.debug("TAR stdout: %s" % self._stdout)
+            local_file_utils.delete(errfile)
+    
             self._clear_proc()
             raise error
 
         self._returncode = self._proc.returncode
-
         os.close(errptr)    # Close log handle
         self._stderr = local_file_utils.readfile(errfile)
         if self._stdout_f is None:

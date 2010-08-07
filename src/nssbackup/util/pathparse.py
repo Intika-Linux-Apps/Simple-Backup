@@ -162,7 +162,8 @@ class UriParser(object):
 
     def set_and_parse_uri(self, uri):
         _logger = log.LogFactory.getLogger()
-        _logger.debug("set and parse uri: %s" % uri)
+#        contains password in plain text
+#        _logger.debug("set and parse uri: %s" % uri)
         self.__clear()
         splituri = urlparse.urlsplit(uri)
         self.__uri = splituri.geturl()  # gets normalized URI

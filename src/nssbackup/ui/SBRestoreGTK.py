@@ -65,6 +65,7 @@ from nssbackup.ui import gtk_rsrc
 
 
 sys.excepthook = misc.except_hook_threaded
+system.set_gio_env_from_session()
 system.set_dbus_session_bus_from_session()
 
 # initialize threading before running a main loop
