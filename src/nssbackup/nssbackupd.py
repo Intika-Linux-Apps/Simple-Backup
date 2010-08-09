@@ -69,8 +69,6 @@ def except_hook(etype, evalue, etb):
 
 sys.excepthook = except_hook
 #TODO: move the following into GIO backend: should be executed in case of enabled gio backend only!
-system.set_gio_env_from_session()
-system.set_dbus_session_bus_from_session()
 system.launch_dbus_if_required()
 
 
@@ -286,7 +284,7 @@ class SBackupProc(object):
             except exceptions.BackupCanceledError:
                 self.__on_backup_canceled()
 
-            except Exception, error:
+            except (SystemExit, KeyboardInterrupt, Exception), error:
                 self.__on_error(error)
 
             self.__on_finish()
@@ -298,7 +296,7 @@ class SBackupProc(object):
         self.logger.warning(_("Backup was canceled by user."))
         self.__state.set_state('backup-canceled')
         if self.__bprofilehdl is not None:
-            self.__exitcode = self.__bprofilehdl.finish()
+            self.__exitcode = self.__bprofilehdl.cancel()
 
     def __on_error(self, error):
         """Handles errors that occurs during backup process.
@@ -310,8 +308,12 @@ class SBackupProc(object):
         self.__exitcode = constants.EXCODE_BACKUP_ERROR
         self.__state.set_recent_error(error)
         self.__state.set_state('error')
+
         if self.__bprofilehdl is not None:
             self.__exitcode = self.__bprofilehdl.finish(error)
+
+        if isinstance(error, (SystemExit, KeyboardInterrupt)):
+            raise error
 
     def __on_finish(self):
         """Method that is finally called after backup process.
@@ -538,11 +540,11 @@ class SBackupApp(object):
             enable_termsignal()
             enable_backup_cancel_signal()
             self.parse_cmdline()
-            self.__lock.lock()
 
             self.launch_externals()
             self.create_notifiers()
 
+            self.__lock.lock()
             system.very_nice()
             system.set_grp("admin")
 

@@ -348,7 +348,6 @@ def _add_write_permission(path, recursive = True):
     """Sets write permissions for user, group, and others for
     given directory or file (recursive). 
     """
-    print path
     fstats = os.stat(path)
     fmode = fstats.st_mode
     fmode = fmode | system.UNIX_PERM_ALL_WRITE
