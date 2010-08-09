@@ -1,7 +1,7 @@
 #    NSsbackup - provides access to TAR functionality
 #
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ def getArchiveType(archive):
     return _res
 
 
-def extract(sourcear, restore_file, dest , use_io_pipe, bckupsuffix = None, splitsize = None):
+def extract(sourcear, restore_file, dest , bckupsuffix = None, splitsize = None):
     """Extract from source archive the file "file" to dest.
     
     @param sourcear: path of archive
@@ -86,13 +86,13 @@ def extract(sourcear, restore_file, dest , use_io_pipe, bckupsuffix = None, spli
     @param dest:
     @param bckupsuffix: If set a backup suffix option is set to backup existing files
     @param splitsize: If set the split options are added supposing the size of the archives is this variable
-    @type splitsize: Integer in KB
+    @type splitsize: Integer in 1024 Bytes
     """
     restore_file = restore_file.lstrip(_FOP.pathsep)    # strip leading separator (as TAR did before)
     # tar option  -p, --same-permissions, --preserve-permissions:
     # ignore umask when extracting files (the default for root)
 
-    options = ["-xp", "--ignore-failed-read", '--backup=existing']
+    options = ["-xp", "--ignore-failed-read", '--backup=existing', "--totals"]
 
     archType = getArchiveType(sourcear)
     if archType == "tar" :
@@ -113,15 +113,11 @@ def extract(sourcear, restore_file, dest , use_io_pipe, bckupsuffix = None, spli
     if bckupsuffix :
         options.append("--suffix=" + bckupsuffix)
 
-    if splitsize :
-        options.extend(["-L " + str(splitsize) , "-F " + util.get_resource_file("multipleTarScript")])
+    if splitsize > 0:
+        options.extend(["-L %s" % splitsize , "-F %s" % util.get_resource_file("multipleTarScript")])
 
     _launcher = TarBackendLauncherSingleton()
-    if use_io_pipe:
-        _launcher.set_stdin_file(sourcear)
-    else:
-        options.append("--file=%s" % sourcear)
-
+    options.append("--file=%s" % sourcear)
     options.append(restore_file)
 
     _launcher.launch_sync(options, env = {})
@@ -239,9 +235,11 @@ def __prepare_common_opts(snapshot, publish_progress, use_io_pipe):
     # take care where to insert additional options (e.g. --gzip)
 
     tdir = snapshot.getPath()
-    options = ["-cS", "--directory=" + _FOP.pathsep,
+    options = ["-cS", "--directory=%s" % _FOP.pathsep,
                "--ignore-failed-read",
-               "--blocking-factor", str(constants.TAR_BLOCKING_FACTOR)]
+               "--blocking-factor", str(constants.TAR_BLOCKING_FACTOR),
+               "--totals"
+              ]
 
     # includes and excludes
     tmp_incl = _FOP.normpath(ConfigurationFileHandler().get_user_tempdir(),
@@ -257,8 +255,8 @@ def __prepare_common_opts(snapshot, publish_progress, use_io_pipe):
     if not _FOP.path_exists(tmp_excl):
         raise SBException("Temporary excludes.list does not exist")
 
-    options.append("--files-from=%s" % tmp_incl)
-    options.append("--exclude-from=%s" % tmp_excl)
+    options.append('--files-from=%s' % tmp_incl)
+    options.append('--exclude-from=%s' % tmp_excl)
 
     if snapshot.isFollowLinks() :
         options.append("--dereference")
@@ -276,8 +274,11 @@ def __prepare_common_opts(snapshot, publish_progress, use_io_pipe):
         LogFactory.getLogger().debug("Setting compression to default 'none'")
 
     _ar_path = _FOP.normpath(tdir, archivename)
-    if not use_io_pipe:
-        options.append("--file=%s" % _ar_path)
+    if use_io_pipe:
+        pass
+    # write to socket file object?
+    else:
+        options.append('--file=%s' % _ar_path)
 
     # progress signal
 #TODO: improve calculation of number of checkpoints based on estimated transfer rate.
@@ -301,6 +302,9 @@ def __prepare_common_opts(snapshot, publish_progress, use_io_pipe):
             _progessf = util.get_resource_file(resource_name = "sbackup-progress")
             options.append('--checkpoint-action=exec=%s' % _progessf)
 
+    if LogFactory.getLogger().isEnabledFor(5):
+        options.append("--verbose")
+
     return (options, _ar_path, tmp_incl, tmp_excl)
 
 
@@ -318,7 +322,7 @@ def __add_split_opts(snapshot, options, size):
     """
     if snapshot.getFormat() != "none" :
         raise SBException(_("For the moment split functionality is not compatible with compress option."))
-    options.extend(["-L " + str(size) , "-F " + util.get_resource_file("multipleTarScript")])
+    options.extend(["-L %s" % str(size), "-F %s" % util.get_resource_file("multipleTarScript")])
     return options
 
 
@@ -331,7 +335,6 @@ def __copy_temp_snarfile_into_snapshot(tmp_snarfile, snarfile):
 
 
 def __remove_tempfiles(tmp_files):
-    #TODO: Use fam.delete_ignore_errors()!
     for _tmpf in tmp_files:
         try:
             _FOP.delete(_tmpf)
@@ -340,7 +343,14 @@ def __remove_tempfiles(tmp_files):
                                             % { 'file' : _tmpf, 'error': error })
 
 
-def makeTarIncBackup(snapshot, publish_progress, use_io_pipe):
+def mk_archive(snapshot, publish_progress, supports_publish):
+    if snapshot.isfull():
+        _mk_tar_full(snapshot, publish_progress, supports_publish)
+    else:
+        _mk_tar_incr(snapshot, publish_progress, supports_publish)
+
+
+def _mk_tar_incr(snapshot, publish_progress, supports_publish):
     """
     Launch a TAR incremental backup
     @param snapshot: the snapshot in which to make the backup
@@ -348,11 +358,18 @@ def makeTarIncBackup(snapshot, publish_progress, use_io_pipe):
     """
     LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 
-    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress, use_io_pipe)
+    _env = {}
+    _use_io_pipe = True
+    _splitsize = snapshot.getSplitedSize()
+    if _splitsize > 0:
+        _use_io_pipe = False
+        publish_progress = publish_progress and supports_publish
+        _env = { "SBACKUP_VOLUME_SIZE" : str(_splitsize * constants.TAR_VOLUME_SIZE_UNIT_IN_BYTES) }
 
-    splitSize = snapshot.getSplitedSize()
-    if splitSize: # > 0
-        options = __add_split_opts(snapshot, options, splitSize)
+    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress, _use_io_pipe)
+
+    if _splitsize > 0:
+        options = __add_split_opts(snapshot, options, _splitsize)
 
     base_snarfile = snapshot.getBaseSnapshot().getSnarFile()
     snarfile = snapshot.getSnarFile()
@@ -367,7 +384,7 @@ def makeTarIncBackup(snapshot, publish_progress, use_io_pipe):
     if not _FOP.path_exists(base_snarfile) :
         LogFactory.getLogger().error(_("Unable to find the SNAR file to make an incremental backup."))
         LogFactory.getLogger().error(_("Falling back to full backup."))
-        makeTarFullBackup(snapshot, publish_progress, use_io_pipe)
+        _mk_tar_full(snapshot, publish_progress, _use_io_pipe)
     else:
         try:
             _FOP.copyfile(base_snarfile, tmp_snarfile)
@@ -387,10 +404,10 @@ def makeTarIncBackup(snapshot, publish_progress, use_io_pipe):
 
         # launch TAR with empty environment
         _launcher = TarBackendLauncherSingleton()
-        if use_io_pipe:
+        if _use_io_pipe:
             _launcher.set_stdout_file(ar_path)
         try:
-            _launcher.launch_sync(options, env = {})
+            _launcher.launch_sync(options, env = _env)
             retVal = _launcher.get_returncode()
             outstr = _launcher.get_stdout()
             errStr = _launcher.get_stderr()
@@ -401,7 +418,7 @@ def makeTarIncBackup(snapshot, publish_progress, use_io_pipe):
             __remove_tempfiles([tmp_snarfile, tmp_incl, tmp_excl])
 
 
-def makeTarFullBackup(snapshot, publish_progress, use_io_pipe):
+def _mk_tar_full(snapshot, publish_progress, supports_publish):
     """Convenience function that launches TAR to create a full backup.
 
     @param snapshot: the snapshot in which to make the backup
@@ -410,11 +427,18 @@ def makeTarFullBackup(snapshot, publish_progress, use_io_pipe):
     """
     LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 
-    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress, use_io_pipe)
+    _env = {}
+    _use_io_pipe = True
+    _splitsize = snapshot.getSplitedSize()
+    if _splitsize > 0:
+        _use_io_pipe = False
+        publish_progress = publish_progress and supports_publish
+        _env = { "SBACKUP_VOLUME_SIZE" : str(_splitsize * constants.TAR_VOLUME_SIZE_UNIT_IN_BYTES) }
 
-    splitSize = snapshot.getSplitedSize()
-    if splitSize:   # > 0
-        options = __add_split_opts(snapshot, options, splitSize)
+    options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress, _use_io_pipe)
+
+    if _splitsize > 0:
+        options = __add_split_opts(snapshot, options, _splitsize)
 
     snarfile = snapshot.getSnarFile()
     tmp_snarfile = _FOP.normpath(ConfigurationFileHandler().get_user_tempdir(),
@@ -429,14 +453,14 @@ def makeTarFullBackup(snapshot, publish_progress, use_io_pipe):
     if _FOP.path_exists(tmp_snarfile) :
         _FOP.delete(tmp_snarfile)
 
-    options.append("--listed-incremental=" + tmp_snarfile)
+    options.append("--listed-incremental=%s" % tmp_snarfile)
 
     # launch TAR with empty environment
     _launcher = TarBackendLauncherSingleton()
-    if use_io_pipe:
+    if _use_io_pipe:
         _launcher.set_stdout_file(ar_path)
     try:
-        _launcher.launch_sync(options, env = {})
+        _launcher.launch_sync(options, env = _env)
         retVal = _launcher.get_returncode()
         outstr = _launcher.get_stdout()
         errStr = _launcher.get_stderr()
@@ -444,6 +468,7 @@ def makeTarFullBackup(snapshot, publish_progress, use_io_pipe):
         __copy_temp_snarfile_into_snapshot(tmp_snarfile, snarfile)
     finally:
         __remove_tempfiles([tmp_snarfile, tmp_incl, tmp_excl])
+
 
 def __finish_tar(exitcode, output_str, error_str):
     """
@@ -492,7 +517,7 @@ def __finish_tar(exitcode, output_str, error_str):
         _logger.info(_("TAR returned warnings but has been finished successfully."))
 
     else:
-        # list-incremental is not compatible with ignore failed read
+        # list-incremental is not compatible with ignore failed read ???
         _errmsg = _("Unable to finish successfully. TAR terminated with errors.")
         _logger.error("%s\n%s(exit code: %s)" % (_errmsg, error_str, exitcode))
         raise SBException(_errmsg)
@@ -596,7 +621,7 @@ class TarBackendLauncherSingleton(object):
 
             self._proc = subprocess.Popen(self._argv, stdin = _stdin_param, stdout = _stdout_param,
                                           stderr = errptr, env = env)
-
+            self._logger.debug("Subprocess created")
             if self._stdout_f is not None:
                 _arsrc = self._proc.stdout
             if self._stdin_f is not None:
@@ -620,14 +645,11 @@ class TarBackendLauncherSingleton(object):
             self._returncode = self._proc.returncode
             os.close(errptr)    # Close log handle
             self._stderr = local_file_utils.readfile(errfile)
-            self._logger.debug("TAR exit code: %s" % self._returncode)
-            self._logger.debug("TAR errout: %s" % self._stderr)
             if self._stdout_f is None:
                 os.close(outptr)
                 self._stdout = local_file_utils.readfile(outfile)
-                self._logger.debug("TAR stdout: %s" % self._stdout)
             local_file_utils.delete(errfile)
-    
+
             self._clear_proc()
             raise error
 

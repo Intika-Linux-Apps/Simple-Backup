@@ -65,8 +65,8 @@ from nssbackup.ui import gtk_rsrc
 
 
 sys.excepthook = misc.except_hook_threaded
-system.set_gio_env_from_session()
-system.set_dbus_session_bus_from_session()
+system.launch_dbus_if_required()
+
 
 # initialize threading before running a main loop
 gtk.gdk.threads_init()
@@ -696,11 +696,10 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         _task.set_finish_callback(gobject.idle_add, self.__restore_finished,
                                    statbar_msgid)
 
-        _pipe_io = self.__fam_target_hdl.get_use_io_pipe()
         if dirname is None:
-            _task.start(snapshot, source, _pipe_io)
+            _task.start(snapshot, source)
         else:
-            _task.start(snapshot, source, dirname, _pipe_io)
+            _task.start(snapshot, source, dirname)
 
     def __restore_finished(self, *args):
         """Callback method that is called after finishing of a restoration
@@ -1016,6 +1015,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
 
 
 def main(argv):
+    system.nice()
     restore_win = SBRestoreGTK()
     restore_win.show()
     restore_win.main()

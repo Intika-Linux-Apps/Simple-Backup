@@ -31,7 +31,7 @@ except ImportError:
     raise FuseFAMException("Unable to import required module `pexpect`")
 
 
-ssh_re = "^sftp://"
+ssh_re = "^ssh://"
 ssh_url_re = ssh_re + "([^:]+?)(:([^@]+?))?@([^/^:^@]+?)(:([0-9]+?))?/(.*)"
 
 class sshFuseFAM (pluginFAM)  :

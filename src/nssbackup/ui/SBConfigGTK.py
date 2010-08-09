@@ -50,8 +50,7 @@ from nssbackup.util import local_file_utils
 
 
 sys.excepthook = misc.except_hook
-system.set_gio_env_from_session()
-system.set_dbus_session_bus_from_session()
+system.launch_dbus_if_required()
 
 
 class SBconfigGTK(GladeGnomeApp):

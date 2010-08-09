@@ -80,10 +80,13 @@ class GioTargetHandler(interfaces.ITargetHandler):
         _loc = self._dest.is_local()
         return _loc
 
-    def get_use_io_pipe(self):
-        _res = True
+    def get_supports_publish(self):
+        """Current implementations of gvfs-fuse causes issues when using
+        tar's checkpoint action in conjunction with multiple volumes.
+        """
+        _res = False
         if self.is_local():
-            _res = False
+            _res = True
         return _res
 
     def set_configuration_ref(self, configuration):

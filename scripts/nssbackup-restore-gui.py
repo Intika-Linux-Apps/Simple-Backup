@@ -27,6 +27,7 @@ if __name__ == '__main__':
     from nssbackup.util import system
     system.set_default_environment()
     system.set_display_from_session()
+    system.set_gio_env_from_session()    
 
     from nssbackup.util import get_locale_dir, get_locale_domain
     application = get_locale_domain()

@@ -41,7 +41,7 @@ class RestoreManager(object):
         self.logger = log.LogFactory.getLogger()
         self._fop = fam.get_file_operations_facade_instance()
 
-    def restore(self, snapshot, _file, use_io_pipe):
+    def restore(self, snapshot, _file):
         """
         Restore one file or directory from the backup tdir with name
         file to its old location.
@@ -49,9 +49,9 @@ class RestoreManager(object):
         @param snapshot: 
         @param file : 
         """
-        self.restoreAs(snapshot, _file, None, use_io_pipe)
+        self.restoreAs(snapshot, _file, None)
 
-    def restoreAs(self, snapshot, _file, target, use_io_pipe, backupFlag = True, failOnNotFound = True) :
+    def restoreAs(self, snapshot, _file, target, backupFlag = True, failOnNotFound = True) :
         """
         Restore one file or directory from the backup tdir with name
         file to target (or to its old location if None if given to target).
@@ -96,7 +96,7 @@ class RestoreManager(object):
                 _tmpdir = tempfile.mkdtemp(dir = target, prefix = 'nssbackup-restore_')
                 self.logger.debug("Restore tempdir: `%s`" % _tmpdir)
 
-                tar.extract(snapshot.getArchive(), _file, _tmpdir, use_io_pipe,
+                tar.extract(snapshot.getArchive(), _file, _tmpdir,
                             bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
 
                 _file_in_target = self._fop.joinpath(target, self._fop.get_basename(_file))
@@ -114,33 +114,33 @@ class RestoreManager(object):
             else:
                 #the target is a file (i.e. the backuped file is restored under new name
                 parent = self._fop.get_dirname(target)
-                tar.extract(snapshot.getArchive(), _file, parent, use_io_pipe,
+                tar.extract(snapshot.getArchive(), _file, parent,
                             bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
         else:
             # target is set to None or target not exists
             if target and not self._fop.path_exists(target) :
                 #target != None but target doesn't exists
                 self._fop.makedirs(target)
-                tar.extract(snapshot.getArchive(), _file, target, use_io_pipe,
+                tar.extract(snapshot.getArchive(), _file, target,
                             splitsize = snapshot.getSplitedSize())
             else :
                 # Target = None , extract at the place it belongs
                 if self._fop.path_exists(_file) :
                     # file exist:
-                    tar.extract(snapshot.getArchive(), _file, target, use_io_pipe,
+                    tar.extract(snapshot.getArchive(), _file, target,
                                 bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
                 else :
                     # file doesn't exist nothing to move, just extract
-                    tar.extract(snapshot.getArchive(), _file, target, use_io_pipe,
+                    tar.extract(snapshot.getArchive(), _file, target,
                                 splitsize = snapshot.getSplitedSize())
 
-    def revert(self, snapshot, directory, use_io_pipe):
+    def revert(self, snapshot, directory):
         """
         Revert a directory to its snapshot date state.
         @param snapshot : The snapshot from which to revert 
         @param dir : the dir to revert, use self._fop.pathsep for the whole snapshot
         """
-        self.revertAs(snapshot, directory, None, use_io_pipe)
+        self.revertAs(snapshot, directory, None)
 
 
     def __cleanBackupedFiles(self, directory , suffix):
@@ -152,7 +152,7 @@ class RestoreManager(object):
         pass
 
 
-    def revertAs(self, snapshot, directory, targetdir, use_io_pipe):
+    def revertAs(self, snapshot, directory, targetdir):
         """
         Revert a directory to its snapshot date state into a directory.
         We will restore the directory starting from the base snapshot to the selected one and clean the restore directory each time.
@@ -177,6 +177,6 @@ class RestoreManager(object):
                 _bak = True
             _cnt += 1
 
-            self.restoreAs(snp, directory, targetdir, use_io_pipe, backupFlag = _bak,
+            self.restoreAs(snp, directory, targetdir, backupFlag = _bak,
                            failOnNotFound = False)
 

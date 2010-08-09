@@ -49,6 +49,11 @@ if __name__ == '__main__':
     import os
     from nssbackup.util import system
 
+    from nssbackup.util import system
+    system.set_default_environment()
+    system.set_display_from_session()
+    system.set_gio_env_from_session()    
+
     options = parse_cmdline(sys.argv)
     os.nice(5)
 

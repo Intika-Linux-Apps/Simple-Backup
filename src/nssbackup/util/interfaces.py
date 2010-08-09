@@ -70,8 +70,8 @@ class ITargetHandler(object):
     def is_local(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "is_local"))
 
-    def get_use_io_pipe(self):
-        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "get_use_io_pipe"))
+    def get_supports_publish(self):
+        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "get_supports_publish"))
 
     def set_use_mainloop(self, use):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "set_use_mainloop"))

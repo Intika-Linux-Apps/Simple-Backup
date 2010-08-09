@@ -873,6 +873,14 @@ class SnapshotManager(object):
 #            listing = self.get_snapshots(forceReload = True)
         self._remove_standalone_snapshot(snapshot)
 
+    def remove_snapshot_forced(self, snapshot):
+        """Removes snapshot directory forcefully.
+        """
+        self.logger.debug("Removing '%s'" % snapshot.getName())
+        self._fop.delete(snapshot.getPath())
+        self.get_snapshots(forceReload = True)
+
+
     def __remove_full_snapshot(self, snapshot):
         """Method that removes the given full backup snapshot. The removal of
         a full anspshot is only possible if the full snapshot is not be the
