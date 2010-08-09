@@ -833,7 +833,7 @@ class SnapshotManager(object):
     def _remove_standalone_snapshot(self, snapshot):
         if not self.is_standalone_snapshot(snapshot):
             raise RemoveSnapshotHasChildsError("The given snapshot '%s' is not stand-alone." % snapshot)
-        self.logger.debug("Removing '%s'" % snapshot.getName())
+        self.logger.info("Removing '%s'" % snapshot.getName())
         self._fop.delete(snapshot.getPath())
         self.get_snapshots(forceReload = True)
 
