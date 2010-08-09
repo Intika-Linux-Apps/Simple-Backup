@@ -1,4 +1,4 @@
-nssbackup (0.3.0ppa2~lucid1) lucid; urgency=low
+nssbackup (0.3.0ppa1~lucid1) lucid; urgency=low
 
   * [Fix] LP #130856: Show remaining time till backup is finished in UI
   * [Fix] LP #146619: Make a full backup now button
