@@ -28,8 +28,10 @@
 
 This script provides necessary functionality when upgrading NSsbackup
 to a new version. Purpose of this script is to be run from the Debian
-`postinst` script after package update.
+`postinst` script after package update resp. manually after `make install`.
 
+Since the package (at least core) is configured when this script runs,
+we can import modules from nssbackup here.
 """
 
 import sys
@@ -42,6 +44,9 @@ import re
 
 from nssbackup.pkginfo import Infos
 from nssbackup.core import ConfigManager
+
+from nssbackup.util import system
+
 
 # definition of error codes
 NO_ERRORS = 0
@@ -147,7 +152,7 @@ class UpgradeLogOption(object):
         """Constructor of the log option upgrader.
         
         """
-        self.__min_uid = 1000
+        self.__min_uid = 1000       # fallback values
         self.__max_uid = 60000
         self.__users = []
         self.__configdirs = []
@@ -329,6 +334,39 @@ class UpgradeLogOption(object):
         return retcode
 
 
+class CronSetter(object):
+    """Reads schedule info from superuser's
+    default profile and write according cron entries.
+    
+    Purpose is to re-create cron entries after package upgrades
+    (i.e. when configurations already exist).
+    """
+
+    def __init__(self):
+        pass
+
+    def do_upgrade(self):
+        """Public method that performs the setting.
+        Returns always `NO_ERRORS` as exit code.
+        """
+        try:
+            if system.is_superuser():
+                print "Reading schedule info from superuser's default profile"
+                _conffilehdl = ConfigManager.ConfigurationFileHandler()
+                _defconffile = _conffilehdl.get_default_conffile_fullpath()
+                print "Configuration: `%s`" % _defconffile
+
+                _conf = ConfigManager.ConfigManager(_defconffile)
+                _conf.write_schedule()
+            else:
+                print "Operation requires root privileges"
+        except Exception, error:
+            print "Error while writing CRON settings: %s" % error
+
+        retcode = NO_ERRORS
+        return retcode
+
+
 class UpgradeApplication(object):
     """The upgrade application class that instantiates several upgrade
     action classes and processes them. Due to this design one can simply
@@ -340,6 +378,7 @@ class UpgradeApplication(object):
         
         """
         self.__logoption_upgrader = UpgradeLogOption()
+        self.__cron_setter = CronSetter()
 
     def main(self):
         """Main method that actually does the upgrade process. It returns
@@ -350,11 +389,12 @@ class UpgradeApplication(object):
         print "%s %s upgrade tool" % (Infos.NAME, Infos.VERSION)
         print "-" * 60
 
-        if os.getuid() != 0:
+        if not system.is_superuser():
             print "Upgrade script must be run with root privileges!"
             retcode = NO_SUPERUSER
         else:
             retcode = self.__logoption_upgrader.do_upgrade()
+            self.__cron_setter.do_upgrade()
 
         return retcode
 

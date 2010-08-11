@@ -55,6 +55,9 @@ from nssbackup.util import structs
 from nssbackup.util import log
 
 
+GZIP_COMPRESSION_SPEED = "-1"
+
+
 _FOP = fam.get_file_operations_facade_instance()
 
 
@@ -358,13 +361,13 @@ def _mk_tar_incr(snapshot, publish_progress, supports_publish):
     """
     LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 
-    _env = {}
+    _env = { "GZIP" : GZIP_COMPRESSION_SPEED }
     _use_io_pipe = True
     _splitsize = snapshot.getSplitedSize()
     if _splitsize > 0:
         _use_io_pipe = False
         publish_progress = publish_progress and supports_publish
-        _env = { "SBACKUP_VOLUME_SIZE" : str(_splitsize * constants.TAR_VOLUME_SIZE_UNIT_IN_BYTES) }
+        _env["SBACKUP_VOLUME_SIZE"] = str(_splitsize * constants.TAR_VOLUME_SIZE_UNIT_IN_BYTES)
 
     options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress, _use_io_pipe)
 
@@ -427,13 +430,13 @@ def _mk_tar_full(snapshot, publish_progress, supports_publish):
     """
     LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 
-    _env = {}
+    _env = { "GZIP" : GZIP_COMPRESSION_SPEED }
     _use_io_pipe = True
     _splitsize = snapshot.getSplitedSize()
     if _splitsize > 0:
         _use_io_pipe = False
         publish_progress = publish_progress and supports_publish
-        _env = { "SBACKUP_VOLUME_SIZE" : str(_splitsize * constants.TAR_VOLUME_SIZE_UNIT_IN_BYTES) }
+        _env["SBACKUP_VOLUME_SIZE"] = str(_splitsize * constants.TAR_VOLUME_SIZE_UNIT_IN_BYTES)
 
     options, ar_path, tmp_incl, tmp_excl = __prepare_common_opts(snapshot, publish_progress, _use_io_pipe)
 
@@ -560,7 +563,6 @@ class TarBackendLauncherSingleton(object):
     _cmd = "/bin/tar"
 
     def __init__(self):
-        self._logger = log.LogFactory.getLogger()
         self._proc = None
         self._argv = []
 
@@ -590,6 +592,8 @@ class TarBackendLauncherSingleton(object):
         return _pid
 
     def launch_sync(self, opts, env = None):
+        # note: get logger instance on demand as BackendLauncher is a Singleton
+        _logger = log.LogFactory.getLogger()
         if self._proc is not None:
             raise AssertionError("Another process is already running")
 
@@ -602,26 +606,26 @@ class TarBackendLauncherSingleton(object):
         _stdin_param = None
 
         try:
-            self._logger.debug("Lauching: %s" % (" ".join(self._argv)))
+            _logger.debug("Lauching: %s" % (" ".join(self._argv)))
 
             if self._stdout_f is None:
                 outptr, outfile = tempfile.mkstemp(prefix = "output_")
                 _stdout_param = outptr
             else:
                 assert self._stdin_f is None
-                self._logger.debug("Output archive: %s" % self._stdout_f)
+                _logger.debug("Output archive: %s" % self._stdout_f)
                 _stdout_param = subprocess.PIPE
                 _ardst = _FOP.openfile_for_write(self._stdout_f)
 
             if self._stdin_f is not None:
                 assert self._stdout_f is None
-                self._logger.debug("Input archive: %s" % self._stdin_f)
+                _logger.debug("Input archive: %s" % self._stdin_f)
                 _stdin_param = subprocess.PIPE
                 _arsrc = _FOP.openfile_for_read(self._stdin_f)
 
             self._proc = subprocess.Popen(self._argv, stdin = _stdin_param, stdout = _stdout_param,
                                           stderr = errptr, env = env)
-            self._logger.debug("Subprocess created")
+            _logger.debug("Subprocess created")
             if self._stdout_f is not None:
                 _arsrc = self._proc.stdout
             if self._stdin_f is not None:
@@ -698,7 +702,7 @@ class TarBackendLauncherSingleton(object):
             try:
                 self._proc.terminate()
             except OSError, error:
-                self._logger.warning(_("Unable to terminate backend process: %s") % error)
+                log.LogFactory.getLogger().warning(_("Unable to terminate backend process: %s") % error)
 
 
 class Dumpdir(object):
