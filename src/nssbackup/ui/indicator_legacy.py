@@ -28,9 +28,11 @@ from nssbackup.util import constants
 from nssbackup.ui import indicator_core
 from nssbackup.ui.indicator_core import PyNotifyMixin, SBackupdIndicatorHandler, SBackupdIndicatorBase
 from nssbackup.ui import misc
+from nssbackup.util import system
 
 
 sys.excepthook = misc.except_hook
+system.launch_dbus_if_required()
 
 
 class SBackupdIndicatorLegacy(SBackupdIndicatorBase, PyNotifyMixin):

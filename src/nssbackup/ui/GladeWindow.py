@@ -26,6 +26,9 @@ import gtk.glade
 import gobject
 
 
+PROGRESSBAR_PULSE_INTERVAL = 150
+
+
 def search_file(filename, search_path):
     """Given a search path, find file
     """
@@ -251,7 +254,7 @@ class ProgressbarMixin(object):
         self._progressbar.set_fraction(0.0)
         if self.__hide_when_stopped:
             self._progressbar.show()
-        self.__pulsetimer_id = gobject.timeout_add(100, self.__pulse)
+        self.__pulsetimer_id = gobject.timeout_add(PROGRESSBAR_PULSE_INTERVAL, self.__pulse)
 
     def _stop_pulse(self):
         """Calling this method stops the progressbar.

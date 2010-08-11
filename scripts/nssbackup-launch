@@ -23,6 +23,13 @@
 
 
 PATH=/usr/local/bin:/usr/bin:/bin
+logdir=/var/log/nssbackup
+logfile=$logdir/nssbackup-cron.log
+
+
+if ! [ -d $logdir ]; then
+	mkdir -p $logdir
+fi
 
 if [ -x /usr/bin/nice ]; then
 	nicecmd="/usr/bin/nice -n 19"
@@ -36,7 +43,7 @@ if [ -x /usr/bin/ionice ]; then
 fi
 
 if [ -x /usr/bin/nssbackupd ]; then
-	$nicecmd $ionicecmd /usr/bin/nssbackupd
+	$nicecmd $ionicecmd /usr/bin/nssbackupd > $logfile 2>&1
 elif [ -x /usr/local/bin/nssbackupd ]; then
-	$nicecmd $ionicecmd /usr/local/bin/nssbackupd
+	$nicecmd $ionicecmd /usr/local/bin/nssbackupd > $logfile 2>&1
 fi

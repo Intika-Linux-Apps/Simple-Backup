@@ -342,8 +342,8 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
         _loc = self._dest.is_local()
         return _loc
 
-    def get_use_io_pipe(self):
-        _res = False
+    def get_supports_publish(self):
+        _res = True
         return _res
 
     def dest_eff_path_exists(self):

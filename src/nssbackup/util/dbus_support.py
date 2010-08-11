@@ -131,7 +131,7 @@ class _DBusConnection(object):
             remote_obj = None
         return remote_obj
 
-    def connect(self, silent = False):
+    def connect(self, silent = True):
         """Connects passively to DBus service and registers this connection at the service.
         The service id is stored for later checks of the validity of the connection.
         

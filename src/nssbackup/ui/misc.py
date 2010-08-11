@@ -298,15 +298,17 @@ def set_watch_cursor(widget):
     watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
     try:
         widget.window.set_cursor(watch)
-    except AttributeError, error:
-        print "Ignored error when setting cursor: %s" % error
+    except AttributeError:
+        pass
+#        print "Ignored error when setting cursor"
 
 
 def unset_cursor(widget):
     try:
         widget.window.set_cursor(None)
-    except AttributeError, error:
-        print "Ignored error when un-setting cursor: %s" % error
+    except AttributeError:
+        pass
+#        print "Ignored error when un-setting cursor"
 
 
 def _common_except_hook(etype, evalue, etb):

@@ -144,7 +144,6 @@ def launch(cmd, opts, env = None):
     @param cmd: The command to launch
     @return: (outStr, errStr, retVal)
     
-    @todo: Implement a Singleton TAR launcher!
     """
     _logger = log.LogFactory.getLogger()
 

@@ -134,9 +134,6 @@ class BackupProfileHandler(object):
             _msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using '(Not So) Simple Backup-Restoration' if you want to use them.")
             self.logger.warning(_msg)
 
-        self.logger.info(_("Backup process is being started."))
-        self.__state.set_state('start')
-
         # get basic informations about new snapshot
         (snppath, base) = self.__retrieve_basic_infos(force_full_snp = self.__full_snp)
 
@@ -198,14 +195,15 @@ class BackupProfileHandler(object):
 
         self.__collect_files()
 
-        self.__state.set_state('commit')
         _publish_progress = True
         if self.__dbus_conn is None:
             _publish_progress = False
-        _pipe_io = self.__fam_target_hdl.get_use_io_pipe()
+        _supports_publish = self.__fam_target_hdl.get_supports_publish()
 
-        self.__snapshot.commit(_publish_progress, _pipe_io)
-
+        self.logger.info(_("Snapshot is being committed"))
+        self.__state.set_state('start')
+#        self.__state.set_state('commit')
+        self.__snapshot.commit(_publish_progress, _supports_publish)
 
 #TODO: add state purging
 #FIXME: Files are not entirely written to some FS now! Improve this.
@@ -215,7 +213,7 @@ class BackupProfileHandler(object):
             purge = self.config.get("general", "purge")
         if purge is not None:
             try:
-                self.__snpman.purge(purge, self.__snapshot.getName()) # do not purge cre snapshot
+                self.__snpman.purge(purge, self.__snapshot.getName()) # do not purge created snapshot
             except exceptions.SBException, sberror:
                 self.logger.error(_("Error while purging old snapshots: %s") % sberror)
 
@@ -226,6 +224,7 @@ class BackupProfileHandler(object):
         """Fill snapshot's include and exclude lists and retrieve some information
         about the snapshot (uncompressed size, file count).
         """
+        self.logger.info(_("Inspect file system and collect file infos"))
         _collector = self.__create_collector_obj()
         _collector.collect_files()
         _stats = _collector.get_stats()
@@ -236,6 +235,7 @@ class BackupProfileHandler(object):
         _sizefs, _freespace = self.__fam_target_hdl.query_dest_fs_info()
 
         _snpsize_hr = util.get_humanreadable_size_str(size_in_bytes = _snpsize, binary_prefixes = True)
+        self.logger.info(_("Summary of backup"))
         self.logger.info(_("Number of directories: %s.") % _stats.get_count_dirs())
         self.logger.info(_("Total number of files: %s.") % _stats.get_count_files_total())
         self.logger.info(_("Number of symlinks: %s.") % _stats.get_count_symlinks())
@@ -295,6 +295,15 @@ class BackupProfileHandler(object):
             else:
                 self.logger.warning(_("No snapshot to copy logfile."))
 
+    def cancel(self):
+        if self.__snapshot is not None:
+            self.__snpman.remove_snapshot_forced(self.__snapshot)
+
+        self.__fam_target_hdl.terminate()
+        self.logger.info(_("Processing of profile was canceled on user request\n"))
+        _excode = constants.EXCODE_SUCCESS
+        return _excode
+
     def finish(self, error = None):
         """End nssbackup session :
         
@@ -308,13 +317,13 @@ class BackupProfileHandler(object):
         self.__fam_target_hdl.terminate()
 
         if error is None:
-            self.logger.info(_("Processing of profile successfully finished (no errors)"))
+            self.logger.info(_("Processing of profile successfully finished (no errors)\n"))
             _excode = constants.EXCODE_SUCCESS
         else:
             err_str = str(error)
             if err_str == "":
                 err_str = str(type(error))
-            self.logger.info(_("Processing of profile failed with error: %s") % err_str)
+            self.logger.info(_("Processing of profile failed with error: %s\n") % err_str)
             _excode = constants.EXCODE_BACKUP_ERROR
 
         return _excode
@@ -325,6 +334,7 @@ class BackupProfileHandler(object):
 # TODO: Improve handling of original and modified target paths. Support display names for state (improved user interaction)
         _target_display_name = self.__fam_target_hdl.query_dest_display_name()
         self.__state.set_target(_target_display_name)
+        self.logger.info(_("Backup destination: %s") % _target_display_name)
 
         # Check if the target dir exists, but Do not create any directories. 
         if not self.__fam_target_hdl.dest_eff_path_exists():

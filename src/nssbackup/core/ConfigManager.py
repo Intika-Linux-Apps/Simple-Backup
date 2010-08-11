@@ -263,7 +263,6 @@ class ConfigManager(ConfigParser.ConfigParser):
 
         self.__create_logger()
 
-#        if self.valid_options:
         self.validateConfigFileOpts()
         self.__check_destination_option()
 
@@ -1007,9 +1006,9 @@ class ConfigManager(ConfigParser.ConfigParser):
         self.write(fld)
         fld.close()
         if configfile is None and system.is_superuser():
-            self.__write_schedule()
+            self.write_schedule()
 
-    def __write_schedule(self):
+    def write_schedule(self):
         """Write the schedule from the configuration file. Scheduling is only
         written for admin default profiles.
         
@@ -1229,6 +1228,8 @@ class ConfigurationFileHandler(object):
 
     def get_user_confdir(self):
         """Get the user config dir using the XDG specification.
+        
+        :todo: Is method `ConfigManagerStaticData.get_superuser_confdir()` still relevant?
         """
         if self.__super_user:
             confdir = local_file_utils.normpath("/etc")

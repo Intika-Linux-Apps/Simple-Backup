@@ -42,7 +42,10 @@ COMMAND_PS = "ps"
 # default values for environment variable if not set
 # see: http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
 ENVVAR_XDG_DATA_DIRS = "XDG_DATA_DIRS"
-DEFAULT_XDG_DATA_DIRS = "/usr/local/share/:/usr/share/"
+DEFAULT_XDG_DATA_DIRS = "/usr/local/share:/usr/share"
+
+ENVVAR_PATH = "PATH"
+DEFAULT_PATH = "/usr/bin:/usr/local/bin:/bin"
 
 
 CLEAN_ENVIRONMENT = {
@@ -206,6 +209,10 @@ def set_grp(groupname):
             print "Failed to set GID to `admin`: %s" % error
 
 
+def nice():
+    os.nice(5)
+
+
 def very_nice():
     os.nice(20)
 
@@ -222,11 +229,13 @@ def set_default_environment():
     are defined.
     
     """
-    var = ENVVAR_XDG_DATA_DIRS
-    defval = DEFAULT_XDG_DATA_DIRS
-    val = os.environ.get(var)
-    if val is None:
-        os.environ[var] = defval
+    vars = { ENVVAR_XDG_DATA_DIRS : DEFAULT_XDG_DATA_DIRS,
+             ENVVAR_PATH : DEFAULT_PATH
+           }
+    for var in vars:
+        val = os.environ.get(var)
+        if val is None:
+            os.environ[var] = vars[var]
 
 
 def get_process_environment(pid):
@@ -261,6 +270,28 @@ def get_clean_environment():
         if _val != "":
             _clean_env[_var] = _val
     return _clean_env
+
+
+def set_gio_env_from_session():
+    _set_envvar_from_session(key = 'SSH_AUTH_SOCK')
+    _set_envvar_from_session(key = 'GNOME_KEYRING_CONTROL')
+    _set_envvar_from_session(key = 'GNOME_KEYRING_PID')
+    _set_envvar_from_session(key = 'XAUTHORITY')
+    _set_envvar_from_session(key = 'GPG_AGENT_INFO')
+    #===========================================================================
+    # key_kr = 'GNOME_KEYRING_CONTROL'
+    # key_ssh = 'SSH_AUTH_SOCK'
+    # _value = os.environ.get(key_kr)
+    # if _value is None:
+    #    _session = get_session_name()
+    #    _env = get_session_environment(_session)
+    #    if _env is not None:
+    #        _nvalue = _env.get(key_kr)
+    #        if _nvalue is not None:
+    #            _nvalue = "%s/ssh" % _nvalue
+    #            print "Updating %s to: %s" % (key_ssh, _nvalue)
+    #            os.environ[key_ssh] = _nvalue
+    #===========================================================================
 
 
 def is_dbus_session_bus_set():
@@ -332,11 +363,11 @@ def get_session_name():
 def get_session_environment(session):
     mod_env = None
     if session == "gnome":
-        print "Gnome session running"
+#        print "Gnome session running"
         mod_env = _get_gnome_session_environment()
 
     elif session == "kde":
-        print "KDE session running"
+#        print "KDE session running"
         mod_env = _get_kde_session_environment()
 
     else:
@@ -361,22 +392,22 @@ def _get_session_env(session):
     if _session_pid is None:
         print "Session `%s` not found" % session
     else:
-        print "Session `%s` PID: %s" % (session, _session_pid)
+#        print "Session `%s` PID: %s" % (session, _session_pid)
         _mod_env = get_clean_environment()
         _session_env = get_process_environment(pid = _session_pid)
         if _session_env is None:
             _mod_env = None
         else:
             _mod_env.update(_session_env)
+#    debug_print_environment(_mod_env, "modified from desktop session")
     return _mod_env
 
 
-def debug_print_environment():
-    _env = os.environ
-    print "\nCurrent environment:"
+def debug_print_environment(env, description):
+    print "\nEnvironment `%s`:" % description
     print "-----------------------------------------------------------------------------"
-    for _var in _env:
-        print "%s: %s" % (_var, _env[_var])
+    for _var in env:
+        print "%s: %s" % (_var, env[_var])
     print "-----------------------------------------------------------------------------"
 
 

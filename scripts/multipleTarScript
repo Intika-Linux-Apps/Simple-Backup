@@ -2,6 +2,7 @@
 
 #   NSsbackup - helper script for multiple volume backups
 #
+#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -19,37 +20,77 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-import os, re, sys
-from gettext import gettext as _
+import sys
+import os
+import re
+
+TAR_BLOCKSIZE = 512
+
+output = sys.stderr
+name = "files"
+archRE = re.compile("(.+?/)?files(-[0-9]+)*?\.tar")
+
+
+def publish_progress(checkpoint):
+    """Remove duplicated code (see `sbackup-progress`)
+    """
+    import dbus
+
+    tar_checkpoint_str = str(checkpoint)
+    try:
+        _system_bus = dbus.SystemBus()
+        remote_obj = _system_bus.get_object("org.sbackupteam.SimpleBackup",
+                                            "/SBackupProcess")
+    except dbus.DBusException:
+        remote_obj = None
+
+    if remote_obj is not None:
+        remote_obj.emit_progress_signal(tar_checkpoint_str,
+                                        dbus_interface = "org.sbackupteam.SimpleBackup.SBackupDbusInterface")
+
 
 if __name__ == '__main__':
-    vol = os.getenv("TAR_VOLUME")
-    archRE = re.compile("(.+?/)?files(-[0-9]+)*?\.tar")
+
+    _vol = int(os.getenv("TAR_VOLUME"))
     arch = os.getenv("TAR_ARCHIVE")
-    name = "files"
-    
+    subcommand = os.getenv("TAR_SUBCOMMAND")
+
     m = archRE.match(arch)
-    if m and m.group(1):
-    	path = m.group(1)
-    	os.environ["TAR_ARCHIV_PATH"] = path
-    else :
-    	raise Exception(_("The name of the archive must meet '(+*?)/files.tar' : %s found") % arch)
-    
-    print "Preparing volume "+ vol + " of "+ name +"."
-    
-    origPath = os.getenv("TAR_ARCHIV_PATH","")
-    
-    if os.getenv("TAR_SUBCOMMAND") in ["-d","-x","-t"]:
-    	if os.path.exists(origPath+os.sep+name+"-"+vol+".tar") :
-    		fd = os.getenv("TAR_FD")
-    		os.write(int(fd),origPath+os.sep+name+"-"+vol+".tar")
-    		sys.exit()
-    	else:
-    		raise Exception (_("The file '%s' that was asked doesn't exist") % origPath+os.sep+name+"-"+vol+".tar" ) 
-    elif os.getenv("TAR_SUBCOMMAND") == "-c" :
-    	fd = os.getenv("TAR_FD")
-    	os.write(int(fd),origPath+os.sep+name+"-"+vol+".tar")
-    	sys.exit()
-    else :
-    	pass
-  
+    if arch == "-":   # stdin/stdout   
+        raise Exception("Multiple archives from/to stdin/stdout are not supported")
+    elif m and m.group(1):
+        path = m.group(1)
+        os.environ["TAR_ARCHIV_PATH"] = path
+    else:
+        raise Exception("The name of the archive must meet '(+*?)/files.tar' : %s found" % arch)
+
+    origPath = os.getenv("TAR_ARCHIV_PATH", "")
+
+    try:
+    	_splitsize = os.getenv("SBACKUP_VOLUME_SIZE")
+    	if _splitsize is not None:
+	        _splitsize = int(_splitsize)
+	        _blockfac = int(os.getenv("TAR_BLOCKING_FACTOR"))
+	        _chkpt = ((_vol - 1) * _splitsize) / (_blockfac * TAR_BLOCKSIZE)
+	        publish_progress(_chkpt)
+    except Exception, error:
+        output.write("Error while publishing progress: %s" % error)
+
+
+#    output.write("Preparing volume no. %s of `%s`\n" % (_vol, name))
+
+    next_vol_path = "%s%s%s-%s.tar" % (origPath.rstrip(os.sep), os.sep, name.strip(os.sep), _vol)
+
+    if subcommand in ["-d", "-x", "-t"]:
+        if os.path.exists(next_vol_path):
+            fd = os.getenv("TAR_FD")
+            os.write(int(fd), next_vol_path)
+        else:
+            raise Exception ("The file `%s` that was asked doesn't exist" % next_vol_path)
+    elif subcommand == "-c":
+        fd = os.getenv("TAR_FD")
+        os.write(int(fd), next_vol_path)
+    else:
+        pass
+
+sys.exit(0)

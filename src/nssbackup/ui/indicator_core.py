@@ -385,6 +385,9 @@ class SBackupdIndicatorBase(INotifyMixin):
     def _set_menuitems_status_finished(self):
         self._set_menuitems_status(self._indicator_hdl.get_finished_menu_label)
 
+    def _set_menuitems_status_prepare(self):
+        self._set_menuitems_status(self._indicator_hdl.get_prepare_menu_label)
+
     def _set_menuitems_status_unknown(self):
         self._set_menuitems_status(self._indicator_hdl.get_unknown_menu_label)
 
@@ -502,17 +505,19 @@ class SBackupdIndicatorBase(INotifyMixin):
         msg = ""
 
         if event == 'prepare':
-            self._set_menuitems_status_unknown()
+            msg = _("Starting backup session")
+            self.set_status_to_normal()
+            self._set_menuitems_status_prepare()
             self._set_cancel_sensitive(sensitive = False)
 
         elif event == 'start':
-            msg = _("Starting backup Session")
-            self.set_status_to_normal()
             self._set_cancel_sensitive(sensitive = True)
             self._indicator_hdl.backup_started()
+            self._set_menuitems_status_progress(checkpoint = 0)
 
         elif event == 'commit':
-            self._set_cancel_sensitive(sensitive = True)
+            pass
+#            self._set_cancel_sensitive(sensitive = True)
 
         elif event == 'finish':
             msg = _("Ending Backup Session")
@@ -876,9 +881,10 @@ class SBackupdIndicatorHandler(object):
         space_str = self.__get_space_required_str()
 
         # values valid?
-        if (self._space_required > 0) and (checkpoint >= 0):
+        if (self._space_required > 0) and (checkpoint > 0):
             _done = (checkpoint - 1) * constants.TAR_RECORDSIZE
             _percent = (float(_done) / float(self._space_required)) * 100.0
+            _percent = min(100.0, max(0.01, _percent))
 
             _time_passed = time.time() - self._starttime_backup
             _time_est_total = (_time_passed / _percent) * 100.0
@@ -924,6 +930,15 @@ class SBackupdIndicatorHandler(object):
         menu_msg = {"profile"        : self._menuitem_status_tmpl["profile"] % self.get_profilename(),
                     "size_of_backup" : self._menuitem_status_tmpl["size_of_backup"] % space_str,
                     "progress"       : _("Progress: unknown"),
+                    "remaining_time" : self._menuitem_status_tmpl["remaining_time"] % _("unknown")}
+        return menu_msg
+
+    def get_prepare_menu_label(self):
+        self.__update_properties()
+        space_str = self.__get_space_required_str()
+        menu_msg = {"profile"        : self._menuitem_status_tmpl["profile"] % self.get_profilename(),
+                    "size_of_backup" : self._menuitem_status_tmpl["size_of_backup"] % space_str,
+                    "progress"       : _("Backup is being prepared"),
                     "remaining_time" : self._menuitem_status_tmpl["remaining_time"] % _("unknown")}
         return menu_msg
 

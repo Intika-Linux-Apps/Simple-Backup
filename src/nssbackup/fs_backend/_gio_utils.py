@@ -328,7 +328,7 @@ class GioMountHandler(object):
 
         else:
             try:
-                _mount.unmount(self._umount_done_cb, gio.MOUNT_UNMOUNT_NONE, None, gfileobj)
+                _mount.unmount(self._umount_done_cb, gio.MOUNT_UNMOUNT_FORCE, None, gfileobj)
     #            gobject.timeout_add(15000, self._umount_done_cb, _mount, None, gfileobj)
     # remaining issues:
     # * how to cancel a timeout if mount was successful?
@@ -544,8 +544,11 @@ class GioOperations(interfaces.IOperations):
         # setting of permissions only in case of failures does not work:
         # if directory is read-only we cannot remove files inside even if these are
         # read/write
-        _gfile = gio.File(path)
-        _gfile.delete()
+        try:
+            _gfile = gio.File(path)
+            _gfile.delete()
+        except gio.Error, error:
+            raise IOError(str(error))
 
     @classmethod
     def _rmtree_recurse(cls, path):

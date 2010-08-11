@@ -21,7 +21,6 @@
 from gettext import gettext as _
 
 import re
-import subprocess
 import os
 import sys
 import types
@@ -51,7 +50,7 @@ from nssbackup.util import local_file_utils
 
 
 sys.excepthook = misc.except_hook
-system.set_dbus_session_bus_from_session()
+system.launch_dbus_if_required()
 
 
 class SBconfigGTK(GladeGnomeApp):

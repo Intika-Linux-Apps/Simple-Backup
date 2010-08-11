@@ -142,7 +142,7 @@ class UpgradeManager(object):
         
         """
         res = False
-        self.logger.info("Checking need for upgrading in '%s'" % target_eff_path)
+        self.logger.info("Checking for snapshots stored in old formats")
         snpman = SnapshotManager.SnapshotManager(target_eff_path)
         snps = snpman.get_snapshots_allformats()
         for csnp in snps:
