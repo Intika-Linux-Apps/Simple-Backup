@@ -1,6 +1,6 @@
 @prefix@/share/locale
 @prefix@/share/pixmaps
 @prefix@/share/applications
-@prefix@/share/nssbackup
+@prefix@/share/sbackup
 @prefix@/bin
-@prefix@/share/doc/nssbackup
+@prefix@/share/doc/sbackup

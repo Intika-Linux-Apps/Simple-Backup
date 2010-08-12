@@ -1,4 +1,4 @@
-#    NSsbackup - package info
+#   Simple Backup - package info
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -22,7 +22,7 @@ import os
 import socket
 from gettext import gettext as _
 
-from nssbackup import util
+from sbackup import util
 
 
 class Infos(object):
@@ -42,7 +42,7 @@ class Infos(object):
 
     DESCRIPTION = _("This is a user friendly backup solution for common desktop needs. If you want to help by submitting bugs, by translating or anything else please visit our website.")
 
-    WEBSITE = "https://launchpad.net/nssbackup/"
+    WEBSITE = "https://launchpad.net/sbackup/"
 
     SNPCURVERSION = "1.5"
 

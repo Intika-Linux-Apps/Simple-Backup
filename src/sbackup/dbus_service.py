@@ -1,4 +1,4 @@
-#    Simple Backup - DBus System Service
+#   Simple Backup - DBus System Service
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -21,7 +21,7 @@
 #   Collabora Ltd. <http://www.collabora.co.uk/>
 #
 """
-:mod:`nssbackup.dbus_service` -- DBus System Service
+:mod:`sbackup.dbus_service` -- DBus System Service
 ====================================================
 
 .. module:: dbus_service
@@ -39,12 +39,12 @@ import gobject
 import dbus.service
 import dbus.mainloop.glib
 
-from nssbackup.pkginfo import Infos
-from nssbackup.util import log
-from nssbackup.util import constants
-from nssbackup.util import exceptions
-from nssbackup.util.system import drop_privileges
-from nssbackup.util.system import pid_exists
+from sbackup.pkginfo import Infos
+from sbackup.util import log
+from sbackup.util import constants
+from sbackup.util import exceptions
+from sbackup.util.system import drop_privileges
+from sbackup.util.system import pid_exists
 
 
 #TODO: Further split of object's responsibility: sender object/receiver 

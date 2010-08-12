@@ -1,4 +1,4 @@
-#    NSsbackup - the actual backup service
+#   Simple Backup - the actual backup service
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -18,10 +18,10 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackupd` --- the actual backup service
+:mod:`sbackupd` --- the actual backup service
 ================================================
 
-.. module:: nssbackupd
+.. module:: sbackupd
    :synopsis: Defines the actual backup service
 .. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
 .. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
@@ -42,21 +42,21 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
-from nssbackup.pkginfo import Infos
+from sbackup.pkginfo import Infos
 
-from nssbackup.core.ConfigManager import ConfigManager, get_profiles
-from nssbackup.core.ConfigManager import ConfigurationFileHandler
-from nssbackup.core.profile_handler import BackupProfileHandler
+from sbackup.core.ConfigManager import ConfigManager, get_profiles
+from sbackup.core.ConfigManager import ConfigurationFileHandler
+from sbackup.core.profile_handler import BackupProfileHandler
 
-from nssbackup.util import enable_backup_cancel_signal, enable_termsignal
-from nssbackup.util import get_resource_file
-from nssbackup.util import local_file_utils
-from nssbackup.util import exceptions
-from nssbackup.util import constants
-from nssbackup.util import system
-from nssbackup.util import notifier
-from nssbackup.util import lock
-from nssbackup.util import log
+from sbackup.util import enable_backup_cancel_signal, enable_termsignal
+from sbackup.util import get_resource_file
+from sbackup.util import local_file_utils
+from sbackup.util import exceptions
+from sbackup.util import constants
+from sbackup.util import system
+from sbackup.util import notifier
+from sbackup.util import lock
+from sbackup.util import log
 
 
 def except_hook(etype, evalue, etb):
@@ -192,7 +192,7 @@ class SBackupProc(object):
         msg_content = MIMEText(_content)
         # Set the filename parameter
         msg_content.add_header('Content-Disposition', 'attachment',
-                               filename = "nssbackup.log")
+                               filename = "sbackup.log")
         msg.attach(msg_content)
 
         # getting the connection
@@ -390,7 +390,7 @@ class SBackupApp(object):
         :note: import D-Bus related modules only if using D-Bus is enabled        
         """
         if self.__options_given.use_dbus and self.__dbus_avail:
-            from nssbackup.util import dbus_support
+            from sbackup.util import dbus_support
             dbus_notifier = dbus_support.DBusNotifier()
             self.__notifiers.append(dbus_notifier)
 
@@ -412,7 +412,7 @@ class SBackupApp(object):
         
         :note: import D-Bus related modules only if using D-Bus is enabled
         """
-        from nssbackup.util import dbus_support
+        from sbackup.util import dbus_support
         self.__dbus_conn = dbus_support.DBusProviderFacade(constants.BACKUP_PROCESS_NAME)
         try:
             self.__dbus_conn.connect()
@@ -430,7 +430,7 @@ class SBackupApp(object):
                  user who owns the session.
         :note: import D-Bus related modules only if using D-Bus is enabled                 
         """
-        from nssbackup.util import dbus_support
+        from sbackup.util import dbus_support
 
         print "Now launching indicator application (status icon)."
         _path_to_app = get_resource_file(constants.INDICATORAPP_FILE)
@@ -534,7 +534,7 @@ class SBackupApp(object):
         """
         print _("Backup is not being started.\n%s") % (str(error))
         if self.__options_given.use_dbus and self.__dbus_avail:
-            from nssbackup.util import dbus_support
+            from sbackup.util import dbus_support
             conn = dbus_support.DBusClientFacade("Simple Backup Process (another instance)")
             conn.connect()
             conn.emit_alreadyrunning_signal()
