@@ -1,4 +1,4 @@
-#    NSsbackup - provides access to TAR functionality
+#   Simple Backup - provides access to TAR functionality
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -39,20 +39,20 @@ import re
 from datetime import datetime
 
 
-from nssbackup.core.ConfigManager import ConfigurationFileHandler
+from sbackup.core.ConfigManager import ConfigurationFileHandler
 
-from nssbackup.fs_backend import fam
+from sbackup.fs_backend import fam
 
-from nssbackup.util.log import LogFactory
-from nssbackup.util.structs import SBdict
-from nssbackup.util.exceptions import SBException
-from nssbackup.util import exceptions
-from nssbackup.util import constants
-from nssbackup.util import system
-from nssbackup import util
-from nssbackup.util import local_file_utils
-from nssbackup.util import structs
-from nssbackup.util import log
+from sbackup.util.log import LogFactory
+from sbackup.util.structs import SBdict
+from sbackup.util.exceptions import SBException
+from sbackup.util import exceptions
+from sbackup.util import constants
+from sbackup.util import system
+from sbackup import util
+from sbackup.util import local_file_utils
+from sbackup.util import structs
+from sbackup.util import log
 
 
 GZIP_COMPRESSION_SPEED = "-1"
@@ -1215,7 +1215,7 @@ class MemSnapshotFile(SnapshotFileWrapper, SBdict):
         """
         load the snapshotFile in memory
         @param snapshotFile: a SnapshotFile to convert in MemSnapshotFile
-        @type snapshotFile: nssbackup.util.tar.SnapshotFile
+        @type snapshotFile: sbackup.util.tar.SnapshotFile
         """
         if not isinstance(snapshotFile, SnapshotFile) :
             raise Exception("A SnapshotFile is required")
@@ -1292,7 +1292,7 @@ class ProcSnapshotFile(SnapshotFileWrapper):
         """
         load the snapshotFile to get a reference on it
         @param snapshotFile: a SnapshotFile to convert in MemSnapshotFile
-        @type snapshotFile: nssbackup.util.tar.SnapshotFile
+        @type snapshotFile: sbackup.util.tar.SnapshotFile
         """
         if not isinstance(snapshotFile, SnapshotFile) :
             raise TypeError(_("A SnapshotFile is required"))
