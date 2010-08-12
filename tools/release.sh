@@ -35,6 +35,8 @@
 #
 ################################################################################
 
+#TODO: check version in METAINFO against version in changelog when preparing releases
+
 startpwd=$PWD
 
 #

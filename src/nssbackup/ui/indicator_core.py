@@ -508,7 +508,7 @@ class SBackupdIndicatorBase(INotifyMixin):
             msg = _("Starting backup session")
             self.set_status_to_normal()
             self._set_menuitems_status_prepare()
-            self._set_cancel_sensitive(sensitive = False)
+            self._set_cancel_sensitive(sensitive = True)
 
         elif event == 'start':
             self._set_cancel_sensitive(sensitive = True)
@@ -517,7 +517,6 @@ class SBackupdIndicatorBase(INotifyMixin):
 
         elif event == 'commit':
             pass
-#            self._set_cancel_sensitive(sensitive = True)
 
         elif event == 'finish':
             msg = _("Ending Backup Session")
@@ -935,10 +934,9 @@ class SBackupdIndicatorHandler(object):
 
     def get_prepare_menu_label(self):
         self.__update_properties()
-        space_str = self.__get_space_required_str()
         menu_msg = {"profile"        : self._menuitem_status_tmpl["profile"] % self.get_profilename(),
-                    "size_of_backup" : self._menuitem_status_tmpl["size_of_backup"] % space_str,
-                    "progress"       : _("Backup is being prepared"),
+                    "size_of_backup" : _("Backup is being prepared"),
+                    "progress"       : _("Collecting file info"),
                     "remaining_time" : self._menuitem_status_tmpl["remaining_time"] % _("unknown")}
         return menu_msg
 

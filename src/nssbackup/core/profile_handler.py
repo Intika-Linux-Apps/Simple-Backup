@@ -135,6 +135,7 @@ class BackupProfileHandler(object):
             self.logger.warning(_msg)
 
         # get basic informations about new snapshot
+        self.__state.set_state('prepare')
         (snppath, base) = self.__retrieve_basic_infos(force_full_snp = self.__full_snp)
 
         # Create a new snapshot
@@ -206,7 +207,6 @@ class BackupProfileHandler(object):
         self.__snapshot.commit(_publish_progress, _supports_publish)
 
 #TODO: add state purging
-#FIXME: Files are not entirely written to some FS now! Improve this.
         # purge
         purge = None
         if self.config.has_option("general", "purge"):
