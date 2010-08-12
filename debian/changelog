@@ -1,3 +1,15 @@
+nssbackup (0.3.1ppa1~lucid1) lucid; urgency=low
+
+  * [Fix] LP #576030: nssbackup-upgrade-backups and nssbackupd crashes when
+                      starting nssbackup-restoration-gui
+  * [Fix] LP #616667: Unable to save configuration as superuser: OSError-File
+                      exists (broken links were not removed before overwriting)
+  * [Fix] LP #616497: Misleading option label: nssbackup is not cleaning up
+                      incomplete/corrupt backups
+  * translations updated
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 12 Aug 2010 19:43:34 +0200
+
 nssbackup (0.3.0ppa1~lucid1) lucid; urgency=low
 
   * [Fix] LP #130856: Show remaining time till backup is finished in UI

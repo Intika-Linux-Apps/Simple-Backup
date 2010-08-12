@@ -362,6 +362,7 @@ class CronSetter(object):
                 print "Operation requires root privileges"
         except Exception, error:
             print "Error while writing CRON settings: %s" % error
+            traceback.print_exc()
 
         retcode = NO_ERRORS
         return retcode

@@ -285,37 +285,35 @@ class SBackupProc(object):
                 self.__on_backup_canceled()
 
             except (SystemExit, KeyboardInterrupt, Exception), error:
-                self.__on_error(error)
+                self.__on_backup_error(error)
 
-            self.__on_finish()
+            self.__on_proc_finish()
 
         self.__terminate_notifiers()
         return self.__exitcode
 
     def __on_backup_canceled(self):
-        self.logger.warning(_("Backup was canceled by user."))
-        self.__state.set_state('backup-canceled')
-        if self.__bprofilehdl is not None:
-            self.__exitcode = self.__bprofilehdl.cancel()
+        try:
+            self.logger.warning(_("Backup was canceled by user."))
+            self.__state.set_state('backup-canceled')
+            if self.__bprofilehdl is not None:
+                self.__exitcode = self.__bprofilehdl.cancel()
+        except Exception, error:
+            self.__notify_error(error, _("An error occurred during the cancellation of backup:"))
+            self.__exitcode = constants.EXCODE_GENERAL_ERROR
 
-    def __on_error(self, error):
+    def __on_backup_error(self, error):
         """Handles errors that occurs during backup process.
         """
-        if self.logger.isEnabledFor(10):
-            self.logger.exception(_("An error occurred during the backup:\n%s") % (str(error)))
-        else:
-            self.logger.error(_("An error occurred during the backup: %s") % (str(error)))
+        self.__notify_error(error, _("An error occurred during the backup:"))
         self.__exitcode = constants.EXCODE_BACKUP_ERROR
-        self.__state.set_recent_error(error)
-        self.__state.set_state('error')
-
         if self.__bprofilehdl is not None:
             self.__exitcode = self.__bprofilehdl.finish(error)
 
         if isinstance(error, (SystemExit, KeyboardInterrupt)):
             raise error
 
-    def __on_finish(self):
+    def __on_proc_finish(self):
         """Method that is finally called after backup process.
         """
         try:
@@ -324,12 +322,24 @@ class SBackupProc(object):
                 if self.__bprofilehdl.config.has_section("report") and self.__bprofilehdl.config.has_option("report", "to") :
                     self.__sendEmail()
         except Exception, error:
+            self.__notify_error(error, _("Error when sending email:"))
             self.__exitcode = constants.EXCODE_MAIL_ERROR
-            self.logger.exception("Error when sending email:\n%s" % error)
+
+    def __notify_error(self, error, title):
+        """Sends user notification and logs error that occurred during backup process.
+        """
+        if self.logger.isEnabledFor(10):
+            self.logger.exception("%s\n%s" % (title, error))
+        else:
+            self.logger.error("%s %s" % (title, error))
+        self.__state.set_recent_error(error)
+        self.__state.set_state('error')
 
     def __notify_init_errors(self):
         """Errors that occurred during the initialization process were stored
         in an error list. This error list is showed to the user by this method.
+        
+        Consolidate this method, `__write_errors_to_log` and `__notify_error`!
         """
         if len(self.__errors) > 0:
             for errmsg in self.__errors:

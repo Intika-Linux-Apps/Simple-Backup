@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nssbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-10 00:48+0200\n"
+"POT-Creation-Date: 2010-08-12 13:07+0200\n"
 "PO-Revision-Date: 2010-05-30 16:14+0000\n"
 "Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -101,62 +101,62 @@ msgstr ""
 "  Oumar Aziz OUATTARA https://launchpad.net/~wattazoum\n"
 "  edonia https://launchpad.net/~uwe-ufritz"
 
-#: src/nssbackup/ar_backend/tar.py:105 src/nssbackup/ar_backend/tar.py:157
-#: src/nssbackup/ar_backend/tar.py:203
+#: src/nssbackup/ar_backend/tar.py:108 src/nssbackup/ar_backend/tar.py:160
+#: src/nssbackup/ar_backend/tar.py:206
 msgid "Invalid archive type."
 msgstr "Ungültiger Archivtyp."
 
-#: src/nssbackup/ar_backend/tar.py:324
+#: src/nssbackup/ar_backend/tar.py:327
 msgid ""
 "For the moment split functionality is not compatible with compress option."
 msgstr ""
 "Zur Zeit ist das Aufteilen von Sicherungen nicht kompatibel mit "
 "komprimierten Sicherungen."
 
-#: src/nssbackup/ar_backend/tar.py:333 src/nssbackup/ar_backend/tar.py:392
+#: src/nssbackup/ar_backend/tar.py:336 src/nssbackup/ar_backend/tar.py:395
 #: src/nssbackup/core/profile_handler.py:289
 #, python-format
 msgid "Unable to change permissions for file '%s'."
 msgstr "Zugriffsrechte für Datei '%s' konnten nicht geändert werden."
 
-#: src/nssbackup/ar_backend/tar.py:342
+#: src/nssbackup/ar_backend/tar.py:345
 #, fuzzy, python-format
 msgid "Unable to remove temporary file `%(file)s`: %(error)s"
 msgstr "Lock-Datei konnte nicht entfernt werden: %s"
 
-#: src/nssbackup/ar_backend/tar.py:359
+#: src/nssbackup/ar_backend/tar.py:362
 msgid "Launching TAR to make incremental backup."
 msgstr "Ausführen von TAR um eine inkrementelle Sicherung zu erstellen."
 
-#: src/nssbackup/ar_backend/tar.py:385
+#: src/nssbackup/ar_backend/tar.py:388
 msgid "Unable to find the SNAR file to make an incremental backup."
 msgstr ""
 "Die SNAR-Datei zur Erstellung einer inkrementellen Sicherung wurde nicht "
 "gefunden."
 
-#: src/nssbackup/ar_backend/tar.py:386
+#: src/nssbackup/ar_backend/tar.py:389
 msgid "Falling back to full backup."
 msgstr "Es wird auf die Erstellung einer vollen Sicherung zurück gefallen."
 
-#: src/nssbackup/ar_backend/tar.py:428
+#: src/nssbackup/ar_backend/tar.py:431
 msgid "Launching TAR to make a full backup."
 msgstr "Ausführen von TAR um eine vollständige Sicherung zu erstellen."
 
-#: src/nssbackup/ar_backend/tar.py:492
+#: src/nssbackup/ar_backend/tar.py:495
 msgid "Leading '/' from member names were removed."
 msgstr "Führende '/' wurden von den Pfaden im Archiv entfernt."
 
-#: src/nssbackup/ar_backend/tar.py:494
+#: src/nssbackup/ar_backend/tar.py:497
 msgid "Leading '/' from hard link targets were removed."
 msgstr ""
 "Führende '/' wurden von den Zielen harter Verknüpfungen im Archiv entfernt."
 
-#: src/nssbackup/ar_backend/tar.py:503
+#: src/nssbackup/ar_backend/tar.py:506
 #, fuzzy, python-format
 msgid "TAR returned a message: %s"
 msgstr "TAR lieferte eine Warnung: %s"
 
-#: src/nssbackup/ar_backend/tar.py:505
+#: src/nssbackup/ar_backend/tar.py:508
 #, fuzzy, python-format
 msgid ""
 "TAR returned messages:\n"
@@ -165,16 +165,16 @@ msgstr ""
 "TAR lieferte Warnungen:\n"
 "%s"
 
-#: src/nssbackup/ar_backend/tar.py:508
+#: src/nssbackup/ar_backend/tar.py:511
 msgid "TAR has been finished successfully."
 msgstr "TAR wurde erfolgreich beendet."
 
-#: src/nssbackup/ar_backend/tar.py:512
+#: src/nssbackup/ar_backend/tar.py:515
 #, python-format
 msgid "TAR returned a warning: %s"
 msgstr "TAR lieferte eine Warnung: %s"
 
-#: src/nssbackup/ar_backend/tar.py:514
+#: src/nssbackup/ar_backend/tar.py:517
 #, python-format
 msgid ""
 "TAR returned warnings:\n"
@@ -183,72 +183,69 @@ msgstr ""
 "TAR lieferte Warnungen:\n"
 "%s"
 
-#: src/nssbackup/ar_backend/tar.py:517
+#: src/nssbackup/ar_backend/tar.py:520
 #, fuzzy
 msgid "TAR returned warnings but has been finished successfully."
 msgstr "TAR wurde erfolgreich beendet."
 
-#: src/nssbackup/ar_backend/tar.py:521
-#, fuzzy
+#: src/nssbackup/ar_backend/tar.py:524
 msgid "Unable to finish successfully. TAR terminated with errors."
 msgstr ""
-"Es konnte keine fehlerfreie Sicherung erstellt werden. TAR wurde vorzeitig "
-"abgebrochen."
 
-#: src/nssbackup/ar_backend/tar.py:701
+#: src/nssbackup/ar_backend/tar.py:705
 #, fuzzy, python-format
 msgid "Unable to terminate backend process: %s"
 msgstr "Lock-Datei konnte nicht entfernt werden: %s"
 
-#: src/nssbackup/ar_backend/tar.py:734
+#: src/nssbackup/ar_backend/tar.py:738
 msgid "Included"
 msgstr "Aufgenommen"
 
-#: src/nssbackup/ar_backend/tar.py:734
+#: src/nssbackup/ar_backend/tar.py:738
 msgid "Not changed"
 msgstr "Nicht geändert"
 
-#: src/nssbackup/ar_backend/tar.py:734
+#: src/nssbackup/ar_backend/tar.py:738
 msgid "Directory"
 msgstr "Verzeichnis"
 
-#: src/nssbackup/ar_backend/tar.py:762
+#: src/nssbackup/ar_backend/tar.py:766
 msgid "Line must be a string"
 msgstr "Zeile muss eine Zeichenkette sein"
 
-#: src/nssbackup/ar_backend/tar.py:778
+#: src/nssbackup/ar_backend/tar.py:782
 msgid "Dumpdir inconsistancy : 'filename' is empty"
 msgstr "Verzeichnis zum Ablegen ist inkonsistent: 'filename' ist leer"
 
-#: src/nssbackup/ar_backend/tar.py:791
+#: src/nssbackup/ar_backend/tar.py:795
 msgid "Dumpdir inconsistancy : 'control' is empty"
 msgstr "Verzeichnis zum Ablegen ist inkonsistent: 'control' ist leer"
 
-#: src/nssbackup/ar_backend/tar.py:864
+#: src/nssbackup/ar_backend/tar.py:868
 #, python-format
 msgid "File '%s' does not exist."
 msgstr "Die Datei '%s' existiert nicht."
 
-#: src/nssbackup/ar_backend/tar.py:994 src/nssbackup/ar_backend/tar.py:1028
-#: src/nssbackup/ar_backend/tar.py:1125
+#: src/nssbackup/ar_backend/tar.py:998 src/nssbackup/ar_backend/tar.py:1032
+#: src/nssbackup/ar_backend/tar.py:1129
 msgid "The snarfile header is incomplete."
 msgstr "Kopf der SNAR-Datei ist unvollständig."
 
-#: src/nssbackup/ar_backend/tar.py:1294
+#: src/nssbackup/ar_backend/tar.py:1298
 msgid "A SnapshotFile is required"
 msgstr "Eine Sicherungsdatei wird benötigt"
 
-#: src/nssbackup/ar_backend/tar.py:1394
+#: src/nssbackup/ar_backend/tar.py:1398
 #, python-format
 msgid "Directory does not exist: %s."
 msgstr "Das Verzeichnis existiert nicht: %s."
 
-#: src/nssbackup/core/ConfigManager.py:271
+#: src/nssbackup/core/ConfigManager.py:274
 #, python-format
 msgid "Profile settings are being read from file '%s'."
 msgstr "Einstellungen des Profils werden gelesen aus Datei '%s'."
 
-#: src/nssbackup/core/ConfigManager.py:274
+#: src/nssbackup/core/ConfigManager.py:277
 #, python-format
 msgid ""
 "Profile settings are being set to default values. Configuration file is set "
@@ -257,12 +254,12 @@ msgstr ""
 "Einstellungen des Profils werden auf die Standardwerte gesetzt. "
 "Konfigurationsdatei wird auf Datei '%s' festgelegt."
 
-#: src/nssbackup/core/ConfigManager.py:420
+#: src/nssbackup/core/ConfigManager.py:423
 msgid "Option 'target' is missing, aborting."
 msgstr "Angabe der Option 'target' fehlt, Abbruch"
 
-#: src/nssbackup/core/ConfigManager.py:522
-#: src/nssbackup/core/ConfigManager.py:556
+#: src/nssbackup/core/ConfigManager.py:525
+#: src/nssbackup/core/ConfigManager.py:559
 #, python-format
 msgid ""
 "Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r')."
@@ -270,7 +267,7 @@ msgstr ""
 "Parameter '%(parameter)s' konnte nicht als assoziatives Feld (Dictionary) "
 "ausgewertet werden (übergebener Wert = '%(value)r')."
 
-#: src/nssbackup/core/ConfigManager.py:548
+#: src/nssbackup/core/ConfigManager.py:551
 #, python-format
 msgid ""
 "Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )"
@@ -278,65 +275,65 @@ msgstr ""
 "Parameter '%(parameter)s' konnte nicht als assoziatives Feld (Dictionary) "
 "ausgewertet werden (value got = '%(value)r' )"
 
-#: src/nssbackup/core/ConfigManager.py:572
+#: src/nssbackup/core/ConfigManager.py:575
 msgid "You must provide a dictionary."
 msgstr "Ein assoziatives Feld (Dictionary) muss übergeben werden."
 
-#: src/nssbackup/core/ConfigManager.py:689
+#: src/nssbackup/core/ConfigManager.py:692
 #, python-format
 msgid "Log output for [%(profile)s] is directed to file '%(file)s'."
 msgstr "Logausgabe für [%(profile)s] wird in Datei '%(file)s' umgeleitet."
 
-#: src/nssbackup/core/ConfigManager.py:696
+#: src/nssbackup/core/ConfigManager.py:699
 #, python-format
 msgid "Log output for [%s] is not directed into a file."
 msgstr "Logausgabe für [%s] wird nicht in eine Datei umgeleitet."
 
-#: src/nssbackup/core/ConfigManager.py:715
+#: src/nssbackup/core/ConfigManager.py:718
 #, python-format
 msgid "Unable to rename log file '%(src)s'->'%(dst)s': %(err)s"
 msgstr ""
 "Protokolldatei konnte nicht umbenannt werden '%(src)s'->'%(dst)s': %(err)s"
 
-#: src/nssbackup/core/ConfigManager.py:735
+#: src/nssbackup/core/ConfigManager.py:738
 #, python-format
 msgid "The config file '%s' couldn't be read!"
 msgstr "Konfigurationsdatei '%s' konnte nicht eingelesen werden!"
 
-#: src/nssbackup/core/ConfigManager.py:747
+#: src/nssbackup/core/ConfigManager.py:750
 #, python-format
 msgid "section [%(section)s] in '%(configfile)s' should not exist, aborting"
 msgstr ""
 "Abschnitt [%(section)s] in '%(configfile)s' sollte nicht existieren, Abbruch"
 
-#: src/nssbackup/core/ConfigManager.py:813
+#: src/nssbackup/core/ConfigManager.py:816
 msgid "No schedule defined in configuration file. Probing from filesystem."
 msgstr ""
 "Kein Zeitplan in der Konfiguration definiert. Untersuchung des Dateisystems."
 
-#: src/nssbackup/core/ConfigManager.py:907
-#: src/nssbackup/core/ConfigManager.py:919
+#: src/nssbackup/core/ConfigManager.py:910
+#: src/nssbackup/core/ConfigManager.py:922
 msgid "The config file is not set yet into this ConfigManager"
 msgstr ""
 "Die Konfigurationsdatei wurde in diesem ConfigManager noch nicht gesetzt"
 
-#: src/nssbackup/core/ConfigManager.py:1097
+#: src/nssbackup/core/ConfigManager.py:1083
 msgid "No receiver set."
 msgstr "Kein Empfänger gesetzt."
 
-#: src/nssbackup/core/ConfigManager.py:1099
+#: src/nssbackup/core/ConfigManager.py:1085
 msgid "No SMTP server set."
 msgstr "Kein SMTP-Server gesetzt."
 
-#: src/nssbackup/core/ConfigManager.py:1102
+#: src/nssbackup/core/ConfigManager.py:1088
 msgid "Username set but no password specified."
 msgstr "Benutzername gesetzt, jedoch kein Passwort festgelegt."
 
-#: src/nssbackup/core/ConfigManager.py:1105
+#: src/nssbackup/core/ConfigManager.py:1091
 msgid "Password set but no username specified."
 msgstr "Passwort gesetzt, jedoch kein Benutzername festgelegt."
 
-#: src/nssbackup/core/ConfigManager.py:1108
+#: src/nssbackup/core/ConfigManager.py:1094
 msgid ""
 "A certificate and key file is given while SSL option (smtptls=1) is not "
 "set.\n"
@@ -346,7 +343,7 @@ msgstr ""
 "die Option SSL (smtptls=1) nicht gesetzt ist.\n"
 "Aktiviere SSL um ein Zertifikat und einen Schlüssel zu verwenden."
 
-#: src/nssbackup/core/ConfigManager.py:1112
+#: src/nssbackup/core/ConfigManager.py:1098
 msgid ""
 "When specifying a SSL certificate or key file, a key file resp. certificate "
 "is mandatory."
@@ -354,65 +351,65 @@ msgstr ""
 "Wenn ein SSL Zertifikat oder eine Schlüsseldatei festgelegt wurde, ist die "
 "Angabe einer Schlüsseldatei bzw. eines Zertifikats notwendig."
 
-#: src/nssbackup/core/ConfigManager.py:1301
+#: src/nssbackup/core/ConfigManager.py:1289
 msgid "Default Profile"
 msgstr "Standardprofil"
 
-#: src/nssbackup/core/ConfigManager.py:1302
+#: src/nssbackup/core/ConfigManager.py:1290
 msgid "Unknown Profile"
 msgstr "unbekanntes Profil"
 
-#: src/nssbackup/core/ConfigManager.py:1352
+#: src/nssbackup/core/ConfigManager.py:1340
 msgid "Unlimited"
 msgstr "Unbegrenzt"
 
-#: src/nssbackup/core/ConfigManager.py:1353
+#: src/nssbackup/core/ConfigManager.py:1341
 msgid "100 MiB"
 msgstr "100 MiB"
 
-#: src/nssbackup/core/ConfigManager.py:1354
+#: src/nssbackup/core/ConfigManager.py:1342
 msgid "250 MiB"
 msgstr "250 MiB"
 
-#: src/nssbackup/core/ConfigManager.py:1355
+#: src/nssbackup/core/ConfigManager.py:1343
 msgid "650 MiB"
 msgstr "650 MiB"
 
-#: src/nssbackup/core/ConfigManager.py:1356
+#: src/nssbackup/core/ConfigManager.py:1344
 msgid "2 GiB (FAT16)"
 msgstr "2 GiB (FAT16)"
 
-#: src/nssbackup/core/ConfigManager.py:1357
+#: src/nssbackup/core/ConfigManager.py:1345
 msgid "4 GiB (FAT32)"
 msgstr "4 GiB (FAT32)"
 
-#: src/nssbackup/core/ConfigManager.py:1358
+#: src/nssbackup/core/ConfigManager.py:1346
 #: src/nssbackup/ui/SBConfigGTK.py:275 src/nssbackup/ui/SBConfigGTK.py:1386
 msgid "Custom"
 msgstr "Benutzerdefiniert"
 
-#: src/nssbackup/core/ConfigManager.py:1360
+#: src/nssbackup/core/ConfigManager.py:1348
 msgid "MP3 Music"
 msgstr "MP3-Musik"
 
-#: src/nssbackup/core/ConfigManager.py:1361
+#: src/nssbackup/core/ConfigManager.py:1349
 msgid "AVI Video"
 msgstr "AVI-Videos"
 
-#: src/nssbackup/core/ConfigManager.py:1362
-#: src/nssbackup/core/ConfigManager.py:1363
+#: src/nssbackup/core/ConfigManager.py:1350
+#: src/nssbackup/core/ConfigManager.py:1351
 msgid "MPEG Video"
 msgstr "MPEG-Videos"
 
-#: src/nssbackup/core/ConfigManager.py:1364
+#: src/nssbackup/core/ConfigManager.py:1352
 msgid "Matrjoshka Video"
 msgstr "Matroska-Videos"
 
-#: src/nssbackup/core/ConfigManager.py:1365
+#: src/nssbackup/core/ConfigManager.py:1353
 msgid "OGG Multimedia container"
 msgstr "OGG-Multimedia-Container"
 
-#: src/nssbackup/core/ConfigManager.py:1366
+#: src/nssbackup/core/ConfigManager.py:1354
 msgid "CD Images"
 msgstr "CD-Abbilder"
 
@@ -610,9 +607,8 @@ msgid "Inspect file system and collect file infos"
 msgstr ""
 
 #: src/nssbackup/core/profile_handler.py:238
-#, fuzzy
 msgid "Summary of backup"
-msgstr "Sicherungen erstellen"
+msgstr ""
 
 #: src/nssbackup/core/profile_handler.py:239
 #, python-format
@@ -1891,22 +1887,22 @@ msgstr ""
 msgid "Sorry, this should not have happened"
 msgstr ""
 
-#: src/nssbackup/util/__init__.py:440
+#: src/nssbackup/util/__init__.py:439
 #, fuzzy, python-format
 msgid "%(mb)d MiB %(kb)d KiB"
 msgstr "%(mb)d MiB %(kb)d KiB %(bytes)d"
 
-#: src/nssbackup/util/__init__.py:443
+#: src/nssbackup/util/__init__.py:442
 #, python-format
 msgid "%(mb)d MiB %(kb)d KiB %(bytes)d"
 msgstr "%(mb)d MiB %(kb)d KiB %(bytes)d"
 
-#: src/nssbackup/util/__init__.py:448
+#: src/nssbackup/util/__init__.py:447
 #, fuzzy, python-format
 msgid "%(mb)d MB %(kb)d kB"
 msgstr "%(mb)d MB %(kb)d kB %(bytes)d"
 
-#: src/nssbackup/util/__init__.py:451
+#: src/nssbackup/util/__init__.py:450
 #, python-format
 msgid "%(mb)d MB %(kb)d kB %(bytes)d"
 msgstr "%(mb)d MB %(kb)d kB %(bytes)d"
@@ -2392,7 +2388,8 @@ msgid "Schedule"
 msgstr "Zeitplan"
 
 #: data/ui/nssbackup-config.glade:2955
-msgid "Enable purging of old and incomplete backups"
+#, fuzzy
+msgid "Enable purging of old backups"
 msgstr "Alte und unvollständige Sicherungen automatisch entfernen"
 
 #: data/ui/nssbackup-config.glade:2983
@@ -2729,35 +2726,6 @@ msgstr ""
 "Benutzen sie simple-restore-gnome für eine komfortablere graphische "
 "Benutzeroberfläche.\n"
 
-#~ msgid "Backup process is being started."
-#~ msgstr "Sicherungsvorgang wird gestartet."
-
-#, fuzzy
-#~ msgid ""
-#~ "TAR returned following output:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "TAR lieferte Warnungen:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "A backup process is initiated in the background."
-#~ msgstr ""
-#~ "Ein Sicherungsvorgang wurde als Hintergrundprozess gestartet.\n"
-#~ "Die Prozess-Id lautet: %s."
-
-#, fuzzy
-#~ msgid ""
-#~ "An error occurred while starting backup process:\n"
-#~ "\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Während der Sicherung ist ein Fehler aufgetreten:\n"
-#~ "%s"
-
-#~ msgid "(Not So) Simple Backup restoration error"
-#~ msgstr "(Not So) Simple Backup Wiederherstellung Fehler"
-
 #~ msgid ""
 #~ "Please test writability of the target directory by pressing \"Test\" "
 #~ "button on the right."
@@ -2797,6 +2765,13 @@ msgstr ""
 #~ msgstr ""
 #~ "Nur Sicherungen im Format 'gzip' können auf die ältere Version 1.4 "
 #~ "umgestellt werden"
+
+#~ msgid ""
+#~ "A backup run is initiated in the background.\n"
+#~ "The process id is: %s."
+#~ msgstr ""
+#~ "Ein Sicherungsvorgang wurde als Hintergrundprozess gestartet.\n"
+#~ "Die Prozess-Id lautet: %s."
 
 #~ msgid "Test on '%s' didn't succeed!"
 #~ msgstr "Der Test mit '%s' schlug fehl!"
@@ -2847,6 +2822,9 @@ msgstr ""
 #~ msgid "Actual base : <b>%s</b>"
 #~ msgstr "Derzeitige Ausgangssicherung: <b>%s</b>"
 
+#~ msgid "(Not So) Simple Backup restoration error"
+#~ msgstr "(Not So) Simple Backup Wiederherstellung Fehler"
+
 #~ msgid ""
 #~ "Are you sure that you want to remove snapshot '%s'?\n"
 #~ "\n"
@@ -2861,6 +2839,11 @@ msgstr ""
 
 #~ msgid "Command 'env' failed."
 #~ msgstr "Befehl 'env' ist fehlgeschlagen."
+
+#~ msgid "Unable to make a proper backup. TAR was terminated."
+#~ msgstr ""
+#~ "Es konnte keine fehlerfreie Sicherung erstellt werden. TAR wurde "
+#~ "vorzeitig abgebrochen."
 
 #~ msgid ""
 #~ "This dialogue helps you to manage your configuration profiles. You can "

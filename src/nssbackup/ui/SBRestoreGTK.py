@@ -306,7 +306,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             date = self.widgets["calendar"].get_date()
             fromDate = "-".join([str(date[0]), "%02d" % (int(date[1]) + 1), "01"])
             toDate = "-".join([str(date[0]), "%02d" % (int(date[1]) + 1), "31"])
-            snplist = self.snpman.get_snapshots_allformats(fromDate, toDate)
+            snplist = self.snpman.get_snapshots_allformats_by_timespan_ro(fromDate, toDate)
 
             for snapshot in snplist :
                 self.widgets["calendar"].mark_day(int(snapshot.getDate()["day"]))
@@ -493,7 +493,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.flisttreestore.clear()
         self.widgets['buttonspool'].set_sensitive(False)
         self.currSnpFilesInfos = self.currentSnp.getSnapshotFileInfos()
-        if self.currSnpFilesInfos :
+        if self.currSnpFilesInfos is not None:
             # load the items in background
             self.__get_snpfileinfo_items_bg()
 
@@ -566,7 +566,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         """
         day = "-".join([str(date[0]), "%02d" % (int(date[1]) + 1), "%02d" % date[2]])
         self.logger.debug("Selected day : " + day)
-        snplist = self.snpman.get_snapshots_allformats(byDate = day, forceReload = True)
+        snplist = self.snpman.get_snapshots_allformats_by_date_ro(day, force_reload = True)
 
         self.snplisttreestore.clear()
         self.flisttreestore.clear()
@@ -838,7 +838,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                         _headline_str = _("Unable to delete snapshot")
                         gobject.idle_add(self._show_errmessage, _message_str, _boxtitle, _headline_str)
 
-                    self.snpman.get_snapshots_allformats(forceReload = True)
+                    self.snpman.get_snapshots_allformats_ro(force_reload = True)
                     self.on_calendar_day_selected()
             else:
                 message = _("The selected snapshot '%s' is referenced by more recent snapshots as base snapshot.\n\nRemove all of these child snapshots in order to delete this snapshot.")\

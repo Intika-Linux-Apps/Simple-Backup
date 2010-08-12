@@ -124,7 +124,13 @@ from nssbackup.util import log
 from nssbackup.util import system
 
 
+_CRON_PATH_TEMPLATE = "/etc/cron.%s/%s"
 _LAUNCHER_NAME_CRON = "nssbackup"
+_ANACRON_SERVICES = ["hourly", "daily", "weekly", "monthly"]
+_CRON_SERVICE = "d"
+
+_SCHEDULE_SERVICES = _ANACRON_SERVICES
+_SCHEDULE_SERVICES.append(_CRON_SERVICE)
 
 
 def is_default_profile(conffile):
@@ -1014,46 +1020,31 @@ class ConfigManager(ConfigParser.ConfigParser):
         
         """
         if not system.is_superuser():
-            self.logger.warning("Not implemented for non root users yet.")
+            self.logger.warning("Schedules are not implemented for regular users")
             return
 
-        if self.is_default_profile():
-            self.__erase_services()
-
-            if not self.has_section("schedule") \
-                    or (not self.has_option("schedule", "anacron") and not self.has_option("schedule", "cron")) :
-                return
-
-            else:
-                if self.has_option("schedule", "cron") :
-                    self.logger.debug("Saving Cron entries")
-                    local_file_utils.writetofile("/etc/cron.d/%s" % _LAUNCHER_NAME_CRON,
-                                    self.__make_cronfile_content())
-
-                if self.has_option("schedule", "anacron"):
-                    self.logger.debug("Saving Anacron entries")
-                    if self.get("schedule", "anacron") == "hourly":
-                        os.symlink(self.__servicefile,
-                                    "/etc/cron.hourly/%s" % _LAUNCHER_NAME_CRON)
-
-                    elif self.get("schedule", "anacron") == "daily":
-                        os.symlink(self.__servicefile,
-                                    "/etc/cron.daily/%s" % _LAUNCHER_NAME_CRON)
-
-                    elif self.get("schedule", "anacron") == "weekly":
-                        os.symlink(self.__servicefile,
-                                    "/etc/cron.weekly/%s" % _LAUNCHER_NAME_CRON)
-
-                    elif self.get("schedule", "anacron") == "monthly":
-                        os.symlink(self.__servicefile,
-                                    "/etc/cron.monthly/%s" % _LAUNCHER_NAME_CRON)
-                    else :
-                        self.logger.warning("'%s' is not a valid value" \
-                                            % self.get("schedule", "anacron"))
-                    return
-        else:
-            self.logger.warning("Not implemented for non-default profiles yet.")
+        if not self.is_default_profile():
+            self.logger.warning("Schedules are not implemented for non-default profiles")
             return
+
+        self.__erase_services()
+
+        if not self.has_section("schedule"):
+            return
+
+        if self.has_option("schedule", "cron"):
+            self.logger.debug("Writing Cron entry")
+            _crpath = _CRON_PATH_TEMPLATE % (_CRON_SERVICE, _LAUNCHER_NAME_CRON)
+            local_file_utils.writetofile(_crpath, self.__make_cronfile_content())
+
+        elif self.has_option("schedule", "anacron"):
+            _anacr = self.get("schedule", "anacron")
+            self.logger.debug("Writing Anacron entry `%s`" % _anacr)
+            _anacrpath = _CRON_PATH_TEMPLATE % (_anacr, _LAUNCHER_NAME_CRON)
+            if _anacr in _ANACRON_SERVICES:
+                os.symlink(self.__servicefile, _anacrpath)
+            else :
+                self.logger.warning("Anacron entry `%s` is invalid" % _anacr)
 
     def __make_cronfile_content(self):
         """Collects required data in order to create the content for
@@ -1071,17 +1062,15 @@ class ConfigManager(ConfigParser.ConfigParser):
 
     def __erase_services(self):
         """Removes Cron and Anacron service from /etc/cron.*
-         
         """
-        listserv = ["/etc/cron.hourly/nssbackup",
-                    "/etc/cron.daily/nssbackup",
-                    "/etc/cron.weekly/nssbackup",
-                    "/etc/cron.monthly/nssbackup",
-                    "/etc/cron.d/nssbackup"]
-        for serv in listserv:
-            if os.path.exists(serv):
-                self.logger.debug("Unlinking '%s'" % serv)
-                os.unlink(serv)
+        for serv in _SCHEDULE_SERVICES:
+            path = _CRON_PATH_TEMPLATE % (serv, _LAUNCHER_NAME_CRON)
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+            else:
+                print "Cron entry `%s` was removed" % path
 
     def testMail(self):
         """Test the mail settings
