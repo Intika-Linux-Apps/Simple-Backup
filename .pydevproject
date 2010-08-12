@@ -4,9 +4,9 @@
 <pydev_project>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.5</pydev_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-<path>/nssbackup-devel/src</path>
-<path>/nssbackup-devel/tests</path>
-<path>/nssbackup-devel/scripts</path>
+<path>/sbackup-trunk/src</path>
+<path>/sbackup-trunk/tests</path>
+<path>/sbackup-trunk/scripts</path>
 </pydev_pathproperty>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
 </pydev_project>
