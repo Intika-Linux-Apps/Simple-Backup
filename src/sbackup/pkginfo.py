@@ -26,7 +26,7 @@ from sbackup import util
 
 
 class Infos(object):
-    """Collects general informations about NSsbackup.
+    """Collects general informations about SBackup.
     
     `name` The application's full name
     `version` Full current version
@@ -46,7 +46,7 @@ class Infos(object):
 
     SNPCURVERSION = "1.5"
 
-    COPYRIGHT = "2007-2010 NSsbackup Development team"
+    COPYRIGHT = "2007-2010 Simple Backup Development team"
 
     AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
                "Jean-Peer Lorenz <peer.loz@gmx.net>",
@@ -60,5 +60,5 @@ class Infos(object):
         mailsuffix = hostname
     else:
         mailsuffix = hostname + ".ext"
-    SMTPFROM = _("NSsbackup Daemon <%(login)s@%(hostname)s>") % {
+    SMTPFROM = _("SBackup Daemon <%(login)s@%(hostname)s>") % {
                     'login' : os.getenv("USERNAME"), 'hostname': mailsuffix }

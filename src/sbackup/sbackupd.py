@@ -165,11 +165,11 @@ class SBackupProc(object):
                 mailsuffix = hostname
             else :
                 mailsuffix = hostname + ".ext"
-            _from = _("NSsbackup Daemon <%(login)s@%(hostname)s>")\
+            _from = _("SBackup Daemon <%(login)s@%(hostname)s>")\
                     % {'login' : str(system.get_user_from_env()), 'hostname': mailsuffix}
 
         _to = self.__bprofilehdl.config.get("report", "to")
-        _title = _("[NSsbackup] [%(profile)s] Report of %(date)s")\
+        _title = _("[SBackup] [%(profile)s] Report of %(date)s")\
                     % { 'profile':self.__profilename,
                         'date': datetime.datetime.now() }
         logf = self.__bprofilehdl.config.get_current_logfile()
@@ -259,7 +259,7 @@ class SBackupProc(object):
                     self.__confm.append(confm)
 
     def run(self):
-        """Actual main method to make backups using NSsbackup
+        """Actual main method to make backups using SBbackup
         
         - launch BackupProfileHandler with the user configuration file
         - catches all exceptions thrown and logs them
