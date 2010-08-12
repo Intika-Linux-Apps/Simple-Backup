@@ -128,7 +128,9 @@ _CRON_PATH_TEMPLATE = "/etc/cron.%s/%s"
 _LAUNCHER_NAME_CRON = "nssbackup"
 _ANACRON_SERVICES = ["hourly", "daily", "weekly", "monthly"]
 _CRON_SERVICE = "d"
-_SCHEDULE_SERVICES = _ANACRON_SERVICES.append(_CRON_SERVICE)
+
+_SCHEDULE_SERVICES = _ANACRON_SERVICES
+_SCHEDULE_SERVICES.append(_CRON_SERVICE)
 
 
 def is_default_profile(conffile):
