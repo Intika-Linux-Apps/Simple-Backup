@@ -1,4 +1,4 @@
-#    Simple Backup - backup certain profile (a distinct configuration)
+#   Simple Backup - process a certain profile (a distinct configuration)
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -36,16 +36,16 @@ import socket
 import time
 
 
-from nssbackup.fs_backend import fam
-from nssbackup.core.SnapshotManager import SnapshotManager
-from nssbackup.core.UpgradeManager import UpgradeManager
-from nssbackup.core import snapshot
+from sbackup.fs_backend import fam
+from sbackup.core.SnapshotManager import SnapshotManager
+from sbackup.core.UpgradeManager import UpgradeManager
+from sbackup.core import snapshot
 
-from nssbackup import util
-from nssbackup.util import filecollect
-from nssbackup.util import exceptions
-from nssbackup.util import constants
-from nssbackup.util import log
+from sbackup import util
+from sbackup.util import filecollect
+from sbackup.util import exceptions
+from sbackup.util import constants
+from sbackup.util import log
 
 
 class BackupProfileHandler(object):
@@ -305,7 +305,7 @@ class BackupProfileHandler(object):
         return _excode
 
     def finish(self, error = None):
-        """End nssbackup session :
+        """End SBackup session :
         
         - copy the log file into the snapshot dir
         

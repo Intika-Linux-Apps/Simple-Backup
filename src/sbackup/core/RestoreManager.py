@@ -1,4 +1,4 @@
-#    NSsbackup - handling of restoration processes
+#   Simple Backup - handling of restoration processes
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -23,12 +23,12 @@ import tempfile
 import datetime
 
 
-from nssbackup.core import SnapshotManager
-from nssbackup.fs_backend import fam
+from sbackup.core import SnapshotManager
+from sbackup.fs_backend import fam
 
-from nssbackup.util import exceptions
-from nssbackup.util import log
-from nssbackup.ar_backend import tar
+from sbackup.util import exceptions
+from sbackup.util import log
+from sbackup.ar_backend import tar
 
 
 class RestoreManager(object):
@@ -93,7 +93,7 @@ class RestoreManager(object):
                 self.logger.debug("Restore target is a directory (i.e. we extract into a directory)")
 
                 #create a temp dir, extract inside then move the content
-                _tmpdir = tempfile.mkdtemp(dir = target, prefix = 'nssbackup-restore_')
+                _tmpdir = tempfile.mkdtemp(dir = target, prefix = 'sbackup-restore_')
                 self.logger.debug("Restore tempdir: `%s`" % _tmpdir)
 
                 tar.extract(snapshot.getArchive(), _file, _tmpdir,

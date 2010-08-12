@@ -1,4 +1,4 @@
-#    NSsbackup - backup a certain profile
+#   Simple Backup - configuration file handling
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -19,15 +19,12 @@
 #
 
 """
-Format of the configuration file used by NSsbackup:
+Format of the configuration file used by SBackup:
 
 [general]
-mountdir = /mnt/nssbackup
+mountdir = /mnt/sbackup
 target=/var/backup
 #target=ssh://user:pass@example.com/home/user/backup/
-
-# Where to put a lockfile (Leave the default)
-lockfile=/var/lock/nssbackup.lock
 
 # Maximal interval between two full backups (in days)
 maxincrement = 21
@@ -54,7 +51,7 @@ packagecmd = <whatever command that will be launched>
 
 [log]
 level = 20
-file = nssbackup.log
+file = sbackup.log
 
 [report]
 from =
@@ -113,19 +110,19 @@ import types
 import os.path
 import re
 
-from nssbackup.pkginfo import Infos
+from sbackup.pkginfo import Infos
 
-from nssbackup import util
+from sbackup import util
 
-from nssbackup.util import local_file_utils
-from nssbackup.util import exceptions
-from nssbackup.util import pathparse
-from nssbackup.util import log
-from nssbackup.util import system
+from sbackup.util import local_file_utils
+from sbackup.util import exceptions
+from sbackup.util import pathparse
+from sbackup.util import log
+from sbackup.util import system
 
 
 _CRON_PATH_TEMPLATE = "/etc/cron.%s/%s"
-_LAUNCHER_NAME_CRON = "nssbackup"
+_LAUNCHER_NAME_CRON = "sbackup"
 _ANACRON_SERVICES = ["hourly", "daily", "weekly", "monthly"]
 _CRON_SERVICE = "d"
 
@@ -200,7 +197,7 @@ def get_default_config_obj():
 
 
 class ConfigManager(ConfigParser.ConfigParser):
-    """nssbackup config manager
+    """SBackup config manager
     
     The configuration manager is responsible for the following:
      
@@ -219,7 +216,7 @@ class ConfigManager(ConfigParser.ConfigParser):
             This is not implemented yet.
             
     @todo: Use the RawConfigParser instead of ConfigParser! And maybe the \
-            parser should be a member of NSsbackup config!
+            parser should be a member of SBackup config!
     """
 
     def __init__(self, configfile = None):
@@ -774,7 +771,7 @@ class ConfigManager(ConfigParser.ConfigParser):
                         Valid values for Anacron are: \
                             daily/monthly/hourly/weekly
                         Valid values for Cron:
-                            cronline to add at /etc/cron.d/nssbackup.
+                            cronline to add at /etc/cron.d/sbackup.
                             
         """
         anacronValues = ["daily", "monthly", "hourly", "weekly"]
@@ -817,23 +814,23 @@ class ConfigManager(ConfigParser.ConfigParser):
             # no entry in configuration found, look at Cron/Anacron directly
             self.logger.info(_("No schedule defined in configuration file. Probing from filesystem."))
             #hourly
-            if os.path.exists("/etc/cron.hourly/nssbackup"):
+            if os.path.exists("/etc/cron.hourly/sbackup"):
                 self.logger.debug("Anacron hourly has been found")
                 return (0, "hourly")
             # daily
-            elif os.path.exists("/etc/cron.daily/nssbackup"):
+            elif os.path.exists("/etc/cron.daily/sbackup"):
                 self.logger.debug("Anacron daily has been found")
                 return (0, "daily")
             # weekly
-            elif os.path.exists("/etc/cron.weekly/nssbackup"):
+            elif os.path.exists("/etc/cron.weekly/sbackup"):
                 self.logger.debug("Anacron weekly has been found")
                 return (0, "weekly")
             # monthly
-            elif os.path.exists("/etc/cron.monthly/nssbackup"):
+            elif os.path.exists("/etc/cron.monthly/sbackup"):
                 self.logger.debug("Anacron monthly has been found")
                 return (0, "monthly")
-            if os.path.exists("/etc/cron.d/nssbackup"):
-                _value = local_file_utils.readfile("/etc/cron.d/nssbackup")
+            if os.path.exists("/etc/cron.d/sbackup"):
+                _value = local_file_utils.readfile("/etc/cron.d/sbackup")
                 self.logger.debug("Custom Cron has been found: %s" % _value)
                 return (1, _value)
             # none has been found
@@ -933,7 +930,6 @@ class ConfigManager(ConfigParser.ConfigParser):
         
         """
         profdir = self.__conffile_hdl.get_profilesdir(self.conffile)
-#        prfDir = getUserConfDir()+"nssbackup.d/"
         self.logger.debug("Getting profiles from `%s`" % profdir)
         _prfls = get_profiles(profdir)
         # debug output of found profiles
@@ -968,7 +964,7 @@ class ConfigManager(ConfigParser.ConfigParser):
     def __get_logfile_template(self):
         """Builds the full path to log file for this configuration and
         returns it. The log file for the default profile is named
-        'nssbackup.log', log files for other profiles are extended by
+        'sbackup.log', log files for other profiles are extended by
         the profile's name to keep them unique and avoid problems while logging.
         
         By 'template' is indicated this is the base logfile name. It is
@@ -1003,7 +999,7 @@ class ConfigManager(ConfigParser.ConfigParser):
                              
         @todo: What happens if the config file is 'Save as...' in order to
                 store a configuration aside but the scheduling is different
-                from the *original* configuration that is used by nssbackupd?
+                from the *original* configuration that is used by sbackupd?
         """
         if configfile is not None:
             fld = local_file_utils.openfile(configfile, True)
@@ -1223,7 +1219,7 @@ class ConfigurationFileHandler(object):
         if self.__super_user:
             confdir = local_file_utils.normpath("/etc")
         else:
-            confdir = local_file_utils.normpath(system.get_user_config_dir(), "nssbackup")
+            confdir = local_file_utils.normpath(system.get_user_config_dir(), "sbackup")
         if not local_file_utils.path_exists(confdir) :
             local_file_utils.makedirs(confdir)
         return confdir
@@ -1231,7 +1227,7 @@ class ConfigurationFileHandler(object):
     def get_user_datadir(self):
         """Get the user datas dir using the XDG specification.
         """
-        datadir = local_file_utils.normpath(system.get_user_data_dir(), "nssbackup")
+        datadir = local_file_utils.normpath(system.get_user_data_dir(), "sbackup")
         if not local_file_utils.path_exists(datadir) :
             local_file_utils.makedirs(datadir)
         return datadir
@@ -1240,7 +1236,7 @@ class ConfigurationFileHandler(object):
         """Returns the user's temporary directory. Currently always
         the directory `/tmp` is used.
         
-        :return: full path to the NSsbackup tempdir
+        :return: full path to the SBackup tempdir
         
         :todo: Review the use of '/tmp' as tempdir as solution for several\
                different distributions?
@@ -1248,7 +1244,7 @@ class ConfigurationFileHandler(object):
                
         """
         if self.__super_user:
-            tempdir = os.path.join("/tmp", "nssbackup/")
+            tempdir = os.path.join("/tmp", "sbackup/")
         else:
             tempdir = os.path.join(self.get_user_datadir(), "tmp/")
 
@@ -1286,22 +1282,22 @@ class ConfigManagerStaticData(object):
     __cronheader = "SHELL=/bin/bash \n"\
         "PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n"
 
-    __schedule_script_file = util.get_resource_file("nssbackup-launch")
+    __schedule_script_file = util.get_resource_file("sbackup-launch")
 
     __default_profilename = _("Default Profile")
     __unknown_profilename = _("Unknown Profile")
 
     # these variables should be read-only
-    __logfile_basename = "nssbackup"
+    __logfile_basename = "sbackup"
     __logfile_ext = "log"
 
     __superuser_confdir = "/etc"
-    __user_confdir_template = ".config/nssbackup"
-    __default_config_file = "nssbackup.conf"
+    __user_confdir_template = ".config/sbackup"
+    __default_config_file = "sbackup.conf"
 
-    __profiles_dir = "nssbackup.d"
+    __profiles_dir = "sbackup.d"
 
-    __profilename_re = re.compile(r"^nssbackup-(.+?).conf(-disable)?$")
+    __profilename_re = re.compile(r"^sbackup-(.+?).conf(-disable)?$")
 
     # configuration's existing sections and options
     __our_options = {
@@ -1602,7 +1598,7 @@ class _DefaultConfigurationForAdmins(_DefaultConfiguration):
     def __init__(self):
         _DefaultConfiguration.__init__(self)
 
-        self._mountdir = "/mnt/nssbackup"
+        self._mountdir = "/mnt/sbackup"
         self._target = "/var/backup"
 
         self._dirconf = { '/etc/'            : '1',
@@ -1615,7 +1611,7 @@ class _DefaultConfigurationForAdmins(_DefaultConfiguration):
                             '/usr/local/'    : '1',
                             '/media/'        : '0' }
 
-        self._logdir = "/var/log/nssbackup"
+        self._logdir = "/var/log/sbackup"
 
         self._schedule = [False, "daily"]
 

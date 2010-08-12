@@ -1,4 +1,4 @@
-#    NSsbackup - upgrade handling
+#   Simple Backup - upgrade handling
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -36,19 +36,19 @@ import time
 import datetime
 import cPickle as pickle
 
-from nssbackup.pkginfo import Infos
+from sbackup.pkginfo import Infos
 
-from nssbackup.fs_backend import fam
-from nssbackup.ar_backend import tar
+from sbackup.fs_backend import fam
+from sbackup.ar_backend import tar
 
-from nssbackup.core import SnapshotManager
-from nssbackup.core import snapshot as snapshot_    # due to parameters named `snapshot`
+from sbackup.core import SnapshotManager
+from sbackup.core import snapshot as snapshot_    # due to parameters named `snapshot`
 
-from nssbackup import util
-from nssbackup.util import structs
-from nssbackup.util import log
-from nssbackup.util import local_file_utils
-from nssbackup.util.exceptions import SBException
+from sbackup import util
+from sbackup.util import structs
+from sbackup.util import log
+from sbackup.util import local_file_utils
+from sbackup.util.exceptions import SBException
 
 
 class UpgradeManager(object):
@@ -114,7 +114,7 @@ class UpgradeManager(object):
 #        
 #        The downgrade feature will be certainly used for exporting
 #        snapshots, so that it would be possible to use it with a
-#        previous version of nssbackup.
+#        previous version of sbackup.
 #        
 #        :param snapshot: the snapshot to downgrade 
 #        :param version: The version to which one the snapshot will be downgraded

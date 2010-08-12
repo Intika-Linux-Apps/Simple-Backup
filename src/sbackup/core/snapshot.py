@@ -1,4 +1,4 @@
-#    Simple Backup - snapshot definition
+#   Simple Backup - snapshot definition
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -18,7 +18,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackup.util.snapshot` -- snapshot definition
+:mod:`sbackup.util.snapshot` -- snapshot definition
 =====================================================
 
 .. module:: snapshot
@@ -34,18 +34,18 @@ import re
 import types
 
 
-from nssbackup.fs_backend import fam
-from nssbackup.ar_backend import tar
+from sbackup.fs_backend import fam
+from sbackup.ar_backend import tar
 
-from nssbackup.core.ConfigManager import ConfigurationFileHandler
+from sbackup.core.ConfigManager import ConfigurationFileHandler
 
-from nssbackup.util.exceptions import NotValidSnapshotNameException
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.exceptions import NotValidSnapshotException
+from sbackup.util.exceptions import NotValidSnapshotNameException
+from sbackup.util.exceptions import SBException
+from sbackup.util.exceptions import NotValidSnapshotException
 
-from nssbackup.util import constants
-from nssbackup.util import structs
-from nssbackup.util import log
+from sbackup.util import constants
+from sbackup.util import structs
+from sbackup.util import log
 
 
 class Snapshot(object):

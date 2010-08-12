@@ -1,4 +1,4 @@
-#    NSsbackup - snapshot handling
+#   Simple Backup - snapshot handling
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -36,26 +36,26 @@ import time
 import types
 
 
-from nssbackup.pkginfo import Infos
-from nssbackup.fs_backend import fam
+from sbackup.pkginfo import Infos
+from sbackup.fs_backend import fam
 
-from nssbackup.ar_backend import tar
-from nssbackup.ar_backend.tar import SnapshotFile
-from nssbackup.ar_backend.tar import Dumpdir
-from nssbackup.ar_backend.tar import SnapshotFileWrapper
-from nssbackup.ar_backend.tar import ProcSnapshotFile
-from nssbackup.ar_backend.tar import get_dumpdir_from_list
+from sbackup.ar_backend import tar
+from sbackup.ar_backend.tar import SnapshotFile
+from sbackup.ar_backend.tar import Dumpdir
+from sbackup.ar_backend.tar import SnapshotFileWrapper
+from sbackup.ar_backend.tar import ProcSnapshotFile
+from sbackup.ar_backend.tar import get_dumpdir_from_list
 
-import nssbackup.util as Util
-from nssbackup.core.snapshot import Snapshot
-from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.exceptions import NotValidSnapshotException
-from nssbackup.util.exceptions import NotValidSnapshotNameException
-from nssbackup.util.exceptions import RebaseSnpException
-from nssbackup.util.exceptions import RebaseFullSnpForbidden
-from nssbackup.util.exceptions import RemoveSnapshotHasChildsError
-from nssbackup.util.exceptions import NotSupportedError
+import sbackup.util as Util
+from sbackup.core.snapshot import Snapshot
+from sbackup.util.log import LogFactory
+from sbackup.util.exceptions import SBException
+from sbackup.util.exceptions import NotValidSnapshotException
+from sbackup.util.exceptions import NotValidSnapshotNameException
+from sbackup.util.exceptions import RebaseSnpException
+from sbackup.util.exceptions import RebaseFullSnpForbidden
+from sbackup.util.exceptions import RemoveSnapshotHasChildsError
+from sbackup.util.exceptions import NotSupportedError
 
 
 _EXT_CORRUPT_SNP = ".corrupt"
