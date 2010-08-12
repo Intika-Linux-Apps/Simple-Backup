@@ -124,6 +124,35 @@ class SnapshotManager(object):
                 return snp
         raise SBException(_("Snapshot '%s' not found ") % name)
 
+    def get_snapshots_allformats_by_timespan_ro(self, from_date, to_date, force_reload = False):
+        """Read-only variant that returns a list with *all* found snapshots, according to the
+        given parameters. All versions of snapshots were returned.
+        No snapshot are being removed or renamed.
+        """
+        snapshots = []
+        for snp in self.get_snapshots_allformats_ro(force_reload):
+            if from_date <= snp.getName()[:10] <= to_date:
+                snapshots.append(snp)
+        snapshots.sort(key = Snapshot.getName, reverse = True)
+        return snapshots
+
+    def get_snapshots_allformats_by_date_ro(self, by_date, force_reload = False):
+        snapshots = []
+        for snp in self.get_snapshots_allformats_ro(force_reload):
+            if snp.getName().startswith(by_date):
+                snapshots.append(snp)
+        snapshots.sort(key = Snapshot.getName, reverse = True)
+        return snapshots
+
+    def get_snapshots_allformats_ro(self, force_reload = False):
+        if self.__snapshots and not force_reload:
+            pass
+        else:
+            self._read_snps_from_disk_allformats(read_only = True)
+        snapshots = self.__snapshots
+        snapshots.sort(key = Snapshot.getName, reverse = True)
+        return snapshots
+
     def get_snapshots_allformats(self, fromDate = None, toDate = None, byDate = None,
                                  forceReload = False):
         """Returns a list with *all* found snapshots, according to the
@@ -140,6 +169,7 @@ class SnapshotManager(object):
         :return: list of snapshots 
         
         :todo: Re-factor this method using the CQS pattern and by simplifying!
+                (e.g. method `reload` + `get...`
         :todo: Separate into 'get_snapshots( force_reload=False )',\
                'get_snapshots_by_timespan' and 'get_snapshot_by_date'!
         :todo: Clarify whether to rename or to delete corrupt snapshots!
@@ -159,13 +189,13 @@ class SnapshotManager(object):
             if self.__snapshots and not forceReload:
                 pass
             else:
-                self._read_snps_from_disk_allformats()
+                self._read_snps_from_disk_allformats(read_only = False)
             snapshots = self.__snapshots
 
         snapshots.sort(key = Snapshot.getName, reverse = True)
         return snapshots
 
-    def _read_snps_from_disk_allformats(self):
+    def _read_snps_from_disk_allformats(self, read_only = True):
         """Reads snapshots from the defined/set target directory and
         stores them in according class attribute.
         
@@ -183,17 +213,18 @@ class SnapshotManager(object):
                 snapshots.append(Snapshot(_snppath))
             except NotValidSnapshotException, error :
                 if isinstance(error, NotValidSnapshotNameException) :
-                    self.logger.warning(_("Invalid snapshot `%(name)s` found: Name of snapshot not valid.")\
+                    self.logger.info(_("Invalid snapshot `%(name)s` found: Name of snapshot not valid.")\
                                         % { 'name': str(_snpname) })
                 else: # rename only if name was valid but snapshot was invalid
-                    self.logger.warning(_("Invalid snapshot `%(name)s` found: %(error_cause)s.")\
+                    self.logger.info(_("Invalid snapshot `%(name)s` found: %(error_cause)s.")\
                                         % { 'name': str(_snpname), 'error_cause' :error })
-                    self.logger.info("Invalid snapshot `%s` is being renamed." % _snpname)
-                    if _snppath.endswith(".inc") or _snppath.endswith(".ful"):
-                        _ren_snppath = "%s%s" % (_snppath[:-4], _EXT_CORRUPT_SNP)
-                    else:
-                        _ren_snppath = "%s%s" % (_snppath, _EXT_CORRUPT_SNP)
-                    self._fop.rename(_snppath, _ren_snppath)
+                    if not read_only:
+                        self.logger.info("Invalid snapshot `%s` is being renamed." % _snpname)
+                        if _snppath.endswith(".inc") or _snppath.endswith(".ful"):
+                            _ren_snppath = "%s%s" % (_snppath[:-4], _EXT_CORRUPT_SNP)
+                        else:
+                            _ren_snppath = "%s%s" % (_snppath, _EXT_CORRUPT_SNP)
+                        self._fop.rename(_snppath, _ren_snppath)
 
         snapshots.sort(key = Snapshot.getName, reverse = True)
         self.__snapshots = snapshots
