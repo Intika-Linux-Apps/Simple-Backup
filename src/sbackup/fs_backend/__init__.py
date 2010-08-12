@@ -1,4 +1,4 @@
-#    Simple Backup - file access backend (package) 
+#   Simple Backup - file access backend (package) 
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #

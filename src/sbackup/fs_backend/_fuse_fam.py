@@ -1,4 +1,4 @@
-#    Simple Backup - Target file access management using Fuse plugins
+#   Simple Backup - Target file access management using Fuse plugins
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -25,14 +25,14 @@ import time
 import uuid
 
 
-from nssbackup.core import ConfigManager
-from nssbackup.fuse_plugins import PluginManager
-from nssbackup.util.exceptions import SBException
-from nssbackup.util import exceptions
-from nssbackup.util import interfaces
-from nssbackup.util import local_file_utils
-from nssbackup.util import log
-from nssbackup.util import pathparse
+from sbackup.core import ConfigManager
+from sbackup.fuse_plugins import PluginManager
+from sbackup.util.exceptions import SBException
+from sbackup.util import exceptions
+from sbackup.util import interfaces
+from sbackup.util import local_file_utils
+from sbackup.util import log
+from sbackup.util import pathparse
 
 
 class  FuseTargetHandler(interfaces.ITargetHandler):
@@ -124,7 +124,7 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
 
     def terminate(self):
         """
-        Unmount all nssbackup mounted dir.
+        Unmount all mounted directories.
         """
         self._logger.info(_("Terminating FUSE File Access Manager."))
         error = None
@@ -285,7 +285,7 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
 ##TODO: inconsistent path handling!
 #        # set the defaults 
 #        if os.getuid() == 0 :
-#            mountdir = "/mnt/nssbackup/"
+#            mountdir = "/mnt/sbackup/"
 #        else :
 #            mountdir = self._configFileHandler.get_user_datadir() + "mountdir"
 #

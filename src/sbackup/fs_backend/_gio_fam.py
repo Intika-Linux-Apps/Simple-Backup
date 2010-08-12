@@ -1,4 +1,4 @@
-#    Simple Backup - Target file access management using GIO/GVFS
+#   Simple Backup - Target file access management using GIO/GVFS
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -21,13 +21,13 @@
 from gettext import gettext as _
 import types
 
-from nssbackup.fs_backend import _gio_utils as gio_utils
-from nssbackup.fs_backend._gio_utils import GioOperations
+from sbackup.fs_backend import _gio_utils as gio_utils
+from sbackup.fs_backend._gio_utils import GioOperations
 
-from nssbackup.util import exceptions
-from nssbackup.util import interfaces
-from nssbackup.util import pathparse
-from nssbackup.util import log
+from sbackup.util import exceptions
+from sbackup.util import interfaces
+from sbackup.util import pathparse
+from sbackup.util import log
 
 
 class GioTargetHandler(interfaces.ITargetHandler):

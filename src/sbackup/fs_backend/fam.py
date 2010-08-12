@@ -1,4 +1,4 @@
-#    Simple Backup - file access management
+#   Simple Backup - file access management
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -17,7 +17,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackup.util.fam` -- file access management
+:mod:`sbackup.util.fam` -- file access management
 ===================================================
 
 .. module:: fam
@@ -27,7 +27,7 @@
 """
 
 
-from nssbackup.util import prefs
+from sbackup.util import prefs
 
 
 _PREFS = prefs.Preferences()
@@ -39,11 +39,11 @@ def get_fam_target_handler_facade_instance():
     _fam = None
 
     if FS_BACKEND == prefs.FS_BACKEND_GIO:
-        from nssbackup.fs_backend import _gio_fam
+        from sbackup.fs_backend import _gio_fam
         _fam = _gio_fam.GioTargetHandler()
 
     elif FS_BACKEND == prefs.FS_BACKEND_FUSE:
-        from nssbackup.fs_backend import _fuse_fam
+        from sbackup.fs_backend import _fuse_fam
         _fam = _fuse_fam.FuseTargetHandler()
 
     else:
@@ -56,11 +56,11 @@ def get_file_operations_facade_instance():
     _op = None
 
     if FS_BACKEND == prefs.FS_BACKEND_GIO:
-        from nssbackup.fs_backend import _gio_utils
+        from sbackup.fs_backend import _gio_utils
         _op = _gio_utils.GioOperations()
 
     elif FS_BACKEND == prefs.FS_BACKEND_FUSE:
-        from nssbackup.fs_backend import _fuse_utils
+        from sbackup.fs_backend import _fuse_utils
         _op = _fuse_utils.FuseOperations()
 
     else:
@@ -73,11 +73,11 @@ def get_remote_services_avail():
     _res = None
 
     if FS_BACKEND == prefs.FS_BACKEND_GIO:
-        from nssbackup.fs_backend import _gio_utils
+        from sbackup.fs_backend import _gio_utils
         _res = _gio_utils.REMOTE_SERVICES_AVAIL
 
     elif FS_BACKEND == prefs.FS_BACKEND_FUSE:
-        from nssbackup.fs_backend import _fuse_utils
+        from sbackup.fs_backend import _fuse_utils
         _res = _fuse_utils.REMOTE_SERVICES_AVAIL
 
     else:
@@ -89,11 +89,11 @@ def get_default_remote_service():
     _res = None
 
     if FS_BACKEND == prefs.FS_BACKEND_GIO:
-        from nssbackup.fs_backend import _gio_utils
+        from sbackup.fs_backend import _gio_utils
         _res = _gio_utils.REMOTE_SERVICE_SFTP
 
     elif FS_BACKEND == prefs.FS_BACKEND_FUSE:
-        from nssbackup.fs_backend import _fuse_utils
+        from sbackup.fs_backend import _fuse_utils
         _res = _fuse_utils.REMOTE_SERVICE_SFTP
 
     else:
@@ -105,11 +105,11 @@ def get_scheme_from_service(service):
     _res = None
 
     if FS_BACKEND == prefs.FS_BACKEND_GIO:
-        from nssbackup.fs_backend import _gio_utils
+        from sbackup.fs_backend import _gio_utils
         _res = _gio_utils.get_scheme_from_service(service)
 
     elif FS_BACKEND == prefs.FS_BACKEND_FUSE:
-        from nssbackup.fs_backend import _fuse_utils
+        from sbackup.fs_backend import _fuse_utils
         _res = _fuse_utils.get_scheme_from_service(service)
 
     else:
@@ -122,11 +122,11 @@ def get_service_from_scheme(scheme):
     _res = None
 
     if FS_BACKEND == prefs.FS_BACKEND_GIO:
-        from nssbackup.fs_backend import _gio_utils
+        from sbackup.fs_backend import _gio_utils
         _res = _gio_utils.get_service_from_scheme(scheme)
 
     elif FS_BACKEND == prefs.FS_BACKEND_FUSE:
-        from nssbackup.fs_backend import _fuse_utils
+        from sbackup.fs_backend import _fuse_utils
         _res = _fuse_utils.get_service_from_scheme(scheme)
 
     else:

@@ -1,4 +1,4 @@
-#    Simple Backup - file access management using GIO/GVFS
+#   Simple Backup - file access management using GIO/GVFS
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -17,7 +17,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackup.util.gio_utils` -- file access management using GIO/GVFS
+:mod:`sbackup.util.gio_utils` -- file access management using GIO/GVFS
 ========================================================================
 
 .. module:: gio_utils
@@ -36,14 +36,14 @@ import glib
 import gio
 
 
-from nssbackup.util import local_file_utils
-from nssbackup.util import exceptions
-from nssbackup.util import interfaces
-from nssbackup.util import constants
-from nssbackup.util import pathparse
-from nssbackup.util import structs
-from nssbackup.util import system
-from nssbackup.util import log
+from sbackup.util import local_file_utils
+from sbackup.util import exceptions
+from sbackup.util import interfaces
+from sbackup.util import constants
+from sbackup.util import pathparse
+from sbackup.util import structs
+from sbackup.util import system
+from sbackup.util import log
 
 
 errorcodes = {
