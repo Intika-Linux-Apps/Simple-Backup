@@ -1,5 +1,5 @@
-#    Simple Backup - Indicator application (status icon)
-#                    targeting Ubuntu 10.04+
+#   Simple Backup - Indicator application (status icon)
+#                   targeting Ubuntu >= 10.04
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -16,20 +16,20 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+#
 
 import sys
 import appindicator
 
 
-from nssbackup import util
-from nssbackup.util.log import LogFactory
-from nssbackup.util import constants
+from sbackup import util
+from sbackup.util.log import LogFactory
+from sbackup.util import constants
 
-from nssbackup.ui import indicator_core
-from nssbackup.ui.indicator_core import PyNotifyMixin, SBackupdIndicatorHandler, SBackupdIndicatorBase
-from nssbackup.ui import misc
-from nssbackup.util import system
+from sbackup.ui import indicator_core
+from sbackup.ui.indicator_core import PyNotifyMixin, SBackupdIndicatorHandler, SBackupdIndicatorBase
+from sbackup.ui import misc
+from sbackup.util import system
 
 
 sys.excepthook = misc.except_hook

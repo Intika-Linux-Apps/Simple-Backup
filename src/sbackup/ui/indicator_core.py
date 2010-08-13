@@ -1,5 +1,5 @@
-#    Simple Backup - Indicator application (status icon)
-#                    core implementation
+#   Simple Backup - Indicator application (status icon)
+#                   core implementation
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -16,7 +16,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+#
 
 import os
 import time
@@ -28,15 +28,15 @@ import dbus.mainloop.glib
 import gtk
 
 
-from nssbackup.pkginfo import Infos
-from nssbackup import util
-from nssbackup.util import dbus_support
-from nssbackup.util.log import LogFactory
-from nssbackup.util import constants
-from nssbackup.util import system
-from nssbackup.util import lock
-from nssbackup.util import exceptions
-from nssbackup.ui import misc
+from sbackup.pkginfo import Infos
+from sbackup import util
+from sbackup.util import dbus_support
+from sbackup.util.log import LogFactory
+from sbackup.util import constants
+from sbackup.util import system
+from sbackup.util import lock
+from sbackup.util import exceptions
+from sbackup.ui import misc
 
 
 class INotifyMixin(object):

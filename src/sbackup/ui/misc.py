@@ -1,19 +1,21 @@
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+#   Simple Backup - GTK+ common helper functionality
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
 #
-# Authors :
-#   Jean-Peer Lorenz <peer.loz@gmx.net>
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
 
 """Module containing commonly used helper classes and functions related to UI
 """
@@ -27,11 +29,11 @@ import types
 import traceback
 
 
-from nssbackup.pkginfo import Infos
-from nssbackup.util import constants
-from nssbackup.util import system
-from nssbackup.util import log
-from nssbackup import util
+from sbackup.pkginfo import Infos
+from sbackup.util import constants
+from sbackup.util import system
+from sbackup.util import log
+from sbackup import util
 
 
 MODEL_COLUMN_INDEX_VALUE = 0
@@ -318,7 +320,7 @@ def _common_except_hook(etype, evalue, etb):
     _lines.strip()
     _logger.error("Uncaught exception: %s" % evalue)
     _logger.error(_lines)
-    _message_str = _("An uncaught error occurred. Close this message window and restart the application.\n\nPlease report this error on https://bugs.launchpad.net/nssbackup.\n\n%s") % (evalue)
+    _message_str = _("An uncaught error occurred. Close this message window and restart the application.\n\nPlease report this error on https://bugs.launchpad.net/sbackup.\n\n%s") % (evalue)
     _headline_str = _("Sorry, this should not have happened")
     _secmsg_str = "%s" % _lines
     return (_headline_str, _message_str, _secmsg_str)

@@ -1,4 +1,4 @@
-#    NSsbackup - GTK+ GUI resources
+#   Simple Backup - GTK+ GUI resources
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -18,16 +18,16 @@
 #
 
 
-CONFIGGUI_TOPWINDOW = 'nssbackupConfApp'
-CONFIGGUI_GLADEFILE = 'nssbackup-config.glade'
+CONFIGGUI_TOPWINDOW = 'sbackupConfApp'
+CONFIGGUI_GLADEFILE = 'sbackup-config.glade'
 
 RESTOREGUI_TOPWINDOW = 'restorewindow'
-RESTOREGUI_GLADEFILE = 'nssbackup-restore.glade'
+RESTOREGUI_GLADEFILE = 'sbackup-restore.glade'
 
 
 def get_configgui_widgets():
     widget_list = [
-        'nssbackupConfApp',
+        'sbackupConfApp',
         'menubar',
         'toolbar',
         'askSaveDialog',
@@ -286,8 +286,8 @@ def get_configgui_handlers():
         'on_menu_set_default_settings_activate',
 
         'on_exit_activate',
-        'on_nssbackupConfApp_delete_event',
-        'on_nssbackupConfApp_destroy'
+        'on_sbackupConfApp_delete_event',
+        'on_sbackupConfApp_destroy'
         ]
     return handlers
 

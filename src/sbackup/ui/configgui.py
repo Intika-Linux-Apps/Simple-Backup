@@ -1,4 +1,4 @@
-#    NSsbackup - Configuration GUI (GTK+)
+#   Simple Backup - Configuration GUI (GTK+)
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -29,24 +29,24 @@ import gobject
 import gtk
 
 # project imports
-from nssbackup.util import log
-from nssbackup.util import system
-from nssbackup.core.ConfigManager import ConfigManagerStaticData
-from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import SBException
-from nssbackup.core.ConfigManager import ConfigManager, ConfigurationFileHandler
-import nssbackup.util as Util
+from sbackup.util import log
+from sbackup.util import system
+from sbackup.core.ConfigManager import ConfigManagerStaticData
+from sbackup.util.log import LogFactory
+from sbackup.util.exceptions import SBException
+from sbackup.core.ConfigManager import ConfigManager, ConfigurationFileHandler
+import sbackup.util as Util
 
-from nssbackup.ui.GladeGnomeApp import GladeGnomeApp
-from nssbackup.ui import misc
-from nssbackup.ui import gtk_rsrc
+from sbackup.ui.GladeGnomeApp import GladeGnomeApp
+from sbackup.ui import misc
+from sbackup.ui import gtk_rsrc
 
-from nssbackup.fs_backend import fam
+from sbackup.fs_backend import fam
 
-from nssbackup.util import exceptions
-from nssbackup.util import pathparse
-from nssbackup.util import constants
-from nssbackup.util import local_file_utils
+from sbackup.util import exceptions
+from sbackup.util import pathparse
+from sbackup.util import constants
+from sbackup.util import local_file_utils
 
 
 sys.excepthook = misc.except_hook
@@ -105,7 +105,7 @@ class SBconfigGTK(GladeGnomeApp):
         self.__destination_failure = False
 
         GladeGnomeApp.__init__(self,
-                               app_name = "NSsbackup",
+                               app_name = "SBackup",
                                app_version = "0.2",
                                filename = Util.get_resource_file(gtk_rsrc.CONFIGGUI_GLADEFILE),
                                top_window = gtk_rsrc.CONFIGGUI_TOPWINDOW,
@@ -799,10 +799,10 @@ class SBconfigGTK(GladeGnomeApp):
         dialog.destroy()
 
     def on_menu_help_activate(self, button):
-        misc.open_uri("ghelp:nssbackup")
+        misc.open_uri("ghelp:sbackup")
 
     def on_menu_about_activate(self, *args): #IGNORE:W0613
-        misc.show_about_dialog(set_transient_for = self.widgets["nssbackupConfApp"])
+        misc.show_about_dialog(set_transient_for = self.widgets["sbackupConfApp"])
 
     def on_reload_clicked(self, *args): #IGNORE:W0613
         self.configman = ConfigManager(self.conffile)
@@ -1268,7 +1268,7 @@ class SBconfigGTK(GladeGnomeApp):
     def __get_application_widget(self):
         """Returns the top level application widget object.
         """
-        app_obj = self.widgets['nssbackupConfApp']
+        app_obj = self.widgets['sbackupConfApp']
         return app_obj
 
     def on_testMailButton_clicked(self, *args):
@@ -1804,7 +1804,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
             self.logger.debug("Key : " + str(self.configman.get("report", "smtpkey")))
 
-    def on_nssbackupConfApp_delete_event(self, *args):
+    def on_sbackupConfApp_delete_event(self, *args):
         """Signal handler that is called when the window decorator close
         button is clicked.
         """
@@ -1816,7 +1816,7 @@ class SBconfigGTK(GladeGnomeApp):
         self.orig_configman = None
         gtk.main_quit()
 
-    def on_nssbackupConfApp_destroy(self, *args):
+    def on_sbackupConfApp_destroy(self, *args):
         """Signal handler that is called when the window was destroyed.
         """
         self.__terminate_app()
@@ -1847,7 +1847,7 @@ class SBconfigGTK(GladeGnomeApp):
         valid_input = False
         prf_set = False
 
-        prfDir = local_file_utils.normpath(self.__configFileHandler.get_user_confdir(), "nssbackup.d")
+        prfDir = local_file_utils.normpath(self.__configFileHandler.get_user_confdir(), "sbackup.d")
         if not os.path.exists(prfDir):
             os.makedirs(prfDir)
 
@@ -1862,7 +1862,7 @@ class SBconfigGTK(GladeGnomeApp):
                 enable = self.widgets['enableNewPrfCB'].get_active()
                 prfName = self.widgets['newPrfNameEntry'].get_text()
                 prfName = prfName.strip()
-                prfConf = local_file_utils.normpath(prfDir, "nssbackup-%s.conf" % prfName)
+                prfConf = local_file_utils.normpath(prfDir, "sbackup-%s.conf" % prfName)
                 prfConfDisabled = "%s-disable" % prfConf
 
                 if not prfName or prfName is '':

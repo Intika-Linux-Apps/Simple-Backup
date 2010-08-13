@@ -1,4 +1,4 @@
-#    NSsbackup - Restoration GUI in GTK+
+#   Simple Backup - Restoration GUI in GTK+
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -41,27 +41,27 @@ import gobject
 from GladeWindow import GladeWindow
 from GladeWindow import ProgressbarMixin
 
-from nssbackup.fs_backend import fam
+from sbackup.fs_backend import fam
 
-import nssbackup.util as Util
-from nssbackup.util import log
-from nssbackup.core.ConfigManager import ConfigManager, ConfigurationFileHandler
-from nssbackup.core.SnapshotManager import SnapshotManager
-from nssbackup.core.RestoreManager import RestoreManager
-from nssbackup.core.UpgradeManager import UpgradeManager
-from nssbackup.util.log import LogFactory
-import nssbackup.ar_backend.tar as TAR
-from nssbackup.pkginfo import Infos
-from nssbackup.util import exceptions
-from nssbackup.util import tasks
-from nssbackup.util import constants
-from nssbackup.util import pathparse
-from nssbackup.util import local_file_utils
-from nssbackup.ar_backend.tar import Dumpdir
-from nssbackup.util import system
+import sbackup.util as Util
+from sbackup.util import log
+from sbackup.core.ConfigManager import ConfigManager, ConfigurationFileHandler
+from sbackup.core.SnapshotManager import SnapshotManager
+from sbackup.core.RestoreManager import RestoreManager
+from sbackup.core.UpgradeManager import UpgradeManager
+from sbackup.util.log import LogFactory
+import sbackup.ar_backend.tar as TAR
+from sbackup.pkginfo import Infos
+from sbackup.util import exceptions
+from sbackup.util import tasks
+from sbackup.util import constants
+from sbackup.util import pathparse
+from sbackup.util import local_file_utils
+from sbackup.ar_backend.tar import Dumpdir
+from sbackup.util import system
 
-from nssbackup.ui import misc
-from nssbackup.ui import gtk_rsrc
+from sbackup.ui import misc
+from sbackup.ui import gtk_rsrc
 
 
 sys.excepthook = misc.except_hook_threaded
@@ -238,11 +238,11 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
     def __init_statusbar(self):
         """Initializes the statusbar, i.e. gets the context (here
-        'nssbackup restore') and displays 'Ready'.
+        'sbackup restore') and displays 'Ready'.
         """
         if self.__context_id is not None:
             raise AssertionError("Statusbar cannot be intialized multiple times!")
-        self.__context_id = self.widgets['statusbar'].get_context_id("nssbackup restore")
+        self.__context_id = self.widgets['statusbar'].get_context_id("sbackup restore")
         self.__send_statusbar_msg(message = _("Ready"))
 
     def __send_statusbar_msg(self, message):
@@ -895,7 +895,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
     def __init__(self, parent):
         """Default constructor.
         """
-        _gladefile = Util.get_resource_file('nssbackup-restore.glade')
+        _gladefile = Util.get_resource_file('sbackup-restore.glade')
 
         _wdgt_lst = [
             'restoreDialog',
@@ -917,7 +917,7 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
                               parent = parent, pull_down_dict = None)
         self.set_top_window(self.widgets[_top_win_name])
         self.top_window.set_icon_from_file(\
-                                    Util.get_resource_file("nssbackup-restore.png"))
+                                    Util.get_resource_file("sbackup-restore.png"))
 
         ProgressbarMixin.__init__(self, self.widgets['restore_progressbar'])
         self.__mode = None
