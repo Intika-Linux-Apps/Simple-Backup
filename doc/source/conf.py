@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# NSsbackup documentation build configuration file
+# Simple Backup documentation build configuration file
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -39,16 +39,16 @@ source_suffix = '.rst'
 master_doc = 'contents'
 
 # General substitutions.
-project = 'NSsbackup'
-copyright = '2009, NSsbackup Development Team'
+project = 'SBackup'
+copyright = '2009-2010, NSsbackup Development Team'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '0.2'
+version = '0.11'
 # The full version, including alpha/beta/rc tags.
-release = '0.2.0-RC3'
+release = '0.11.0'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -91,14 +91,14 @@ html_style = 'sphinxdoc.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'A not so simple backup solution'
+html_title = 'A simple backup solution'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = 'NSsbackup'
+html_short_title = 'SBackup'
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.
-#html_logo = 'static/nssbackup-logo.png'
+#html_logo = 'static/sbackup-logo.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -126,7 +126,7 @@ html_sidebars = {'index': 'indexsidebar.html'}
 
 # Additional templates that should be rendered to pages, maps page names to
 # templates.
-html_additional_pages = {'index': 'index.html','screenshots':'screenshots.html'}
+html_additional_pages = {'index': 'index.html', 'screenshots':'screenshots.html'}
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {'index': 'index-sidebar.jinja'}
@@ -156,7 +156,7 @@ html_copy_source = False
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'NSsbackupdoc'
+htmlhelp_basename = 'SBackupdoc'
 
 
 # Options for LaTeX output
@@ -171,7 +171,7 @@ latex_font_size = '10pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'NSsbackup.tex', 'NSsbackup Documentation', 'Jean-Peer Lorenz <peer.loz@gmx.net>', 'manual'),
+  ('index', 'SBackup.tex', 'Simple Backup Documentation', 'Jean-Peer Lorenz <peer.loz@gmx.net>', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

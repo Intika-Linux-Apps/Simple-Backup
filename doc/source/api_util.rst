@@ -4,15 +4,15 @@ Utilities
    
 Here are misceallenous functions and classes with several purposes collected.
 
-.. automodule:: nssbackup
+.. automodule:: sbackup
    :members:
 
-.. automodule:: nssbackup.util
+.. automodule:: sbackup.util
    :members:
    
-.. automodule:: nssbackup.util.exceptions
+.. automodule:: sbackup.util.exceptions
    :members:
    
-.. automodule:: nssbackup.util.Snapshot
+.. automodule:: sbackup.util.Snapshot
    :members:
   

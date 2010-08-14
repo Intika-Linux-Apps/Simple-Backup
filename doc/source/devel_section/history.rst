@@ -1,7 +1,7 @@
 History
 *******
 
-NSsbackup
+Simple Backup
 
 Original Creators::
 

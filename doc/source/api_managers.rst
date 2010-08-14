@@ -2,8 +2,8 @@
 Managers API
 ===============
    
-.. automodule:: nssbackup.managers
+.. automodule:: sbackup.core
    :members:
 
-.. automodule:: nssbackup.managers.SnapshotManager
+.. automodule:: sbackup.core.SnapshotManager
    :members:

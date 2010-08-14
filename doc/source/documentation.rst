@@ -1,10 +1,10 @@
 
-Not so Simple Backup User Manual
-================================
+Simple Backup User Manual
+==========================
 
 
 :ref:`api`
-    The complete NSsbackup API.
+    The complete SBackup API.
 
 
 

@@ -6,11 +6,11 @@ Overview over existing snapshot format versions:
 
 * 1.0 --- the original version that was used by sbackup up to 0.10.x ??? Is that right?
 * 1.1 --- was it ever used?
-* 1.2 --- used by NSsbackup version xxx?
+* 1.2 --- used by Simple Backup version xxx?
 		  - data stored in file `tree` was split and stored in `flist`
 		    containing the list of files and `fprops` containing the
 		    file properties
-* 1.3 --- used by NSsbackup version xxx?
+* 1.3 --- used by Simple Backup version xxx?
 		  - internal format of `flist` and `fprops` changed, instead of newline
 		    (\n) now ASCII Nul (\000) was used to separate entries
 * 1.4 --- no changes but the version numbering

@@ -3,8 +3,8 @@ Release Log
 ===========
 
 
-NSsbackup 0.2.0
----------------
+Simple Backup 0.11
+-------------------
 
 Release date: 
 

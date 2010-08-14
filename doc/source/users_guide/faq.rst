@@ -4,7 +4,7 @@ Q:
 Where are the log files stored by default?
 
 A:
-If you run NSsbackup as super-user the log is stored in '/var/log/nssbackup.log'. If you run NSsbackup as user the log is stored in '~/.local/share/nssbackup/nssbackup.log'.
+If you run Simple Backup as super-user the log is stored in '/var/log/sbackup.log'. If you run Simple Backup as user the log is stored in '~/.local/share/sbackup/sbackup.log'.
 
 
 

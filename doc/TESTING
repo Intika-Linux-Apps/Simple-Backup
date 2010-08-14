@@ -1,6 +1,6 @@
-====================
-Testing of NSsbackup
-====================
+======================
+Testing Simple Backup
+======================
 
 Testing strategy
 ================
@@ -46,7 +46,7 @@ Automated tests with helper scripts:
 How to run tests
 ================
 
-First read the paragraph about hacking on NSsbackup. If you understood this
+First read the paragraph about hacking on Simple Backup. If you understood this
 you can do the following to run Unittest cases:
 
 1. Move to the test directory within your development environment. This is
