@@ -1,4 +1,4 @@
-#    Simple Backup - Operation System related utilities
+#   Simple Backup - Operation System related utilities
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -15,7 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+#
 
 # UNIX specific implementations/definitions
 

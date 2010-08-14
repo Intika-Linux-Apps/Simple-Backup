@@ -1,7 +1,7 @@
-#    NSsbackup - custom exceptions
+#   Simple Backup - definition of custom exceptions
 #
+#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
-#   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by

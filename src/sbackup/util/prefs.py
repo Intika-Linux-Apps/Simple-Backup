@@ -1,4 +1,4 @@
-#    Simple Backup - handling of preferences
+#   Simple Backup - handling of preferences
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -17,7 +17,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackup.util.prefs` -- handling of preferences
+:mod:`sbackup.util.prefs` -- handling of preferences
 ======================================================
 
 .. module:: prefs
@@ -31,7 +31,7 @@ import glib
 import gconf
 
 
-from nssbackup.util import structs
+from sbackup.util import structs
 
 
 FS_BACKEND_GIO = "gio"

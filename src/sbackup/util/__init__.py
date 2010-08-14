@@ -1,4 +1,4 @@
-#    NSsbackup - Miscellaneous utilities
+#   Simple Backup - Miscellaneous utilities
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -18,7 +18,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackup.util` -- Miscellaneous utilities
+:mod:`sbackup.util` -- Miscellaneous utilities
 ================================================
 
 .. module:: util
@@ -40,16 +40,16 @@ import types
 import re
 import signal
 
-import nssbackup
-from nssbackup.util import local_file_utils
-from nssbackup.util import exceptions
-from nssbackup.util import constants
-from nssbackup.util import structs
-from nssbackup.util import log
+import sbackup
+from sbackup.util import local_file_utils
+from sbackup.util import exceptions
+from sbackup.util import constants
+from sbackup.util import structs
+from sbackup.util import log
 
 
 def __get_resource(resource_name, is_file = False):
-    """Looks for certain resources installed by nssbackup.
+    """Looks for certain resources installed by sbackup.
     The installation script writes into the 'resources' file where
     the files/resources are being stored.
     This function will look for them and return the appropriate path.
@@ -58,10 +58,10 @@ def __get_resource(resource_name, is_file = False):
     @param isFile: flag whether the resource looked up is a file
     
     @note: The resources file is required to be located in the
-            root directory of the nssbackup package. 
+            root directory of the sbackup package. 
     """
 #    print "Debug: Looking for '%s' (isFile=%s)" % (resourceName, isFile)
-    tmp = inspect.getabsfile(nssbackup)
+    tmp = inspect.getabsfile(sbackup)
     resfile = file(os.path.join(os.path.dirname(tmp), constants.RSRC_FILE), "r")
     resfilelines = resfile.readlines()
     resfile.close()
@@ -116,7 +116,7 @@ def get_version_number():
     """
     ver_line = "VERSION=n.a."
 
-    tmp = inspect.getabsfile(nssbackup)
+    tmp = inspect.getabsfile(sbackup)
     resfile = file(os.sep.join([os.path.dirname(tmp), "metainfo"]), "r")
     resfilelines = resfile.readlines()
     resfile.close()

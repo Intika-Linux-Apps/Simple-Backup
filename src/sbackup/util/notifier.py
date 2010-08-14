@@ -1,4 +1,4 @@
-#    NSsbackup - general observer-notfifier implementation
+#   Simple Backup - general observer-notfifier implementation
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -18,7 +18,7 @@
 #
 
 
-from nssbackup.util import constants
+from sbackup.util import constants
 
 
 # Handling of states and information provided by Dbus objects is

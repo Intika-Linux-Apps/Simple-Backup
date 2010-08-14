@@ -1,4 +1,4 @@
-#    Simple Backup - interface definitions
+#   Simple Backup - interface definitions
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #

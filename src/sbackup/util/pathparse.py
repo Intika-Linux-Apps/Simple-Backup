@@ -1,4 +1,4 @@
-#    Simple Backup - pathname manipulation on string basis
+#   Simple Backup - pathname manipulation on string basis
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -17,7 +17,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackup.util.pathparse` -- pathname manipulation on string basis
+:mod:`sbackup.util.pathparse` -- pathname manipulation on string basis
 ========================================================================
 
 .. module:: pathparse
@@ -32,9 +32,9 @@ import datetime
 import types
 
 
-from nssbackup.util import log
-from nssbackup.util import system
-from nssbackup.util import exceptions
+from sbackup.util import log
+from sbackup.util import system
+from sbackup.util import exceptions
 
 
 #TODO: Do we need to implement this module per backend?

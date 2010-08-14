@@ -1,4 +1,4 @@
-#    NSsbackup - Basic structures
+#   Simple Backup - Basic data structures
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -20,8 +20,8 @@
 
 import os
 
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.exceptions import CorruptedSBdictException
+from sbackup.util.exceptions import SBException
+from sbackup.util.exceptions import CorruptedSBdictException
 
 
 class Singleton(type):

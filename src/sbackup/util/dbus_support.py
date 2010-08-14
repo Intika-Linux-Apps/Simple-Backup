@@ -1,4 +1,4 @@
-#    NSsbackup - support of DBus functionality
+#   Simple Backup - support of DBus functionality
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -31,15 +31,15 @@ import time
 import types
 import dbus
 
-from nssbackup import dbus_service
+from sbackup import dbus_service
 
-from nssbackup.util import log
-from nssbackup.util import notifier
-from nssbackup.util import structs
-from nssbackup.util import constants
-from nssbackup.util import system
-from nssbackup.util import exceptions
-from nssbackup.util import get_resource_file
+from sbackup.util import log
+from sbackup.util import notifier
+from sbackup.util import structs
+from sbackup.util import constants
+from sbackup.util import system
+from sbackup.util import exceptions
+from sbackup.util import get_resource_file
 
 
 #DBUS_CONNECT_TIMEOUT_TOTAL_SECONDS = 15 # for given number of trials

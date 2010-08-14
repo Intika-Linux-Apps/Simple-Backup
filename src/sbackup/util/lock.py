@@ -1,4 +1,4 @@
-#    NSsbackup - lock file facilities
+#   Simple Backup - lock file facilities
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -31,10 +31,10 @@ import types
 import os
 
 
-from nssbackup.util import local_file_utils
-from nssbackup.util import system
-from nssbackup.util import exceptions
-from nssbackup.util import log
+from sbackup.util import local_file_utils
+from sbackup.util import system
+from sbackup.util import exceptions
+from sbackup.util import log
 
 
 class ApplicationLock(object):

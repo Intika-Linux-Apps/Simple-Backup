@@ -1,4 +1,4 @@
-#    NSsbackup - Logging facilities
+#   Simple Backup - Logging facilities
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -68,7 +68,7 @@ class LogFactory(object):
         already created loggers are stored.
         """
         if not name:
-            name = "NSsbackup"
+            name = "SBackup"
 
         _formatter = LogFactory.formatter
         if level == logging.DEBUG:
@@ -95,11 +95,11 @@ class LogFactory(object):
                     parentdir = os.path.dirname(os.path.abspath(logfile))
                     if not os.path.exists(parentdir):
                         os.makedirs(parentdir)
-                    _writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
+                    _writetofile(logfile, "SBackup '%s' Logger\r\n==============\r\n" % name)
                 else :
                     # clean the logfile
                     os.rename(logfile, logfile + ".old")
-                    _writetofile(logfile, "NSSBackup '%s' Logger\r\n==============\r\n" % name)
+                    _writetofile(logfile, "SBackup '%s' Logger\r\n==============\r\n" % name)
                 ch1 = logging.FileHandler(logfile)
                 ch1.setLevel(level)
                 ch1.setFormatter(_formatter)

@@ -1,4 +1,4 @@
-#    Simple Backup - definition of common constants related to SBackup
+#   Simple Backup - definition of common constants related to SBackup
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -74,15 +74,15 @@ INDICATORAPP_NAME = "Simple Backup Indicator Application"
 DBUS_NOTIFIER_NAME = "Simple Backup DBus Notifier"
 
 TERMINATE_FILE = "sbackup-terminate"
-BACKUP_COMMAND = "nssbackupd"
+BACKUP_COMMAND = "sbackupd"
 BACKUP_PROCESS_NAME = "Simple Backup Process"
 
 
 # icon filenames
-DEFAULT_ICON_FILENAME = "nssbackup.png"
-NOTIFICATION_ICON_FILENAME = "nssbackup32x32.png"
-CONFIG_ICON_FILENAME = "nssbackup-conf.png"
-RESTORE_ICON_FILENAME = "nssbackup-restore.png"
+DEFAULT_ICON_FILENAME = "sbackup.png"
+NOTIFICATION_ICON_FILENAME = "sbackup32x32.png"
+CONFIG_ICON_FILENAME = "sbackup-conf.png"
+RESTORE_ICON_FILENAME = "sbackup-restore.png"
 
 # icon names (must be registered before using)
 INDICATOR_ATTENTION_ICON = "sbackup-attention"
@@ -93,9 +93,9 @@ INDICATOR_SUCCESS_ICON = "sbackup-success"
 # used in module `util`
 RSRC_FILE = "resources"
 LOCALE_DIR = "locale"
-LOCALE_DOMAIN = "nssbackup"
+LOCALE_DOMAIN = "sbackup"
 
-NOTIFICATION_DOMAIN = "nssbackup"
+NOTIFICATION_DOMAIN = "sbackup"
 
 
 # dbus constants - keep copies of these up-to-date in `sbackup-progress`

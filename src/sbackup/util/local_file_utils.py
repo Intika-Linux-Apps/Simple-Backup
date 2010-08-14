@@ -1,4 +1,4 @@
-#    Simple Backup - unified file handling
+#   Simple Backup - unified file handling using (Python's) native functions
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -39,11 +39,11 @@ import gzip
 import uuid
 
 
-from nssbackup.util import pathparse
-from nssbackup.util import exceptions
-from nssbackup.util import constants
-from nssbackup.util import system
-from nssbackup.util import log
+from sbackup.util import pathparse
+from sbackup.util import exceptions
+from sbackup.util import constants
+from sbackup.util import system
+from sbackup.util import log
 
 
 
