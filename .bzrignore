@@ -31,6 +31,6 @@
 ./po/pt
 ./po/pt_BR
 ./po/ru
-./src/nssbackup.egg-info
-./src/nssbackup/metainfo
-./src/nssbackup/resources
+./src/sbackup.egg-info
+./src/sbackup/metainfo
+./src/sbackup/resources
