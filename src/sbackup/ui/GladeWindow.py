@@ -200,7 +200,7 @@ class GladeWindow(object):
     def _show_destination_error(self, error):
         _sec_msg = _("Please make sure the missing directory exists (e.g. by mounting an external disk) or change the specified target.")
         self._show_errmessage(message_str = _("While accessing the backup destination following error occurred:\n\n%s.") % error,
-                boxtitle = _("(Not So) Simple Backup error"),
+                boxtitle = _("Simple Backup error"),
                 headline_str = _("Unable to access backup destination"),
                 secmsg_str = _sec_msg)
 

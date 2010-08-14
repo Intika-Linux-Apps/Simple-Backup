@@ -529,7 +529,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             self.logger.error(str(_items))
             self.logger.error(traceback.format_exc())
             self._show_errmessage(message_str = str(_items),
-                    boxtitle = _("(Not So) Simple Backup restore error"),
+                    boxtitle = _("Simple Backup restore error"),
                     headline_str = _("An error occurred while reading snapshot"))
             _items = None
 
@@ -780,7 +780,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                 self.logger.exception("Error while upgrade snapshot: %s" % error)
                 _message_str = _("While attempting to upgrade snapshot the following error occurred:\n%s")\
                                     % error
-                _boxtitle = _("(Not So) Simple Backup error")
+                _boxtitle = _("Simple Backup error")
                 _headline_str = _("Unable to upgrade snapshot")
                 gobject.idle_add(self._show_errmessage, _message_str, _boxtitle, _headline_str)
 
@@ -834,7 +834,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                         self.logger.exception("Error while delete snapshot: %s" % error)
                         _message_str = _("While attempting to delete snapshot the following error occurred:\n%s")\
                                             % error
-                        _boxtitle = _("(Not So) Simple Backup error")
+                        _boxtitle = _("Simple Backup error")
                         _headline_str = _("Unable to delete snapshot")
                         gobject.idle_add(self._show_errmessage, _message_str, _boxtitle, _headline_str)
 
@@ -867,25 +867,25 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
     """
 
     __messages = \
-      { "restore"     : { "dialog_titletxt": _("(Not So) Simple Backup restoration"),
+      { "restore"     : { "dialog_titletxt": _("Simple Backup restoration"),
                          "msg_headline"    : _("<b>Restoring of selected files</b>"),
                          "msg_progress"    : _("Restoring of <tt>'%s'</tt> is in progress."),
                          "msg_sucess"      : _("Restoring of <tt>'%s'</tt> was successful."),
                          "msg_failure"     : _("Restoring of <tt>'%s'</tt> was not successful.\n\nFollowing error occurred:\n") },
 
-        "restore_as" : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
+        "restore_as" : { "dialog_titletxt" : _("Simple Backup restoration"),
                          "msg_headline"    : _("<b>Restoring of selected files</b>"),
                          "msg_progress"    : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
                          "msg_sucess"      : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was successful."),
                          "msg_failure"     : _("Restoring of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was not successful.\n\nFollowing error occurred:\n") },
 
-        "revert"     : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
+        "revert"     : { "dialog_titletxt" : _("Simple Backup restoration"),
                          "msg_headline"    : _("<b>Reverting selected files</b>"),
                          "msg_progress"    : _("Reverting of <tt>'%s'</tt> is in progress.\n"),
                          "msg_sucess"      : _("Reverting of <tt>'%s'</tt> was successful."),
                          "msg_failure"     : _("Reverting of <tt>'%s'</tt> was not successful.\n\nFollowing error occurred:\n") },
 
-        "revert_as"     : { "dialog_titletxt" : _("(Not So) Simple Backup restoration"),
+        "revert_as"     : { "dialog_titletxt" : _("Simple Backup restoration"),
                          "msg_headline"    : _("<b>Reverting selected files</b>"),
                          "msg_progress"    : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> is in progress."),
                          "msg_sucess"      : _("Reverting of <tt>'%(source)s'</tt>\nto <tt>'%(dirname)s'</tt> was successful."),

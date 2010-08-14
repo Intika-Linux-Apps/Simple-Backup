@@ -131,7 +131,7 @@ class BackupProfileHandler(object):
 
         if needupgrade:
             self.__state.set_state('needupgrade')
-            _msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using '(Not So) Simple Backup-Restoration' if you want to use them.")
+            _msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using 'Simple Backup-Restoration' if you want to use them.")
             self.logger.warning(_msg)
 
         # get basic informations about new snapshot

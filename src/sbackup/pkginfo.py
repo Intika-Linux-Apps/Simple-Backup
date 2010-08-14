@@ -36,7 +36,7 @@ class Infos(object):
     
     """
 
-    NAME = "(Not So) Simple Backup Suite"
+    NAME = "Simple Backup Suite"
 
     VERSION = util.get_version_number()
 
