@@ -1,6 +1,6 @@
-************************
-How to hack on NSsbackup
-************************
+*****************************
+How to hack on Simple Backup
+*****************************
 
 Style guide
 -----------
@@ -33,8 +33,8 @@ Summary of style guide
 How to run from source code
 ---------------------------
 
-Attention: For the current version, it is not recommended to install NSsbackup
-for productive use and to code on it beside at the same time.
+Attention: For the current version, it is not recommended to install
+Simple Backup for productive use and to code on it beside at the same time.
 
 The reason is that there are 2 packages for import in
 that case, it might occur name conflicts: in your development environment and

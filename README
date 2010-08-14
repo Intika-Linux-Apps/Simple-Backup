@@ -10,8 +10,8 @@ See INSTALL file for more information.
 
 Uninstall
 =========
-To remove (Not So) Simple Backup Suite and created user
-configuration files type:
+To remove a prior installation of Simple Backup Suite and all user
+configuration files:
 
 sudo make uninstall && sudo make clean && sudo make purge-user-config
 
