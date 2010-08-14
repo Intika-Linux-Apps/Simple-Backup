@@ -1,6 +1,6 @@
 ################################################################################
 #
-# GNU Makefile for NSsbackup
+#   Simple Backup - GNU Makefile
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2010: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -104,62 +104,62 @@ po-dir:
 	set -e; for lang in $(PO); do mkdir -p po/$$lang/LC_MESSAGES/ ; done
 
 po-data: po-dir
-	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/nssbackup.mo ; done
+	set -e; for lang in $(PO); do msgfmt po/$$lang.po -o po/$$lang/LC_MESSAGES/sbackup.mo ; done
 
 #TODO: use intltool and scan *.desktop...
 po-gen:
-	set -e; xgettext -o po/nssbackup.pot src/nssbackup/*.py src/nssbackup/*/*.py data/ui/*.glade scripts/*.py
-	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/nssbackup.pot; done
+	set -e; xgettext -o po/sbackup.pot src/sbackup/*.py src/sbackup/*/*.py data/ui/*.glade scripts/*.py
+	set -e; for lang in $(PO); do msgmerge -U po/$$lang.po po/sbackup.pot; done
 
 fill-templates:
-	set -e; sed s+@prefix@+$(PREFIX)+ src/nssbackup/resources.in > src/nssbackup/resources
+	set -e; sed s+@prefix@+$(PREFIX)+ src/sbackup/resources.in > src/sbackup/resources
 
-	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-config.desktop.in > data/desktop/nssbackup-config.desktop
-	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-config-su.desktop.in > data/desktop/nssbackup-config-su.desktop.tmp
-	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-config-su.desktop.tmp > data/desktop/nssbackup-config-su.desktop
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/sbackup-config.desktop.in > data/desktop/sbackup-config.desktop
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/sbackup-config-su.desktop.in > data/desktop/sbackup-config-su.desktop.tmp
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/sbackup-config-su.desktop.tmp > data/desktop/sbackup-config-su.desktop
 
-	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-restore.desktop.in > data/desktop/nssbackup-restore.desktop
-	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-restore-su.desktop.in > data/desktop/nssbackup-restore-su.desktop.tmp
-	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/nssbackup-restore-su.desktop.tmp > data/desktop/nssbackup-restore-su.desktop
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/sbackup-restore.desktop.in > data/desktop/sbackup-restore.desktop
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/sbackup-restore-su.desktop.in > data/desktop/sbackup-restore-su.desktop.tmp
+	set -e; sed s+@prefix@+$(PREFIX)+ data/desktop/sbackup-restore-su.desktop.tmp > data/desktop/sbackup-restore-su.desktop
 
 	set -e; sed s+@version@+$(VERSION)+ setup.py.in > setup.py.tmp
 	set -e; sed s+@pkgname@+$(PKGNAME)+ setup.py.tmp > setup.py
 	
-	set -e; sed s+@version@+$(VERSION)+ src/nssbackup/metainfo.in > src/nssbackup/metainfo.tmp
-	set -e; sed s+@pkgname@+$(PKGNAME)+ src/nssbackup/metainfo.tmp > src/nssbackup/metainfo
+	set -e; sed s+@version@+$(VERSION)+ src/sbackup/metainfo.in > src/sbackup/metainfo.tmp
+	set -e; sed s+@pkgname@+$(PKGNAME)+ src/sbackup/metainfo.tmp > src/sbackup/metainfo
 	
-	rm -f data/desktop/nssbackup-config-su.desktop.tmp
-	rm -f data/desktop/nssbackup-restore-su.desktop.tmp
-	rm -f data/desktop/nssbackup-notify.tmp
-	rm -f src/nssbackup/metainfo.tmp
+	rm -f data/desktop/sbackup-config-su.desktop.tmp
+	rm -f data/desktop/sbackup-restore-su.desktop.tmp
+	rm -f data/desktop/sbackup-notify.tmp
+	rm -f src/sbackup/metainfo.tmp
 	rm -f setup.py.tmp
 
 
 install: install-po install-help install-bin install-sbin install-package install-data
-	chmod +x $(datadir)/nssbackup/multipleTarScript
-	chmod +x $(datadir)/nssbackup/nssbackup-launch
-	chmod +x $(datadir)/nssbackup/sbackup-dbusservice
-	chmod +x $(datadir)/nssbackup/sbackup-indicator
-	chmod +x $(datadir)/nssbackup/sbackup-progress
-	chmod +x $(datadir)/nssbackup/sbackup-terminate
+	chmod +x $(datadir)/sbackup/multipleTarScript
+	chmod +x $(datadir)/sbackup/sbackup-launch
+	chmod +x $(datadir)/sbackup/sbackup-dbusservice
+	chmod +x $(datadir)/sbackup/sbackup-indicator
+	chmod +x $(datadir)/sbackup/sbackup-progress
+	chmod +x $(datadir)/sbackup/sbackup-terminate
 
 # application's binaries
 install-bin:
 	mkdir -p $(bindir)
-	cp -a scripts/nssbackupd.py $(bindir)/nssbackupd
-	cp -a scripts/nssbackup-config-gui.py $(bindir)/nssbackup-config-gui
-	cp -a scripts/nssbackup-restore-gui.py $(bindir)/nssbackup-restore-gui
-	cp -a scripts/nssbackup-upgrade-backups.py $(bindir)/nssbackup-upgrade-backups
-	chmod +x $(bindir)/nssbackupd
-	chmod +x $(bindir)/nssbackup-config-gui
-	chmod +x $(bindir)/nssbackup-restore-gui
-	chmod +x $(bindir)/nssbackup-upgrade-backups
+	cp -a scripts/sbackupd.py $(bindir)/sbackupd
+	cp -a scripts/sbackup-config-gui.py $(bindir)/sbackup-config-gui
+	cp -a scripts/sbackup-restore-gui.py $(bindir)/sbackup-restore-gui
+	cp -a scripts/sbackup-upgrade-backups.py $(bindir)/sbackup-upgrade-backups
+	chmod +x $(bindir)/sbackupd
+	chmod +x $(bindir)/sbackup-config-gui
+	chmod +x $(bindir)/sbackup-restore-gui
+	chmod +x $(bindir)/sbackup-upgrade-backups
 	
 # Configuration and setup tools
 install-sbin:
 	mkdir -p $(sbindir)
-	cp -a scripts/nssbackupconfig.py $(sbindir)/nssbackupconfig
-	chmod +x $(sbindir)/nssbackupconfig
+	cp -a scripts/sbackupconfig.py $(sbindir)/sbackupconfig
+	chmod +x $(sbindir)/sbackupconfig
 
 # python package
 install-package:
@@ -230,31 +230,31 @@ install-gconf:
 uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-help clean-data
 
 uninstall-bin:
-	rm -f $(bindir)/nssbackupd
-	rm -f $(bindir)/nssbackup-config-gui
-	rm -f $(bindir)/nssbackup-restore-gui
-	rm -f $(bindir)/nssbackup-upgrade-backups
+	rm -f $(bindir)/sbackupd
+	rm -f $(bindir)/sbackup-config-gui
+	rm -f $(bindir)/sbackup-restore-gui
+	rm -f $(bindir)/sbackup-upgrade-backups
 
 uninstall-sbin:
-	rm -f $(sbindir)/nssbackupconfig
+	rm -f $(sbindir)/sbackupconfig
 
 uninstall-package:
-	rm -rf $(DESTDIR)/lib/python*/*/nssbackup*
+	rm -rf $(DESTDIR)/lib/python*/*/sbackup*
 
 uninstall-data: uninstall-icons uninstall-dbus uninstall-gconf
-	rm -f $(datadir)/pixmaps/nssbackup-restore.png
-	rm -f $(datadir)/pixmaps/nssbackup-conf.png
-	rm -f $(datadir)/pixmaps/nssbackup.png
-	rm -f $(datadir)/pixmaps/nssbackup32x32.png
+	rm -f $(datadir)/pixmaps/sbackup-restore.png
+	rm -f $(datadir)/pixmaps/sbackup-conf.png
+	rm -f $(datadir)/pixmaps/sbackup.png
+	rm -f $(datadir)/pixmaps/sbackup32x32.png
 	
-	rm -f $(datadir)/applications/nssbackup-config.desktop
-	rm -f $(datadir)/applications/nssbackup-restore.desktop
-	rm -f $(datadir)/applications/nssbackup-config-su.desktop
-	rm -f $(datadir)/applications/nssbackup-restore-su.desktop
+	rm -f $(datadir)/applications/sbackup-config.desktop
+	rm -f $(datadir)/applications/sbackup-restore.desktop
+	rm -f $(datadir)/applications/sbackup-config-su.desktop
+	rm -f $(datadir)/applications/sbackup-restore-su.desktop
 	
-	rm -rf $(datadir)/nssbackup
-	rm -rf $(datadir)/doc/nssbackup
-	set -e; find $(langdir) -name nssbackup.mo -exec rm -f '{}' \;
+	rm -rf $(datadir)/sbackup
+	rm -rf $(datadir)/doc/sbackup
+	set -e; find $(langdir) -name sbackup.mo -exec rm -f '{}' \;
 
 uninstall-icons:
 # implement loop over icon files
@@ -292,28 +292,28 @@ clean-data: clean-crondata clean-tmpdata
 # remove script/symlinks from cron directory
 clean-crondata:
 	if test "$(DISABLE_MAKEFILE_CLEAN_DATA)" = ""; then \
-	rm -f /etc/cron.d/nssbackup; \
-	rm -f /etc/cron.hourly/nssbackup; \
-	rm -f /etc/cron.daily/nssbackup; \
-	rm -f /etc/cron.weekly/nssbackup; \
-	rm -f /etc/cron.monthly/nssbackup; fi
+	rm -f /etc/cron.d/sbackup; \
+	rm -f /etc/cron.hourly/sbackup; \
+	rm -f /etc/cron.daily/sbackup; \
+	rm -f /etc/cron.weekly/sbackup; \
+	rm -f /etc/cron.monthly/sbackup; fi
 
 clean-tmpdata:
 	if test "$(DISABLE_MAKEFILE_CLEAN_DATA)" = ""; then \
-	rm -rf /home/*/.local/share/nssbackup/tmp; \
-	rm -rf /home/*/.local/share/nssbackup/log; \
-	rm -f /home/*/.local/share/nssbackup/nssbackup-*.log; \
-	rm -f /home/*/.local/share/nssbackup/nssbackup-*.log.*.gz; \
-	rm -rf /var/log/nssbackup; \
-	rm -f /var/log/nssbackup-*.log; \
-	rm -f /var/log/nssbackup-*.log.*.gz; \
-	rm -rf /tmp/nssbackup; fi
+	rm -rf /home/*/.local/share/sbackup/tmp; \
+	rm -rf /home/*/.local/share/sbackup/log; \
+	rm -f /home/*/.local/share/sbackup/sbackup-*.log; \
+	rm -f /home/*/.local/share/sbackup/sbackup-*.log.*.gz; \
+	rm -rf /var/log/sbackup; \
+	rm -f /var/log/sbackup-*.log; \
+	rm -f /var/log/sbackup-*.log.*.gz; \
+	rm -rf /tmp/sbackup; fi
 
 
 purge-user-config:
-	rm -f /etc/nssbackup.conf
-	rm -rf /etc/nssbackup.d
-	rm -rf /home/*/.config/nssbackup
+	rm -f /etc/sbackup.conf
+	rm -rf /etc/sbackup.d
+	rm -rf /home/*/.config/sbackup
 
 
 #
@@ -331,14 +331,14 @@ clean:
 	set -e; find . -name '*.bak' -exec rm -f '{}' \;
 	rm -rf build dist setup.py
 	
-	rm -f data/desktop/nssbackup-config-su.desktop
-	rm -f data/desktop/nssbackup-config.desktop
-	rm -f data/desktop/nssbackup-restore-su.desktop
-	rm -f data/desktop/nssbackup-restore.desktop
+	rm -f data/desktop/sbackup-config-su.desktop
+	rm -f data/desktop/sbackup-config.desktop
+	rm -f data/desktop/sbackup-restore-su.desktop
+	rm -f data/desktop/sbackup-restore.desktop
 	
-	rm -f src/nssbackup/resources
-	rm -f src/nssbackup/metainfo
-	rm -rf src/nssbackup.egg-info
+	rm -f src/sbackup/resources
+	rm -f src/sbackup/metainfo
+	rm -rf src/sbackup.egg-info
 	set -e; for lang in $(PO); do rm -rf po/$$lang ; done
 
 # Purpose of this target is to print some informational data

@@ -3,7 +3,7 @@ Install
 
 1. Remove previously installed versions (using make or .deb packages)
 2. make && sudo make install
-3. sudo nssbackupconfig
+3. sudo sbackupconfig
 
 See INSTALL file for more information.
 
@@ -35,12 +35,12 @@ In RC3 the naming convention of log files was changed.
 To change the names of the log files in your configuration files you
 have 2 possibilities:
 
-* run 'sudo nssbackupconfig' afterwards you've installed NSsbackup
+* run 'sudo sbackupconfig' afterwards you've installed Simple Backup
 
 or
 
-* open each of your profiles in 'NSsbackup configuration tool' and
+* open each of your profiles in 'Simple Backup configuration' and
    afterwards save them again.
 
 Please note: your configuration files are modified automatically if you
-install NSsbackup from software packages (PPA) during the installation.
+install Simple Backup from software packages (PPA) during the installation.

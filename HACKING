@@ -5,7 +5,7 @@ How to hack on NSsbackup
 Style guide
 -----------
 
-When writing code for NSsbackup please follow the style guide for Python code,
+When writing code for SBackup please follow the style guide for Python code,
 PEP 8. See http://www.python.org/dev/peps/pep-0008/.
 
 Tools to ease you writing good style code are:
@@ -46,23 +46,23 @@ as follows:
 1. Add your development directory to the Python path. Do this in a shell, so
    it does not affect the whole system! You can use the following commands:
 
-	declare -x PYTHONPATH="/Path-to-development/0.2/src:"$PYTHONPATH
+	declare -x PYTHONPATH="/Path-to-development/sbackup/src:"$PYTHONPATH
 
 2. Manually create a file `resources` with appropriate content based on the
    template file `resources.in` and place it in the package's top level
-   directory (src/nssbackup). This file is usually created during installation
+   directory (src/sbackup). This file is usually created during installation
    and therefore it is required to tweak it by hand for development.
  
 3. Analogous to step 2) create a file `metainfo` with appropriate content based
    on the template file `metainfo.in` and place it in the package's top level
-   directory (src/nssbackup).
+   directory (src/sbackup).
    
 4. Go to the source directory to run the application you wish
 	
 	cd /Path-to-development/0.2/src
-	python nssbackup-config-gui.py
-	python nssbackup-restore-gui.py
-	python nssbackupd.py
+	python sbackup-config-gui.py
+	python sbackup-restore-gui.py
+	python sbackupd.py
 	
 	
 Translations

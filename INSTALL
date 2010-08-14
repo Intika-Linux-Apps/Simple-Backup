@@ -1,6 +1,6 @@
-**************************
-Not So Simple Backup Suite
-**************************
+*******************
+Simple Backup Suite
+*******************
 
 Installation from Package (the easy way)
 ========================================
@@ -19,12 +19,12 @@ Include PPA
 
 Installation
 ~~~~~~~~~~~~
- * sudo apt-get install nssbackup
+ * sudo apt-get install sbackup
 
 
 Uninstalling
 ~~~~~~~~~~~~
-* If installed via apt: 'sudo apt-get remove nssbackup'
+* If installed via apt: 'sudo apt-get remove sbackup'
 
 
 Installation from source code
@@ -47,7 +47,7 @@ curlftpfs (for ftp and sftp fuse plugins)
 
 Installation
 ~~~~~~~~~~~~
-By default, nssbackup will be installed under "/usr/local" folder.
+By default, Simple Backup will be installed under "/usr/local" folder.
 
 * Remove previously installed versions (using make or .deb packages)
 
@@ -62,7 +62,7 @@ By default, nssbackup will be installed under "/usr/local" folder.
 * Walk into the same directory as this README file
 * Type:
  make && sudo make install
- sudo nssbackupconfig
+ sudo sbackupconfig
 
 
 Uninstalling

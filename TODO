@@ -1,12 +1,12 @@
-******************
-TODO for NSsbackup
-******************
+**********************
+TODO for Simple Backup
+**********************
 
-see blueprints on : https://blueprints.edge.launchpad.net/nssbackup/
+see blueprints on https://blueprints.edge.launchpad.net/sbackup
 
 
-This must be done for milestone 'Release 0.3':
-----------------------------------------------
+Planned for near future
+-----------------------
 
 * Check how sbackupd reacts if it can not get into a folder (FUSE used by a user)
 * Check filesizes (2 Gb and 4 Gb limits)
@@ -31,28 +31,21 @@ This must be done for milestone 'Release 0.3':
 * realize PEP 8 style guide for all modules
 
 
-Planned for later releases:
----------------------------
+Planned for later releases
+--------------------------
 
 Features to implement:
-* plugins for exporting snapshot (will be used for tape, CD ... )
 * encription will be via a FusePlugin , find the fuse encripted FS
 * Backup media management (via SnapshotManager )
 * (Ana)Cron for non root
 
 For UI
 * show forever excluded paths in the GUI (including the backup target dir)
-* no "help" on restore :)
-* Follow GNOME HIG
 * first time wizard
 * add ability to restore more than one file/folder a time
 
 For core
 * encryption
-* split master backup file into smaller pieces
-* recording of a backup snapshot to a set of CDs/DVDs
 * backup media management
 * syslog logging
 * testable system
-
-

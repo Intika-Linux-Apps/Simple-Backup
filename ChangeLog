@@ -1,285 +1,152 @@
-nssbackup (0.3.1)
-  * [Fix] LP #576030: nssbackup-upgrade-backups and nssbackupd crashes when
-                      starting nssbackup-restoration-gui
-  * [Fix] LP #616667: Unable to save configuration as superuser: OSError-File
-                      exists (broken links were not removed before overwriting)
-  * [Fix] LP #616497: Misleading option label: nssbackup is not cleaning up
-                      incomplete/corrupt backups
-  * translations updated
+sbackup (0.10.5ubuntu2)
+  * Replace depends on gksu and sudo with menu for su-to-root (LP: #260203)
+    - Thanks to Marcel Stimberg for the fix
 
-nssbackup (0.3.0)
-  * [Fix] LP #130856: Show remaining time till backup is finished in UI
-  * [Fix] LP #146619: Make a full backup now button
-  * [Fix] LP #412934: escape local filename containing an equal sign
-  * [Fix] LP #584294: Restoration GUI revamped
-  * [Fix] LP #599865: Link to launchpad start root firefox
-  * [Fix] LP #604479: Thanks to Florian Achleitner (value returned is a
-                      string and was not converted before comparison)
-  * [Fix] LP #613746: added commandline option to force full backup
-  * [Fix] LP #601574: Changes to the "Do a full backup" text box are not noticed  
-  * [Change]: do purge after backup
-  * [Change]: delete snapshots from restoration gui only if standalone
-  * [Change]: default value for backup compression set to `none`
-  * [Enhancement]: improved error handling
-  * [Enhancement]: added support for GIO backend (Fuse backend can be enabled
-                   by gconf setting)
-  * [Enhancement]: module structure re-organized
-  * [Enhancement]: code formatting and clean-up
-  * [Enhancement]: D-Bus notification service implemented
-  * [Enhancement]: Indicator application using libappindicator (for Ubuntu)
-                   and legacy status icon implemented
-  * [Enhancement]: GUI features implemented: cancel backup, progress of backup,
-                   retry if target is not accessible, make full backup
-  * Launchpad translations merged
+sbackup (0.10.5ubuntu1)
+  * Add Japanese translation. (LP: #280788)
+    Thanks to Hajime Mizuno <mizuno@as.airnet.ne.jp>.
 
-nssbackup (0.2.1)
-  * [FIX] LP Bug #588878: Backup unsuccessful due to wrong exit code handling
+sbackup (0.10.5)  
+  * Update to use su-to-root (Closes: #479826)
+  * Revert the group of all files to 'root' as there 
+    is no common admin group (Closes: #427697)
+  * Save partition information (Closes: #431068)
+  * Remove *.pyc files on purge (Closes: #428022)
+  * Exclude /home/*/.gvfs/ folders by default (Launchpad: #222898)
+  * Fix a typo preventing logarithmic cleanup from 
+    working (Closes: #447252) (Launchpad: #126278, #71698)
+  * Fix a popup help type for SSH target recovery (Launchpad: #183650)
+  * Check regex before adding it (Launchpad: #191127)
+  * Add stop_if_no_target option to abort backups if the taget is
+    on a removable drive that is not currently connected
+  * Fully draw the "Restoring ..." info box before restoring a file
 
-nssbackup (0.2.0)
-  * [Fix] LP Bug #573733: nssbackup does not prevent itself from running in
-          parallel.
-  * [Fix] LP Bug #526544: was re-opened, missing newline at eof
-  * [FIX] LP Bug #577296: Crash, with "%d format: a number is required, not str"
-  * [Fix] LP Bug #258542 from Mascha's branch: adding a $ add the end of new
-          file types; old file type regexps must be edited by hand to add the $;
-          prior defined file types are handled as "normal" regular expression,
-          display file type regular expressions also under regular expression
-          tab to make this clear
-  * [Fix] regression of LP #146618: The file size limitation should not be a
-          recommendation
-  * [Fix] regression: avoid backup of circular symlinks in the case of link
-          dereferencing (follow symlinks)
-  * [Fix]: implemented a work-around to enable notifications when running as
-           root from cron/anacron
-  * [Fix]: avoid merge of snapshots when purging snapshots by only removing
-           stand-alone snapshots
-  * [Fix]: minor changes in file collection codes (counting symlinks as
-           included files)
-  * [Fix]: execution of tar within empty environment; this avoids manipulation
-           of tar options by leaked in environment variables and fixes a
-           performance bug related to non-englisch languages (LANG) and tar
-           (tar was much (6x) slower when running localized)
-  * [Fix]: make uninstall and removal of debian package did not removed written
-           cron entries
-  * [Fix]: when starting another instance of nssbackupd or GUI tools previous
-           log files were overwritten (introduces rotating log file handling)
-  * [Fix]: skip excluded paths when merging snar files (see also LP #567965)
-  * [Fix]: issues with non-translated strings due to incorrect import order
-           of modules
-  * [Fix]: typos and minor issues with translatable strings corrected
-  * [Fix]: avoid system locks when running scheduled backups by decreasing
-           priority of backup process (nice/ionice)
-  * [Fix]: disable timeout (Signal ALARM) after exception handling
-  * [Change]: Logarithmic purge disabled since it still has issues  
-  * [Enhancement]: improvements to the release script
-  * [Enhancement]: improved handling of tar output
-  * [Enhancement]: added support for compressed log files
-  * [Enhancement]: Exclude process pid files as recommendation
-  * [Enhancement]: added Regex for exclusion of backup files '*~' to the default
-                   recommendations
-  * [Enhancement]: create a log directory exclusively for nssbackup as default
-                   recommendation in order not to mess up /var/log (no changes
-                   are made on existing configurations)
-  * Launchpad translations merged
-
-nssbackup (0.2-0~rc9)
-  * [FIX] LP Bug #526544: cron servicefile was not found
-  * [FIX] LP Bug #512007: add fuse allow_other option to ssh plugin
-  * [FIX] LP Bug #382753: NSSBackup doesn't exclude folders with special
-          characters
-  * [FIX] not translatable strings added
-  * [FIX] avoid definition of exclude expressions containing a comma
-          (delimiter in config) from GUI
-  * [FIX] avoid multiple definition of exclude expressions (filetypes, regex)
-  * [FIX] enable 'Save as...' of configuration always
-  * [FIX] default backup target is created if it does not exist
-  * [FIX] unified behaviour on close (using the menu, the window close button
-          etc.)
-  * [FIX] added check before test mail settings
-  * [FIX] split size corrected (1 GiB = 1024 MiB)
-  * [FIX] Application of Gnome HIG to the configuration GUI
-  * [FIX] place nssbackup (admin mode) in Gnome main menu under
-          Applications->System instead of the System->Settings tool
-          (see http://library.gnome.org/devel/menu-spec/)
-  * [FIX] set Freedesktop base directory if missing (required for Help/yelp
-          in some shells)
-  * [FIX] improve startup behaviour from Gnome main menu
-  * [FIX] minor issues with Scheduling fixed (removal, updating)
-  * [FIX] make the backup splitting configuration language independent
-  * [FIX] when the log level is set to ERROR, the config gui couldn't start.
-  * [FIX] moved max. incr. interval in configuration GUI to main page
-  * [FIX] Scheduling only for default-profiles
-  * [FIX] some issues with Scheduling fixed (removal, updating)
-  * [Change] add info to statusbar when running in 'Administrator mode'
-  * [Change] unified storage of name and version of package (in file METAINFO)
-  * [Change] added possibility to cancel the closing if config has changed
-  * [Change] behaviour changed for 'Add profile' when entering non-valid
-             names - dialog remains open
-  * [Change] Removal of the 'main' options from the general page. Each setup
-             is now considered as custom setup that was started from a default
-             configuration. Menu entry is added in order to restore default
-             values configuration (works with profiles) if a user wants to.
-  * [Change] schedule page simplified (precise option removed)
-  * [Enhancement] Help implemented
-
-nssbackup (0.2-0~rc8)
-  * Update translation. Added RU translation.
-  * Support more complex Regex in SSH plugin (fixes LP #511398)
-  * Fix LP #328902: Spelling fixes
-  * patch the config UI to fit with UNR (LP Bug #364833). (thanks to Pierre Boazo)
-  * [FIX]LP #400145 : Add a warning in the Log when TAR returns status code 1.
-  * [CHANGE] LP #428863 : Added packagecmd to config to allow backing up of different distributions (Thanks to Andrew West)
-  * [FIX] LP #428341 Maximum specific time is 13:49?
-  * [FIX] LP #425101: show the default profile on the profile UI
-  * [FIX] LP #346285: backup destination is not created; backup is aborted if the target does not exist.
-  * [FIX] Makefile wasn't working on Jaunty (introduced dep on lsb-release)
-  * [FIX] Creates the logfile parent directory is it doesn't exist.
-
-nssbackup (0.2-0~rc7)
-  * [FIX] 'nssbackupconfig' was writing back the configuration changing the case to lower case,
-          which can cause a invalidation of dirconfig paths.
-  * [FIX] LP Bug #Bug 334580: store temporary files of non-privileged users in /home directory
-  * [FIX] LP Bug #337921: import error fixed; thanks to Martin Schaaf
-  * added Japanese menu entries (taken from sbackup; thanks to Hajime Mizuno)
-  * [CHANGE] Use python setup.py to avoid installing ourselves in a specific python version directory.
-  * [FIX] LP bug #338280 : findResource were returning a directory in place of a file. 
-          Now we can precise the type of file we are searching for.
-  * [FIX] LP Bug #176838: deactivate "restore" and "restore as" button when a non included file is selected.
-  * [FIX] LP Bug #181131: 
-          removed option "backuplinks" and make it the default behavior
-          add option "followlinks" to follow symbolic links.
- 
-nssbackup (0.2-0~rc6)
-  * Re-upload due to errors in packaging binary packages
+sbackup (0.10.4)
+  * Official release.
+  * fix a bug preventing simple-backup-config to resolve anacron monthly
+  * Ubuntu Bug #67814 - fixed permission problems with remote backups
   
-nssbackup (0.2-0~rc5)
-  * [FIX] LP Bug #331507: GUI fails, if configuration file does not exist
-  * [FIX] LP Bug #331349: Backup into target directory containing spaces fails
-  
-nssbackup (0.2-0~rc4)
-  * [FIX] LP Bug #331282: Installation fails due to configuration error
-  
-nssbackup (0.2-0~rc3)
-  * Arabic translation file added and German and Spanish translation updated
-  * Spanish translation of menu entries added: Thanks to Luis J. Claros
-  * [CHANGE]: 'upgrade-backups' renamed into 'nssbackup-upgrade-backups' 
-  * [CHANGE]: 'nssbackupconfig' added for modification of configuration files
-              during the installation
-  * [CHANGE]: existing backups are no longer upgraded automatically
-  * [FIX]: re-base was not working:
-  		   due to errorneous merging of snapshot files
-  		   and missing variable assignment -> fixed
-  * [FIX]: converting an incremental snapshot to a full one was errorneous:
-  		   base references of child snapshots was
-  		   not updated with *.ful name -> fixed
-  * [FIX] LP Bug #319294: catch execptions raised by notification daemon
-  * [FIX]: logger issue (hopefully) finally solved:
-  		   log messages were not printed and log files couldn't copied
-  		   after backups: problem was the use of log files with equal
-  		   names, the use of some static variables in ConfigManager and
-  		   errors in logger implementation: now profiles use their own
-  		   log files, some minor problems were fixed, code simplifications
-  * [FIX]: not all messages were displayed in notification pop-ups:
-  		   reason was an unescaped character: this character is now
-  		   replaced, the notification code is extracted into a mix-in
-  		   class to avoid multiple code definitions
-  * [FIX]: pathnames to log files were incorrect and copying failed:
-  		   fixed by centralized path determination
-  * [FIX]: LogFactory was re-setting log level and log file when calling for
-           a prior created logger: check if a logger was already created and
-           don't overwrite previous settings if so
-  * [FIX]: UpgradeManager used not existing FAM function:
-  		   function 'rename' added
-  * [FIX]: SnapshotManager tried to rebase a snapshot on itself:
-  		   reason was an IndexError if only 1 snapshot was left -> check
-  		   length of snapshots list
+  * gksu is used instead of gksudo (Closes: #327222)
+  * Cron job is removed on package purge (Closes: #346097)
+  * Should not crash on non-dirs in backup target (Closes: #391948)
+  * Fixed typo in About (Closes: #414783)
+  * Included Franch translation (Closes: #396059)
+  * Updated all translations
 
-nssbackup (0.2-0~rc2)
-  * [FIX] LP Bug #299967: the regular expressions from the configuration file
-  	were checked before they are added to any lists in UI; if found regular
-  	expression are invalid they were removed from the configuration and the
-  	users gets informed
-  * [FIX] LP Bug #299964: erroneous string formatting fixed
-  * [FIX] LP Bug #303648: if the target directory isn't accessible, execution
-    of backup daemon and restoration GUI fails.
-  * [FIX] LP Bug #303661: * the target directory is not longer recursively
-    created (within the configuration GUI)
-  * [FIX] in FuseFAM.py: logger issue solved
-  * [FIX] FTP plug-in: problems related to FTP solved
-  * [FIX] Bug LP #137293: display of restoration dialog fixed
+sbackup (0.10.4~beta9)
+  * Gnomevfs doesn't close directory handler.
+  * Hope this is the last beta
+  * Resolved a bug when using ssh 
+  * change some errors printing
+  * admin GID is now get dynamically . 
+  * Changed the right on the flist file to set read access to admin
+  * Fixes a problem with incremental backups
+  * Avoid usage of current dir for the lock file
+  * Version on about window is set to 0.10.4
+  * Bug #112540 fix : sbackup now runs under root:admin. directories are created with read access for admins
+  * Bug #102577 fix : optimizing the backup process ( thanks to Oliver Gerlich )
+  * A lot of bug fixes, This is just for testers
 
-nssbackup (0.2-0~rc1)
-  * [FIX] LP Bug #191127: Check the regular expression before adding it to
-    the configuration.
-  * [FIX] LP Bug #285927: Change the format of the mail sent to be compliant
-    with the standards
+sbackup (0.10.3-0.2)
+  * Enhancement. applied patch proposed by Oliver Gerlich. See: Bug #110113
+  * Code cleaned to prevent warnings about non existing GTK components :
+    see Bug #106818
+  * Ensure that daily backups are not skipped if the system is off at the scheduled backup time
+  * Created a sbackup script to install in /usr/share/sbackup/sbackup
+  (this script is almost the same created by sbackup in /etc/cron.d/
+  * Makefile :
+  * add a flag to create non existing dirs
+  * install the "sbackup" script in "/usr/share/sbackup/sbackup"
+  * the python files have been renamed in *.py and the Makefile has been
+   changed to be compliant -links are created into BIN without
+   the py extention-
+  * The About dialog now indicates Version 0.10.3 : Closes Bug #74963
+  * French language support added
 
-nssbackup (0.2-0~beta8)
-  * [FIX] LP Bug #284013: Fixed I18N when making customized installs.
-    Thanks a lot to Jean-Peer Lorenz (https://bugs.edge.launchpad.net/~peer.loz)
-  * [Tech] Get rid of GnomeVFS dependancy
+sbackup (0.10.3-0.1)
+  * remove /usr/etc. Closes: #399762
 
-nssbackup (0.2-0~beta6)
-  * [FIX] LP Bug #281852: Restoration GUI crashes on exception in some plug-ins
+sbackup (0.10.3)
+  * Fix an Ubuntu-izm that creeped into the permissions (Closes: #391539)
 
-nssbackup (0.2-0~beta5)
-  * Add the backup links option in the GUI
-  * Send an email by profile
-  * One profile backup can fail and not the others so, we don't fail completely
+sbackup (0.10.2)
+  * "Simple fixes for simple but annoying bugs" release - intended to go 
+    into Etch and Edgy.
+  * Manage /etc/sbackup.conf and /etc/cron.d/sbackup as config files, but
+    not as conffiles, to remove unneeded "config changes upstream" prompt
+    on upgrade. SBackup can handle old config gracefuly.
+  * Brown paperbag one-liner fix on incremental backup time not being counted 
+    properly causing incremental backups to be done all the time.
+  * Reduce nice level of sbackupd process to lowest possible priority (+19)
+  * An empty regex matches everything, so avoid those
 
-nssbackup (0.2-0~beta3)
-  * [FIX] LP Bug #240000: looping in symbolic links
-  * Log refactoring : we now have a proper logger by profile.
+sbackup (0.10-1)
+  * Added i18n support from Jonh Wendell
+  * Added Portuguese translation by Jonh Wendell
+  * Adjusts in Makefile, support to uninstall and another prefix,
+    rather than /usr (SF:1376603) - wendell
+  * fix problem with spaces in target dir (SF:1508991) - wendell
+  * Add command-line option parsing support from Andreas Sliwka
+  * Improve parsing of cron timelines with added custom option
+    (Ubuntu: #5720)
+  * Separate filenames in metadata with NULL instead of a newline
+    (Closes: #349700)
+  * Critical pseydofilesystems are explicitly excluded (Closes: #340115)
+  * Command line tar is used and is trying to be robust agaist race
+    conditions (Closes: #328824)
+  * Ability to edit filenames, paths and regexp directly in the cells - wendell
+  * Purge old backup snapshots in smart and simple way (Yay!)
+  * Really test the writability of a directory by writing into it.
+    Solves several permission related errors, especially in remote backups.
+  * Improved restore window interface - wendell
+  * Rewriten restore backend fixes bugs while restoring files beyond 2Gb
+    limit and speeds up the restore 2-3 times
 
-nssbackup (0.2-0~beta2)
-  * Logarithm purge implemented
-  * Installing nssbackup will install FTP and SSH plugins
+sbackup (0.9-1)
+  * document all the TODOs and plans
+  * backup all files if maxsize=-1 (SF:1324065)
+  * fixed many bugs with the root directory enabled for backup
+  * fixed an exception with remote target testing (Closes: #329341)
+  * secure backup permissions - now all files are 0600 (Ubuntu: #3177)
+  * also rename remote directories to get rid of ":" in filename
+  * upgrade backup directories before each backup run
 
-nssbackup (0.2-0~alpha3)
-  * Snapshot management functionality implemented
+sbackup (0.8-1)
+  * Fix binary paths in .menu entries to sbin (Closes: #324781)
+  * Use "." instead of ":" in all directory names (Closes: #325431)
+  * Fix a bug with first item of file format exclusion list (Closes: #325426)
 
-nssbackup (0.2-0~alpha2)
-  * [FIX] LP Bug #189879: NSSbackup cannot find files.snar -> crash
+sbackup (0.7-2)
+  * Also fix the config applet to work in sarge
+  * Move the restore icon to System->Administration menu too
+  * First upload to Debian unstable :)
 
-nssbackup (0.2-0~alpha1)
-  * First alpha of version 0.2
-  * New multi binaries strategy
-  * [FIX] LP Bug #181998: typo in an error message
-  * [FIX] LP Bug #181987: DEL key is now usable to remove some entries
-  * avoid an exception in regex tab of configGUI when adding the first regexp
-  * [FIX] LP Bug #153605: Prefill the 'From' text entry in the report tab
-  * add necessary import in upgrade-backup script
-  * Upgrade backus scripts takes relative path
-  * [FIX] LP BUG #184713: nssbackup doesn't backup
-  * [FIX] LP BUG #184713: add a backuplinks option to backup link
+sbackup (0.7-1)
+  * Fix and reenable remote restore. It is still heal of a slow, but it works
+  * Add empty directories to a full backup
+  * Stop using pythons tarfile module on backup
+  * Interface to systems 'tar' tool - double speedup, 10 times less memory used
+  * Reduce memory usage by factor of 3 on restore and restore GUI
+  * target directories are checked for validity, so interrupted backup no longer
+    breaks other backups
+  * Cache all files locally on remote backup - gnomevfs is very slow on small updates
+  * A new tool added to upgrade backup directory formats
+  * Gnome Restore tool now automatically asks to upgrade old backup directories
 
-nssbackup (0.1-5)
-  * [FIX] LP BUG #184713: nssbackup doesn't backup
+sbackup (0.5-1)
+  * Added the restore GUI: simple-restore-gnome
+  * Added the command-line: srestore.py (Also a python module for restoring)
+  * Only backup directories if there are files inside
+  * Minimize usage of /tree file (planned for removal, with compartibility)
+  * Usability adjustments to the config gui
+  * Improved configuration defaults
+  * Improved backup algorithm - now only folders with changes are included in
+    the backup archive
+  * NOTE: remote restore is *not* supported in this version
 
-nssbackup (0.1-4)
-  * [FIX] LP Bug #181998: typo in an error message
-  * [FIX] LP Bug #181987: DEL key is now usable to remove some entries
-  * avoid an exception in regex tab of configGUI when adding the first regexp
-  * [FIX] LP Bug #153605: Prefill the 'From' text entry in the report tab
-  * add necessary import in upgrade-backup script
-  * Upgrade backus scripts takes relative path
+sbackup (0.4-1)
+  * Adjustments to Gnome capplets Target tab
+  * Write username to cron.d file (was breaking automatic backups)
 
-nssbackup (0.1-3)
-  * removed build dependancy on pyGTK
-  * [FIX] LP Bug #157250: simple-backup-config has incorrect example exclusion regex 
-  * [FIX] LP Bug #177385: Maxincrement option is not working
-
-nssbackup (0.1-2)
-  * GNU packaging standardization
-  * Deleted unuseful documentation
-  * We don't exclude anything as a recommendation (Closes LP Bug #152861)
-  * Changed nssbackup icons
-  * changed the whole revert process ( closes LP Bug #146617 )
-  * base was always set as the last full snapshot
-  * [FIX] LP Bug #146618: remove the file size limit recommendation
-  * [FIX] LP Bug #138750
-  * [FIX] LP Bug #138749
-
-nssbackup (0.1-1)
-  * Ubuntu Initial release
-
+sbackup (0.3-1)
+  * Initial release
