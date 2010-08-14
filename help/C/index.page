@@ -19,7 +19,7 @@
     <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude" />
   </info>
 
-  <title>Not so simple backup</title>
+  <title>Simple backup</title>
 
   <section id="basics" style="2column">
     <title>Basics</title>

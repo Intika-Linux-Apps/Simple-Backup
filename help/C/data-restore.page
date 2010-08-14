@@ -23,8 +23,8 @@
 
   <title>Restoration of data</title>
 
-    <media type="image" src="figures/nssbackup-config-gui.png" mime="image/png" style="right">
-      <p><app>NSsbackup</app> configuration window.</p>
+    <media type="image" src="figures/sbackup-config-gui.png" mime="image/png" style="right">
+      <p><app>SBackup</app> configuration window.</p>
     </media>
 
 </page>
