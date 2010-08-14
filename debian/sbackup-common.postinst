@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# postinst script for NSsbackup
+# postinst script for Simple Backup
 #
 # see: dh_installdeb(1)
 
@@ -34,7 +34,7 @@ dbus_system_conf_file=org.sbackupteam.SimpleBackup.conf
 gconfd=gconfd-2
 gconfdpid=$(pgrep $gconfd)
 
-confscript=$sbindir/nssbackupconfig
+confscript=$sbindir/sbackupconfig
 
 case "$1" in
     configure)
@@ -51,7 +51,7 @@ case "$1" in
         invoke-rc.d dbus force-reload; fi; fi
         
         # byte-compile: deb package does not ship compiled files
-        python -m compileall /usr/lib/python*/*/nssbackup
+        python -m compileall /usr/lib/python*/*/sbackup
         
         [ -x $confscript ] && $confscript
     ;;

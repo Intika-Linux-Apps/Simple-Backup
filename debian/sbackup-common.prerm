@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# prerm script for NSsbackup
+# prerm script for Simple Backup
 #
 # see: dh_installdeb(1)
 
@@ -32,20 +32,20 @@ gconfdpid=$(pgrep $gconfd)
 
 case "$1" in
     remove|deconfigure)
-      find /usr/lib/python*/*/nssbackup -name '*.pyc' -exec rm -f '{}' \;
-      find /usr/lib/python*/*/nssbackup -name '*.pyo' -exec rm -f '{}' \;
-      find /usr/share/nssbackup -name '*.pyc' -exec rm -f '{}' \;
-      find /usr/share/nssbackup -name '*.pyo' -exec rm -f '{}' \;
+      find /usr/lib/python*/*/sbackup -name '*.pyc' -exec rm -f '{}' \;
+      find /usr/lib/python*/*/sbackup -name '*.pyo' -exec rm -f '{}' \;
+      find /usr/share/sbackup -name '*.pyc' -exec rm -f '{}' \;
+      find /usr/share/sbackup -name '*.pyo' -exec rm -f '{}' \;
       
       gconf-schemas --unregister $gconf_schema_file_dir/$gconf_schema_file
       test "$gconfdpid" && killall $gconfd
     ;;
 
     upgrade)
-      find /usr/lib/python*/*/nssbackup -name '*.pyc' -exec rm -f '{}' \;
-      find /usr/lib/python*/*/nssbackup -name '*.pyo' -exec rm -f '{}' \;
-      find /usr/share/nssbackup -name '*.pyc' -exec rm -f '{}' \;
-      find /usr/share/nssbackup -name '*.pyo' -exec rm -f '{}' \;
+      find /usr/lib/python*/*/sbackup -name '*.pyc' -exec rm -f '{}' \;
+      find /usr/lib/python*/*/sbackup -name '*.pyo' -exec rm -f '{}' \;
+      find /usr/share/sbackup -name '*.pyc' -exec rm -f '{}' \;
+      find /usr/share/sbackup -name '*.pyo' -exec rm -f '{}' \;
     ;;
 
     failed-upgrade)

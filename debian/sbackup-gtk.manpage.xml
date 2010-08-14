@@ -20,11 +20,11 @@
   <refnamediv>
     <refname>&dhpackage;</refname>
 
-    <refpurpose>NSsbackup is a Backup Software for desktop user.</refpurpose>
+    <refpurpose>Simple Backup is a Backup Software for desktop user.</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <cmdsynopsis>
-      <command>nssbackupd</command>
+      <command>sbackupd</command>
 
       <arg><option>-e <replaceable>this</replaceable></option></arg>
 
@@ -35,7 +35,7 @@
     <title>DESCRIPTION</title>
 
     <para>This manual page documents briefly the
-      <command>nssbackupd</command>
+      <command>sbackupd</command>
       command.</para>
 
     <para>This manual page was written for the &debian; distribution

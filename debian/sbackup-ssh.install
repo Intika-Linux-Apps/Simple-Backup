@@ -1,1 +1,1 @@
-debian/tmp/usr/lib/python*/*/nssbackup/fuse_plugins/sshFuseFAM.py
+debian/tmp/usr/lib/python*/*/sbackup/fuse_plugins/sshFuseFAM.py

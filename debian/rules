@@ -85,7 +85,7 @@ binary-common:
 	dh_testroot
 	dh_installchangelogs ChangeLog
 	dh_installdocs
-	dh_installexamples $(CURDIR)/data/nssbackup.conf.example
+	dh_installexamples $(CURDIR)/data/sbackup.conf.example
 	dh_installman
 	dh_installmenu
 	dh_link

@@ -1,4 +1,4 @@
-Source: nssbackup
+Source: sbackup
 Section: admin
 Priority: optional
 Maintainer: NSsbackup team <nssbackup-team@lists.launchpad.net>
@@ -8,10 +8,10 @@ Build-Depends: debhelper (>= 7), python ( >= 2.5 ), python (<< 3.0),
 Build-Depends-Indep: python-support (>= 0.5.3)
 Standards-Version: 3.8.4
 
-Package: nssbackup
+Package: sbackup
 Architecture: all
-Depends: nssbackup-common(= ${binary:Version}),
-         nssbackup-gtk(= ${binary:Version}),
+Depends: sbackup-common(= ${binary:Version}),
+         sbackup-gtk(= ${binary:Version}),
          python ( >= 2.5 ), python (<< 3.0),
          ${misc:Depends}
 Description: (Not So) Simple Backup Suite for desktop use
@@ -27,7 +27,7 @@ Description: (Not So) Simple Backup Suite for desktop use
  This meta package installs required packages to use (Not So) Simple Backup
  Suite.
  
-Package: nssbackup-common
+Package: sbackup-common
 Architecture: all
 Depends: python ( >= 2.5 ), python (<< 3.0),
          ${misc:Depends},
@@ -39,9 +39,9 @@ Description: (Not So) Simple Backup Suite core functionality
  the minimum set of files to create backups from the commandline. It uses
  GIO/GVFS for access of remote backup destinations.
 
-Package: nssbackup-gtk
+Package: sbackup-gtk
 Architecture: all
-Depends: nssbackup-common(= ${binary:Version}),
+Depends: sbackup-common(= ${binary:Version}),
          python ( >= 2.5 ), python (<< 3.0),
          ${misc:Depends},
          python-glade2,
@@ -55,9 +55,9 @@ Description: (Not So) Simple Backup Suite GTK+ graphical user interface
  GTK+. This package installs the GTK+ GUI of (Not So) Simple Backup Suite
  including a status indicator placed in panel when running backups.
 
-Package: nssbackup-ftp
+Package: sbackup-ftp
 Architecture: all
-Depends: nssbackup-common(= ${binary:Version}),
+Depends: sbackup-common(= ${binary:Version}),
          python ( >= 2.5 ), python (<< 3.0),
          ${misc:Depends},
          fuse-utils,
@@ -71,9 +71,9 @@ Description: (Not So) Simple Backup Suite FTP FUSE plugins
  GIO/GVFS. This package is required only in case of explicit need
  for mounting external sites using CURLFTPFS.
 
-Package: nssbackup-ssh
+Package: sbackup-ssh
 Architecture: all
-Depends: nssbackup-common(= ${binary:Version}),
+Depends: sbackup-common(= ${binary:Version}),
          python ( >= 2.5 ), python (<< 3.0),
          ${misc:Depends},
          fuse-utils,

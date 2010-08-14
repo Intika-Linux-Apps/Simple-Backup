@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# postrm script for NSsbackup
+# postrm script for Simple Backup
 #
 # see: dh_installdeb(1)
 
@@ -32,20 +32,20 @@ dbus_system_conf_file=org.sbackupteam.SimpleBackup.conf
 
 case "$1" in
     remove)
-        rm -f /etc/cron.d/nssbackup
-        rm -f /etc/cron.hourly/nssbackup
-        rm -f /etc/cron.daily/nssbackup
-        rm -f /etc/cron.weekly/nssbackup
-        rm -f /etc/cron.monthly/nssbackup
+        rm -f /etc/cron.d/sbackup
+        rm -f /etc/cron.hourly/sbackup
+        rm -f /etc/cron.daily/sbackup
+        rm -f /etc/cron.weekly/sbackup
+        rm -f /etc/cron.monthly/sbackup
         
-        rm -rf /home/*/.local/share/nssbackup/tmp
-        rm -rf /home/*/.local/share/nssbackup/log
-        rm -f /home/*/.local/share/nssbackup/nssbackup-*.log
-        rm -f /home/*/.local/share/nssbackup/nssbackup-*.log.*.gz
-        rm -rf /var/log/nssbackup
-        rm -f /var/log/nssbackup-*.log
-        rm -f /var/log/nssbackup-*.log.*.gz
-        rm -rf /tmp/nssbackup
+        rm -rf /home/*/.local/share/sbackup/tmp
+        rm -rf /home/*/.local/share/sbackup/log
+        rm -f /home/*/.local/share/sbackup/sbackup-*.log
+        rm -f /home/*/.local/share/sbackup/sbackup-*.log.*.gz
+        rm -rf /var/log/sbackup
+        rm -f /var/log/sbackup-*.log
+        rm -f /var/log/sbackup-*.log.*.gz
+        rm -rf /tmp/sbackup
         
         gtk-update-icon-cache -f -t $icondir/hicolor
         gtk-update-icon-cache -f -t $icondir/ubuntu-mono-light
@@ -53,9 +53,9 @@ case "$1" in
     ;;
 
     purge)
-        rm -f /etc/nssbackup.conf
-        rm -rf /etc/nssbackup.d
-        rm -rf /home/*/.config/nssbackup
+        rm -f /etc/sbackup.conf
+        rm -rf /etc/sbackup.d
+        rm -rf /home/*/.config/sbackup
         rm -f $dbus_system_conf_dir/$dbus_system_conf_file
     ;;
 

@@ -1,6 +1,6 @@
 This package was debianized by Jean-Peer Lorenz <peer.loz@gmx.net> Thu, 12 Aug 2010 19:43:34 +0200
 
-It was downloaded from: https://launchpad.net/nssbackup/
+It was downloaded from: https://launchpad.net/sbackup/
 
 Upstream Authors: Jean-Peer Lorenz <peer.loz@gmx.net>
                   Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -28,5 +28,6 @@ License:
 On Debian systems, the complete text of the GNU General
 Public License can be found in `/usr/share/common-licenses/GPL'.
 
-The Debian packaging is (C) 2008-2010, Ouattara Oumar Aziz <wattazoum@gmail.com>,
-(C) 2009-2010, Jean-Peer Lorenz <peer.loz@gmx.net> and is licensed under the GPL, see above.
+The Debian packaging is (C) 2009-2010, Jean-Peer Lorenz <peer.loz@gmx.net>,
+(C) 2008-2010, Ouattara Oumar Aziz <wattazoum@gmail.com>,
+(C) 2005-2007 Aigars Mahinovs and is licensed under the GPL, see above.
