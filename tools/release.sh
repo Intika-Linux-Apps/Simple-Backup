@@ -219,12 +219,12 @@ rm -rf "$exportdestdir/.pydevproject"
 rm -rf "$exportdestdir/.project"
 rm -rf "$exportdestdir/.settings"
 rm -rf "$exportdestdir/setup.py"
-rm -rf "$exportdestdir/src/nssbackup/resources"
-rm -rf "$exportdestdir/src/nssbackup/metainfo"
-rm -rf "$exportdestdir/data/desktop/nssbackup-config-su.desktop"
-rm -rf "$exportdestdir/data/desktop/nssbackup-config.desktop"
-rm -rf "$exportdestdir/data/desktop/nssbackup-restore-su.desktop"
-rm -rf "$exportdestdir/data/desktop/nssbackup-restore.desktop"
+rm -rf "$exportdestdir/src/sbackup/resources"
+rm -rf "$exportdestdir/src/sbackup/metainfo"
+rm -rf "$exportdestdir/data/desktop/sbackup-config-su.desktop"
+rm -rf "$exportdestdir/data/desktop/sbackup-config.desktop"
+rm -rf "$exportdestdir/data/desktop/sbackup-restore-su.desktop"
+rm -rf "$exportdestdir/data/desktop/sbackup-restore.desktop"
 
 # 'tests', 'tools', and 'doc' are removed
 #FIXME: re-add 'doc' in later releases
