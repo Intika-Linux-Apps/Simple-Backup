@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-
+#
+#   Simple Backup - upgrades all backups found
+#
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
@@ -16,6 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
 
 
 if __name__ == "__main__":
@@ -23,11 +26,11 @@ if __name__ == "__main__":
     import sys
     import os
 
-    from nssbackup.util import system
+    from sbackup.util import system
     system.set_default_environment()
     system.set_display_from_session()
 
-    from nssbackup.util import get_locale_dir, get_locale_domain
+    from sbackup.util import get_locale_dir, get_locale_domain
     application = get_locale_domain()
     locale_dir = get_locale_dir()
 
@@ -36,7 +39,7 @@ if __name__ == "__main__":
     gettext.textdomain(application)
 
     from gettext import gettext as _
-    from nssbackup.core.UpgradeManager import UpgradeManager
+    from sbackup.core.UpgradeManager import UpgradeManager
 
     if not len(sys.argv) in [2]:
         print _("""
@@ -56,6 +59,6 @@ Use simple-restore-gnome for more ease of use.
         u.upgradeAll(path)
     except Exception, e :
         import traceback
-        from nssbackup.util.log import LogFactory
+        from sbackup.util.log import LogFactory
         LogFactory.getLogger().error(str(e))
         LogFactory.getLogger().error(traceback.format_exc())

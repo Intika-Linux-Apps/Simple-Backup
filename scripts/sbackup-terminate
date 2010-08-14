@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#    Simple Backup - helper script for terminating a running backup
+#   Simple Backup - helper script for terminating a running backup
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -27,7 +27,7 @@ import subprocess
 
 
 INTERPRETER = "python"
-BACKUP_COMMAND = "nssbackupd"
+BACKUP_COMMAND = "sbackupd"
 BACKUP_CANCEL_SIG = signal.SIGUSR1
 
 

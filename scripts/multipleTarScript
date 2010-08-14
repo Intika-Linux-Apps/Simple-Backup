@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#   NSsbackup - helper script for multiple volume backups
+#   Simple Backup - helper script for multiple volume backups
 #
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>

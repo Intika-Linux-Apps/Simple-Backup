@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#    Simple Backup - Launcher script for indicator application (status icon)
+#   Simple Backup - Launcher script for indicator application (status icon)
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -21,8 +21,8 @@
 
 def parse_cmdline(argv):
     import optparse
-    from nssbackup.pkginfo import Infos
-    from nssbackup.util import constants
+    from sbackup.pkginfo import Infos
+    from sbackup.util import constants
     
     usage = "Usage: %prog [options] (use -h or --help for more infos)"
     version = "%prog " + Infos.VERSION
@@ -47,9 +47,9 @@ def parse_cmdline(argv):
 if __name__ == '__main__':
     import sys
     import os
-    from nssbackup.util import system
+    from sbackup.util import system
 
-    from nssbackup.util import system
+    from sbackup.util import system
     system.set_default_environment()
     system.set_display_from_session()
     system.set_gio_env_from_session()    
@@ -71,7 +71,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
 
-    from nssbackup.util import get_locale_dir, get_locale_domain
+    from sbackup.util import get_locale_dir, get_locale_domain
     application = get_locale_domain()
     locale_dir = get_locale_dir()
 
@@ -90,13 +90,13 @@ if __name__ == '__main__':
         appindicator_avail = False
 
     if options.legacy_appindicator is True:
-        from nssbackup.ui.indicator_legacy import main
+        from sbackup.ui.indicator_legacy import main
     else:
         if appindicator_avail:
-            from nssbackup.ui.indicator import main
+            from sbackup.ui.indicator import main
         else:
             print "Unable to use `libappindicator`. Falling back to legacy status icon."
-            from nssbackup.ui.indicator_legacy import main
+            from sbackup.ui.indicator_legacy import main
 
 
     exitcode = main(options)

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-#    NSsbackup - helper script for upgrading nssbackup
+#   Simple Backup - post-installation script for upgrading Simple Backup
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -19,33 +19,32 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`nssbackupupgrade` --- helper script for upgrading nssbackup
-==================================================================
+:mod:`sbackupupgrade` --- post-installation script for upgrading Simple Backup
+==============================================================================
 
-.. module:: nssbackupupgrade
-   :synopsis: helper script for upgrading nssbackup from older versions
+.. module:: sbackupupgrade
+   :synopsis: helper script for upgrading sbackup from older versions
 .. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
 
-This script provides necessary functionality when upgrading NSsbackup
+This script provides necessary functionality when upgrading SBackup
 to a new version. Purpose of this script is to be run from the Debian
 `postinst` script after package update resp. manually after `make install`.
 
 Since the package (at least core) is configured when this script runs,
-we can import modules from nssbackup here.
+we can import modules from sbackup here.
 """
 
 import sys
 import traceback
 import os
-import os.path
 import pwd
 import ConfigParser
 import re
 
-from nssbackup.pkginfo import Infos
-from nssbackup.core import ConfigManager
+from sbackup.pkginfo import Infos
+from sbackup.core import ConfigManager
 
-from nssbackup.util import system
+from sbackup.util import system
 
 
 # definition of error codes
@@ -57,10 +56,10 @@ UNKNOWN_ERROR = 9
 class UpgradeLogOption(object):
     """This class encapsulates the upgrading of the log options due
     to changes in log file naming in release 0.2.0-RC3. In prior
-    releases the log file was named `nssbackup.log`. With release
+    releases the log file was named `sbackup.log`. With release
     0.2.0-RC3 this has changed. From now the log file for the default
-    profile is named `nssbackup.log` and log files for any other
-    profiles are named `nssbackup-profilename.log`. This was
+    profile is named `sbackup.log` and log files for any other
+    profiles are named `sbackup-profilename.log`. This was
     neccessary due to problems with identical names of log files.
     
     """
@@ -106,7 +105,7 @@ class UpgradeLogOption(object):
 
 
     class _Config(ConfigParser.ConfigParser):
-        """A customized ConfigParser for reading and writing of NSsbackup
+        """A customized ConfigParser for reading and writing of SBackup
         configuration files.
         
         """
@@ -227,7 +226,7 @@ class UpgradeLogOption(object):
         default configuration directory `/etc`.
         
         :note: It is assumed that user configurations are stored in a\
-               directory like `~/.config/nssbackup`.
+               directory like `~/.config/sbackup`.
         
         :todo: Implement a better way for retrieval of user's confdirs e.g.\
                by reading the users environ!

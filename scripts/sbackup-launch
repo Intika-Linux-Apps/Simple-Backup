@@ -1,11 +1,9 @@
 #!/bin/bash
-
 #
-#   NSsbackup service file used by cron/anacron
-#   Do not call this file manually.
+#   Simple Backup - service file used by cron/anacron
 #
-#   Copyright (c)2007: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2007: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -20,11 +18,15 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+
+
+#   Do not call this file manually.
 
 
 PATH=/usr/local/bin:/usr/bin:/bin
-logdir=/var/log/nssbackup
-logfile=$logdir/nssbackup-cron.log
+logdir=/var/log/sbackup
+logfile=$logdir/sbackup-cron.log
 
 
 if ! [ -d $logdir ]; then
@@ -42,8 +44,8 @@ if [ -x /usr/bin/ionice ]; then
 	ionicecmd="/usr/bin/ionice -c 3"
 fi
 
-if [ -x /usr/bin/nssbackupd ]; then
-	$nicecmd $ionicecmd /usr/bin/nssbackupd > $logfile 2>&1
-elif [ -x /usr/local/bin/nssbackupd ]; then
-	$nicecmd $ionicecmd /usr/local/bin/nssbackupd > $logfile 2>&1
+if [ -x /usr/bin/sbackupd ]; then
+	$nicecmd $ionicecmd /usr/bin/sbackupd > $logfile 2>&1
+elif [ -x /usr/local/bin/sbackupd ]; then
+	$nicecmd $ionicecmd /usr/local/bin/sbackupd > $logfile 2>&1
 fi

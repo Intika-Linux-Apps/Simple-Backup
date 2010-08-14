@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#    Simple Backup - Launcher script for DBus System Service
+#   Simple Backup - Launcher script for DBus System Service
 #
 #   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     import sys
 
-    from nssbackup.util import get_locale_dir, get_locale_domain
+    from sbackup.util import get_locale_dir, get_locale_domain
     application = get_locale_domain()
     locale_dir = get_locale_dir()
 
@@ -33,10 +33,10 @@ if __name__ == '__main__':
     gettext.textdomain(application)
 
 #TODO: how can we drop the privileges here? Environment is cleared.
-#    from nssbackup.util.system import drop_privileges
+#    from sbackup.util.system import drop_privileges
 #    drop_privileges()
 
-    from nssbackup.dbus_service import run
+    from sbackup.dbus_service import run
     retc = run(sys.argv)
     sys.exit(retc)
 

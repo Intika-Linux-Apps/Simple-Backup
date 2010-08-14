@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#    Simple Backup - Launcher script for configuration GUI
+#   Simple Backup - Launcher script for configuration GUI
 #
 #   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
@@ -18,18 +18,18 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+#
 
 if __name__ == '__main__':
 
     import sys
 
-    from nssbackup.util import system
+    from sbackup.util import system
     system.set_default_environment()
     system.set_display_from_session()
-    system.set_gio_env_from_session()    
+    system.set_gio_env_from_session()
 
-    from nssbackup.util import get_locale_dir, get_locale_domain
+    from sbackup.util import get_locale_dir, get_locale_domain
     application = get_locale_domain()
     locale_dir = get_locale_dir()
 
@@ -41,5 +41,5 @@ if __name__ == '__main__':
     gtk.glade.bindtextdomain(application, locale_dir)
     gtk.glade.textdomain(application)
 
-    from nssbackup.ui.SBConfigGTK import main
+    from sbackup.ui.SBConfigGTK import main
     main(sys.argv)
