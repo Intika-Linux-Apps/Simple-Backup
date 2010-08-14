@@ -1,27 +1,27 @@
 [Desktop Entry]
 Type=Application
 #
-Name=NSsbackup-Configuration
-Name[fr]=Configurateur de la NSsbackup
-Name[de]=NSsbackup-Einstellungen
+Name=Simple Backup-Configuration
+Name[fr]=Configurateur de la Simple Backup
+Name[de]=Simple Backup-Einstellungen
 Name[pt_BR]=Configuração do Backup
-Name[es]=Configuración de NSsbackup
+Name[es]=Configuración de Simple Backup
 Name[ja]=バックアップの設定
 #
-Comment=NSsbackup configuration tool for non-admins.
-Comment[de]=NSsbackup Konfiguration für Nicht-Admins.
+Comment=Simple Backup configuration tool for non-admins.
+Comment[de]=Simple Backup Konfiguration für Nicht-Admins.
 Comment[pt_BR]=Configure como seus backups são feitos (non-admins).
-Comment[es]=Configuración de NSsbackup para no administradores.
+Comment[es]=Configuración de Simple Backup para no administradores.
 Comment[ja]=バックアップの設定・実行ツールを起動します
 #
 GenericName=Backup configuration tool
 GenericName[de]=Backup Einstellungen
 GenericName[es]=Herramienta de copia de seguridad
 #
-Exec=@prefix@/bin/nssbackup-config-gui
+Exec=@prefix@/bin/sbackup-config-gui
 #
 Terminal=false
 Categories=Utility;
 StartupNotify=true
-Icon=nssbackup-conf
-X-Ubuntu-Gettext-Domain=nssbackup
+Icon=sbackup-conf
+X-Ubuntu-Gettext-Domain=sbackup

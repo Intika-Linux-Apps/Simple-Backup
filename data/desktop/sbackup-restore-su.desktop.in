@@ -1,16 +1,16 @@
 [Desktop Entry]
 Type=Application
 #
-Name=NSsbackup-Restoration
-Name[de]=NSsbackup-Wiederherstellung
+Name=Simple Backup-Restoration
+Name[de]=Simple Backup-Wiederherstellung
 Name[pt_BR]=Restauração de Backup
 Name[es]=Restauración de copia de seguridad
 Name[ja]=バックアップの復元
 #
-Comment=NSsbackup restoration tool for admins. Requires superuser rights.
-Comment[de]=NSsbackup Wiederherstellung für Admins. Erfordert Superuser-Rechte.
+Comment=Simple Backup restoration tool for admins. Requires superuser rights.
+Comment[de]=Simple Backup Wiederherstellung für Admins. Erfordert Superuser-Rechte.
 Comment[pt_BR]=Restaure seu backup feito anteriormente. Requires superuser rights.
-Comment[es]=Restauración de NSsbackup para administradores. Requiere privilegios de superusuario.
+Comment[es]=Restauración de Simple Backup para administradores. Requiere privilegios de superusuario.
 Comment[ja]=バックアップの復元ツールを起動します
 #
 GenericName=Restoration tool
@@ -18,12 +18,12 @@ GenericName[fr_FR]=Utilitaire de restauration
 GenericName[de]=Backup Wiederherstellung
 GenericName[es]=Herramienta de restauración
 #
-Exec=gksu --description @prefix@/share/applications/nssbackup-restore-su.desktop @prefix@/bin/nssbackup-restore-gui
+Exec=gksu --description @prefix@/share/applications/sbackup-restore-su.desktop @prefix@/bin/sbackup-restore-gui
 #
 Terminal=false
 Categories=GTK;GNOME;System;
 StartupNotify=true
-Icon=nssbackup-restore
+Icon=sbackup-restore
 #
 X-KDE-SubstituteUID = true
-X-Ubuntu-Gettext-Domain=nssbackup
+X-Ubuntu-Gettext-Domain=sbackup

@@ -444,7 +444,7 @@ Files and directories matching this expression will be excluded from backup.</pr
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
     <property name="urgency_hint">True</property>
-    <property name="transient_for">nssbackupConfApp</property>
+    <property name="transient_for">sbackupConfApp</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox6">
@@ -572,7 +572,7 @@ Do you want to save the configuration now?</property>
     <property name="title" translatable="yes">Configuration Profile Manager</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
-    <property name="transient_for">nssbackupConfApp</property>
+    <property name="transient_for">sbackupConfApp</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox7">
@@ -910,11 +910,11 @@ Please enter the new profile name and set the according checkbox in order to ena
       </widget>
     </child>
   </widget>
-  <widget class="GnomeApp" id="nssbackupConfApp">
+  <widget class="GnomeApp" id="sbackupConfApp">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-    <property name="title" translatable="yes">Not So Simple Backup Suite</property>
-    <signal name="destroy" handler="on_nssbackupConfApp_destroy"/>
-    <signal name="delete_event" handler="on_nssbackupConfApp_delete_event"/>
+    <property name="title" translatable="yes">Simple Backup Suite</property>
+    <signal name="destroy" handler="on_sbackupConfApp_destroy"/>
+    <signal name="delete_event" handler="on_sbackupConfApp_delete_event"/>
     <child internal-child="dock">
       <widget class="BonoboDock" id="app1-dock1">
         <child>
@@ -1441,7 +1441,7 @@ Default is set to uncompressed backups.</property>
                                 <property name="receives_default">True</property>
                                 <property name="tooltip" translatable="yes">Show help topic about configuration GUI.</property>
                                 <property name="relief">none</property>
-                                <property name="uri">ghelp:nssbackup#config-gui</property>
+                                <property name="uri">ghelp:sbackup#config-gui</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -2631,7 +2631,7 @@ Expressions</property>
                                 <property name="has_tooltip">True</property>
                                 <property name="tooltip" translatable="yes">Show help topic about configuration GUI.</property>
                                 <property name="relief">none</property>
-                                <property name="uri">ghelp:nssbackup#config-gui</property>
+                                <property name="uri">ghelp:sbackup#config-gui</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -2744,7 +2744,7 @@ Expressions</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
                             <property name="has_tooltip">True</property>
-                            <property name="tooltip" translatable="yes">This option will make nssbackup make a backup not at a precise time but when the computer is up. </property>
+                            <property name="tooltip" translatable="yes">This option will make a backup not at a precise time but when the computer is up. </property>
                             <property name="use_underline">True</property>
                             <property name="yalign">1</property>
                             <property name="draw_indicator">True</property>
@@ -2866,7 +2866,7 @@ monthly</property>
                                 <property name="receives_default">True</property>
                                 <property name="tooltip" translatable="yes">Show help topic about scheduled backups.</property>
                                 <property name="relief">none</property>
-                                <property name="uri">ghelp:nssbackup#schedule</property>
+                                <property name="uri">ghelp:sbackup#schedule</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -3115,7 +3115,7 @@ Erase all other backups.&lt;/small&gt;</property>
                                 <property name="has_tooltip">True</property>
                                 <property name="tooltip" translatable="yes">Show help topic about purging of backups.</property>
                                 <property name="relief">none</property>
-                                <property name="uri">ghelp:nssbackup#purge</property>
+                                <property name="uri">ghelp:sbackup#purge</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -3859,7 +3859,7 @@ Error</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip" translatable="yes">Show help topic about default values.</property>
                         <property name="relief">none</property>
-                        <property name="uri">ghelp:nssbackup#defaults</property>
+                        <property name="uri">ghelp:sbackup#defaults</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
