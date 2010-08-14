@@ -36,15 +36,15 @@ import os
 import subprocess
 import unittest
 
-from nssbackup.managers.SnapshotManager import SnapshotManager
-from nssbackup.managers.SnapshotManager import debug_print_snarfile
-from nssbackup.managers.SnapshotManager import debug_snarfile_to_list
+from sbackup.managers.SnapshotManager import SnapshotManager
+from sbackup.managers.SnapshotManager import debug_print_snarfile
+from sbackup.managers.SnapshotManager import debug_snarfile_to_list
 
-from nssbackup import util
-from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.exceptions import RebaseFullSnpForbidden
-from nssbackup.util.exceptions import RebaseSnpException
+from sbackup import util
+from sbackup.util.log import LogFactory
+from sbackup.util.exceptions import SBException
+from sbackup.util.exceptions import RebaseFullSnpForbidden
+from sbackup.util.exceptions import RebaseSnpException
 
 
 LOGLEVEL = 100

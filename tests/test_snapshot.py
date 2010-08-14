@@ -26,12 +26,12 @@ import unittest
 import pickle
 import subprocess
 
-from nssbackup.util.exceptions import SBException
-from nssbackup.util.exceptions import NotValidSnapshotNameException
-from nssbackup.util.exceptions import NotValidSnapshotException
+from sbackup.util.exceptions import SBException
+from sbackup.util.exceptions import NotValidSnapshotNameException
+from sbackup.util.exceptions import NotValidSnapshotException
 
-from nssbackup.util import snapshot
-from nssbackup.util.log import LogFactory
+from sbackup.util import snapshot
+from sbackup.util.log import LogFactory
 
 
 class _TestSnapshotPaths(object):

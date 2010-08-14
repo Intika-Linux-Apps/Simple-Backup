@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 
-my $baseDir = './nssbackup-test';
+my $baseDir = './sbackup-test';
 
 # Number of created lowest-level dirs is $breadth ^ $depth
 # depth = 0 means: only files will be created.
@@ -37,7 +37,7 @@ sub makeDirs
             my $fileName = "$parentDir/f$i.txt";
             if (open(OUT, ">$fileName"))
             {
-                print OUT "nssbackup-test\n";
+                print OUT "sbackup-test\n";
                 close(OUT);
                 $numFiles++;
             }

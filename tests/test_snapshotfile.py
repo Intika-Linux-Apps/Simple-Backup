@@ -22,9 +22,9 @@ import sys
 import os.path
 import unittest
 
-from nssbackup.util.log import LogFactory
-from nssbackup.util import tar
-from nssbackup.util import file_handling as fam
+from sbackup.util.log import LogFactory
+from sbackup.util import tar
+from sbackup.util import file_handling as fam
 
 
 LOGLEVEL = 100

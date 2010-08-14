@@ -18,9 +18,9 @@
 
 import unittest
 
-from nssbackup.plugins.sshFuseFAM import sshFuseFAM
-from nssbackup.util.exceptions import SBException
-from nssbackup.plugins.ftpFuseFAM import ftpFuseFAM
+from sbackup.plugins.sshFuseFAM import sshFuseFAM
+from sbackup.util.exceptions import SBException
+from sbackup.plugins.ftpFuseFAM import ftpFuseFAM
 
 class TestFuseFAM(unittest.TestCase):
     """

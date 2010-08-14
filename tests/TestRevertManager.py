@@ -15,9 +15,9 @@
 # Authors :
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from nssbackup.core.RestoreManager import RestoreManager
-from nssbackup.core.SnapshotManager import SnapshotManager
-from nssbackup.util.log import LogFactory
+from sbackup.core.RestoreManager import RestoreManager
+from sbackup.core.SnapshotManager import SnapshotManager
+from sbackup.util.log import LogFactory
 import unittest
 import os
 

@@ -18,7 +18,7 @@
 
 import os
 import unittest
-from nssbackup import util as Util
+from sbackup import util as Util
 
 class TestUtilsRemoveConfEntry(unittest.TestCase):
     """Testing function 'util.remove_conf_entry'.

@@ -21,15 +21,15 @@ import os
 import subprocess
 import datetime
 
-from nssbackup.util.tar import SnapshotFile
-from nssbackup.util.tar import MemSnapshotFile
-from nssbackup.util.tar import ProcSnapshotFile
-from nssbackup.util.tar import Dumpdir
-from nssbackup.util.tar import getArchiveType
-from nssbackup.util.tar import get_dumpdir_from_list
+from sbackup.util.tar import SnapshotFile
+from sbackup.util.tar import MemSnapshotFile
+from sbackup.util.tar import ProcSnapshotFile
+from sbackup.util.tar import Dumpdir
+from sbackup.util.tar import getArchiveType
+from sbackup.util.tar import get_dumpdir_from_list
 
-from nssbackup.util.log import LogFactory
-from nssbackup.util.exceptions import SBException
+from sbackup.util.log import LogFactory
+from sbackup.util.exceptions import SBException
 
 
 class _TestTarPaths(object):

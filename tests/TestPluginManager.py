@@ -17,7 +17,7 @@
 
 
 import unittest
-from nssbackup.plugins import PluginManager
+from sbackup.plugins import PluginManager
 
 class TestPluginManager(unittest.TestCase):
     """

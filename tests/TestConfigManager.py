@@ -18,8 +18,8 @@
 
 import os
 import unittest
-from nssbackup.util.exceptions import SBException, NonValidOptionException
-from nssbackup.core.ConfigManager import ConfigManager
+from sbackup.util.exceptions import SBException, NonValidOptionException
+from sbackup.core.ConfigManager import ConfigManager
 
 class TestConfigManager(unittest.TestCase):
 
@@ -42,7 +42,7 @@ class TestConfigManager(unittest.TestCase):
     #        self.assertRaises(IOError, self.config.setDefaultForRoot )
     #    else :
     #        self.config.setDefaultForRoot()
-    #        self.assertTrue(os.path.exists("/var/log/nssbackup.log"))
+    #        self.assertTrue(os.path.exists("/var/log/sbackup.log"))
     # 
     # def testsetDefaultForUsers(self):
     #    "Set the default config for normal users"    
@@ -54,7 +54,7 @@ class TestConfigManager(unittest.TestCase):
         """
         self.config._set_defaults()
         if os.geteuid() == 0 :
-            self.assertTrue(os.path.exists("/var/log/nssbackup.log"))
+            self.assertTrue(os.path.exists("/var/log/sbackup.log"))
 
 
     def testread(self):

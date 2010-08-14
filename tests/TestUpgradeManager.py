@@ -15,9 +15,9 @@
 # Authors :
 #    Ouattara Oumar Aziz ( alias wattazoum ) <wattazoum@gmail.com>
 
-from nssbackup.managers.UpgradeManager import UpgradeManager
-from nssbackup.managers.SnapshotManager import SnapshotManager
-from nssbackup.util import log
+from sbackup.managers.UpgradeManager import UpgradeManager
+from sbackup.managers.SnapshotManager import SnapshotManager
+from sbackup.util import log
 import unittest
 import os
 

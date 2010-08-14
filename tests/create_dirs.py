@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #
-#    NSsbackup - helper script for automated creation of test data
+#   Simple Backup - helper script for automated creation of test data
 #
 #   Copyright (c)2008-2009: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
@@ -40,7 +40,7 @@ random.seed()
 class TestdataOptions(object):
 
     def __init__(self, mode):
-        self.__wdir = "./nssbackup-test-py"
+        self.__wdir = "./sbackup-test-py"
         self.__mode = mode
         #mode = "medium"
         #mode = "large"

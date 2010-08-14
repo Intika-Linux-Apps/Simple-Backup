@@ -1,4 +1,4 @@
-from nssbackup.util.log import LogFactory
+from sbackup.util.log import LogFactory
 
 class Test:
     """
