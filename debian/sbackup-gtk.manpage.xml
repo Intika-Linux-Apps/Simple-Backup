@@ -24,7 +24,7 @@
   </refnamediv>
   <refsynopsisdiv>
     <cmdsynopsis>
-      <command>sbackupd</command>
+      <command>sbackup</command>
 
       <arg><option>-e <replaceable>this</replaceable></option></arg>
 
@@ -35,7 +35,7 @@
     <title>DESCRIPTION</title>
 
     <para>This manual page documents briefly the
-      <command>sbackupd</command>
+      <command>sbackup</command>
       command.</para>
 
     <para>This manual page was written for the &debian; distribution

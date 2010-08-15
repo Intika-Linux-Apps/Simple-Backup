@@ -999,7 +999,7 @@ class ConfigManager(ConfigParser.ConfigParser):
                              
         @todo: What happens if the config file is 'Save as...' in order to
                 store a configuration aside but the scheduling is different
-                from the *original* configuration that is used by sbackupd?
+                from the *original* configuration that is used by sbackup?
         """
         if configfile is not None:
             fld = local_file_utils.openfile(configfile, True)

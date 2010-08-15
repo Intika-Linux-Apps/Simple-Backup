@@ -44,8 +44,8 @@ if [ -x /usr/bin/ionice ]; then
 	ionicecmd="/usr/bin/ionice -c 3"
 fi
 
-if [ -x /usr/bin/sbackupd ]; then
-	$nicecmd $ionicecmd /usr/bin/sbackupd > $logfile 2>&1
-elif [ -x /usr/local/bin/sbackupd ]; then
-	$nicecmd $ionicecmd /usr/local/bin/sbackupd > $logfile 2>&1
+if [ -x /usr/bin/sbackup ]; then
+	$nicecmd $ionicecmd /usr/bin/sbackup > $logfile 2>&1
+elif [ -x /usr/local/bin/sbackup ]; then
+	$nicecmd $ionicecmd /usr/local/bin/sbackup > $logfile 2>&1
 fi

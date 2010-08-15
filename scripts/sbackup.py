@@ -38,6 +38,6 @@ if __name__ == '__main__':
     gettext.bindtextdomain(application, locale_dir)
     gettext.textdomain(application)
 
-    from sbackup.sbackupd import main
+    from sbackup.backupproc import main
     retc = main(sys.argv)
     sys.exit(retc)

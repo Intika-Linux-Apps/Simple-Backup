@@ -27,7 +27,7 @@ import subprocess
 
 
 INTERPRETER = "python"
-BACKUP_COMMAND = "sbackupd"
+BACKUP_COMMAND = "sbackup"
 BACKUP_CANCEL_SIG = signal.SIGUSR1
 
 

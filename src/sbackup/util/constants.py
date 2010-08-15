@@ -74,7 +74,7 @@ INDICATORAPP_NAME = "Simple Backup Indicator Application"
 DBUS_NOTIFIER_NAME = "Simple Backup DBus Notifier"
 
 TERMINATE_FILE = "sbackup-terminate"
-BACKUP_COMMAND = "sbackupd"
+BACKUP_COMMAND = "sbackup"
 BACKUP_PROCESS_NAME = "Simple Backup Process"
 
 

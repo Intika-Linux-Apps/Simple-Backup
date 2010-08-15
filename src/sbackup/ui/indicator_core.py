@@ -732,14 +732,14 @@ class SBackupdIndicatorBase(INotifyMixin):
 
 
 class SBackupdIndicatorHandler(object):
-    def __init__(self, sbackupd_dbus_obj, options):
-        if not isinstance(sbackupd_dbus_obj, dbus_support.DBusClientFacade):
-            raise TypeError("Given sbackupd_dbus_obj of type `DBusClientFacade` expected.")
+    def __init__(self, backup_dbus_obj, options):
+        if not isinstance(backup_dbus_obj, dbus_support.DBusClientFacade):
+            raise TypeError("Given backup_dbus_obj of type `DBusClientFacade` expected.")
 
         self.logger = LogFactory.getLogger()
         self.__options = options
 
-        self._sbackupd_dbus_obj = sbackupd_dbus_obj
+        self._backup_dbus_obj = backup_dbus_obj
 
         self._space_required = constants.SPACE_REQUIRED_UNKNOWN
         self._target = constants.TARGET_UNKNOWN
@@ -762,41 +762,41 @@ class SBackupdIndicatorHandler(object):
         return self.__options.keep_alive
 
     def test_dbus_validity(self):
-        self._sbackupd_dbus_obj.test_validity()
+        self._backup_dbus_obj.test_validity()
 
     def is_dbus_valid(self):
-        _valid = self._sbackupd_dbus_obj.get_is_connected()
+        _valid = self._backup_dbus_obj.get_is_connected()
         return _valid
 
     def dbus_reconnect(self):
-        self._sbackupd_dbus_obj.connect(silent = True)
+        self._backup_dbus_obj.connect(silent = True)
 
     def connect_dbus_event_signal(self, handler):
-        self._sbackupd_dbus_obj.connect_to_event_signal(handler)
+        self._backup_dbus_obj.connect_to_event_signal(handler)
 
     def connect_dbus_error_signal(self, handler):
-        self._sbackupd_dbus_obj.connect_to_error_signal(handler)
+        self._backup_dbus_obj.connect_to_error_signal(handler)
 
     def connect_dbus_progress_signal(self, handler):
-        self._sbackupd_dbus_obj.connect_to_progress_signal(handler)
+        self._backup_dbus_obj.connect_to_progress_signal(handler)
 
     def connect_dbus_targetnotfound_signal(self, handler):
-        self._sbackupd_dbus_obj.connect_to_targetnotfound_signal(handler)
+        self._backup_dbus_obj.connect_to_targetnotfound_signal(handler)
 
     def connect_dbus_alreadyrunning_signal(self, handler):
-        self._sbackupd_dbus_obj.connect_to_alreadyrunning_signal(handler)
+        self._backup_dbus_obj.connect_to_alreadyrunning_signal(handler)
 
     def connect_dbus_exit_signal(self, handler):
-        self._sbackupd_dbus_obj.connect_to_exit_signal(handler)
+        self._backup_dbus_obj.connect_to_exit_signal(handler)
 
     def __update_properties(self):
-        self._profile = self._sbackupd_dbus_obj.get_profilename()
-        self._target = self._sbackupd_dbus_obj.get_target()
-        self._space_required = self._sbackupd_dbus_obj.get_space_required()
+        self._profile = self._backup_dbus_obj.get_profilename()
+        self._target = self._backup_dbus_obj.get_target()
+        self._space_required = self._backup_dbus_obj.get_space_required()
 
     def cancel_backup(self):
         res = True
-        pid = self._sbackupd_dbus_obj.get_backup_pid()
+        pid = self._backup_dbus_obj.get_backup_pid()
         self.logger.info(_("PID of backup process being canceled: %s") % pid)
         if pid != constants.PID_UNKNOWN:
             term_script = util.get_resource_file(constants.TERMINATE_FILE)
@@ -829,7 +829,7 @@ class SBackupdIndicatorHandler(object):
         if retry not in (constants.RETRY_UNKNOWN, constants.RETRY_FALSE,
                          constants.RETRY_TRUE):
             raise ValueError("Invalid value for retry target check.")
-        self._sbackupd_dbus_obj.set_retry_target_check(retry)
+        self._backup_dbus_obj.set_retry_target_check(retry)
 
     def enable_targetnotfound_run_timer(self):
         self._targetnotfound_run_timer = True
@@ -841,7 +841,7 @@ class SBackupdIndicatorHandler(object):
         return self._targetnotfound_run_timer
 
     def get_targetnotfound_error_msg(self):
-        target = self._sbackupd_dbus_obj.get_target()
+        target = self._backup_dbus_obj.get_target()
         msg = _("<b>Unable to find specified target directory</b>\n\nThe specified target directory '%s' was not found.\n\n") % target
         msg = msg + _("You can try to use the specified target again or cancel the profile execution. The profile execution is canceled automatically in %s seconds.")
         return msg

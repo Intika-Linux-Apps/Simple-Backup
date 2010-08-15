@@ -146,11 +146,11 @@ install: install-po install-help install-bin install-sbin install-package instal
 # application's binaries
 install-bin:
 	mkdir -p $(bindir)
-	cp -a scripts/sbackupd.py $(bindir)/sbackupd
+	cp -a scripts/sbackup.py $(bindir)/sbackup
 	cp -a scripts/sbackup-config-gui.py $(bindir)/sbackup-config-gui
 	cp -a scripts/sbackup-restore-gui.py $(bindir)/sbackup-restore-gui
 	cp -a scripts/sbackup-upgrade-backups.py $(bindir)/sbackup-upgrade-backups
-	chmod +x $(bindir)/sbackupd
+	chmod +x $(bindir)/sbackup
 	chmod +x $(bindir)/sbackup-config-gui
 	chmod +x $(bindir)/sbackup-restore-gui
 	chmod +x $(bindir)/sbackup-upgrade-backups
@@ -230,7 +230,7 @@ install-gconf:
 uninstall: uninstall-bin uninstall-sbin uninstall-package uninstall-data uninstall-help clean-data
 
 uninstall-bin:
-	rm -f $(bindir)/sbackupd
+	rm -f $(bindir)/sbackup
 	rm -f $(bindir)/sbackup-config-gui
 	rm -f $(bindir)/sbackup-restore-gui
 	rm -f $(bindir)/sbackup-upgrade-backups

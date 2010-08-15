@@ -113,7 +113,7 @@ sbackup (0.10.2) unstable; urgency=high
     on upgrade. SBackup can handle old config gracefuly.
   * Brown paperbag one-liner fix on incremental backup time not being counted 
     properly causing incremental backups to be done all the time.
-  * Reduce nice level of sbackupd process to lowest possible priority (+19)
+  * Reduce nice level of sbackup process to lowest possible priority (+19)
   * An empty regex matches everything, so avoid those
 
  -- Aigars Mahinovs <aigarius@debian.org>  Fri, 06 Oct 2006 16:55:10 +0100

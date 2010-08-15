@@ -8,7 +8,7 @@ see blueprints on https://blueprints.edge.launchpad.net/sbackup
 Planned for near future
 -----------------------
 
-* Check how sbackupd reacts if it can not get into a folder (FUSE used by a user)
+* Check how sbackup reacts if it can not get into a folder (FUSE used by a user)
 * Check filesizes (2 Gb and 4 Gb limits)
 * manpage
 * refactor some of the classes:

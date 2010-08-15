@@ -18,10 +18,10 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 """
-:mod:`sbackupd` --- the actual backup service
+:mod:`backupproc` --- the actual backup service
 ================================================
 
-.. module:: sbackupd
+.. module:: backupproc
    :synopsis: Defines the actual backup service
 .. moduleauthor:: Ouattara Oumar Aziz (alias wattazoum) <wattazoum@gmail.com>
 .. moduleauthor:: Jean-Peer Lorenz <peer.loz@gmx.net>
