@@ -1,5 +1,5 @@
 debian/tmp/usr/lib/python*/*/sbackup/__init__.py
-debian/tmp/usr/lib/python*/*/sbackup/sbackupproc.py
+debian/tmp/usr/lib/python*/*/sbackup/backupproc.py
 debian/tmp/usr/lib/python*/*/sbackup/pkginfo.py
 debian/tmp/usr/lib/python*/*/sbackup/dbus_service.py
 debian/tmp/usr/lib/python*/*/sbackup/resources
@@ -9,8 +9,6 @@ debian/tmp/usr/lib/python*/*/sbackup/core/*.py
 debian/tmp/usr/lib/python*/*/sbackup/fs_backend/*.py
 debian/tmp/usr/lib/python*/*/sbackup/util/*.py
 debian/tmp/usr/lib/python*/*/sbackup/ui/__init__.py
-debian/tmp/usr/lib/python*/*/sbackup/fuse_plugins/__init__.py
-debian/tmp/usr/lib/python*/*/sbackup/fuse_plugins/localFuseFAM.py
 debian/tmp/usr/share/sbackup/multipleTarScript
 debian/tmp/usr/share/sbackup/sbackup-launch
 debian/tmp/usr/share/sbackup/sbackup-dbusservice
