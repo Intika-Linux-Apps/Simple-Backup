@@ -35,26 +35,22 @@ class Infos(object):
     @todo: Remove the smtpfrom info from here.
     
     """
-
     NAME = "Simple Backup Suite"
-
     VERSION = util.get_version_number()
-
     DESCRIPTION = _("This is a user friendly backup solution for common desktop needs. If you want to help by submitting bugs, by translating or anything else please visit our website.")
-
     WEBSITE = "https://launchpad.net/sbackup/"
-
-    SNPCURVERSION = "1.5"
-
     COPYRIGHT = "2007-2010 Simple Backup Development team"
-
     AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
                "Jean-Peer Lorenz <peer.loz@gmx.net>",
                "Aigars Mahinovs <aigarius@debian.org>"
               ]
     TRANSLATORS = _("translator-credits")
 
-    #
+
+#TODO: remove snapshot version from here!
+    SNPCURVERSION = "1.5"
+
+#TODO: remove hostname and mailsuffix from here!
     hostname = socket.gethostname()
     if "." in hostname:
         mailsuffix = hostname
@@ -62,3 +58,4 @@ class Infos(object):
         mailsuffix = hostname + ".ext"
     SMTPFROM = _("SBackup Daemon <%(login)s@%(hostname)s>") % {
                     'login' : os.getenv("USERNAME"), 'hostname': mailsuffix }
+

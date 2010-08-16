@@ -134,8 +134,22 @@ fill-templates:
 	rm -f src/sbackup/metainfo.tmp
 	rm -f setup.py.tmp
 
+check:
+	@if [ -e $(DESTDIR)/bin/sbackupd ]; then \
+	echo "Another installation of sbackup is present. Please uninstall first."; exit 1; fi
+	@if [ -e $(DESTDIR)/bin/sbackup ]; then \
+	echo "Another installation of sbackup is present. Please uninstall first."; exit 1; fi
+	@if [ -e $(DESTDIR)/bin/nssbackupd ]; then \
+	echo "Another installation of nssbackup is present. Please uninstall first."; exit 1; fi
+		
+	@if [ -e $(DESTDIR)/../bin/sbackupd ]; then \
+	echo "Another installation of sbackup is present. Please uninstall first."; exit 1; fi
+	@if [ -e $(DESTDIR)/../bin/sbackup ]; then \
+	echo "Another installation of sbackup is present. Please uninstall first."; exit 1; fi
+	@if [ -e $(DESTDIR)/../bin/nssbackupd ]; then \
+	echo "Another installation of nssbackup is present. Please uninstall first."; exit 1; fi	
 
-install: install-po install-help install-bin install-sbin install-package install-data
+install: check install-po install-help install-bin install-sbin install-package install-data
 	chmod +x $(datadir)/sbackup/multipleTarScript
 	chmod +x $(datadir)/sbackup/sbackup-launch
 	chmod +x $(datadir)/sbackup/sbackup-dbusservice
@@ -146,10 +160,10 @@ install: install-po install-help install-bin install-sbin install-package instal
 # application's binaries
 install-bin:
 	mkdir -p $(bindir)
-	cp -a scripts/sbackup.py $(bindir)/sbackup
-	cp -a scripts/sbackup-config-gui.py $(bindir)/sbackup-config-gui
-	cp -a scripts/sbackup-restore-gui.py $(bindir)/sbackup-restore-gui
-	cp -a scripts/sbackup-upgrade-backups.py $(bindir)/sbackup-upgrade-backups
+	cp -a scripts/sbackup $(bindir)/sbackup
+	cp -a scripts/sbackup-config-gui $(bindir)/sbackup-config-gui
+	cp -a scripts/sbackup-restore-gui $(bindir)/sbackup-restore-gui
+	cp -a scripts/sbackup-upgrade-backups $(bindir)/sbackup-upgrade-backups
 	chmod +x $(bindir)/sbackup
 	chmod +x $(bindir)/sbackup-config-gui
 	chmod +x $(bindir)/sbackup-restore-gui

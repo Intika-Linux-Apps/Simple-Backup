@@ -42,5 +42,5 @@ if __name__ == '__main__':
     gtk.glade.bindtextdomain(application, locale_dir)
     gtk.glade.textdomain(application)
 
-    from sbackup.ui.SBRestoreGTK import main
+    from sbackup.ui.restoregui import main
     main(sys.argv)

@@ -129,6 +129,10 @@ _CRON_SERVICE = "d"
 _SCHEDULE_SERVICES = _ANACRON_SERVICES
 _SCHEDULE_SERVICES.append(_CRON_SERVICE)
 
+SCHEDULE_TYPE_ANACRON = 0
+SCHEDULE_TYPE_CRON = 1
+SCHEDULE_TYPES = [SCHEDULE_TYPE_CRON, SCHEDULE_TYPE_ANACRON]
+
 
 def is_default_profile(conffile):
     """Checks whether the given configuration file corresponds to the
@@ -171,11 +175,29 @@ def get_profiles(prfdir):
      
     @return: a dictionarity of { name: [path_to_conffile, enable] } 
     """
+    return _get_profiles(prfdir, application = "sbackup")
+
+def get_profiles_nssbackup(prfdir):
+    """Get the configuration profiles list
+     
+    @return: a dictionarity of { name: [path_to_conffile, enable] } 
+    """
+    return _get_profiles(prfdir, application = "nssbackup")
+
+def _get_profiles(prfdir, application):
+    """Get the configuration profiles list
+     
+    @return: a dictionarity of { name: [path_to_conffile, enable] } 
+    """
     profiles = dict()
     if os.path.exists(prfdir) and os.path.isdir(prfdir):
         _listing = os.listdir(prfdir)
+        if application == "nssbackup":
+            _re = ConfigManagerStaticData.get_profilename_nssbackup_re()
+        else:
+            _re = ConfigManagerStaticData.get_profilename_re()
         for conff in  _listing:
-            mobj = ConfigManagerStaticData.get_profilename_re().match(conff)
+            mobj = _re.match(conff)
             if mobj is not None:
                 name = mobj.group(1)
                 path = os.path.join(prfdir, mobj.group(0))
@@ -194,6 +216,26 @@ def get_default_config_obj():
     else:
         _default_config = _DefaultConfigurationForUsers()
     return _default_config
+
+
+def parse_cronexpression(cronfile_content):
+    print "Cronfile content:\n%s" % cronfile_content
+    _expr = None
+    for _line in cronfile_content.split("\n"):
+        _line = _line.strip()
+        print "Line: %s" % _line
+        if _line.startswith("#"):
+            continue
+        else:
+            _tup = _line.split()
+            print str(_tup)
+            if len(_tup) == 7:
+                _expr = " ".join(_tup[0:5])
+                break
+    return _expr
+
+
+
 
 
 class ConfigManager(ConfigParser.ConfigParser):
@@ -293,7 +335,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         @todo: Use the 'our_options' from ConfigManagerStaticData class for \
                 initialisation.
                 
-        @todo: Should we remove *unknown* sections?
+        @note: Should we remove *unknown* sections? No, though we validate the file.
         """
         if not self.has_section("general"):
             self.add_section("general")
@@ -763,38 +805,52 @@ class ConfigManager(ConfigParser.ConfigParser):
                 retVal.append((key, value))
         return retVal
 
+    def get_compress_format(self):
+        if self.has_option("general", "format"):
+            _compr = self.get("general", "format")
+            if str(_compr) == "1":  # sbackup < 0.11 compatibility hack
+                _compr = "gzip"
+                self.set("general", "format", _compr)
+        else:
+            defaults = self.__get_default_config_obj()
+            _compr = defaults.get_compress_format()
+        return _compr
+
+
     def setSchedule(self, isCron, value):
         """Set the backup Schedule.
         
-        @param isCron : 0 for Anacron use , 1 for Cron use
+        @param isCron : schedule type (cron/anacron)
         @param value : a string containing the value to set for Cron/Anacron. \
                         Valid values for Anacron are: \
                             daily/monthly/hourly/weekly
                         Valid values for Cron:
-                            cronline to add at /etc/cron.d/sbackup.
-                            
+                            cron expression to add at /etc/cron.d/sbackup.                            
         """
-        anacronValues = ["daily", "monthly", "hourly", "weekly"]
-        if type(isCron) != int or not (isCron in [0, 1]) :
-            raise exceptions.NonValidOptionException("isCron must be 0 or 1")
-        if isCron == 0 :
-            # an Anacron entry was given (simple scheduling)
-            if value not in anacronValues :
-                raise exceptions.NonValidOptionException("Valid values for anacron are: "\
-                        "%s, got '%s' instead." % (str(anacronValues), value))
-            else :
+        _logger = log.LogFactory().getLogger()  # in some cases a logger is not yet available
+
+        if isCron not in SCHEDULE_TYPES:
+            raise exceptions.NonValidOptionException("Invalid schedule type given")
+
+        if not self.has_section("schedule"):
+            self.add_section("schedule")
+
+        if isCron == SCHEDULE_TYPE_ANACRON:     # (simple scheduling)
+            if value in _ANACRON_SERVICES :
                 if self.has_option("schedule", "cron"):
-# in some cases a logger is not yet available
-#                    self.logger.debug("Removing Cron config to set Anacron config.")
+                    _logger.debug("Removing Cron config to set Anacron config.")
                     self.remove_option("schedule", "cron")
-#                self.logger.debug("Setting Anacron config to: %s" % value)
+                _logger.debug("Setting Anacron config to: %s" % value)
                 self.set("schedule", "anacron", value)
-        elif isCron == 1:
-            # a Cron entry was given (precise scheduling)
+            else:
+                raise exceptions.NonValidOptionException("Valid values for anacron are: "\
+                        "%s, got '%s' instead." % (str(_ANACRON_SERVICES), value))
+
+        elif isCron == SCHEDULE_TYPE_CRON:  # Cron entry given (precise scheduling)
             if self.has_option("schedule", "anacron"):
-#                self.logger.debug("Removing Anacron config to set Cron config.")
+                _logger.debug("Removing Anacron config to set Cron config.")
                 self.remove_option("schedule", "anacron")
-#            self.logger.debug("Setting cron config to: %s" % value)
+            _logger.debug("Setting cron config to: %s" % value)
             self.set("schedule", "cron", value)
 
     def get_schedule_and_probe(self):
@@ -813,26 +869,25 @@ class ConfigManager(ConfigParser.ConfigParser):
 
             # no entry in configuration found, look at Cron/Anacron directly
             self.logger.info(_("No schedule defined in configuration file. Probing from filesystem."))
-            #hourly
-            if os.path.exists("/etc/cron.hourly/sbackup"):
+            # for anacron we check for link rather exists to cope with cases of broken links
+            if os.path.islink("/etc/cron.hourly/sbackup"):
                 self.logger.debug("Anacron hourly has been found")
-                return (0, "hourly")
-            # daily
-            elif os.path.exists("/etc/cron.daily/sbackup"):
+                return (SCHEDULE_TYPE_ANACRON, "hourly")
+            elif os.path.islink("/etc/cron.daily/sbackup"):
                 self.logger.debug("Anacron daily has been found")
-                return (0, "daily")
-            # weekly
-            elif os.path.exists("/etc/cron.weekly/sbackup"):
+                return (SCHEDULE_TYPE_ANACRON, "daily")
+            elif os.path.islink("/etc/cron.weekly/sbackup"):
                 self.logger.debug("Anacron weekly has been found")
-                return (0, "weekly")
-            # monthly
-            elif os.path.exists("/etc/cron.monthly/sbackup"):
+                return (SCHEDULE_TYPE_ANACRON, "weekly")
+            elif os.path.islink("/etc/cron.monthly/sbackup"):
                 self.logger.debug("Anacron monthly has been found")
-                return (0, "monthly")
+                return (SCHEDULE_TYPE_ANACRON, "monthly")
+
             if os.path.exists("/etc/cron.d/sbackup"):
                 _value = local_file_utils.readfile("/etc/cron.d/sbackup")
                 self.logger.debug("Custom Cron has been found: %s" % _value)
-                return (1, _value)
+                _value = parse_cronexpression(_value)
+                return (SCHEDULE_TYPE_CRON, _value)
             # none has been found
             return None
 
@@ -841,11 +896,11 @@ class ConfigManager(ConfigParser.ConfigParser):
             if self.has_option("schedule", "cron"):
                 _value = self.get("schedule", "cron")
                 self.logger.debug("Schedule type Cron found in Config: %s" % _value)
-                return (1, _value)
+                return (SCHEDULE_TYPE_CRON, _value)
             elif self.has_option("schedule", "anacron"):
                 _value = self.get("schedule", "anacron")
                 self.logger.debug("Schedule type Anacron found in Config: %s" % _value)
-                return (0, _value)
+                return (SCHEDULE_TYPE_ANACRON, _value)
             else:
                 return None
 
@@ -1296,8 +1351,10 @@ class ConfigManagerStaticData(object):
     __default_config_file = "sbackup.conf"
 
     __profiles_dir = "sbackup.d"
+    __profiles_dir_nssbackup = "nssbackup.d"
 
     __profilename_re = re.compile(r"^sbackup-(.+?).conf(-disable)?$")
+    __profilename_nssbackup_re = re.compile(r"^nssbackup-(.+?).conf(-disable)?$")
 
     # configuration's existing sections and options
     __our_options = {
@@ -1407,8 +1464,19 @@ class ConfigManagerStaticData(object):
         return cls.__profiles_dir
 
     @classmethod
+    def get_profiles_dir_nssbackup(cls):
+        """Returns the name (only basename, no path) of the directory where
+        profile configurations are stored.        
+        """
+        return cls.__profiles_dir_nssbackup
+
+    @classmethod
     def get_profilename_re(cls):
         return cls.__profilename_re
+
+    @classmethod
+    def get_profilename_nssbackup_re(cls):
+        return cls.__profilename_nssbackup_re
 
     @classmethod
     def get_default_profilename(cls):

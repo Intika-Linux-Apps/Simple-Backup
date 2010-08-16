@@ -48,6 +48,9 @@ from sbackup.util import structs
 from sbackup.util import log
 
 
+AVAIL_SNP_FORMATS = ["none", "bzip2", "gzip"]
+
+
 class Snapshot(object):
     """The snapshot class represents one snapshot in the backup directory.
     
@@ -469,8 +472,7 @@ class Snapshot(object):
         Sets the backup compression format
         cformat : the format to set
         """
-        supported = ["none", "bzip2", "gzip"]
-        if cformat and cformat in supported :
+        if cformat in AVAIL_SNP_FORMATS :
             self.logger.debug("Set the compression format to %s" % cformat)
             self.__format = cformat
 

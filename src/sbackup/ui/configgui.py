@@ -325,12 +325,11 @@ class SBconfigGTK(GladeGnomeApp):
         specified in configuration.
         """
         cformats = ConfigManagerStaticData.get_compr_formats()
-        if self.configman.has_option("general", "format") :
-            cformatOpt = self.configman.get("general", "format")
-            if cformatOpt not in cformats:
-                cformatOpt = 'none'
-            cformatIndex = cformats.index(cformatOpt)
-            self.widgets["cformat"].set_active(cformatIndex)
+        cformatOpt = self.configman.get_compress_format()
+        if cformatOpt not in cformats:
+            cformatOpt = 'none'
+        cformatIndex = cformats.index(cformatOpt)
+        self.widgets["cformat"].set_active(cformatIndex)
 
     def __fill_purge_widgets_from_config(self):
         """Sets the UI elements for 'purge' to the value

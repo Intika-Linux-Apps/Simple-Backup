@@ -174,10 +174,9 @@ class BackupProfileHandler(object):
             gexclude = ""
         self.__snapshot.setExcludes(gexclude)
 
-        if self.config.has_option("general", "format"):
-            _compr = self.config.get("general", "format")
-            self.logger.info(_("Setting compression format to `%s`") % _compr)
-            self.__snapshot.setFormat(_compr)
+        _compr = self.config.get_compress_format()
+        self.logger.info(_("Setting compression format to `%s`") % _compr)
+        self.__snapshot.setFormat(_compr)
 
         if self.config.has_option("general", "splitsize"):
             _chunks = int(self.config.get("general", "splitsize"))
