@@ -219,16 +219,31 @@ def get_default_config_obj():
 
 
 def parse_cronexpression(cronfile_content):
-    print "Cronfile content:\n%s" % cronfile_content
     _expr = None
     for _line in cronfile_content.split("\n"):
         _line = _line.strip()
-        print "Line: %s" % _line
+        _line = " ".join(_line.split()) # eliminate multiple spaces and tabs
         if _line.startswith("#"):
             continue
+
+        elif _line.startswith("@hourly"):
+            _expr = "0 * * * *"
+            break
+        elif _line.startswith("@daily"):
+            _expr = "0 0 * * *"
+            break
+        elif _line.startswith("@weekly"):
+            _expr = "0 0 * * 0"
+            break
+        elif _line.startswith("@monthly"):
+            _expr = "0 0 1 * *"
+            break
+        elif _line.startswith("@"):
+            _expr = None    # not supported (@yearly,...)
+            break
+
         else:
-            _tup = _line.split()
-            print str(_tup)
+            _tup = _line.split(" ", 6)  # now split at spaces
             if len(_tup) == 7:
                 _expr = " ".join(_tup[0:5])
                 break
@@ -1091,6 +1106,7 @@ class ConfigManager(ConfigParser.ConfigParser):
         elif self.has_option("schedule", "anacron"):
             _anacr = self.get("schedule", "anacron")
             self.logger.debug("Writing Anacron entry `%s`" % _anacr)
+            assert _anacr in _ANACRON_SERVICES, "Anacron entry found in config is invalid"
             _anacrpath = _CRON_PATH_TEMPLATE % (_anacr, _LAUNCHER_NAME_CRON)
             if _anacr in _ANACRON_SERVICES:
                 os.symlink(self.__servicefile, _anacrpath)
@@ -1103,6 +1119,8 @@ class ConfigManager(ConfigParser.ConfigParser):
         """
         _cronheader = ConfigManagerStaticData.get_cronheader()
         _cronexpr = self.get("schedule", "cron")
+        assert (_cronexpr is not None) and (_cronexpr != "None"), \
+               "Cron entry `%s` found in config is invalid" % _cronexpr
         _cronuser = self.__schedules_user
         _execline = "if [ -x '%s' ]; then %s; fi;" % (self.__servicefile,
                                                       self.__servicefile)

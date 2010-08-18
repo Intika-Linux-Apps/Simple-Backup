@@ -50,10 +50,12 @@ URI_SCHEME_SSH = 'ssh'
 # davs support currently disabled due to umount issues
 #URI_SCHEME_DAVS = 'davs'
 URI_SCHEME_NFS = 'nfs'
+#URI_SCHEME_SMB = 'smb'
 
 
 VALID_URI_SCHEMES = [ URI_SCHEME_LOCAL_FILE, URI_SCHEME_FTP, URI_SCHEME_SFTP,
                       URI_SCHEME_SSH, URI_SCHEME_NFS
+#                      URI_SCHEME_SMB
 #                      URI_SCHEME_DAVS
                     ]
 
@@ -65,10 +67,12 @@ URI_SCHEME_EFF_FTP = URI_SCHEME_FTP
 URI_SCHEME_EFF_SFTP = URI_SCHEME_SFTP
 URI_SCHEME_EFF_SSH = URI_SCHEME_SSH
 URI_SCHEME_EFF_NFS = URI_SCHEME_NFS
+#URI_SCHEME_EFF_SMB = URI_SCHEME_SMB
 
 
 VALID_EFF_URI_SCHEMES = [ URI_SCHEME_EFF_LOCAL_FILE, URI_SCHEME_EFF_FTP, URI_SCHEME_EFF_SFTP,
                           URI_SCHEME_EFF_SSH, URI_SCHEME_EFF_NFS
+#                          URI_SCHEME_EFF_SMB
 #                          URI_SCHEME_EFF_DAVS
                         ]
 
@@ -77,6 +81,7 @@ URI_SCHEME_TO_EFF_URI_SCHEME = { URI_SCHEME_LOCAL_FILE : URI_SCHEME_EFF_LOCAL_FI
                                  URI_SCHEME_SFTP : URI_SCHEME_EFF_SFTP,
                                  URI_SCHEME_SSH : URI_SCHEME_EFF_SSH,
                                  URI_SCHEME_NFS : URI_SCHEME_EFF_NFS
+#                                 URI_SCHEME_SMB : URI_SCHEME_EFF_SMB
 #                                 URI_SCHEME_DAVS : URI_SCHEME_EFF_DAVS
                                }
 

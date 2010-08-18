@@ -101,24 +101,28 @@ REMOTE_SERVICE_FTP = 102
 #REMOTE_SERVICE_SECURE_WEBDAV = 103
 REMOTE_SERVICE_SSH = 104
 REMOTE_SERVICE_NFS = 105
+#REMOTE_SERVICE_SMB = 106
 
 
 REMOTE_SERVICES_AVAIL = { REMOTE_SERVICE_SFTP : _("SFTP"),
                           REMOTE_SERVICE_SSH : _("SSH"),
                           REMOTE_SERVICE_FTP : _("FTP"),
                           REMOTE_SERVICE_NFS : _("NFS")
+#                          REMOTE_SERVICE_SMB : _("SMB")
 #                          REMOTE_SERVICE_SECURE_WEBDAV : _("Secure WebDAV (HTTPS)")
                         }
 REMOTE_SERVICE_TO_URI_SCHEME = { REMOTE_SERVICE_FTP : pathparse.URI_SCHEME_FTP,
                                  REMOTE_SERVICE_SFTP : pathparse.URI_SCHEME_SFTP,
                                  REMOTE_SERVICE_SSH : pathparse.URI_SCHEME_SSH,
                                  REMOTE_SERVICE_NFS : pathparse.URI_SCHEME_NFS
+#                                 REMOTE_SERVICE_SMB : pathparse.URI_SCHEME_SMB
 #                                 REMOTE_SERVICE_SECURE_WEBDAV : URI_SCHEME_DAVS
                                }
 URI_SCHEME_TO_REMOTE_SERVICE = { REMOTE_SERVICE_TO_URI_SCHEME[REMOTE_SERVICE_FTP] : REMOTE_SERVICE_FTP,
                                  REMOTE_SERVICE_TO_URI_SCHEME[REMOTE_SERVICE_SFTP] : REMOTE_SERVICE_SFTP,
                                  REMOTE_SERVICE_TO_URI_SCHEME[REMOTE_SERVICE_SSH] : REMOTE_SERVICE_SSH,
                                  REMOTE_SERVICE_TO_URI_SCHEME[REMOTE_SERVICE_NFS] : REMOTE_SERVICE_NFS
+#                                 REMOTE_SERVICE_TO_URI_SCHEME[REMOTE_SERVICE_SMB] : REMOTE_SERVICE_SMB
 #                                 REMOTE_SERVICE_TO_URI_SCHEME[REMOTE_SERVICE_SECURE_WEBDAV] : REMOTE_SERVICE_SECURE_WEBDAV
                                }
 

@@ -250,7 +250,7 @@ class CopyConf_nssbackup_to_sbackup_011(_UpgradeAllConffiles):
 
     def _mk_dir(self, dst, src):
         if not os.path.exists(dst):
-            print "   `%s` is being created" % dst
+            print "`%s` is being created" % dst
             os.mkdir(dst)
             _stats = os.stat(src)
             os.chown(dst, _stats.st_uid, _stats.st_gid)
@@ -259,11 +259,12 @@ class CopyConf_nssbackup_to_sbackup_011(_UpgradeAllConffiles):
     def _copy_default_profile(self):
         for cdir in self._configdirs:
             cdir_nssb = cdir.replace("sbackup", "nssbackup")
-            self._mk_dir(cdir, cdir_nssb)
 
-            cfile_src = os.path.join(cdir_nssb, "nssbackup.conf")
-            cfile_dst = os.path.join(cdir, ConfigManager.ConfigManagerStaticData.get_default_conffile())
-            self._copy_configfile(cfile_src, cfile_dst)
+            if os.path.isdir(cdir_nssb) and os.access(cdir_nssb, os.F_OK and os.R_OK):
+                self._mk_dir(cdir, cdir_nssb)
+                cfile_src = os.path.join(cdir_nssb, "nssbackup.conf")
+                cfile_dst = os.path.join(cdir, ConfigManager.ConfigManagerStaticData.get_default_conffile())
+                self._copy_configfile(cfile_src, cfile_dst)
 
     def _copy_other_profiles(self):
         """Modifies the configuration files for the other profiles.
@@ -275,12 +276,11 @@ class CopyConf_nssbackup_to_sbackup_011(_UpgradeAllConffiles):
             cdir_nssb = cdir.replace("sbackup", "nssbackup")
             pdir_nssb = os.path.join(cdir_nssb, ConfigManager.ConfigManagerStaticData.get_profiles_dir_nssbackup())
 
-            self._mk_dir(pdir, pdir_nssb)
-
             # get the profile directory for current configuration directory
             if os.path.isdir(pdir_nssb) and\
-               os.access(pdir_nssb, os.F_OK and os.R_OK and os.W_OK):
+               os.access(pdir_nssb, os.F_OK and os.R_OK):
                 # and get the profiles from the profiles directory
+                self._mk_dir(pdir, pdir_nssb)
                 profiles_nssb = ConfigManager.get_profiles_nssbackup(pdir_nssb)
                 for cprof in profiles_nssb:
                     _src = profiles_nssb[cprof][0]
@@ -392,6 +392,7 @@ class UpgradeConfAllProfiles(_UpgradeAllConffiles):
            os.access(conffile, os.F_OK and os.R_OK and os.W_OK):
             print "checking file: %s" % conffile
             config = _Config(conffile)
+            _default_config = ConfigManager.get_default_config_obj()
             if config.has_section("log"):
                 if config.has_option("log", "file"):
                     logfile = config.get("log", "file")
@@ -407,9 +408,22 @@ class UpgradeConfAllProfiles(_UpgradeAllConffiles):
                         print "   from `%s`" % (logfile)
                         print "   to   `%s`" % (new_log)
                         config.set("log", "file", str(new_log))
-                        config.commit_to_disk()
+                else:
+                    config.set("log", "file", os.path.join(_default_config.get_logdir(),
+                                                           ConfigManager.get_logfile_name_template(conffile)))
+                    print "   no log file specified. Default value set"
+
+                if not config.has_option("log", "level"):
+                    config.set("log", "level", _default_config.get_loglevel())
+                    print "   no log level specified. Default value set"
             else:
-                print "   nothing to do. skipped"
+                config.add_section("log")
+                config.set("log", "file", os.path.join(_default_config.get_logdir(),
+                                                       ConfigManager.get_logfile_name_template(conffile)))
+                config.set("log", "level", _default_config.get_loglevel())
+                print "   no section `log` found. Default values set"
+
+            config.commit_to_disk()
 
             if config.has_section("general"):
                 # remove old backuplinks options - it's now always done.
@@ -548,6 +562,9 @@ class UpgradeSBackupConf_v010_011(object):
                 print "Schedule found on FS: %s" % str(_sched)
                 _ctype = _sched[0]
                 _cexpr = _sched[1]
+                assert _ctype in ConfigManager.SCHEDULE_TYPES, "Given schedule type `%s` is invalid" % _ctype
+                assert (_cexpr is not None) and (_cexpr != "None"), \
+                       "Given cron expression `%s` is invalid" % _cexpr
 
                 _conf.setSchedule(_ctype, _cexpr)
                 _conf.saveConf()

@@ -28,13 +28,15 @@ import types
 import gobject
 import gtk
 
-# project imports
 from sbackup.util import log
 from sbackup.util import system
-from sbackup.core.ConfigManager import ConfigManagerStaticData
 from sbackup.util.log import LogFactory
 from sbackup.util.exceptions import SBException
-from sbackup.core.ConfigManager import ConfigManager, ConfigurationFileHandler
+
+from sbackup.core import ConfigManager
+from sbackup.core.ConfigManager import ConfigurationFileHandler
+from sbackup.core.ConfigManager import ConfigManagerStaticData
+
 import sbackup.util as Util
 
 from sbackup.ui.GladeGnomeApp import GladeGnomeApp
@@ -84,7 +86,7 @@ class SBconfigGTK(GladeGnomeApp):
         if os.path.exists(_path_conffile):
             self.default_conffile = _path_conffile
             self.conffile = self.default_conffile
-            self.configman = ConfigManager(self.default_conffile)
+            self.configman = ConfigManager.ConfigManager(self.default_conffile)
 
             # hack to get rid of schedule settings in non-admin profiles
             # we just remove existing schedules from the config files
@@ -94,9 +96,9 @@ class SBconfigGTK(GladeGnomeApp):
                 self.configman.saveConf()
             # end of hack
 
-            self.orig_configman = ConfigManager(self.default_conffile)
+            self.orig_configman = ConfigManager.ConfigManager(self.default_conffile)
         else :
-            self.configman = ConfigManager()
+            self.configman = ConfigManager.ConfigManager()
             self.orig_configman = None
 
         self.logger = LogFactory.getLogger()
@@ -337,8 +339,10 @@ class SBconfigGTK(GladeGnomeApp):
         """
         if self.configman.has_option("general", "purge") :
             self.logger.debug("Setting purge")
-            if self.configman.get("general", "purge") == "log" :
-                self.widgets['logpurgeradiobutton'].set_active(True)
+            if self.configman.get("general", "purge") == "log":
+#FIXME: re-enable log purge
+#                self.widgets['logpurgeradiobutton'].set_active(True)
+                self.widgets["purgecheckbox"].set_active(False)
             else:
                 try :
                     purge = int(self.configman.get("general", "purge"))
@@ -350,6 +354,7 @@ class SBconfigGTK(GladeGnomeApp):
                 self.widgets['purgeradiobutton'].set_active(True)
                 self.widgets["purgedays"].set_sensitive(True)
                 self.on_purgedays_changed()
+
             self.widgets['purgecheckbox'].set_active(True)
         else:
             self.widgets["purgecheckbox"].set_active(False)
@@ -367,8 +372,17 @@ class SBconfigGTK(GladeGnomeApp):
         """Sets the UI elements for 'log' to the value
         specified in configuration.
         """
+        _default_config = ConfigManager.get_default_config_obj()
+
+        if not self.configman.has_section("log"):
+            self.configman.add_section("log")
+
         if not self.configman.has_option("log", "level"):
-            raise ValueError("No option 'loglevel' found.")
+            self.configman.set("log", "level", _default_config.get_loglevel())
+
+        if not self.configman.has_option("log", "file"):
+            self.configman.set_logdir(_default_config.get_logdir())
+            self.configman.set_logfile_templ_to_config()
 
         loglevel = self.configman.get("log", "level")
         valid_levels = ConfigManagerStaticData.get_valid_loglevels()
@@ -804,7 +818,7 @@ class SBconfigGTK(GladeGnomeApp):
         misc.show_about_dialog(set_transient_for = self.widgets["sbackupConfApp"])
 
     def on_reload_clicked(self, *args): #IGNORE:W0613
-        self.configman = ConfigManager(self.conffile)
+        self.configman = ConfigManager.ConfigManager(self.conffile)
         # hack to get rid of schedule settings in non-default profiles
         # we just remove existing schedules from the non-default config files
         # and don't allow new settings by disabling the schedule page
@@ -812,7 +826,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.configman.remove_schedule()
             self.configman.saveConf()
         # end of hack
-        self.orig_configman = ConfigManager(self.conffile)
+        self.orig_configman = ConfigManager.ConfigManager(self.conffile)
         self._fill_widgets_from_config(probe_fs = True)
         self.isConfigChanged()
         self.logger.debug("Config '%s' loaded" % self.conffile)
@@ -823,7 +837,7 @@ class SBconfigGTK(GladeGnomeApp):
         self.conffile = self.configman.conffile
         if not self.default_conffile:
             self.default_conffile = self.conffile
-        self.orig_configman = ConfigManager(self.configman.conffile)
+        self.orig_configman = ConfigManager.ConfigManager(self.configman.conffile)
         self.isConfigChanged()
 
     def on_backup_clicked(self, *args): #IGNORE:W0613
@@ -1889,7 +1903,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.logger.debug("Got new profile name '%s : enable=%r' " % (prfName, enable))
             if not enable:
                 prfConf = prfConfDisabled
-            confman = ConfigManager()
+            confman = ConfigManager.ConfigManager()
             confman.saveConf(prfConf)
             self.profiles.append([enable, prfName, prfConf])
 #        else:

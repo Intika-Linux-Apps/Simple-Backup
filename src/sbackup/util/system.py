@@ -41,8 +41,9 @@ COMMAND_PS = "ps"
 
 # default values for environment variable if not set
 # see: http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
+# Note: do not remove trailing slashs, it does not work without them!
 ENVVAR_XDG_DATA_DIRS = "XDG_DATA_DIRS"
-DEFAULT_XDG_DATA_DIRS = "/usr/local/share:/usr/share"
+DEFAULT_XDG_DATA_DIRS = "/usr/local/share/:/usr/share/"
 
 ENVVAR_PATH = "PATH"
 DEFAULT_PATH = "/usr/bin:/usr/local/bin:/bin"
@@ -229,13 +230,13 @@ def set_default_environment():
     are defined.
     
     """
-    vars = { ENVVAR_XDG_DATA_DIRS : DEFAULT_XDG_DATA_DIRS,
+    _vars = { ENVVAR_XDG_DATA_DIRS : DEFAULT_XDG_DATA_DIRS,
              ENVVAR_PATH : DEFAULT_PATH
            }
-    for var in vars:
+    for var in _vars:
         val = os.environ.get(var)
         if val is None:
-            os.environ[var] = vars[var]
+            os.environ[var] = _vars[var]
 
 
 def get_process_environment(pid):
