@@ -5,8 +5,8 @@ debian/tmp/usr/lib/python*/*/sbackup/ui/indicator_core.py
 debian/tmp/usr/lib/python*/*/sbackup/ui/indicator_legacy.py
 debian/tmp/usr/lib/python*/*/sbackup/ui/indicator.py
 debian/tmp/usr/lib/python*/*/sbackup/ui/misc.py
-debian/tmp/usr/lib/python*/*/sbackup/ui/SBConfigGTK.py
-debian/tmp/usr/lib/python*/*/sbackup/ui/SBRestoreGTK.py
+debian/tmp/usr/lib/python*/*/sbackup/ui/configgui.py
+debian/tmp/usr/lib/python*/*/sbackup/ui/restoregui.py
 debian/tmp/usr/share/sbackup/sbackup-restore.glade
 debian/tmp/usr/share/sbackup/sbackup-config.glade
 debian/tmp/usr/share/sbackup/sbackup-indicator

@@ -1,3 +1,26 @@
+sbackup (0.11.0ppa1~lucid1) lucid; urgency=low
+
+  * [Fix] LP #618730: Merge sbackup and nssbackup
+  * [Fix] LP #604558: 'abort backup' on exernal drives not possible
+  * [Fix] LP #412934: sbackup/nssbackup fails if exclude-path contains an equal-sign
+  * [Fix] LP #277137: crashed with NoSpaceError: No space left on device
+  * [Fix] LP #328902: Spelling and wording errors  
+  * [Fix] LP #130856: Show remaining time till backup is finished in UI
+  * [Fix] LP #267759: Simple Backup should display a progress bar  
+  * [Fix] LP #137293: empty dialog when restoring with sbackup
+  * [Fix] LP #176838: Incremental backups should not appear incremental when restoring
+  * [Fix] LP #254464: Password for SSH Do Not URI Encode
+  * [Fix] LP #489107: sbackup crahses: stop_if_no_target is not an option in general
+  * [Fix] LP #504990: Mb used instead of MB in the application dialogs
+  * [Fix] LP #507175: libgnomevfs2-extra required for FTP backups  
+  * [Fix] LP #310306: Error: no space left  
+  * [Fix] LP #383383: restore crashes when the destination path or file is non existent  
+  * [Fix] LP #331551: Wrong original English text in sbackup po-file
+  * [Fix] LP #585769: default backup directory doesn't exist in ubuntu
+  * translations updated
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Wed, 18 Aug 2010 15:55:28 +0200
+ 
 sbackup (0.10.5ubuntu2) intrepid; urgency=low
 
   * Replace depends on gksu and sudo with menu for su-to-root (LP: #260203)

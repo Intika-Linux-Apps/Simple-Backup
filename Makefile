@@ -135,14 +135,14 @@ fill-templates:
 	rm -f setup.py.tmp
 
 check:
-	@if [ -e $(DESTDIR)/bin/sbackupd ]; then \
+	@if [ -e $(DESTDIR)/sbin/sbackupd ]; then \
 	echo "Another installation of sbackup is present. Please uninstall first."; exit 1; fi
 	@if [ -e $(DESTDIR)/bin/sbackup ]; then \
 	echo "Another installation of sbackup is present. Please uninstall first."; exit 1; fi
 	@if [ -e $(DESTDIR)/bin/nssbackupd ]; then \
 	echo "Another installation of nssbackup is present. Please uninstall first."; exit 1; fi
 		
-	@if [ -e $(DESTDIR)/../bin/sbackupd ]; then \
+	@if [ -e $(DESTDIR)/../sbin/sbackupd ]; then \
 	echo "Another installation of sbackup is present. Please uninstall first."; exit 1; fi
 	@if [ -e $(DESTDIR)/../bin/sbackup ]; then \
 	echo "Another installation of sbackup is present. Please uninstall first."; exit 1; fi
