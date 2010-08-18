@@ -37,6 +37,8 @@
 
 #TODO: check version in METAINFO against version in changelog when preparing releases
 
+export GZIP="-9"
+
 startpwd=$PWD
 
 #

@@ -1,8 +1,7 @@
 #! /bin/sh
 #
-# postinst script for Simple Backup
+# postinst script for Simple Backup GTK package
 #
-# see: dh_installdeb(1)
 
 set -e
 
@@ -16,39 +15,21 @@ set -e
 #          <conflicting-package> <version>
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
-#
 
 DESTDIR=/usr
 datadir=$DESTDIR/share
-sbindir=$DESTDIR/sbin
 
-gconf_schema_file_dir=$datadir/gconf/schemas
-
-sysconf_dir=/etc
-dbus_system_conf_dir=$sysconf_dir/dbus-1/system.d
-
-gconf_schema_file=apps_sbackup_global-preferences.schemas
-dbus_system_conf_file=org.sbackupteam.SimpleBackup.conf
-
-gconfd=gconfd-2
-gconfdpid=$(pgrep $gconfd)
-
-confscript=$sbindir/sbackupconfig
+icondir=$datadir/icons
 
 case "$1" in
     configure)
-        gconf-schemas --register $gconf_schema_file_dir/$gconf_schema_file
-        test "$gconfdpid" && killall $gconfd
-        
-        if [ -x /usr/sbin/service ]; then
-        /usr/sbin/service dbus force-reload
-        else if [ -r /etc/init.d/dbus ]; then
-        invoke-rc.d dbus force-reload; fi; fi
+        gtk-update-icon-cache -f -t $icondir/hicolor
+        gtk-update-icon-cache -f -t $icondir/ubuntu-mono-light
+        gtk-update-icon-cache -f -t $icondir/ubuntu-mono-dark
         
         # byte-compile: deb package does not ship compiled files
         python -m compileall /usr/lib/python*/*/sbackup
         
-        [ -x $confscript ] && $confscript
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

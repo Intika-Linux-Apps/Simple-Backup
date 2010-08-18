@@ -68,10 +68,12 @@ def getArchiveType(archive):
     @return: tar, gzip, bzip2 or None
     @rtype: String
     """
+    _logger = log.LogFactory().getLogger()
     _res = None
     command = "file"
     opts = ["--mime", "-b", archive]
     out, err, retVal = util.launch(command, opts)
+    _logger.debug("Query archive type: %s" % out)
     if "x-bzip2" in out:
         _res = "bzip2"
     elif "x-gzip" in out:
@@ -91,6 +93,7 @@ def extract(sourcear, restore_file, dest , bckupsuffix = None, splitsize = None)
     @param splitsize: If set the split options are added supposing the size of the archives is this variable
     @type splitsize: Integer in 1024 Bytes
     """
+    _logger = log.LogFactory().getLogger()
     restore_file = restore_file.lstrip(_FOP.pathsep)    # strip leading separator (as TAR did before)
     # tar option  -p, --same-permissions, --preserve-permissions:
     # ignore umask when extracting files (the default for root)
@@ -98,6 +101,7 @@ def extract(sourcear, restore_file, dest , bckupsuffix = None, splitsize = None)
     options = ["-xp", "--ignore-failed-read", '--backup=existing', "--totals"]
 
     archType = getArchiveType(sourcear)
+    _logger.debug("Archive type: %s" % archType)
     if archType == "tar" :
         pass
     elif archType == "gzip" :
