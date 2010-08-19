@@ -22,36 +22,17 @@ set -e
 
 DESTDIR=/usr
 datadir=$DESTDIR/share
-
-sysconf_dir=/etc
-dbus_system_conf_dir=$sysconf_dir/dbus-1/system.d
-
-dbus_system_conf_file=org.sbackupteam.SimpleBackup.conf
+icondir=$datadir/icons
 
 
 case "$1" in
-    remove)
-        rm -f /etc/cron.d/sbackup
-        rm -f /etc/cron.hourly/sbackup
-        rm -f /etc/cron.daily/sbackup
-        rm -f /etc/cron.weekly/sbackup
-        rm -f /etc/cron.monthly/sbackup
-        
-        rm -rf /home/*/.local/share/sbackup/tmp
-        rm -rf /home/*/.local/share/sbackup/log
-        rm -f /home/*/.local/share/sbackup/sbackup-*.log
-        rm -f /home/*/.local/share/sbackup/sbackup-*.log.*.gz
-        rm -rf /var/log/sbackup
-        rm -f /var/log/sbackup-*.log
-        rm -f /var/log/sbackup-*.log.*.gz
-        rm -rf /tmp/sbackup
+    remove)        
+        gtk-update-icon-cache -f -t $icondir/hicolor
+        gtk-update-icon-cache -f -t $icondir/ubuntu-mono-light
+        gtk-update-icon-cache -f -t $icondir/ubuntu-mono-dark
     ;;
 
     purge)
-        rm -f /etc/sbackup.conf
-        rm -rf /etc/sbackup.d
-        rm -rf /home/*/.config/sbackup
-        rm -f $dbus_system_conf_dir/$dbus_system_conf_file
     ;;
 
     upgrade)

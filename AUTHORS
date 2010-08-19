@@ -1,10 +1,14 @@
-Authors:
-Ouattara Oumar Aziz <wattazoum@gmail.com> -  Maintainer
-Jean-Peer Lorenz <peer.loz@gmx.net> - Maintainer
+Maintainers:
+Jean-Peer Lorenz <peer.loz@gmx.net>
+Oumar Aziz Ouattara <wattazoum@gmail.com>
+
+Former maintainers:
+Aigars Mahinovs <aigarius@debian.org>
+Jonh Wendell <wendell@bani.com.br>
 
 Contributors:
-Aigars Mahinovs <aigarius@debian.org>
 Martin Schaaf <mascha@ma-scha.de>
 Florian Achleitner
+Andreas Sliwka <goff@johalla.de>
 
 Thanks to all Launchpad translators.

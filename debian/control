@@ -28,7 +28,8 @@ Description: Simple Backup Suite for desktop use (core functionality)
  of regular expressions. Regular backups can be scheduled.
  .
  This package contains the minimum set of files to create backups
- from the commandline. It uses GIO/GVFS for access of remote backup destinations.
+ from the commandline. It uses GIO/GVFS for access of remote backup
+ destinations.
 
 Package: sbackup-gtk
 Architecture: all
