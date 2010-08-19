@@ -251,7 +251,7 @@ class BackupProfileHandler(object):
             _freespace_hr = util.get_humanreadable_size_str(size_in_bytes = _freespace, binary_prefixes = True)
             self.logger.info(_("Available disk size is '%s'.") % _freespace_hr)
             if _freespace <= _snpsize:
-                raise exceptions.SBException(_("Not enough free space in the target directory for the planned backup (%(freespace)s <= %(neededspace)s).")\
+                raise exceptions.SBException(_("Not enough free space in the target directory for the planned backup (free: %(freespace)s, required: %(neededspace)s).")\
                                                % { 'freespace' : _freespace_hr, 'neededspace' : _snpsize_hr})
 
     def __create_collector_obj(self):

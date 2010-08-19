@@ -39,10 +39,19 @@ class Infos(object):
     VERSION = util.get_version_number()
     DESCRIPTION = _("This is a user friendly backup solution for common desktop needs. If you want to help by submitting bugs, by translating or anything else please visit our website.")
     WEBSITE = "https://launchpad.net/sbackup/"
-    COPYRIGHT = "2007-2010 Simple Backup Development team"
-    AUTHORS = ["Oumar Aziz Ouattara <wattazoum@gmail.com>",
+    COPYRIGHT = "2005-2010 The Simple Backup authors"
+    AUTHORS = [_("Maintainers:"),
                "Jean-Peer Lorenz <peer.loz@gmx.net>",
-               "Aigars Mahinovs <aigarius@debian.org>"
+               "Oumar Aziz Ouattara <wattazoum@gmail.com>",
+               "",
+               _("Former maintainers:"),
+               "Aigars Mahinovs <aigarius@debian.org>",
+               "Jonh Wendell <wendell@bani.com.br>",
+               "",
+               _("Contributors:"),
+               "Martin Schaaf <mascha@ma-scha.de>",
+               "Florian Achleitner",
+               "Andreas Sliwka <goff@johalla.de>"
               ]
     TRANSLATORS = _("translator-credits")
 

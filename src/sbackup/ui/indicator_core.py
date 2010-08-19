@@ -626,11 +626,13 @@ class SBackupdIndicatorBase(INotifyMixin):
 
     def dbus_error_signal_hdl(self, error):
         self._exit = False # eventually interrupt termination
+        self._set_cancel_sensitive(sensitive = False)
         self.set_status_to_attention()
         msg = self._indicator_hdl.get_error_msg(error)
         self._show_errormsg(headline = msg[0], message = msg[1])
         self._indicator_hdl.set_error_present(is_present = False)
         self.set_status_to_normal()
+        self._set_menuitems_status_canceled()
 
     def dbus_progress_signal_hdl(self, checkpoint):
         self._exit = False # eventually interrupt termination
@@ -962,6 +964,8 @@ class SBackupdIndicatorHandler(object):
         1. Headline
         2. actual error message
         3. additional info
+        
+        :todo: rename into `format_error_msg`
         """
         self.__update_properties()
         self.set_error_present(is_present = True)

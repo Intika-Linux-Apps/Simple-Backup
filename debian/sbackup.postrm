@@ -22,7 +22,6 @@ set -e
 
 DESTDIR=/usr
 datadir=$DESTDIR/share
-icondir=$datadir/icons
 
 sysconf_dir=/etc
 dbus_system_conf_dir=$sysconf_dir/dbus-1/system.d
@@ -46,10 +45,6 @@ case "$1" in
         rm -f /var/log/sbackup-*.log
         rm -f /var/log/sbackup-*.log.*.gz
         rm -rf /tmp/sbackup
-        
-        gtk-update-icon-cache -f -t $icondir/hicolor
-        gtk-update-icon-cache -f -t $icondir/ubuntu-mono-light
-        gtk-update-icon-cache -f -t $icondir/ubuntu-mono-dark
     ;;
 
     purge)

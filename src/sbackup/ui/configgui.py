@@ -97,9 +97,10 @@ class SBconfigGTK(GladeGnomeApp):
             # end of hack
 
             self.orig_configman = ConfigManager.ConfigManager(self.default_conffile)
-        else :
+        else:
             self.configman = ConfigManager.ConfigManager()
             self.orig_configman = None
+            gobject.idle_add(_notify_new_default_profile_created)
 
         self.logger = LogFactory.getLogger()
         self.__destination_uri_obj = None
@@ -337,11 +338,11 @@ class SBconfigGTK(GladeGnomeApp):
         """Sets the UI elements for 'purge' to the value
         specified in configuration.
         """
-        if self.configman.has_option("general", "purge") :
+        if self.configman.has_option("general", "purge"):
             self.logger.debug("Setting purge")
             if self.configman.get("general", "purge") == "log":
 #FIXME: re-enable log purge
-#                self.widgets['logpurgeradiobutton'].set_active(True)
+                self.widgets['logpurgeradiobutton'].set_active(True)
                 self.widgets["purgecheckbox"].set_active(False)
             else:
                 try :
@@ -354,11 +355,12 @@ class SBconfigGTK(GladeGnomeApp):
                 self.widgets['purgeradiobutton'].set_active(True)
                 self.widgets["purgedays"].set_sensitive(True)
                 self.on_purgedays_changed()
-
-            self.widgets['purgecheckbox'].set_active(True)
+                self.widgets['purgecheckbox'].set_active(True)
+                self.on_purgecheckbox_toggled()
         else:
             self.widgets["purgecheckbox"].set_active(False)
-        self.on_purgecheckbox_toggled()
+            self.on_purgecheckbox_toggled()
+#        self.on_purgecheckbox_toggled()
 
     def __fill_max_inc_widgets_from_config(self):
         """Sets the UI elements for 'Maximum of inc' to the value
@@ -546,7 +548,7 @@ class SBconfigGTK(GladeGnomeApp):
                     self.__set_target_option("default")
 
                     _sec_msg = _("Please make sure the missing directory exists (e.g. by mounting an external disk) or change the specified target to an existing one.")
-                    _message_str = _("Backup target does not exist.\n\nAttention: The target will be set to the default value. Check this on the destination settings page before saving the configuration.")
+                    _message_str = _("Backup target `%s` does not exist.\n\nAttention: The target will be set to the default value. Check this on the destination settings page before saving the configuration.") % ctarget
                     _headline_str = \
                     _("Unable to open backup target")
 
@@ -2043,6 +2045,20 @@ def _forbid_default_profile_disable():
     not able to do the given action on the default profile.    
     """
     info = _("<b>Unable to remove default profile</b>\n\nThe default profile cannot be disabled. In the case you want to use just a single profile, please set up the default profile accordingly.")
+
+    dialog = gtk.MessageDialog(type = gtk.MESSAGE_INFO,
+                    flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                    buttons = gtk.BUTTONS_CLOSE)
+    dialog.set_markup(info)
+    dialog.run()
+    dialog.destroy()
+
+
+def _notify_new_default_profile_created():
+    """Helper function that shows an info box which states that
+    a new default profile was created.    
+    """
+    info = _("<b>No backup profile found.</b>\n\nNo default profile was found. You are probably running Simple Backup for the first time. A backup profile using default values was created.\n\nPlease modify the settings according to your needs and save the configuration in order to use it.")
 
     dialog = gtk.MessageDialog(type = gtk.MESSAGE_INFO,
                     flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
