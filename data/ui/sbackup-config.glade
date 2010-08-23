@@ -3037,7 +3037,7 @@ monthly</property>
                                         <child>
                                           <widget class="GtkRadioButton" id="logpurgeradiobutton">
                                             <property name="label" translatable="yes">Logarithmic</property>
-                                            <property name="sensitive">False</property>
+                                            <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">False</property>
                                             <property name="use_underline">True</property>
@@ -3061,14 +3061,14 @@ monthly</property>
                                     </child>
                                     <child>
                                       <widget class="GtkLabel" id="purgelabel2">
-                                        <property name="sensitive">False</property>
+                                        <property name="visible">True</property>
                                         <property name="label" translatable="yes">&lt;small&gt;Keep progressively less backups into the past:
-Keep all backups from yesterday.
-Keep one backup per day from last week.
-Keep one backup per week from last month.
-Keep one backup per month from last year.
-Keep one backup per year further into past.
-Erase all other backups.&lt;/small&gt;</property>
+Keep all backups from yesterday
+Keep one backup per day from last week
+Keep one backup per week from last month
+Keep one backup per month from last year
+Keep one backup per quarter from 2nd last year
+Keep one backup per year further into past&lt;/small&gt;</property>
                                         <property name="use_markup">True</property>
                                         <property name="wrap">True</property>
                                       </widget>

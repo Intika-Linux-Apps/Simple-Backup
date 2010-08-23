@@ -47,6 +47,7 @@ from sbackup.ar_backend.tar import ProcSnapshotFile
 from sbackup.ar_backend.tar import get_dumpdir_from_list
 
 import sbackup.util as Util
+from sbackup.util import constants
 from sbackup.core.snapshot import Snapshot
 from sbackup.util.log import LogFactory
 from sbackup.util.exceptions import SBException
@@ -995,81 +996,105 @@ class SnapshotManager(object):
         """
         self.get_snapshots(forceReload = True)
         if purge == "log":
-            self.logger.warning(_("Logarithmic purge is currently disabled. Please specify a cutoff purge interval in your configuration instead."))
-#            self._do_log_purge()
+            self._do_log_purge(no_purge_snp)
         else:
             self._do_cutoff_purge(purge, no_purge_snp)
         self.get_snapshots(forceReload = True)
 
-    def _do_log_purge(self):
-        """Does a logarithmic purge...
-        
+    def _do_log_purge(self, no_purge_snp = ""):
+        """Logarithmic purge
+        Keep progressivelly less backups into the past:
+        Keep all backups from yesterday
+        Keep one backup per day from last week.
+        Keep one backup per week from last month.
+        Keep one backup per month from last year.
+        Keep one backup per quarter from 2nd last year.
+        Keep one backup per year further in past.        
         """
-
-        def purgeinterval(_from, _to):
+        def _purge_period(start, nperiod, interval):
+            """period is given as `start` age and interval length in days.
+            The period is repeated `nperiod` times.
+            Within these timespans the defined number of backups must remain.
             """
-            :todo: Unify the formatting of snapshot timestamps!
-            """
-            f, t = datetime.date.fromtimestamp(_from), datetime.date.fromtimestamp(_to)
-            _fromD = '%04d-%02d-%02d' % (f.year, f.month, f.day)
-            _toD = '%04d-%02d-%02d' % (t.year, t.month, t.day)
-            self.logger.debug("Purging from %s to %s" % (_fromD, _toD))
-            snps = self.get_snapshots(fromDate = _fromD, toDate = _toD)
-            if snps is not None:
-                self.logger.debug("Found %s snapshots in timespan (%s..%s)" % (len(snps), _fromD, _toD))
-                if len(snps) > 1: # we need 3 snapshots to delete 1!
-                    snps_for_purge = snps[1:]
-                    for snp in snps_for_purge:
-                        self.logger.debug("Snapshot '%s' -> will be removed!" % (snp))
-                        try:
-                            self.removeSnapshot(snp)
-                        except RemoveSnapshotHasChildsError, exc:
-                            self.logger.info("%s Continue with next one." % exc)
-                            continue
+            _number_to_keep = 1
+            for j in range(0, nperiod):
+                _min_age = start + (j * interval)
+                _max_age = _min_age + (interval + 1)
+                self._do_purge_in_timespan(_min_age, _max_age, _number_to_keep, no_purge_snp)
+            return _max_age
 
-        self.logger.info("Logarithm Purging !")
-        # Logarithmic purge
-        #Keep progressivelly less backups into the past:
-        #Keep all backups from yesterday
-        #Keep one backup per day from last week.
-        #Keep one backup per week from last month.
-        #Keep one backup per month from last year.
-        #Keep one backup per year further into past.
-        #Erase all other backups.
-        daytime = 24 * 3600
-        _today = t = int(time.time())
-        _2daysbefore = t - 2 * daytime
-        _1weekbefore = t - 9 * daytime
-        _1monthbefore = t - 30 * daytime
-        _1yearbefore = t - 365 * daytime
-        currentday = _2daysbefore
+        self.logger.info("Logarithmic purging")
+        # compute years since begin of epoch: we need to go back this far
+        _years_epoch = int(time.time() / (constants.SECONDS_IN_DAY * constants.DAYS_IN_YEAR))
 
-        # the appropriate interval is given as parameter e.g. a single day
-        # within the last week or a single week within the last month
-        # Within these timespans the defined number of backups must remain
+        purge_plan = [ { "title" : "Last week", "nperiod" : 7,
+                         "interval" : 1 },
+                       { "title" : "Last month", "nperiod" : 3,
+                         "interval" : constants.DAYS_IN_WEEK },
+                       { "title" : "Last year", "nperiod" : 11,
+                         "interval" : constants.DAYS_IN_MONTH },
+                       { "title" : "2nd last year", "nperiod" : 4,
+                         "interval" : constants.DAYS_IN_QUARTER },
+                       { "title" : "remaining years", "nperiod" : _years_epoch,
+                         "interval" : constants.DAYS_IN_YEAR }
+                     ]
 
-        # check for last week 
-        self.logger.info("Logarithm Purging [Last week]!")
-        for n in range(1, (_2daysbefore - _1weekbefore) / daytime) :
-            purgeinterval(_2daysbefore - n * daytime, _2daysbefore - (n - 1) * daytime)
+        _max_age = 2    # start value
+        for pent in purge_plan:
+            self.logger.info("Logarithm Purging [%s]" % pent["title"])
+            _max_age = _purge_period(start = (_max_age - 1), nperiod = pent["nperiod"],
+                                     interval = pent["interval"])
 
-        # check for last month
-        self.logger.info("Logarithm Purging [Last month]!")
-        for n in range(1, (_1weekbefore - _1monthbefore) / (7 * daytime)) :
-            purgeinterval(_1weekbefore - n * 7 * daytime, _1weekbefore - (n - 1) * 7 * daytime)
+    def _do_purge_in_timespan(self, min_age, max_age, number_to_keep, no_purge_snp = ""):
+        """Simple purging is processed: all snapshots in timespan (i.e. younger
+        than `max_age` and older than `min_age` are removed. Only freestanding
+        snapshots are removed.
+        Given snapshot `no_purge_snp` is never removed.
+        The removal is terminated if `number_to_keep` snapshots remain.
+        """
+        print "Min. age: %s, max. age: %s" % (min_age, max_age)
+        _min_age = int(round(min_age))
+        _max_age = int(round(max_age))
+        assert _max_age > _min_age, "Given parameter max. age should be greater than min. age"
 
-        # check for last year
-        self.logger.info("Logarithm Purging [Last Year]!")
-#            for n in range(1,(_1monthbefore - _1yearbefore) / (30*daytime)) :
-        for n in range(1, (currentday - _1yearbefore) / (30 * daytime)) :
-            from_time_int = _1monthbefore - n * 30 * daytime
-            purgeinterval(from_time_int, _1monthbefore - (n - 1) * 30 * daytime)
+        if _min_age > 0:
+            self.logger.debug("Purge in timespan\nRemove freestanding snapshots younger "\
+                              "than %(max_age)s and older than %(min_age)s days."\
+                              % {"max_age" : _max_age, "min_age" : _min_age})
 
-        from_time = datetime.date.fromtimestamp(from_time_int)
+            while True:
+                _was_removed = False
+                snapshots = self.get_snapshots()
+                snapshots.sort(key = Snapshot.getName)  # keep most recent snapshot
 
-        # now we need to remove any older snapshots by simple cutoff
-        max_age = (datetime.date.today() - from_time).days
-        self._do_cutoff_purge(max_age)
+                snapshots = _get_snapshots_younger_than(snapshots, _max_age)
+                snapshots = _get_snapshots_older_than(snapshots, _min_age)
+
+                # debugging output
+                if self.logger.isEnabledFor(5):
+                    self.logger.debug("Snapshots in timespan - re-sorted]")
+                    for csnp in snapshots:
+                        self.logger.debug(str(csnp))
+                ###
+
+                if len(snapshots) <= number_to_keep:
+                    break
+                for snp in snapshots:
+                    if snp.getName() == no_purge_snp:
+                        self.logger.debug("`%s` skipped.")
+                        continue
+
+                    self.logger.debug("Checking '%s' for childs." % (snp))
+                    childs = self._retrieve_childsnps(snapshot = snp)
+                    if len(childs) == 0:
+                        self.logger.debug("Snapshot '%s' has no childs "\
+                                        "-> is being removed." % (snp))
+                        self._remove_standalone_snapshot(snapshot = snp)
+                        _was_removed = True
+                        break
+                if _was_removed is False:
+                    break
+            self.get_snapshots(forceReload = True)
 
     def _do_cutoff_purge(self, purge, no_purge_snp = ""):
         """Simple cut-off purging is processed: all snapshots older than
@@ -1086,8 +1111,7 @@ class SnapshotManager(object):
 
             while True:
                 _was_removed = False
-                snapshots = _get_snapshots_older_than(self.get_snapshots(),
-                                                      purge, logger = self.logger)
+                snapshots = _get_snapshots_older_than(self.get_snapshots(), purge)
                 for snp in snapshots:
                     if snp.getName() == no_purge_snp:
                         self.logger.debug("`%s` skipped.")
@@ -1105,20 +1129,28 @@ class SnapshotManager(object):
                     break
             self.get_snapshots(forceReload = True)
 
-def _get_snapshots_older_than(snapshots, max_age, logger = None):
+
+def _get_snapshots_younger_than(snapshots, age):
     _res = []
     for snp in snapshots:
-        if logger:
-            logger.debug("Checking age of snapshot '%s'." % snp)
         date = snp.getDate()
-        age = (datetime.date.today() - datetime.date(date['year'],
+        snp_age = (datetime.date.today() - datetime.date(date['year'],
+                                                         date['month'],
+                                                         date['day'])).days
+        if snp_age < age:
+            _res.append(snp)
+    return _res
+
+
+def _get_snapshots_older_than(snapshots, age):
+    _res = []
+    for snp in snapshots:
+        date = snp.getDate()
+        snp_age = (datetime.date.today() - datetime.date(date['year'],
                                                     date['month'],
                                                     date['day'])).days
-        if age > max_age:
+        if snp_age > age:
             _res.append(snp)
-            if logger:
-                logger.debug("Adding '%s' to list of removable snapshots."\
-                              % (snp))
     return _res
 
 
