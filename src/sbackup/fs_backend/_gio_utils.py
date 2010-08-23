@@ -702,9 +702,36 @@ class GioOperations(interfaces.IOperations):
         """
         listing = []
         _gfileobj = gio.File(path)
-        _infos = _gfileobj.enumerate_children('standard::name')
-        for _info in _infos:
-            listing.append(_info.get_name())
+        try:
+            _infos = _gfileobj.enumerate_children('standard::name')
+        except gio.Error, error:
+            if error.code == gio.ERROR_NOT_DIRECTORY:
+                _msg = get_gio_errmsg(error, "Unable to list directory content")
+                _logger = log.LogFactory.getLogger()
+                _logger.warning(_msg)
+                _ftype = cls._query_file_type(_gfileobj)
+                if _ftype == gio.FILE_TYPE_DIRECTORY:
+                    _msg = "Directory"
+                elif _ftype == gio.FILE_TYPE_MOUNTABLE:
+                    _msg = "Mountable"
+                elif _ftype == gio.FILE_TYPE_REGULAR:
+                    _msg = "Regular file"
+                elif _ftype == gio.FILE_TYPE_SHORTCUT:
+                    _msg = "Shortcut"
+                elif _ftype == gio.FILE_TYPE_SPECIAL:
+                    _msg = "Special file"
+                elif _ftype == gio.FILE_TYPE_SYMBOLIC_LINK:
+                    _msg = "Symbolic link"
+                elif _ftype == gio.FILE_TYPE_UNKNOWN:
+                    _msg = "unknown"
+                else:
+                    _msg = "unknown (no match)"
+                _logger.warning("Filetype of `listdir` parameter is: %s" % _msg)
+            else:
+                raise
+        else:
+            for _info in _infos:
+                listing.append(_info.get_name())
         return listing
 
     @classmethod

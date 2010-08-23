@@ -116,7 +116,7 @@ class BackupProfileHandler(object):
         """
         assert self.__fam_target_hdl.is_initialized()
 
-        self.__snpman = SnapshotManager(self.config.get_destination_path())
+        self.__snpman = SnapshotManager(self.__fam_target_hdl.query_mount_uri())
 
         # Upgrade Target
         # But we should not upgrade without user's agreement!
@@ -125,7 +125,7 @@ class BackupProfileHandler(object):
         #              there are snapshots in older versions 
         needupgrade = False
         try:
-            needupgrade = self.__um.need_upgrade(self.config.get_destination_path())
+            needupgrade = self.__um.need_upgrade(self.__fam_target_hdl.query_mount_uri())
         except exceptions.SBException, exc:
             self.logger.warning(str(exc))
 

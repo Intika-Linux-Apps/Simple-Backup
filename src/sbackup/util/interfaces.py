@@ -43,6 +43,9 @@ class ITargetHandler(object):
     def query_dest_display_name(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "query_dest_display_name"))
 
+    def query_mount_uri(self):
+        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "query_mount_uri"))
+
     def query_dest_fs_info(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "query_dest_fs_info"))
 

@@ -74,22 +74,19 @@ class SnapshotManager(object):
 
     REBASEDIR = "rebasetmp"
 
-    def __init__(self, target_eff_path):
+    def __init__(self, destination):
         """Default constructor. Takes the path to the target backup
         directory as parameter.
-        
-        Use target handler (without config) here. Refactor!
-
         """
-        if not isinstance(target_eff_path, types.StringTypes):
-            raise TypeError("Effective target path of type string expected. Got %s instead"\
-                            % type(target_eff_path))
+        if not isinstance(destination, types.StringTypes):
+            raise TypeError("Destination path of type string expected. Got %s instead"\
+                            % type(destination))
 
         self.logger = LogFactory.getLogger()
 
         self._fop = fam.get_file_operations_facade_instance()
         # This is the current directory used by this SnapshotManager
-        self.__target_eff_path = target_eff_path
+        self.__dest_path = destination
 
         # The list of the snapshots is stored the first time it's used,
         # so we don't have to re-get it later
@@ -99,10 +96,6 @@ class SnapshotManager(object):
         self.statusMessage = None
         self.substatusMessage = None
         self.statusNumber = None
-
-#TODO: Wrap it.
-        if not self.__target_eff_path.startswith(self._fop.pathsep):
-            raise ValueError("Given effective path to target must be local")
 
     def getStatus(self):
         """
@@ -193,7 +186,6 @@ class SnapshotManager(object):
                 self._read_snps_from_disk_allformats(read_only = False)
             snapshots = self.__snapshots
 
-        snapshots.sort(key = Snapshot.getName, reverse = True)
         return snapshots
 
     def _read_snps_from_disk_allformats(self, read_only = True):
@@ -202,16 +194,16 @@ class SnapshotManager(object):
         
         Unreadable snapshots are being renamed.
         """
-        snapshots = []
-        listing = self._fop.listdir_fullpath(self.__target_eff_path)
+        self.__snapshots = []
+        listing = self._fop.listdir_fullpath(self.__dest_path)
 
         for _snppath in listing :
             _snpname = self._fop.get_basename(_snppath)
             if _snpname.endswith(_EXT_CORRUPT_SNP):
                 self.logger.info("Corrupt snapshot `%s` found. Skipped." % _snpname)
                 continue
-            try :
-                snapshots.append(Snapshot(_snppath))
+            try:
+                self.__snapshots.append(Snapshot(_snppath))
             except NotValidSnapshotException, error :
                 if isinstance(error, NotValidSnapshotNameException) :
                     self.logger.info(_("Invalid snapshot `%(name)s` found: Name of snapshot not valid.")\
@@ -227,8 +219,7 @@ class SnapshotManager(object):
                             _ren_snppath = "%s%s" % (_snppath, _EXT_CORRUPT_SNP)
                         self._fop.rename(_snppath, _ren_snppath)
 
-        snapshots.sort(key = Snapshot.getName, reverse = True)
-        self.__snapshots = snapshots
+        self.__snapshots.sort(key = Snapshot.getName, reverse = True)
 
     def get_snapshots(self, fromDate = None, toDate = None, byDate = None,
                       forceReload = False):
@@ -844,7 +835,7 @@ class SnapshotManager(object):
         `snapshot` and returns a list containing all child snapshots.
         
         """
-        listing = self.get_snapshots(forceReload = True)
+        listing = self.get_snapshots(forceReload = False)
         child_snps = []
         for snp in listing :
             if snp.getBase() == snapshot.getName() :
@@ -1011,17 +1002,6 @@ class SnapshotManager(object):
         Keep one backup per quarter from 2nd last year.
         Keep one backup per year further in past.        
         """
-        def _purge_period(start, nperiod, interval):
-            """period is given as `start` age and interval length in days.
-            The period is repeated `nperiod` times.
-            Within these timespans the defined number of backups must remain.
-            """
-            _number_to_keep = 1
-            for j in range(0, nperiod):
-                _min_age = start + (j * interval)
-                _max_age = _min_age + (interval + 1)
-                self._do_purge_in_timespan(_min_age, _max_age, _number_to_keep, no_purge_snp)
-            return _max_age
 
         self.logger.info("Logarithmic purging")
         # compute years since begin of epoch: we need to go back this far
@@ -1042,8 +1022,20 @@ class SnapshotManager(object):
         _max_age = 2    # start value
         for pent in purge_plan:
             self.logger.info("Logarithm Purging [%s]" % pent["title"])
-            _max_age = _purge_period(start = (_max_age - 1), nperiod = pent["nperiod"],
-                                     interval = pent["interval"])
+            _max_age = self.__purge_period(start = (_max_age - 1), nperiod = pent["nperiod"],
+                                           interval = pent["interval"], no_purge_snp = no_purge_snp)
+
+    def __purge_period(self, start, nperiod, interval, no_purge_snp):
+        """period is given as `start` age and interval length in days.
+        The period is repeated `nperiod` times.
+        Within these timespans the defined number of backups must remain.
+        """
+        _number_to_keep = 1
+        for j in range(0, nperiod):
+            _min_age = start + (j * interval)
+            _max_age = _min_age + (interval + 1)
+            self._do_purge_in_timespan(_min_age, _max_age, _number_to_keep, no_purge_snp)
+        return _max_age
 
     def _do_purge_in_timespan(self, min_age, max_age, number_to_keep, no_purge_snp = ""):
         """Simple purging is processed: all snapshots in timespan (i.e. younger
@@ -1052,7 +1044,6 @@ class SnapshotManager(object):
         Given snapshot `no_purge_snp` is never removed.
         The removal is terminated if `number_to_keep` snapshots remain.
         """
-        print "Min. age: %s, max. age: %s" % (min_age, max_age)
         _min_age = int(round(min_age))
         _max_age = int(round(max_age))
         assert _max_age > _min_age, "Given parameter max. age should be greater than min. age"
@@ -1089,12 +1080,11 @@ class SnapshotManager(object):
                     if len(childs) == 0:
                         self.logger.debug("Snapshot '%s' has no childs "\
                                         "-> is being removed." % (snp))
-                        self._remove_standalone_snapshot(snapshot = snp)
+                        self.remove_snapshot_forced(snapshot = snp) # it's freestanding
                         _was_removed = True
                         break
                 if _was_removed is False:
                     break
-            self.get_snapshots(forceReload = True)
 
     def _do_cutoff_purge(self, purge, no_purge_snp = ""):
         """Simple cut-off purging is processed: all snapshots older than
@@ -1122,12 +1112,11 @@ class SnapshotManager(object):
                     if len(childs) == 0:
                         self.logger.debug("Snapshot '%s' has no childs "\
                                         "-> is being removed." % (snp))
-                        self._remove_standalone_snapshot(snapshot = snp)
+                        self.remove_snapshot_forced(snapshot = snp)
                         _was_removed = True
                         break
                 if _was_removed is not True:
                     break
-            self.get_snapshots(forceReload = True)
 
 
 def _get_snapshots_younger_than(snapshots, age):
