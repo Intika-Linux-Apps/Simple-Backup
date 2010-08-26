@@ -6,8 +6,8 @@
 
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-<path>/sbackup-trunk/src</path>
-<path>/sbackup-trunk/scripts</path>
-<path>/sbackup-trunk/tests</path>
+<path>/sbackup/src</path>
+<path>/sbackup/scripts</path>
+<path>/sbackup/tests</path>
 </pydev_pathproperty>
 </pydev_project>
