@@ -1441,7 +1441,7 @@ Default is set to uncompressed backups.</property>
                                 <property name="receives_default">True</property>
                                 <property name="tooltip" translatable="yes">Show help topic about configuration GUI.</property>
                                 <property name="relief">none</property>
-                                <property name="uri">ghelp:sbackup#config-gui</property>
+                                <property name="uri">ghelp:sbackup#config-gtk</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -2631,7 +2631,7 @@ Expressions</property>
                                 <property name="has_tooltip">True</property>
                                 <property name="tooltip" translatable="yes">Show help topic about configuration GUI.</property>
                                 <property name="relief">none</property>
-                                <property name="uri">ghelp:sbackup#config-gui</property>
+                                <property name="uri">ghelp:sbackup#config-gtk</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>

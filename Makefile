@@ -111,8 +111,8 @@ install: check install-package install-po install-help install-bin install-data
 	chmod +x $(libdir)/sbackup-progress
 	chmod +x $(libdir)/sbackup-terminate
 	chmod +x $(libdir)/sbackup-run
-	chmod +x $(libdir)/sbackup-config-gui
-	chmod +x $(libdir)/sbackup-restore-gui
+	chmod +x $(libdir)/sbackup-config-gtk
+	chmod +x $(libdir)/sbackup-restore-gtk
 	chmod +x $(libdir)/sbackup-upgrade-backups
 	chmod +x $(libdir)/sbackupconfig.py
 
@@ -120,8 +120,8 @@ install: check install-package install-po install-help install-bin install-data
 install-bin:
 	install -d $(bindir) $(sbindir)
 	ln -sf ../share/sbackup/sbackup-run $(bindir)/sbackup
-	ln -sf ../share/sbackup/sbackup-config-gui $(bindir)/sbackup-config-gui
-	ln -sf ../share/sbackup/sbackup-restore-gui $(bindir)/sbackup-restore-gui
+	ln -sf ../share/sbackup/sbackup-config-gtk $(bindir)/sbackup-config-gtk
+	ln -sf ../share/sbackup/sbackup-restore-gtk $(bindir)/sbackup-restore-gtk
 	ln -sf ../share/sbackup/sbackup-upgrade-backups $(bindir)/sbackup-upgrade-backups
 	ln -sf ../share/sbackup/sbackupconfig.py $(sbindir)/sbackupconfig
 
@@ -180,8 +180,8 @@ uninstall: uninstall-package uninstall-bin uninstall-data uninstall-help clean-d
 
 uninstall-bin:
 	rm -f $(bindir)/sbackup
-	rm -f $(bindir)/sbackup-config-gui
-	rm -f $(bindir)/sbackup-restore-gui
+	rm -f $(bindir)/sbackup-config-gtk
+	rm -f $(bindir)/sbackup-restore-gtk
 	rm -f $(bindir)/sbackup-upgrade-backups
 	rm -f $(sbindir)/sbackupconfig
 

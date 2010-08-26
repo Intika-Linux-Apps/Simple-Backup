@@ -40,7 +40,7 @@
     described.
   </p>
   
-  <section id="basics-config-gui">
+  <section id="basics-config-gtk">
   <title>Configuration Graphical User Interface</title>
   <p>
     The <app>Configuration User Interface</app> provides an easy way to
@@ -50,14 +50,14 @@
   <figure>
     <title>Configuration GUI</title>
     <desc>The Configuration GUI is a GTK+ application.</desc>
-    <media type="image" src="./figures/config-gui.png">
+    <media type="image" src="./figures/config-gtk.png">
       <p>The Configuration GUI: a GTK+ application</p>
     </media>
   </figure>
 
   </section>
 
-  <section id="basics-restore-gui">
+  <section id="basics-restore-gtk">
   <title>Restore User Interface</title>
   <p>
     The <app>Restore User Interface</app> provides a graphical way to

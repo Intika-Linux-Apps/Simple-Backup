@@ -9,7 +9,7 @@ usr/share/pixmaps/sbackup-restore.png
 usr/share/icons/hicolor/24x24/apps/*.png
 usr/share/icons/ubuntu-mono-light/apps/24/*.png
 usr/share/icons/ubuntu-mono-dark/apps/24/*.png
-usr/share/sbackup/sbackup-config-gui
-usr/share/sbackup/sbackup-restore-gui
-usr/bin/sbackup-restore-gui
-usr/bin/sbackup-config-gui
+usr/share/sbackup/sbackup-config-gtk
+usr/share/sbackup/sbackup-restore-gtk
+usr/bin/sbackup-restore-gtk
+usr/bin/sbackup-config-gtk

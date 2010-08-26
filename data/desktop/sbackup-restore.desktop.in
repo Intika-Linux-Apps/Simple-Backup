@@ -18,7 +18,7 @@ GenericName[fr_FR]=Utilitaire de restauration
 GenericName[de]=Backup Wiederherstellung
 GenericName[es]=Herramienta de restauración
 #
-Exec=@prefix@/bin/sbackup-restore-gui
+Exec=@prefix@/bin/sbackup-restore-gtk
 #
 Terminal=false
 Categories=Utility;
