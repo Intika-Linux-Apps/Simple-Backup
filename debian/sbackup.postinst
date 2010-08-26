@@ -5,14 +5,14 @@ set -e
 #DEBHELPER#
 
 sysconf_dir=/etc
-servicetool=$(shell which service)
-confscript=$(shell which sbackupconfig)
+servicetool=/usr/sbin/service
+confscript=/usr/sbin/sbackupconfig
 
 case "$1" in
     configure)
-        if [ -x $(servicetool) ]; then
-        $(servicetool) dbus force-reload
-        else if [ -r $(sysconf_dir)/init.d/dbus ]; then
+        if [ -x $servicetool ]; then
+        $servicetool dbus force-reload
+        else if [ -r $sysconf_dir/init.d/dbus ]; then
         invoke-rc.d dbus force-reload; fi; fi
         
         [ -x $confscript ] && $confscript

@@ -1,4 +1,4 @@
-sbackup (0.11.1ppa1) lucid; urgency=low
+sbackup (0.11.1) lucid; urgency=low
 
   * [Fix] LP #587911: Logarithmic purge does not work
   * [Fix] LP #622095: catch error when listing directory contents fails
