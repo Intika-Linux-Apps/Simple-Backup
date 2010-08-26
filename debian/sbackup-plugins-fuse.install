@@ -1,5 +1,1 @@
-debian/tmp/usr/lib/python*/*/sbackup/fuse_plugins/__init__.py
-debian/tmp/usr/lib/python*/*/sbackup/fuse_plugins/localFuseFAM.py
-debian/tmp/usr/lib/python*/*/sbackup/fuse_plugins/ftpFuseFAM.py
-debian/tmp/usr/lib/python*/*/sbackup/fuse_plugins/sftpFuseFAM.py
-debian/tmp/usr/lib/python*/*/sbackup/fuse_plugins/sshFuseFAM.py
+usr/share/sbackup/sbackup/fuse_plugins/*.py

@@ -1,35 +1,8 @@
 #!/usr/bin/make -f
-#
 # -*- makefile -*-
-#
-# This file was originally written by Joey Hess and Craig Small.
-# As a special exception, when this file is copied by dh-make into a
-# dh-make output file, you may use that output file without restriction.
-# This special exception was added by Craig Small in version 0.37 of dh-make.
-#
-# Modified to make a template file for a multi-binary package with separated
-# build-arch and build-indep targets  by Bill Allombert 2001
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-# This has to be exported to make some magic below work.
+export DH_VERBOSE=1
 export DH_OPTIONS
-UbuntuVersion=$(shell lsb_release -rs)
-# if we use jaunty
-ifneq (,$(findstring 9.04,$(UbuntuVersion)))
-    LAYOUT=--install-layout=deb
-endif
-ifneq (,$(findstring 9.10,$(UbuntuVersion)))
-    LAYOUT=--install-layout=deb
-endif
-ifneq (,$(findstring 10.04,$(UbuntuVersion)))
-    LAYOUT=--install-layout=deb
-endif
-ifneq (,$(findstring 10.10,$(UbuntuVersion)))
-    LAYOUT=--install-layout=deb
-endif
-
 
 # don't register gconf schemas nor update icon cache -> postinst
 # don't clean crondata -> postrm
@@ -39,69 +12,45 @@ export DISABLE_MAKEFILE_CLEAN_DATA=1
 export DISABLE_MAKEFILE_DBUS_RELOAD=1
 export DISABLE_MAKEFILE_DESKTOP_DATABASE_RELOAD=1
 
+installdestdir=$(CURDIR)/debian/tmp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
-
-	# Add here commands to clean up after the build process.
+	rm -f install-stamp build-stamp
 	$(MAKE) clean
-
 	dh_clean 
 
 build: build-stamp
-
 build-stamp:
-	dh_testdir
-
-	# Add here commands to compile the package.
-	# Debian uses, contrary to GNU standards, the /usr instead of /usr/local
-	
+	dh_testdir	
 	$(MAKE) PREFIX=/usr
-
 	touch build-stamp
 
-install: build install-indep
-
-install-indep:
+install: build-stamp
 	dh_testdir
 	dh_testroot
-	dh_prep -i 
-	dh_installdirs -i
+	dh_prep
+	dh_installdirs
+	$(MAKE) PREFIX=/usr DESTDIR=$(installdestdir)/usr sysconf_dir=$(installdestdir)/etc SETUP.PY_OPTS="--root=$(installdestdir) --install-lib /usr/share/sbackup --no-compile -O0" install
+	dh_install
+	touch install-stamp
 
-	# Add here commands to install the indep part of the package into
-	# debian/<package>-doc.
-	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/tmp/usr sysconf_dir=$(CURDIR)/debian/tmp/etc SETUP.PY_OPTS="--root=$(CURDIR)/debian/tmp/ $(LAYOUT)" install
-
-	dh_install -i
-
-# Must not depend on anything. This is to be called by
-# binary-arch/binary-indep
-# in another 'make' thread.
-binary-common:
-#	dh_pysupport # installs to pyshared
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs ChangeLog
-	dh_installdocs
+binary-arch:
+binary-indep: install
+	dh_installdocs -A
 	dh_installexamples $(CURDIR)/data/sbackup.conf.example
-	dh_installman
-	dh_installmenu
+	dh_installchangelogs
 	dh_link
-	dh_compress 
+	dh_compress
 	dh_fixperms
+	dh_pysupport /usr/share/sbackup
+	dh_gconf
 	dh_installdeb
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
 
-# Build architecture independant packages using the common target.
-binary-indep: install-indep
-	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
-	
-binary-arch:
+binary: binary-arch binary-indep
+.PHONY: build clean binary-indep binary-arch binary
 
-binary: binary-indep binary-arch
-
-.PHONY: build clean binary-indep binary-arch binary install install-indep

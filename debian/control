@@ -1,22 +1,20 @@
 Source: sbackup
 Section: admin
 Priority: optional
-Maintainer: NSsbackup team <nssbackup-team@lists.launchpad.net>
+Maintainer: Simple Backup Maintainers <nssbackup-team@lists.launchpad.net>
 Uploaders: Jean-Peer Lorenz <peer.loz@gmx.net>, Ouattara Oumar Aziz <wattazoum@gmail.com>
-Build-Depends: debhelper (>= 7), python ( >= 2.5 ), python (<< 3.0), 
-               python-setuptools, lsb-release
-Build-Depends-Indep: python-support (>= 0.5.3)
-Standards-Version: 3.8.4
+Build-Depends: debhelper (>= 7), python-support (>= 0.90), python
+Standards-Version: 3.9.1
 
 Package: sbackup
 Architecture: all
-Depends: python ( >= 2.5 ), python (<< 3.0),
+Depends: ${python:Depends},
          ${misc:Depends},
          python-gobject,
          gvfs, gvfs-fuse, gvfs-backends
 Conflicts: nssbackup, nssbackup-common, nssbackup-gtk,
            nssbackup-ftp, nssbackup-ssh
-Recommends: sbackup-gtk(= ${binary:Version})
+Recommends: sbackup-gtk(= ${binary:Version}), python-dbus, python-gconf
 Description: Simple Backup Suite for desktop use (core functionality)
  Simple Backup Suite comprises of backend backup script and
  GNOME GUI frontends that provide a simple yet powerful backup
@@ -34,16 +32,17 @@ Description: Simple Backup Suite for desktop use (core functionality)
 Package: sbackup-gtk
 Architecture: all
 Depends: sbackup(= ${binary:Version}),
-         python ( >= 2.5 ), python (<< 3.0),
+         ${python:Depends},
          ${misc:Depends},
          python-glade2,
          python-gtk2 (>= 2.10),
          python-gnome2,
          python-gobject,
          python-notify,
-         menu
+         gksu
 Conflicts: nssbackup, nssbackup-common, nssbackup-gtk,
            nssbackup-ftp, nssbackup-ssh
+Recommends: python-dbus
 Description: Simple Backup Suite GTK+ graphical user interface
  Simple Backup Suite graphical user interface (GUI) written in 
  GTK+. This package installs the GTK+ GUI of Simple Backup Suite
@@ -52,7 +51,7 @@ Description: Simple Backup Suite GTK+ graphical user interface
 Package: sbackup-plugins-fuse
 Architecture: all
 Depends: sbackup(= ${binary:Version}),
-         python ( >= 2.5 ), python (<< 3.0),
+         ${python:Depends},
          ${misc:Depends},
          fuse-utils,
          curlftpfs,
