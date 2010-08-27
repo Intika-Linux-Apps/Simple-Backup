@@ -42,7 +42,7 @@ Depends: sbackup(= ${binary:Version}),
          gksu
 Conflicts: nssbackup, nssbackup-common, nssbackup-gtk,
            nssbackup-ftp, nssbackup-ssh
-Recommends: python-dbus
+Recommends: python-dbus, python-appindicator
 Description: Simple Backup Suite GTK+ graphical user interface
  Simple Backup Suite graphical user interface (GUI) written in 
  GTK+. This package installs the GTK+ GUI of Simple Backup Suite
@@ -59,8 +59,8 @@ Depends: sbackup(= ${binary:Version}),
          python-pexpect
 Conflicts: nssbackup, nssbackup-common, nssbackup-gtk,
            nssbackup-ftp, nssbackup-ssh
-Description: (Not So) Simple Backup Suite FUSE plugins
- (Not So) Simple Backup Suite plugins that use FUSE file systems. This
+Description: Simple Backup Suite FUSE plugins
+ Simple Backup Suite plugins that use FUSE file systems. This
  optional package enables storage of backups on FTP/SFTP/SSH locations
  using FUSE.
  .
