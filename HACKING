@@ -60,9 +60,9 @@ as follows:
 4. Go to the source directory to run the application you wish
 	
 	cd /Path-to-development/0.2/sripts
-	python sbackup-config-gui.py
-	python sbackup-restore-gui.py
-	python sbackup.py
+	python sbackup-config-gtk
+	python sbackup-restore-gtk
+	python sbackup
 	
 	
 Translations

@@ -8,6 +8,6 @@
 # Attention:
 #   Use exactly the prescribed format. Additional spaces are not allowed.
 #
-VERSION=0.11.0
+VERSION=0.11.1
 PKGNAME=sbackup
 

@@ -18,7 +18,7 @@ GenericName=Backup configuration tool
 GenericName[de]=Backup Einstellungen
 GenericName[es]=Herramienta de copia de seguridad
 #
-Exec=@prefix@/bin/sbackup-config-gui
+Exec=@prefix@/bin/sbackup-config-gtk
 #
 Terminal=false
 Categories=Utility;

@@ -1,3 +1,9 @@
+sbackup (0.11.1)
+
+  * [Fix] LP #587911: Logarithmic purge does not work
+  * [Fix] LP #622095: catch error when listing directory contents fails
+  * [Fix]: revamped packaging: use distutils and pysupport
+
 sbackup (0.11.0)
 
   * [Fix] LP #618730: Merge sbackup and nssbackup (see enclosed file

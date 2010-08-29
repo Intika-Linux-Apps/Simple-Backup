@@ -194,6 +194,9 @@ class GioTargetHandler(interfaces.ITargetHandler):
     def query_dest_display_name(self):
         return self._dest.query_display_name()
 
+    def query_mount_uri(self):
+        return self._dest.query_mount_uri()
+
     def dest_eff_path_exists(self):
         """The effective path denotes the local mountpoint of the actual remote or local target.
         It is required in order to give it to TAR as parameter (tar does not support gio).

@@ -1,21 +1,29 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
 
-setup(name='@pkgname@', version='@version@',
-    description='SBackup, shortform of Simple Backup suite, is a backup solution for common desktop use.',
-    author='http://launchpad.net/~nssbackup-team',
-    author_email='nssbackup-team@lists.launchpad.net',
-    url='http://launchpad.net/sbackup',
-    
-    packages = find_packages("src"),
-    package_dir = {'':'src'},
-    package_data = {'': ['resources',
-                         'metainfo'],},
-                         
-    data_files=[('share/sbackup', ['data/ui/sbackup-restore.glade',
-                                     'data/ui/sbackup-config.glade',
-                                     
+from distutils.core import setup
+
+
+setup(name = '@pkgname@',
+      version = '@version@',
+      description = 'SBackup, shortform of Simple Backup suite, is a backup solution for common desktop use.',
+      maintainer = 'Simple Backup Maintainers',
+      maintainer_email = 'nssbackup-team@lists.launchpad.net',
+      url = 'http://launchpad.net/sbackup',
+
+      packages = ['sbackup', 'sbackup.core', 'sbackup.util', 'sbackup.fs_backend', 'sbackup.ar_backend',
+                  'sbackup.fuse_plugins', 'sbackup.ui'],
+      package_dir = {'' : 'src'},
+      package_data = {'' : ['resources', 'metainfo']},
+
+      data_files = [('share/sbackup', ['data/ui/sbackup-restore.glade',
+                                       'data/ui/sbackup-config.glade',
+                                       'scripts/sbackup-run',
+                                     'scripts/sbackup-config-gtk',
+                                     'scripts/sbackup-restore-gtk',
+                                     'scripts/sbackup-upgrade-backups',
+                                     'scripts/sbackupconfig.py',
+
                                      'scripts/multipleTarScript',
                                      'scripts/sbackup-launch',
                                      'scripts/sbackup-dbusservice',
@@ -28,9 +36,9 @@ setup(name='@pkgname@', version='@version@',
                                       'data/icons/sbackup.png',
                                       'data/icons/sbackup-restore.png']),
 
-                  ('share/applications', ['data/desktop/sbackup-config.desktop', 
-                                          'data/desktop/sbackup-config-su.desktop', 
-                                          'data/desktop/sbackup-restore.desktop', 
+                  ('share/applications', ['data/desktop/sbackup-config.desktop',
+                                          'data/desktop/sbackup-config-su.desktop',
+                                          'data/desktop/sbackup-restore.desktop',
                                           'data/desktop/sbackup-restore-su.desktop']),
 
                   ('share/doc/sbackup', ['data/sbackup.conf.example',
@@ -41,6 +49,6 @@ setup(name='@pkgname@', version='@version@',
                                            'INSTALL',
                                            'NEWS',
                                            'README',
-                                           'TODO',]) ],
+                                           'TODO', ]) ]
     )
 

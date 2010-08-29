@@ -39,6 +39,7 @@ pynotify
 gettext
 python-setuptools
 pyGTK (>= 2.10)
+
 fuse (for fuse plugins)
 python-pexpect (for ssh fuse plugin)
 sshfs (for ssh plugin)
@@ -69,7 +70,7 @@ Uninstalling
 ~~~~~~~~~~~~
 * Walk into the source code directory from where the application was installed
 * type:
- sudo make uninstall && sudo make clean && sudo make purge-user-config
+ sudo make uninstall && make clean && sudo make purge-user-config
 * this will remove installed files as well as user configurations created
 * you can now remove the source code folder
 

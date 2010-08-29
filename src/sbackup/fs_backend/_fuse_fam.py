@@ -338,6 +338,9 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
     def query_dest_display_name(self):
         return self._dest.query_display_name()
 
+    def query_mount_uri(self):
+        return self.get_eff_path()
+
     def is_local(self):
         _loc = self._dest.is_local()
         return _loc

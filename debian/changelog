@@ -1,3 +1,11 @@
+sbackup (0.11.1) lucid; urgency=low
+
+  * [Fix] LP #587911: Logarithmic purge does not work
+  * [Fix] LP #622095: catch error when listing directory contents fails
+  * [Fix]: revamped packaging: use distutils and pysupport
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 26 Aug 2010 22:44:48 +0200
+
 sbackup (0.11.0ppa1~lucid1) lucid; urgency=low
 
   * [Fix] LP #618730: Merge sbackup and nssbackup (see enclosed file

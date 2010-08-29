@@ -341,9 +341,8 @@ class SBconfigGTK(GladeGnomeApp):
         if self.configman.has_option("general", "purge"):
             self.logger.debug("Setting purge")
             if self.configman.get("general", "purge") == "log":
-#FIXME: re-enable log purge
                 self.widgets['logpurgeradiobutton'].set_active(True)
-                self.widgets["purgecheckbox"].set_active(False)
+                self.widgets["purgecheckbox"].set_active(True)
             else:
                 try :
                     purge = int(self.configman.get("general", "purge"))
@@ -356,11 +355,9 @@ class SBconfigGTK(GladeGnomeApp):
                 self.widgets["purgedays"].set_sensitive(True)
                 self.on_purgedays_changed()
                 self.widgets['purgecheckbox'].set_active(True)
-                self.on_purgecheckbox_toggled()
         else:
             self.widgets["purgecheckbox"].set_active(False)
-            self.on_purgecheckbox_toggled()
-#        self.on_purgecheckbox_toggled()
+        self.on_purgecheckbox_toggled()
 
     def __fill_max_inc_widgets_from_config(self):
         """Sets the UI elements for 'Maximum of inc' to the value
