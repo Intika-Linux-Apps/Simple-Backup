@@ -1043,6 +1043,8 @@ class SnapshotFile(object):
         except:
             LogFactory.getLogger().warn("error on closing the snarfile header after reading: " + sys.exc_info()[1])
 
+        return header
+
     def setHeader(self, timeofBackup):
         """
         Sets the header of the snar File. 
