@@ -594,6 +594,8 @@ class SBackupdIndicatorBase(INotifyMixin):
 
         if result == gtk.RESPONSE_OK:
             retry = constants.RETRY_TRUE
+        elif result == gtk.RESPONSE_NONE:
+            retry = constants.RETRY_TRUE
         else:
             retry = constants.RETRY_FALSE
 
@@ -845,7 +847,7 @@ class SBackupdIndicatorHandler(object):
     def get_targetnotfound_error_msg(self):
         target = self._backup_dbus_obj.get_target()
         msg = _("<b>Unable to find specified target directory</b>\n\nThe specified target directory '%s' was not found.\n\n") % target
-        msg = msg + _("You can try to use the specified target again or cancel the profile execution. The profile execution is canceled automatically in %s seconds.")
+        msg = msg + _("You can try to use the specified target again or cancel the profile execution. The specified destination is automatically used in %s seconds.")
         return msg
 
     def prepare_targetnotfound_handling(self):
