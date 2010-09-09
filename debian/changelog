@@ -4,7 +4,7 @@ sbackup (0.11.2ubuntu1) maverick; urgency=low
                       of `Retry`
   * [Fix] LP: #632605 catch error while closing snapshot file over FTP
 
- -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 26 Aug 2010 22:44:48 +0200
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 09 Sep 2010 16:38:31 +0200
 
 sbackup (0.11.1ubuntu1) maverick; urgency=low
 
