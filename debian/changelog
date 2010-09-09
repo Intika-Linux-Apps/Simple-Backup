@@ -1,38 +1,76 @@
-sbackup (0.11.1) lucid; urgency=low
+sbackup (0.11.2ubuntu1) maverick; urgency=low
 
-  * [Fix] LP #587911: Logarithmic purge does not work
-  * [Fix] LP #622095: catch error when listing directory contents fails
+  * [Fix] LP: #634031 Default behavior incorrectly set to `Cancel` instead
+                      of `Retry`
+  * [Fix] LP: #632605 catch error while closing snapshot file over FTP
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 26 Aug 2010 22:44:48 +0200
+
+sbackup (0.11.1ubuntu1) maverick; urgency=low
+
+  * [Fix] LP: #587911 Logarithmic purge does not work
+  * [Fix] LP: #622095 catch error when listing directory contents fails
   * [Fix]: revamped packaging: use distutils and pysupport
 
  -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 26 Aug 2010 22:44:48 +0200
 
-sbackup (0.11.0ppa1~lucid1) lucid; urgency=low
+sbackup (0.11.0ubuntu1) maverick; urgency=low
 
-  * [Fix] LP #618730: Merge sbackup and nssbackup (see enclosed file
+  * [Fix] LP: #618730 Merge sbackup and nssbackup (see enclosed file
                       nssbackup.ChangeLop for further information)
-  * [Fix] LP #604558: 'abort backup' on exernal drives not possible
-  * [Fix] LP #412934: sbackup/nssbackup fails if exclude-path contains an
+  * [Fix] LP: #604558 'abort backup' on exernal drives not possible
+  * [Fix] LP: #412934 sbackup/nssbackup fails if exclude-path contains an
                       equal-sign
-  * [Fix] LP #277137: crashed with NoSpaceError: No space left on device
-  * [Fix] LP #328902: Spelling and wording errors
-  * [Fix] LP #130856: Show remaining time till backup is finished in UI
-  * [Fix] LP #267759: Simple Backup should display a progress bar
-  * [Fix] LP #137293: empty dialog when restoring with sbackup
-  * [Fix] LP #176838: Incremental backups should not appear incremental when
+  * [Fix] LP: #277137 crashed with NoSpaceError: No space left on device
+  * [Fix] LP: #328902 Spelling and wording errors
+  * [Fix] LP: #130856 Show remaining time till backup is finished in UI
+  * [Fix] LP: #267759 Simple Backup should display a progress bar
+  * [Fix] LP: #137293 empty dialog when restoring with sbackup
+  * [Fix] LP: #176838 Incremental backups should not appear incremental when
                       restoring
-  * [Fix] LP #254464: Password for SSH Do Not URI Encode
-  * [Fix] LP #489107: sbackup crahses: stop_if_no_target is not an option in
+  * [Fix] LP: #254464 Password for SSH Do Not URI Encode
+  * [Fix] LP: #489107 sbackup crahses: stop_if_no_target is not an option in
                       general
-  * [Fix] LP #504990: Mb used instead of MB in the application dialogs
-  * [Fix] LP #507175: libgnomevfs2-extra required for FTP backups
-  * [Fix] LP #310306: Error: no space left
-  * [Fix] LP #383383: restore crashes when the destination path or file is non
+  * [Fix] LP: #504990 Mb used instead of MB in the application dialogs
+  * [Fix] LP: #507175 libgnomevfs2-extra required for FTP backups
+  * [Fix] LP: #310306 Error: no space left
+  * [Fix] LP: #383383 restore crashes when the destination path or file is non
                       existent
-  * [Fix] LP #331551: Wrong original English text in sbackup po-file
-  * [Fix] LP #585769: default backup directory doesn't exist in ubuntu
+  * [Fix] LP: #331551 Wrong original English text in sbackup po-file
+  * [Fix] LP: #585769 default backup directory doesn't exist in ubuntu
   * translations updated
 
  -- Jean-Peer Lorenz <peer.loz@gmx.net>  Wed, 18 Aug 2010 15:55:28 +0200
+
+sbackup (0.10.5+nmu1ubuntu2) maverick; urgency=low
+
+  * Use subprocess instead of os.spawnl to launch the backup. Thanks to
+    Jean-Peer Lorenz (LP: #550261)
+
+ -- Stefano Rivera <stefanor@ubuntu.com>  Thu, 19 Aug 2010 11:14:55 +0200
+
+sbackup (0.10.5+nmu1ubuntu1) maverick; urgency=low
+
+  * Merge from debian unstable.  Remaining changes:
+    - Replace depends on gksu and sudo with menu for su-to-root
+    - Add Japanese translation
+
+ -- Scott Kitterman <scott@kitterman.com>  Thu, 06 May 2010 00:08:02 -0400
+
+sbackup (0.10.5+nmu1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Bump debhelper compatibility to 7
+  * Add ${misc:Depends} to package dependencies to properly deal with
+    dependencies triggerred by the use of debhelper utilities
+  * Explicitly use 1.0 source format
+  * Replace deprecated chown use in  postinst
+  * Drop empty conffiles file
+  * Fix pending l10n issues. Programs translations:
+    - French. Closes: #431936
+    - Portuguese. Closes: #568306
+
+ -- Christian Perrier <bubulle@debian.org>  Mon, 12 Apr 2010 08:27:27 +0200
 
 sbackup (0.10.5ubuntu2) intrepid; urgency=low
 
@@ -149,7 +187,7 @@ sbackup (0.10.2) unstable; urgency=high
     on upgrade. SBackup can handle old config gracefuly.
   * Brown paperbag one-liner fix on incremental backup time not being counted 
     properly causing incremental backups to be done all the time.
-  * Reduce nice level of sbackup process to lowest possible priority (+19)
+  * Reduce nice level of sbackupd process to lowest possible priority (+19)
   * An empty regex matches everything, so avoid those
 
  -- Aigars Mahinovs <aigarius@debian.org>  Fri, 06 Oct 2006 16:55:10 +0100

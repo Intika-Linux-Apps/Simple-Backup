@@ -11,9 +11,9 @@ confscript=/usr/sbin/sbackupconfig
 case "$1" in
     configure)
         if [ -x $servicetool ]; then
-        $servicetool dbus force-reload
+        $servicetool dbus force-reload || true
         else if [ -r $sysconf_dir/init.d/dbus ]; then
-        invoke-rc.d dbus force-reload; fi; fi
+        invoke-rc.d dbus force-reload || true; fi; fi
         
         [ -x $confscript ] && $confscript
     ;;

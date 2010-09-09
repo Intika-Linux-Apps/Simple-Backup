@@ -1,11 +1,14 @@
+sbackup (0.11.2)
+  * [Fix] LP: #634031 Default behavior incorrectly set to `Cancel` instead
+                      of `Retry`
+  * [Fix] LP: #632605 catch error while closing snapshot file over FTP
+  
 sbackup (0.11.1)
-
   * [Fix] LP #587911: Logarithmic purge does not work
   * [Fix] LP #622095: catch error when listing directory contents fails
   * [Fix]: revamped packaging: use distutils and pysupport
 
 sbackup (0.11.0)
-
   * [Fix] LP #618730: Merge sbackup and nssbackup (see enclosed file
                       nssbackup.ChangeLop for further information)
   * [Fix] LP #604558: 'abort backup' on exernal drives not possible
