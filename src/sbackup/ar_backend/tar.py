@@ -35,6 +35,7 @@ import subprocess
 import tempfile
 import shutil
 import re
+import sys
 
 from datetime import datetime
 
@@ -1037,7 +1038,10 @@ class SnapshotFile(object):
             if c == '\0':
                 n += 1
             header += c
-        fd.close()
+        try:
+            fd.close()
+        except:
+            LogFactory.getLogger().warn("error on closing the snarfile header after reading: " + sys.exc_info()[1])
 
         return header
 
