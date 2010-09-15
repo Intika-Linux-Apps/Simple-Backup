@@ -577,9 +577,9 @@ class SBackupdIndicatorBase(INotifyMixin):
         self._targetnotfound_dialog.add_buttons(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                                                  _("Try again"), gtk.RESPONSE_OK)
 
-        gobject.timeout_add_seconds(constants.TIMEOUT_RETRY_TARGET_CHECK_SECONDS,
+        _ttimer = gobject.timeout_add_seconds(constants.TIMEOUT_RETRY_TARGET_CHECK_SECONDS,
                                     self._targetnotfound_dialog_destroy)
-        gobject.timeout_add_seconds(constants.ONE_SECOND,
+        _ctimer = gobject.timeout_add_seconds(constants.ONE_SECOND,
                                     self._targetnotfound_timer, msg,
                                     constants.ONE_SECOND)
 
@@ -599,6 +599,8 @@ class SBackupdIndicatorBase(INotifyMixin):
         else:
             retry = constants.RETRY_FALSE
 
+        gobject.source_remove(_ttimer)
+        gobject.source_remove(_ctimer)
         self._indicator_hdl.finish_targetnotfound_handling(retry)
         self.set_status_to_normal()
 
@@ -864,6 +866,7 @@ class SBackupdIndicatorHandler(object):
     def finish_targetnotfound_handling(self, retry):
         self.__set_retry_target_check(retry)
         self.set_error_present(is_present = False)
+        self.disable_targetnotfound_run_timer()
 
     def decrease_targetnotfound_clock(self, interval):
         self._targetnotfound_clock -= interval
