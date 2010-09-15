@@ -243,14 +243,11 @@ class ProgressbarMixin(object):
         """Calling this method shows up the progressbar and starts
         the pulsing.
         
-        @attention: The progressbar can be started only once. Stop it before
-                    restarting!
-        @raise AssertionError: if another pulse timer is already running
-        
         @return: None
         """
         if self.__pulsetimer_id is not None:
-            raise AssertionError("Another pulse timer is already running!")
+            gobject.source_remove(self.__pulsetimer_id)
+            self.__pulsetimer_id = None
         self._progressbar.set_text("")
         self._progressbar.set_fraction(0.0)
         if self.__hide_when_stopped:
@@ -259,17 +256,12 @@ class ProgressbarMixin(object):
 
     def _stop_pulse(self):
         """Calling this method stops the progressbar.
-
-        @attention: The progressbar can not be stopped if it is not running.
-                    Start it before stopping!
-        @raise AssertionError: if no pulse timer is running
         
         @return: False
         @rtype:  Boolean
         """
-        if self.__pulsetimer_id is None:
-            raise AssertionError("Nothing to stop - no pulse timer is running!")
-        gobject.source_remove(self.__pulsetimer_id)
+        if self.__pulsetimer_id is not None:
+            gobject.source_remove(self.__pulsetimer_id)
         self.__pulsetimer_id = None
         if self.__hide_when_stopped:
             self._progressbar.hide()
