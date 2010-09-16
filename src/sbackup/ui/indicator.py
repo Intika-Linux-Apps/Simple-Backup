@@ -82,7 +82,10 @@ class SBackupdIndicator(SBackupdIndicatorBase, PyNotifyMixin):
         self._indicator.set_status(appindicator.STATUS_ACTIVE)
 
     def set_status_to_attention(self):
-        self._indicator.set_status (appindicator.STATUS_ATTENTION)
+        self._indicator.set_status(appindicator.STATUS_ATTENTION)
+        # Workaround for LP #640034:
+        # Setting status to attention does not change to specified icon (indicator-application)        
+        self._indicator.set_icon(constants.INDICATOR_ATTENTION_ICON)
 
     def set_status_to_finished(self):
         self._indicator.set_icon(constants.INDICATOR_SUCCESS_ICON)
