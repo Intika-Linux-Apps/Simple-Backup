@@ -199,8 +199,12 @@ class SnapshotManager(object):
 
         for _snppath in listing :
             _snpname = self._fop.get_basename(_snppath)
+            _stamp = self._fop.joinpath(_snppath, "upgrade")
             if _snpname.endswith(_EXT_CORRUPT_SNP):
                 self.logger.info("Corrupt snapshot `%s` found. Skipped." % _snpname)
+                continue
+            if self._fop.path_exists(_stamp):   # FIXME: add checks whether stamp is valid
+                self.logger.info("Snapshot `%s` is being upgraded. Skipped." % _snpname)
                 continue
             try:
                 self.__snapshots.append(Snapshot(_snppath))
