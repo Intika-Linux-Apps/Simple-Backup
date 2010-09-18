@@ -1059,9 +1059,7 @@ class SnapshotManager(object):
 
             while True:
                 _was_removed = False
-                snapshots = self.get_snapshots()
-                snapshots.sort(key = Snapshot.getName)  # keep most recent snapshot
-
+                snapshots = self.get_snapshots()    # sort order: idx 0 = most recent
                 snapshots = _get_snapshots_younger_than(snapshots, _max_age)
                 snapshots = _get_snapshots_older_than(snapshots, _min_age)
 
@@ -1072,9 +1070,12 @@ class SnapshotManager(object):
                         self.logger.debug(str(csnp))
                 ###
 
-                if len(snapshots) <= number_to_keep:
+                _nsnps = len(snapshots)
+                _maxidx = _nsnps - number_to_keep    # biggest valid index
+                if _nsnps <= number_to_keep:
                     break
-                for snp in snapshots:
+                for _idx in range(_maxidx):
+                    snp = snapshots[_idx]
                     if snp.getName() == no_purge_snp:
                         self.logger.debug("`%s` skipped.")
                         continue
