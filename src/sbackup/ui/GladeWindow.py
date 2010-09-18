@@ -165,9 +165,17 @@ class GladeWindow(object):
         if self.prev_window is None:
             gtk.main_quit()
 
+    def _show_infomessage(self, message_str, boxtitle = "",
+                               headline_str = "", secmsg_str = ""):
+        self._show_message(gtk.MESSAGE_INFO, message_str, boxtitle, headline_str, secmsg_str)
+
     def _show_errmessage(self, message_str, boxtitle = "",
                                headline_str = "", secmsg_str = ""):
-        """Shows a complex error message using markup.
+        self._show_message(gtk.MESSAGE_ERROR, message_str, boxtitle, headline_str, secmsg_str)
+
+    def _show_message(self, msgtype, message_str, boxtitle = "",
+                            headline_str = "", secmsg_str = ""):
+        """Shows message box using markup.
         
         @attention: gtk.MessageDialog is not fully thread-safe so it is
                     put in a critical section, here!
@@ -175,7 +183,7 @@ class GladeWindow(object):
         gtk.gdk.threads_enter()
         dialog = gtk.MessageDialog(
                     flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                    type = gtk.MESSAGE_ERROR,
+                    type = msgtype,
                     buttons = gtk.BUTTONS_CLOSE)
         if boxtitle.strip() != "":
             dialog.set_title(boxtitle)
