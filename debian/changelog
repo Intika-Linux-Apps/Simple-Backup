@@ -1,10 +1,17 @@
 sbackup (0.11.2ubuntu1) maverick; urgency=low
 
+  * [Fix] LP: #638072 Exclude rules not working on some dirs
+  * [Fix] LP: #634356 Exception on reading snapshots in restore ui
   * [Fix] LP: #634031 Default behavior incorrectly set to `Cancel` instead
                       of `Retry`
   * [Fix] LP: #632605 catch error while closing snapshot file over FTP
+  * [Fix] LP: #642087 Log. purge not working under certain circumstances
+  * Workaround for LP #640034 Setting status to attention does not change
+                              to specified icon (indicator-application)
+  * Fix: don't block restore gui on long running tasks
+  * Fix: don't touch snapshots being upgraded from backup process
 
- -- Jean-Peer Lorenz <peer.loz@gmx.net>  Thu, 09 Sep 2010 16:38:31 +0200
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Sat, 18 Sep 2010 18:44:57 +0200
 
 sbackup (0.11.1ubuntu1) maverick; urgency=low
 
@@ -17,7 +24,7 @@ sbackup (0.11.1ubuntu1) maverick; urgency=low
 sbackup (0.11.0ubuntu1) maverick; urgency=low
 
   * [Fix] LP: #618730 Merge sbackup and nssbackup (see enclosed file
-                      nssbackup.ChangeLop for further information)
+                      nssbackup.ChangeLog for further information)
   * [Fix] LP: #604558 'abort backup' on exernal drives not possible
   * [Fix] LP: #412934 sbackup/nssbackup fails if exclude-path contains an
                       equal-sign
