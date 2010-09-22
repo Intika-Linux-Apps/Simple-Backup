@@ -28,6 +28,7 @@
 
 from gettext import gettext as _
 import types
+import sys
 
 from sbackup.util import local_file_utils
 from sbackup.util import interfaces
@@ -163,11 +164,11 @@ class FuseOperations(interfaces.IOperations):
         return local_file_utils.is_dir(path)
 
     @classmethod
-    def closefile(cls, fd)
+    def close_stream(cls, fd)
         try:
                 fd.close()
         except:
-                LogFactory.getLogger.warning(_("Got following error on closing the snarfile header after reading. Error message: '%s' ") % str(sys.exc_info()[1]))
+                LogFactory.getLogger.warning(_("Got following error on closing a stream: '%s' ") % str(sys.exc_info()[1]))
 
 
 def get_scheme_from_service(service):

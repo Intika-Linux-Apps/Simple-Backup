@@ -31,6 +31,7 @@ import types
 import time
 import uuid
 import pickle
+import sys
 
 import glib
 import gio
@@ -821,11 +822,11 @@ class GioOperations(interfaces.IOperations):
         _ostr.close()
 
     @classmethod
-    def closefile(cls,fd)
+    def close_stream(cls, fd)
         try:
                 fd.close()
         except:
-                LogFactory.getLogger.warning(_("Got following error on closing the snarfile header after reading. Error message: '%s' ") % str(sys.exc_info()[1]))
+                LogFactory.getLogger.warning(_("Got following error on closing a stream: '%s' ") % str(sys.exc_info()[1]))
 
 def get_gio_errmsg(error, title):
     _error_descr = errorcodes[error.code]
