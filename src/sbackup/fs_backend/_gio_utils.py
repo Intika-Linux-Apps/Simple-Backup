@@ -820,6 +820,12 @@ class GioOperations(interfaces.IOperations):
         _ostr.write(content)
         _ostr.close()
 
+    @classmethod
+    def closefile(cls,fd)
+        try:
+                fd.close()
+        except:
+                LogFactory.getLogger.warning(_("Got following error on closing the snarfile header after reading. Error message: '%s' ") % str(sys.exc_info()[1]))
 
 def get_gio_errmsg(error, title):
     _error_descr = errorcodes[error.code]

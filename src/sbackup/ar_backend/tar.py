@@ -1037,7 +1037,7 @@ class SnapshotFile(object):
             if c == '\0':
                 n += 1
             header += c
-        fd.close()
+        _FOP.closefile(fd)
 
         return header
 
