@@ -1045,7 +1045,7 @@ class SnapshotFile(object):
         try:
             fd.close()
         except:
-            LogFactory.getLogger().warn("error on closing the snarfile header after reading: " + sys.exc_info()[1])
+            LogFactory.getLogger().warn("error on closing the snarfile header after reading: " + str(sys.exc_info()[1]))
 
         return header
 
