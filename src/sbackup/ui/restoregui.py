@@ -95,7 +95,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         ProgressbarMixin.__init__(self, self.widgets['progressbar'])
         self._init_pulse()
 
-        self.logger = LogFactory.getLogger()
+        self.logger = LogFactory.getLogger(level = 10)
         self.config = self.__get_configuration()
         self.__default_destination_path = self.config.get_destination_path()
 
@@ -162,13 +162,23 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         acolumn3 = gtk.TreeViewColumn(_("Snapshots"), gtk.CellRendererText(), text = 0)
         self.widgets['historytv'].append_column(acolumn3)
 
+    def _set_topwin_widgets_sensitive(self, value):
+        self.widgets['defaultradiob'].set_sensitive(value)
+        self.widgets['vbox_customdest'].set_sensitive(value)
+        self.widgets['calendar'].set_sensitive(value)
+        self.widgets['snplisttreeview'].set_sensitive(value)
+        self.widgets['snpmanExpander'].set_sensitive(value)
+        self.widgets['restoreExpander'].set_sensitive(value)
+        self.widgets['filelisttreeview'].set_sensitive(value)
+        self.widgets['buttonspool'].set_sensitive(value)
+
     def _make_topwin_busy(self, busy, message = None):
         if busy:
             misc.set_watch_cursor(widget = self.top_window)
-            self.widgets['box_restorewin_content'].set_sensitive(False)
+            self._set_topwin_widgets_sensitive(False)
             self.__send_statusbar_msg(message)
         else:
-            self.widgets['box_restorewin_content'].set_sensitive(True)
+            self._set_topwin_widgets_sensitive(True)
             misc.unset_cursor(widget = self.top_window)
             self.__clean_statusbar_msg()
         return False
@@ -414,7 +424,9 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         """
         if self.flisttreestore.iter_nth_child(self.flisttreesort.convert_iter_to_child_iter(None, iter), 1):
             return
-        self.appendContent(self.path_to_dir(path), self.flisttreesort.convert_iter_to_child_iter(None, iter))
+        self._make_topwin_busy(True, _("Reading directory content..."))
+        gobject.idle_add(self.appendContent, self.path_to_dir(path),
+                         self.flisttreesort.convert_iter_to_child_iter(None, iter))
 
     def path_to_dir(self, path):
         """
@@ -483,6 +495,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                     self.flisttreestore.append(iter, [_("Loading ..."), None])
         if dummy :
             self.flisttreestore.remove(dummy)
+        self._make_topwin_busy(False)
 
     def __load_filestree(self):
         """Method that loads the files list from a snapshot. It uses threads
@@ -497,7 +510,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             # load the items in background
             self.__get_snpfileinfo_items_bg()
 
-    def __show_filestree(self, *args): #IGNORE:W0613
+    def __get_snpfileinfo_items_bg_done(self, *args): #IGNORE:W0613
         """Shows the tree of files within the GUI. We need to use the
         magic *args parameter due to the use of this method as callback
         function. Exceptions that were raised within the thread are handled
@@ -521,29 +534,35 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         # if a statusbar message was set, clean it now
         if _statbar_msgid:
             self.__clean_statusbar_msg(_statbar_msgid)
-
         self._stop_pulse()
+        self._make_topwin_busy(True, _("Reading files from snapshot..."))
+        gobject.idle_add(self.__show_filestree, _items)
 
+    def __show_filestree(self, items):
+        """Shows the tree of files within the GUI.
+        @param items: result of the threaded retrieval of items
+        @return: None
+        """
         # check if an exception was returned
-        if isinstance(_items, Exception):
-            self.logger.error(str(_items))
+        if isinstance(items, Exception):
+            self.logger.error(str(items))
             self.logger.error(traceback.format_exc())
-            self._show_errmessage(message_str = str(_items),
+            self._show_errmessage(message_str = str(items),
                     boxtitle = _("Simple Backup restore error"),
                     headline_str = _("An error occurred while reading snapshot"))
-            _items = None
-
-        if not _items :        # first items is empty
+            items = None
+        if not items :        # first items is empty
             self.flisttreestore.append(None,
                                     [_("This snapshot seems empty."), None])
             self.widgets['snpdetails'].set_sensitive(False)
         else :
             self.widgets['snpdetails'].set_sensitive(True)
-            for k in _items :
+            for k in items :
                 # add k and append the content if not empty
-                iter = self.flisttreestore.append(None,
+                _iter = self.flisttreestore.append(None,
                             [k, TAR.Dumpdir.getHRCtrls()[TAR.Dumpdir.DIRECTORY]])
-                self.appendContent(k, iter)
+                self.appendContent(k, _iter)
+        self._make_topwin_busy(False)
 
     def __get_snpfileinfo_items_bg(self):
         """This method shows a message in the statusbar and retrieves the
@@ -552,10 +571,11 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         
         @return: None
         """
+        self._set_topwin_widgets_sensitive(False)
         _statbar_msgid = self.__send_statusbar_msg(_("Reading backup snapshot..."))
         self._start_pulse()
         _task = tasks.WorkerThread(self.currSnpFilesInfos.getFirstItems)
-        _task.set_finish_callback(gobject.idle_add, self.__show_filestree,
+        _task.set_finish_callback(gobject.idle_add, self.__get_snpfileinfo_items_bg_done,
                                    _statbar_msgid)
         _task.start()
 
@@ -576,9 +596,9 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
         if snplist == []:
             self.snplisttreestore.append(None, [_("No backups found for this day."), None])
-            gobject.idle_add(self.widgets['snplist'].set_sensitive, False)
+            gobject.idle_add(self.widgets['snplisttreeview'].set_sensitive, False)
         else:
-            gobject.idle_add(self.widgets['snplist'].set_sensitive, True)
+            gobject.idle_add(self.widgets['snplisttreeview'].set_sensitive, True)
             for snapshot in snplist:
                 self.snplisttreestore.append(None, [snapshot.getName(), snapshot.getVersion()])
 
@@ -772,22 +792,31 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         response = dialog.run()
         dialog.destroy()
         if response == gtk.RESPONSE_YES:
-            um = UpgradeManager()
-            try:
-                self.logger.debug("Upgrade snapshot '%s'" % self.currentSnp.getName())
-                um.upgradeSnapshot(self.currentSnp)
-            except Exception, error:
-                self.logger.exception("Error while upgrade snapshot: %s" % error)
-                _message_str = _("While attempting to upgrade snapshot the following error occurred:\n%s")\
-                                    % error
-                _boxtitle = _("Simple Backup error")
-                _headline_str = _("Unable to upgrade snapshot")
-                gobject.idle_add(self._show_errmessage, _message_str, _boxtitle, _headline_str)
+            self._make_topwin_busy(True, _("Upgrade snapshot '%s'") % self.currentSnp.getName())
+            gobject.idle_add(self._upgrade)
 
-            self.load_snapshotslist(self.widgets['calendar'].get_date())
-            self.widgets['snpmanExpander'].set_expanded(False)
-            self.on_snpmanExpander_activate()
-            self.widgets['snpmanExpander'].set_expanded(True)
+    def _upgrade(self):
+        um = UpgradeManager()
+        try:
+            self.logger.debug("Upgrade snapshot '%s'" % self.currentSnp.getName())
+            um.upgradeSnapshot(self.currentSnp)
+            gobject.idle_add(self._show_infomessage,
+                             _("Snapshot was sucessfully upgraded."),
+                                   _("Simple Backup upgrade"),
+                                   _("Upgrade finished"))
+        except Exception, error:
+            self.logger.exception("Error while upgrade snapshot: %s" % error)
+            _message_str = _("While attempting to upgrade snapshot the following error occurred:\n%s")\
+                                % error
+            gobject.idle_add(self._show_errmessage,
+                             _message_str, _("Simple Backup error"), _("Unable to upgrade snapshot"))
+        finally:
+            self._make_topwin_busy(False)
+
+        self.load_snapshotslist(self.widgets['calendar'].get_date())
+        self.widgets['snpmanExpander'].set_expanded(False)
+        self.on_snpmanExpander_activate()
+        self.widgets['snpmanExpander'].set_expanded(True)
 
     def on_rebaseButton_toggled(self, *args):
         if self.widgets['rebaseButton'].get_active():

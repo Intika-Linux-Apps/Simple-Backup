@@ -328,7 +328,8 @@ def get_restoregui_widgets():
         'statusbar',
         'progressbar',
         'box_management',
-        'box_restorewin_content'
+        'box_restorewin_content',
+        'vbox_customdest'
         ]
     return widget_list
 

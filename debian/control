@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Simple Backup Maintainers <nssbackup-team@lists.launchpad.net>
 Uploaders: Jean-Peer Lorenz <peer.loz@gmx.net>, Ouattara Oumar Aziz <wattazoum@gmail.com>
 Build-Depends: debhelper (>= 7), python-support (>= 0.90), python
-Standards-Version: 3.8.4
+Standards-Version: 3.9.1
 
 Package: sbackup
 Architecture: all
@@ -34,6 +34,7 @@ Architecture: all
 Depends: sbackup(= ${binary:Version}),
          ${python:Depends},
          ${misc:Depends},
+         libgtk2.0-bin,
          python-glade2,
          python-gtk2 (>= 2.10),
          python-gnome2,

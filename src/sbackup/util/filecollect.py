@@ -593,7 +593,11 @@ class FileCollector(object):
             self.__snapshot.disable_path_in_incl_filelist(_excl)
 
 # TODO: Even better: Remove this inconsistency and don't use TAR's shell patterns. Prefer pure Regex exclusion.
-        for _excl in ["", "/dev/*", "/proc/*", "/sys/*", "/tmp/*", _config.get_target_dir()]:
+        # LP #638072: no wildcards in excludes list;
+        #             excluded directory yields in excluding contained files
+#FIXME: trailing slashes are not retained when writing excludes file! Since exclude items
+#       are literally compared this can exclude more dirs/files than intended!
+        for _excl in ["", "/dev/", "/proc/", "/sys/", "/tmp/", _config.get_target_dir()]:
             self.__snapshot.addToExcludeFlist(_excl)
 
         # sanity check of the lists
