@@ -1,3 +1,17 @@
+sbackup (0.11.3ubuntu1) maverick; urgency=low
+
+  * [Fix] LP: #645543 "Cannot concatenate str and error object" error prevents
+                      incremental backups
+  * [Fix] LP: #648754 Can't mount ftp location: don't fail when gvfs-fuse is
+                      not available; use it only if really required
+  * [Fix] LP: #653577 Error 'iter should be a GtkTreeIter' when clicking on
+                      Restore with no file selected
+  * refer to dependend package 'gvfs-fuse' in install and readme file
+  * translations updated
+  * translations added: da,el,fa,is,ja,kk,ko,kw,ro,sr,sw
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Sun, 03 Oct 2010 15:24:48 +0200
+
 sbackup (0.11.2ubuntu1) maverick; urgency=low
 
   * [Fix] LP: #638072 Exclude rules not working on some dirs
