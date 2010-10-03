@@ -492,27 +492,25 @@ class GioOperations(interfaces.IOperations):
         if not cls.__isfile(src_gfile):
             raise IOError("Given copy source '%s' is not a file" % src_gfile.get_parse_name())
 
-        _src_path = src_gfile.get_path()
-        _dst_path = dst_gfile.get_path()
+        _src_uri = src_gfile.get_uri()
+        _dst_uri = dst_gfile.get_uri()
 
         _src_file = cls.__basename(src_gfile)
-        _src_dir = cls.get_dirname(_src_path)
 
         if cls.__isdir(dst_gfile):
-            _dst_file = _src_file
-            _dst_dir = _dst_path
-        elif _dst_path.endswith(cls.pathsep):
-            _dst_file = _src_file
-            _dst_dir = _dst_path
+            _dstu = cls.joinpath(_dst_uri, _src_file)
+            _dst = gio.File(_dstu)
+        elif _dst_uri.endswith(cls.pathsep):
+            _dstu = cls.joinpath(_dst_uri, _src_file)
+            _dst = gio.File(_dstu)
         else:
-            _dst_file = cls.__basename(dst_gfile)
-            _dst_dir = cls.get_dirname(_dst_path)
+            _dst = dst_gfile
 
-        if cls.path_exists(_dst_dir) is False:
-            raise IOError("Given copy destination '%s' does not exist" % _dst_dir)
+        _dstdir = cls.get_dirname(_dst.get_uri())
+        if cls.path_exists(_dstdir) is False:
+            raise IOError("Given copy destination '%s' does not exist" % _dstdir)
 
-        _dst_path = cls.joinpath(_dst_dir, _dst_file)
-        retval = (src_gfile, gio.File(_dst_path))
+        retval = (src_gfile, _dst)
 
         return retval
 
