@@ -16,6 +16,7 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
+from sbackup.util.exceptions import FileAccessException
 """
 :mod:`sbackup.util.fuse_utils` -- file access management using FUSE
 ========================================================================
@@ -28,7 +29,6 @@
 
 from gettext import gettext as _
 import types
-import sys
 
 from sbackup.util import local_file_utils
 from sbackup.util import interfaces
@@ -164,12 +164,11 @@ class FuseOperations(interfaces.IOperations):
         return local_file_utils.is_dir(path)
 
     @classmethod
-    def close_stream(cls, fd)
+    def close_stream(cls, file_desc):
         try:
-                fd.close()
-        except:
-                LogFactory.getLogger.warning(_("Got following error on closing a stream: '%s' ") % str(sys.exc_info()[1]))
-
+            file_desc.close()
+        except IOError, error:
+                raise FileAccessException("Error in 'close_stream': %s" % error)
 
 def get_scheme_from_service(service):
     if not isinstance(service, types.IntType):
