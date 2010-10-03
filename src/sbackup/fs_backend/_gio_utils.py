@@ -16,6 +16,8 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
+from sbackup.util.exceptions import FileAccessException,\
+    FileAlreadyClosedException
 """
 :mod:`sbackup.util.gio_utils` -- file access management using GIO/GVFS
 ========================================================================
@@ -31,7 +33,6 @@ import types
 import time
 import uuid
 import pickle
-import sys
 
 import glib
 import gio
@@ -822,11 +823,14 @@ class GioOperations(interfaces.IOperations):
         _ostr.close()
 
     @classmethod
-    def close_stream(cls, fd)
+    def close_stream(cls, file_desc):
         try:
-                fd.close()
-        except:
-                LogFactory.getLogger.warning(_("Got following error on closing a stream: '%s' ") % str(sys.exc_info()[1]))
+            file_desc.close()
+        except gio.Error, error:
+            if error.code == gio.ERROR_CLOSED:
+                raise FileAlreadyClosedException(_("Error while closing stream: %s") % error)
+            else:
+                raise FileAccessException(get_gio_errmsg(error, "Error in 'close_stream'"))
 
 def get_gio_errmsg(error, title):
     _error_descr = errorcodes[error.code]
