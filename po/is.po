@@ -1,20 +1,20 @@
-# Russian translation for sbackup
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Icelandic translation for sbackup
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
 # This file is distributed under the same license as the sbackup package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: sbackup\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-03 14:59+0200\n"
-"PO-Revision-Date: 2010-09-25 00:21+0000\n"
-"Last-Translator: Jean-Peer Lorenz <Unknown>\n"
-"Language-Team: Russian <ru@li.org>\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-09-24 23:33+0200\n"
+"PO-Revision-Date: 2010-09-24 21:40+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Icelandic <is@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-09-29 05:45+0000\n"
+"X-Launchpad-Export-Date: 2010-09-29 05:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: src/sbackup/backupproc.py:168 src/sbackup/pkginfo.py:68
@@ -27,7 +27,7 @@ msgstr ""
 msgid "[SBackup] [%(profile)s] Report of %(date)s"
 msgstr ""
 
-#: src/sbackup/backupproc.py:177 src/sbackup/core/profile_handler.py:278
+#: src/sbackup/backupproc.py:177 src/sbackup/core/profile_handler.py:277
 msgid "No log file specified."
 msgstr ""
 
@@ -41,10 +41,6 @@ msgid ""
 "\n"
 "Now continue processing remaining profiles."
 msgstr ""
-"Критическая ошибка: не найден конфигурационный файл для профиля по-"
-"умолчанию!\n"
-"\n"
-"Продолжаем обработку оставшихся профилей."
 
 #: src/sbackup/backupproc.py:297
 msgid "Backup was canceled by user."
@@ -64,7 +60,7 @@ msgstr ""
 
 #: src/sbackup/backupproc.py:356
 msgid "The following error(s) occurred before:"
-msgstr "До этого произошли следующие ошибки:"
+msgstr ""
 
 #: src/sbackup/backupproc.py:535
 #, python-format
@@ -95,144 +91,132 @@ msgstr ""
 #: src/sbackup/pkginfo.py:56
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
-"  Jean-Peer Lorenz https://launchpad.net/~peer.loz"
 
-#: src/sbackup/ar_backend/tar.py:109 src/sbackup/ar_backend/tar.py:167
-#: src/sbackup/ar_backend/tar.py:213
+#: src/sbackup/ar_backend/tar.py:113 src/sbackup/ar_backend/tar.py:165
+#: src/sbackup/ar_backend/tar.py:211
 msgid "Invalid archive type."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:123
-#, python-format
-msgid "Effective path for `%s` is not available"
-msgstr ""
-
-#: src/sbackup/ar_backend/tar.py:294
-#, python-format
-msgid "Unable to get effective path for `%s`"
-msgstr ""
-
-#: src/sbackup/ar_backend/tar.py:338
+#: src/sbackup/ar_backend/tar.py:332
 msgid ""
 "For the moment split functionality is not compatible with compress option."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:347 src/sbackup/ar_backend/tar.py:408
-#: src/sbackup/core/profile_handler.py:288
+#: src/sbackup/ar_backend/tar.py:341 src/sbackup/ar_backend/tar.py:402
+#: src/sbackup/core/profile_handler.py:287
 #, python-format
 msgid "Unable to change permissions for file '%s'."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:356
+#: src/sbackup/ar_backend/tar.py:350
 #, python-format
 msgid "Unable to remove temporary file `%(file)s`: %(error)s"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:372
+#: src/sbackup/ar_backend/tar.py:367
 msgid "Launching TAR to make incremental backup."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:401
+#: src/sbackup/ar_backend/tar.py:395
 msgid "Unable to find the SNAR file to make an incremental backup."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:402
+#: src/sbackup/ar_backend/tar.py:396
 msgid "Falling back to full backup."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:444
+#: src/sbackup/ar_backend/tar.py:438
 msgid "Launching TAR to make a full backup."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:511
+#: src/sbackup/ar_backend/tar.py:504
 msgid "Leading '/' from member names were removed."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:513
+#: src/sbackup/ar_backend/tar.py:506
 msgid "Leading '/' from hard link targets were removed."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:522
+#: src/sbackup/ar_backend/tar.py:515
 #, python-format
 msgid "TAR returned a message: %s"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:524
+#: src/sbackup/ar_backend/tar.py:517
 #, python-format
 msgid ""
 "TAR returned messages:\n"
 "%s"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:527
+#: src/sbackup/ar_backend/tar.py:520
 msgid "TAR has been finished successfully."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:531
+#: src/sbackup/ar_backend/tar.py:524
 #, python-format
 msgid "TAR returned a warning: %s"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:533
+#: src/sbackup/ar_backend/tar.py:526
 #, python-format
 msgid ""
 "TAR returned warnings:\n"
 "%s"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:536
+#: src/sbackup/ar_backend/tar.py:529
 msgid "TAR returned warnings but has been finished successfully."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:540
+#: src/sbackup/ar_backend/tar.py:533
 msgid "Unable to finish successfully. TAR terminated with errors."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:721
+#: src/sbackup/ar_backend/tar.py:714
 #, python-format
 msgid "Unable to terminate backend process: %s"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:754
+#: src/sbackup/ar_backend/tar.py:747
 msgid "Included"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:754
+#: src/sbackup/ar_backend/tar.py:747
 msgid "Not changed"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:754
+#: src/sbackup/ar_backend/tar.py:747
 msgid "Directory"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:782
+#: src/sbackup/ar_backend/tar.py:775
 msgid "Line must be a string"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:798
+#: src/sbackup/ar_backend/tar.py:791
 msgid "Dumpdir inconsistancy : 'filename' is empty"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:811
+#: src/sbackup/ar_backend/tar.py:804
 msgid "Dumpdir inconsistancy : 'control' is empty"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:884
+#: src/sbackup/ar_backend/tar.py:877
 #, python-format
 msgid "File '%s' does not exist."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:1014 src/sbackup/ar_backend/tar.py:1048
-#: src/sbackup/ar_backend/tar.py:1148
+#: src/sbackup/ar_backend/tar.py:1007 src/sbackup/ar_backend/tar.py:1041
+#: src/sbackup/ar_backend/tar.py:1141
 msgid "The snarfile header is incomplete."
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:1317
+#: src/sbackup/ar_backend/tar.py:1310
 msgid "A SnapshotFile is required"
 msgstr ""
 
-#: src/sbackup/ar_backend/tar.py:1417
+#: src/sbackup/ar_backend/tar.py:1410
 #, python-format
 msgid "Directory does not exist: %s."
 msgstr ""
@@ -366,39 +350,39 @@ msgstr ""
 #: src/sbackup/core/ConfigManager.py:1419 src/sbackup/ui/configgui.py:278
 #: src/sbackup/ui/configgui.py:1398
 msgid "Custom"
-msgstr "Пользовательский"
+msgstr "Sérniðið"
 
 #: src/sbackup/core/ConfigManager.py:1421
 msgid "MP3 Music"
-msgstr "Музыка MP3"
+msgstr "MP3 Tónlist"
 
 #: src/sbackup/core/ConfigManager.py:1422
 msgid "AVI Video"
-msgstr "Видео AVI"
+msgstr "AVI Video"
 
 #: src/sbackup/core/ConfigManager.py:1423
 #: src/sbackup/core/ConfigManager.py:1424
 msgid "MPEG Video"
-msgstr "Видео MPEG"
+msgstr "MPEG Video"
 
 #: src/sbackup/core/ConfigManager.py:1425
 msgid "Matrjoshka Video"
-msgstr "Видео Matrjoshka"
+msgstr "Matrjoshka Video"
 
 #: src/sbackup/core/ConfigManager.py:1426
 msgid "OGG Multimedia container"
-msgstr "Мультимедиа OGG"
+msgstr "OGG Margmiðlunar skrár"
 
 #: src/sbackup/core/ConfigManager.py:1427
 msgid "CD Images"
-msgstr "Образы CD"
+msgstr "CD myndir"
 
-#: src/sbackup/core/RestoreManager.py:80
+#: src/sbackup/core/RestoreManager.py:79
 #, python-format
 msgid "File '%s' not found in the backup snapshot files list"
 msgstr ""
 
-#: src/sbackup/core/RestoreManager.py:82
+#: src/sbackup/core/RestoreManager.py:81
 #, python-format
 msgid ""
 "File '%(filename)s' not found in snapshot's [%(snapshotname)s] files list, "
@@ -434,8 +418,8 @@ msgstr ""
 #: src/sbackup/core/SnapshotManager.py:312
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:319
@@ -459,7 +443,8 @@ msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:784
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:824
@@ -621,60 +606,60 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:253
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (free: %"
-"(freespace)s, required: %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup (free: "
+"%(freespace)s, required: %(neededspace)s)."
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:273
+#: src/sbackup/core/profile_handler.py:272
 msgid "Unable to copy log. File access is not initialized."
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:291
+#: src/sbackup/core/profile_handler.py:290
 #, python-format
 msgid "Unable to copy log file: %s"
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:293
+#: src/sbackup/core/profile_handler.py:292
 msgid "Unable to find logfile to copy into snapshot."
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:295
+#: src/sbackup/core/profile_handler.py:294
 msgid "No snapshot to copy logfile."
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:302
+#: src/sbackup/core/profile_handler.py:301
 msgid "Processing of profile was canceled on user request\n"
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:319
+#: src/sbackup/core/profile_handler.py:318
 msgid "Processing of profile successfully finished (no errors)\n"
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:325
+#: src/sbackup/core/profile_handler.py:324
 #, python-format
 msgid "Processing of profile failed with error: %s\n"
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:336
+#: src/sbackup/core/profile_handler.py:335
 #, python-format
 msgid "Backup destination: %s"
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:340
+#: src/sbackup/core/profile_handler.py:339
 msgid "Unable to find destination directory."
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:359
+#: src/sbackup/core/profile_handler.py:358
 msgid "Unable to find destination directory even after retry."
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:360
-#: src/sbackup/core/profile_handler.py:367
+#: src/sbackup/core/profile_handler.py:359
+#: src/sbackup/core/profile_handler.py:366
 #, python-format
 msgid "Target directory '%(target)s' does not exist."
 msgstr ""
 
-#: src/sbackup/core/profile_handler.py:373
+#: src/sbackup/core/profile_handler.py:372
 #, python-format
 msgid "Unable to access destination: %s"
 msgstr ""
@@ -752,11 +737,11 @@ msgstr ""
 msgid "FTP"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_fam.py:100
+#: src/sbackup/fs_backend/_gio_fam.py:96
 msgid "Initializing GIO File Access Manager."
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_fam.py:114
+#: src/sbackup/fs_backend/_gio_fam.py:110
 msgid "Terminating GIO File Access Manager."
 msgstr ""
 
@@ -786,39 +771,39 @@ msgstr ""
 msgid "Unable to un-set mount flag: path is not stored"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:347
+#: src/sbackup/fs_backend/_gio_utils.py:359
 msgid "Path is already mounted."
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:370
+#: src/sbackup/fs_backend/_gio_utils.py:382
 msgid "Path is not mounted."
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:837
+#: src/sbackup/fs_backend/_gio_utils.py:840
 msgid "test specified path for existence using GIO"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:850
+#: src/sbackup/fs_backend/_gio_utils.py:853
 msgid "Create testdir"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:855
+#: src/sbackup/fs_backend/_gio_utils.py:858
 msgid "Test testfile for existence"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:862
+#: src/sbackup/fs_backend/_gio_utils.py:865
 msgid "Create file"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:869
+#: src/sbackup/fs_backend/_gio_utils.py:872
 msgid "Re-read test file"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:881
+#: src/sbackup/fs_backend/_gio_utils.py:884
 msgid "Remove file"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:883
+#: src/sbackup/fs_backend/_gio_utils.py:886
 msgid "Remove dir"
 msgstr ""
 
@@ -879,8 +864,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:137
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:142
@@ -890,8 +875,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:158
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
 
 #: src/sbackup/ui/GladeWindow.py:209
@@ -908,8 +893,8 @@ msgid ""
 "%s."
 msgstr ""
 
-#: src/sbackup/ui/GladeWindow.py:211 src/sbackup/ui/restoregui.py:816
-#: src/sbackup/ui/restoregui.py:870
+#: src/sbackup/ui/GladeWindow.py:211 src/sbackup/ui/restoregui.py:812
+#: src/sbackup/ui/restoregui.py:866
 msgid "Simple Backup error"
 msgstr ""
 
@@ -980,15 +965,15 @@ msgstr ""
 
 #: src/sbackup/ui/configgui.py:712
 msgid "Already included item !"
-msgstr "Пункт уже включён !"
+msgstr "Þessi skrá/mappa hefur þegar verið valin !"
 
 #: src/sbackup/ui/configgui.py:727
 msgid "Already excluded item !"
-msgstr "Пункт уже исключён !"
+msgstr "Hef þegar útilokað þennan hlut"
 
 #: src/sbackup/ui/configgui.py:739 src/sbackup/ui/configgui.py:1438
 msgid "Empty expression. Please enter a valid regular expression."
-msgstr "Пустое выражение. Пожалуйста, введите правильное регулярное выражение."
+msgstr "Tóm segð. Sláðu in gilda regexp segð."
 
 #: src/sbackup/ui/configgui.py:754 src/sbackup/ui/configgui.py:1452
 msgid "Provided regular expression is not valid."
@@ -997,7 +982,7 @@ msgstr ""
 #: src/sbackup/ui/configgui.py:762
 msgid "Empty filename or path. Please enter a valid filename or path."
 msgstr ""
-"Пустое имя файла или путь. Пожалуйста, введите правильное имя файла или путь."
+"Tómt skráarheiti eða tóm slóð. Sláðu inn gilt skráarheiti eða gilda slóð."
 
 #: src/sbackup/ui/configgui.py:771
 msgid ""
@@ -1033,7 +1018,7 @@ msgstr ""
 
 #: src/sbackup/ui/configgui.py:954 src/sbackup/ui/configgui.py:1009
 msgid "All files"
-msgstr "Все файлы"
+msgstr "Allar skrár"
 
 #: src/sbackup/ui/configgui.py:974
 msgid "Include folder..."
@@ -1147,8 +1132,8 @@ msgstr ""
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -1447,17 +1432,17 @@ msgstr ""
 
 #: src/sbackup/ui/restoregui.py:153 data/ui/sbackup-config.glade:4063
 msgid "Path"
-msgstr "Местоположение"
+msgstr "Slóð"
 
 #: src/sbackup/ui/restoregui.py:158
 msgid "State"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:186
+#: src/sbackup/ui/restoregui.py:187
 msgid "Connect to destination..."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:210
+#: src/sbackup/ui/restoregui.py:211
 msgid "Specified path does not exist"
 msgstr ""
 
@@ -1471,7 +1456,7 @@ msgstr ""
 
 #: src/sbackup/ui/restoregui.py:387
 msgid "Choose a source folder"
-msgstr "Выберите исходный каталог"
+msgstr "Veldu áfangastað"
 
 #: src/sbackup/ui/restoregui.py:404
 msgid "Reading snapshots..."
@@ -1483,7 +1468,7 @@ msgstr ""
 
 #: src/sbackup/ui/restoregui.py:457 src/sbackup/ui/restoregui.py:495
 msgid "Loading ..."
-msgstr "Загрузка..."
+msgstr "Hleð ..."
 
 #: src/sbackup/ui/restoregui.py:538
 msgid "Reading files from snapshot..."
@@ -1516,33 +1501,33 @@ msgid ""
 "Version '%(currentversion)s' found. You should upgrade it. "
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:642
+#: src/sbackup/ui/restoregui.py:640
 msgid "Select restore location"
-msgstr "Выберите место для восстановления"
+msgstr "Veldu staðsetningu fyrir endurheimtu gögnin"
 
-#: src/sbackup/ui/restoregui.py:661
+#: src/sbackup/ui/restoregui.py:658
 #, python-format
 msgid "Do you really want to revert '%s'?"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:675
+#: src/sbackup/ui/restoregui.py:671
 msgid "Select revert location"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:684
+#: src/sbackup/ui/restoregui.py:680
 #, python-format
 msgid "Do you really want to revert '%(source)s' to '%(dir)s'?"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:762
+#: src/sbackup/ui/restoregui.py:758
 msgid "Reading snapshot..."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:781
+#: src/sbackup/ui/restoregui.py:777
 msgid "The version of the snapshot is greater than the supported one!"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:791
+#: src/sbackup/ui/restoregui.py:787
 #, python-format
 msgid ""
 "Upgrading the selected snapshot `%s` might corrupt your backup for this "
@@ -1553,44 +1538,44 @@ msgid ""
 "Are you sure that you want to upgrade the snapshot now?"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:795
+#: src/sbackup/ui/restoregui.py:791
 msgid "Do you really want to upgrade snapshot?"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:799
+#: src/sbackup/ui/restoregui.py:795
 #, python-format
 msgid "Upgrade snapshot '%s'"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:808
+#: src/sbackup/ui/restoregui.py:804
 msgid "Snapshot was sucessfully upgraded."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:809
+#: src/sbackup/ui/restoregui.py:805
 msgid "Simple Backup upgrade"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:810
+#: src/sbackup/ui/restoregui.py:806
 msgid "Upgrade finished"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:813
+#: src/sbackup/ui/restoregui.py:809
 #, python-format
 msgid ""
 "While attempting to upgrade snapshot the following error occurred:\n"
 "%s"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:816
+#: src/sbackup/ui/restoregui.py:812
 msgid "Unable to upgrade snapshot"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:837
+#: src/sbackup/ui/restoregui.py:833
 #, python-format
 msgid "Do you really want to rebase '%(current)s' on '%(base)s' ?"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:855
+#: src/sbackup/ui/restoregui.py:851
 #, python-format
 msgid ""
 "Deleting the selected snapshot `%s` will remove your backup for this "
@@ -1599,22 +1584,22 @@ msgid ""
 "Are you sure that you want to remove the snapshot permanently?"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:859
+#: src/sbackup/ui/restoregui.py:855
 msgid "Do you really want to remove snapshot?"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:868
+#: src/sbackup/ui/restoregui.py:864
 #, python-format
 msgid ""
 "While attempting to delete snapshot the following error occurred:\n"
 "%s"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:871
+#: src/sbackup/ui/restoregui.py:867
 msgid "Unable to delete snapshot"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:877
+#: src/sbackup/ui/restoregui.py:873
 #, python-format
 msgid ""
 "The selected snapshot '%s' is referenced by more recent snapshots as base "
@@ -1623,35 +1608,35 @@ msgid ""
 "Remove all of these child snapshots in order to delete this snapshot."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:879
+#: src/sbackup/ui/restoregui.py:875
 msgid "Unable to remove snapshot"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:887
+#: src/sbackup/ui/restoregui.py:883
 msgid "Termination in progress"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:903 src/sbackup/ui/restoregui.py:909
-#: src/sbackup/ui/restoregui.py:915 src/sbackup/ui/restoregui.py:921
+#: src/sbackup/ui/restoregui.py:899 src/sbackup/ui/restoregui.py:905
+#: src/sbackup/ui/restoregui.py:911 src/sbackup/ui/restoregui.py:917
 #: data/ui/sbackup-restore.glade:1039
 msgid "Simple Backup restoration"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:904 src/sbackup/ui/restoregui.py:910
+#: src/sbackup/ui/restoregui.py:900 src/sbackup/ui/restoregui.py:906
 msgid "<b>Restoring of selected files</b>"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:905
+#: src/sbackup/ui/restoregui.py:901
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> is in progress."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:906
+#: src/sbackup/ui/restoregui.py:902
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> was successful."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:907
+#: src/sbackup/ui/restoregui.py:903
 #, python-format
 msgid ""
 "Restoring of <tt>'%s'</tt> was not successful.\n"
@@ -1659,21 +1644,21 @@ msgid ""
 "Following error occurred:\n"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:911
+#: src/sbackup/ui/restoregui.py:907
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> is in progress."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:912
+#: src/sbackup/ui/restoregui.py:908
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:913
+#: src/sbackup/ui/restoregui.py:909
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
@@ -1682,21 +1667,21 @@ msgid ""
 "Following error occurred:\n"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:916 src/sbackup/ui/restoregui.py:922
+#: src/sbackup/ui/restoregui.py:912 src/sbackup/ui/restoregui.py:918
 msgid "<b>Reverting selected files</b>"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:917
+#: src/sbackup/ui/restoregui.py:913
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> is in progress.\n"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:918
+#: src/sbackup/ui/restoregui.py:914
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> was successful."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:919
+#: src/sbackup/ui/restoregui.py:915
 #, python-format
 msgid ""
 "Reverting of <tt>'%s'</tt> was not successful.\n"
@@ -1704,21 +1689,21 @@ msgid ""
 "Following error occurred:\n"
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:923
+#: src/sbackup/ui/restoregui.py:919
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> is in progress."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:924
+#: src/sbackup/ui/restoregui.py:920
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
 
-#: src/sbackup/ui/restoregui.py:925
+#: src/sbackup/ui/restoregui.py:921
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
@@ -1759,7 +1744,8 @@ msgstr ""
 
 #: src/sbackup/util/filecollect.py:364
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
 #: src/sbackup/util/filecollect.py:368
@@ -1831,32 +1817,31 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:11
 msgid "Exclude file type"
-msgstr "Исключить тип файлов"
+msgstr "Útiloka skáargerð"
 
 #: data/ui/sbackup-config.glade:26
 msgid "Standard file types:"
-msgstr "Стандартные типы файлов:"
+msgstr "Hefðbundin skráarsnið"
 
 #: data/ui/sbackup-config.glade:63
 msgid "Custom defined file type with "
-msgstr "Другой тип файла с расширением "
+msgstr "Skráarsnið sem enda á "
 
 #: data/ui/sbackup-config.glade:93
 msgid "file extension"
-msgstr "&nbsp;"
+msgstr "."
 
 #: data/ui/sbackup-config.glade:163
 msgid "Exclude by regex"
-msgstr "Исключить при помощи регулярного выражения"
+msgstr "Útiloka með regex"
 
 #: data/ui/sbackup-config.glade:180
 msgid ""
 "Enter a regular expression.\n"
 "Files and directories matching this expression will be excluded from backup."
 msgstr ""
-"Введите регулярное выражение.\n"
-"Файлы и каталоги, соответствующие этому выражению, будут исключены из "
-"резервной копии."
+"Sláðu inn regex segð.\n"
+"Skrár og möppur sem passa við segðina verða útilokaðar frá afritunartökuni."
 
 #: data/ui/sbackup-config.glade:257
 msgid "Enter the remote target to include"
@@ -1917,7 +1902,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:915 data/ui/sbackup-restore.glade:7
 msgid "Simple Backup Suite"
-msgstr "Пакет автоматической архивации"
+msgstr "Simple Backup Suite"
 
 #: data/ui/sbackup-config.glade:932
 msgid "_File"
@@ -1997,7 +1982,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1330
 msgid "Do a full backup at least once every"
-msgstr "Создавать полную копию по крайней мере один раз в"
+msgstr "Framkvæma heildarafritun á amk."
 
 #: data/ui/sbackup-config.glade:1339
 msgid ""
@@ -2007,11 +1992,11 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1356 data/ui/sbackup-config.glade:3015
 msgid "days"
-msgstr "дней"
+msgstr "daga fresti."
 
 #: data/ui/sbackup-config.glade:1370
 msgid " "
-msgstr " "
+msgstr ""
 
 #: data/ui/sbackup-config.glade:1380 data/ui/sbackup-config.glade:2323
 msgid "MiB"
@@ -2033,7 +2018,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1475
 msgid "General"
-msgstr "Общие"
+msgstr "Almennt"
 
 #: data/ui/sbackup-config.glade:1495
 msgid "<b>Included files and directories</b>"
@@ -2046,15 +2031,15 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1620 data/ui/sbackup-config.glade:1868
 msgid "Add File"
-msgstr "Добавить файл"
+msgstr "Bæta við skrá"
 
 #: data/ui/sbackup-config.glade:1671 data/ui/sbackup-config.glade:1919
 msgid "Add Directory"
-msgstr "Добавить каталог"
+msgstr "Bæta við möppu"
 
 #: data/ui/sbackup-config.glade:1718
 msgid "Include"
-msgstr "Включить"
+msgstr "Til afritunar"
 
 #: data/ui/sbackup-config.glade:1739
 msgid "<b>Excluded files and directories</b>"
@@ -2062,7 +2047,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1952
 msgid "Paths"
-msgstr "Пути"
+msgstr "Slóðir"
 
 #: data/ui/sbackup-config.glade:2074 data/ui/sbackup-config.glade:2232
 msgid "Add"
@@ -2070,7 +2055,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2109
 msgid "File types"
-msgstr "Типы файлов"
+msgstr "Gerðir"
 
 #: data/ui/sbackup-config.glade:2267
 msgid ""
@@ -2092,7 +2077,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2400
 msgid "Exclude"
-msgstr "Исключить"
+msgstr "Útiloka"
 
 #: data/ui/sbackup-config.glade:2421
 msgid "Use default backup directory"
@@ -2104,11 +2089,11 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2472
 msgid "Use custom local backup directory"
-msgstr "Использовать пользовательский локальный каталог резервных копий"
+msgstr "Nota valda möppu undir afritun"
 
 #: data/ui/sbackup-config.glade:2500
 msgid "Select the destination folder"
-msgstr "Выбрать каталог назначения"
+msgstr "Veldu möppu"
 
 #: data/ui/sbackup-config.glade:2526
 msgid "Use a remote site"
@@ -2116,7 +2101,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2568
 msgid "ssh://username:password@example.com/remote/dir/"
-msgstr "ssh://имя:пароль@сервер/ката/лог/"
+msgstr "ssh://notandi:lykilorð@tölvunafn/slóð/á/möppu"
 
 #: data/ui/sbackup-config.glade:2580
 msgid "Connect..."
@@ -2130,7 +2115,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2704
 msgid "Destination"
-msgstr "Назначение"
+msgstr "Áfangastaður"
 
 #: data/ui/sbackup-config.glade:2725
 msgid "_No scheduled backups"
@@ -2213,16 +2198,16 @@ msgid ""
 "<small>Note: Additionally all incomplete and irrecoverable backups will be "
 "erased as long as there is a complete backup snapshot made later on.</small>"
 msgstr ""
-"<small>Примечание: все неполные и невосстановимые резервные копии будут "
-"удалены, как только завершится полное резервное копирование.</small>"
+"Ath: Til viðbótar þá verður öllum ókláruðum og skemmdum afritum hent svo "
+"lengi sem það er til nýrri útgáfa."
 
 #: data/ui/sbackup-config.glade:3184
 msgid "Purging"
-msgstr "Очистка"
+msgstr "Geymsla afrita"
 
 #: data/ui/sbackup-config.glade:3186
 msgid "Cleaning old backups"
-msgstr "Очистка старых резервных копий"
+msgstr "Hreinsa gömul afrit"
 
 #: data/ui/sbackup-config.glade:3209
 msgid "<b>Logging</b>"
@@ -2434,7 +2419,7 @@ msgstr ""
 
 #: data/ui/sbackup-restore.glade:862
 msgid "Restore"
-msgstr "Восстановить"
+msgstr "Endurheimta"
 
 #: data/ui/sbackup-restore.glade:882 data/ui/sbackup-restore.glade:901
 msgid ""
@@ -2461,9 +2446,3 @@ msgstr ""
 #: data/ui/sbackup-restore.glade:1069
 msgid "Content"
 msgstr ""
-
-#~ msgid "This is a user friendly backup solution for common desktop needs."
-#~ msgstr "Удобное решение для организации резервного копирования файлов."
-
-#~ msgid "I didn't find the log file. Please set it up in sbackup.conf "
-#~ msgstr "Лог-файл не найден. Задайте его в sbackup.conf "
