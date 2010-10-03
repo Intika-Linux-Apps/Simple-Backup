@@ -102,7 +102,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.currentSnp = None
         self.currentsbdict = None
         self.currSnpFilesInfos = None
-        self.restoreman = RestoreManager()
+        self.restoreman = None
         self.snpman = None
         self.target = None
         self.__fam_target_hdl = fam.get_fam_target_handler_facade_instance()
@@ -205,8 +205,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             gobject.idle_add(self.__set_destination_done)
 
     def __set_destination_done(self):
-        self.target = self.__fam_target_hdl.get_eff_path()
-        if self.__fam_target_hdl.dest_eff_path_exists() is False: # no errors so far
+        self.target = self.__fam_target_hdl.query_mount_uri()
+        if self.__fam_target_hdl.dest_path_exists() is False: # no errors so far
             self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error            
             gobject.idle_add(self._show_destination_error, _("Specified path does not exist"))
             self.__fam_target_hdl.set_terminate_callback(self._set_dest_failed_cb)
@@ -216,6 +216,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                 self.widgets['defaultfolderlabel'].set_text(self.__fam_target_hdl.query_dest_display_name())
 
             self.snpman = SnapshotManager(self.target)
+            self.restoreman = RestoreManager(self.__fam_target_hdl)
             self.widgets["restoreExpander"].set_expanded(False)
             self.__fill_calendar()
             today = time.localtime()    # select the current day

@@ -586,10 +586,10 @@ class FileCollector(object):
 # TODO: why add an empty string?
 # TODO: put the default excludes into `ConfigManager`.
 # TODO: Remove this hack and replace it by proper shell pattern expansion (glob).
-        for _excl in ["", "/dev", "/proc", "/sys", "/tmp",
-                          "/dev/", "/proc/", "/sys/", "/tmp/",
-                          _config.get_target_dir(),
-                          _config.get_target_dir().rstrip(os.sep) + os.sep]:
+        _excludes = ["", "/dev/", "/proc/", "/sys/", "/tmp/"]
+        if _config.get_target_dir() is not None:
+            _excludes.append(_config.get_target_dir().rstrip(os.sep) + os.sep)
+        for _excl in _excludes:
             self.__snapshot.disable_path_in_incl_filelist(_excl)
 
 # TODO: Even better: Remove this inconsistency and don't use TAR's shell patterns. Prefer pure Regex exclusion.
@@ -597,7 +597,7 @@ class FileCollector(object):
         #             excluded directory yields in excluding contained files
 #FIXME: trailing slashes are not retained when writing excludes file! Since exclude items
 #       are literally compared this can exclude more dirs/files than intended!
-        for _excl in ["", "/dev/", "/proc/", "/sys/", "/tmp/", _config.get_target_dir()]:
+        for _excl in _excludes:
             self.__snapshot.addToExcludeFlist(_excl)
 
         # sanity check of the lists
@@ -626,9 +626,9 @@ class FileCollectorConfigFacade(object):
     for file collection. Purpose is to de-couple class `ConfigManager` and `FileCollector`
     since only very little configuration settings are required in order to collect the files.
     """
-    def __init__(self, configuration):
+    def __init__(self, configuration, eff_local_targetdir):
         self.__configuration = None
-        self.__target_dir = None    # needed to exclude paths == target
+        self.__eff_local_targetdir = eff_local_targetdir     # needed to exclude paths == target
 
         self.__maxsize_enabled = False
         self.__maxsize = 0
@@ -646,14 +646,8 @@ class FileCollectorConfigFacade(object):
 #            raise TypeError("Expected parameter of type 'ConfigManager'. "\
 #                            "Got %s instead." % type(configuration))
         self.__configuration = configuration
-        self.__set_target_dir_from_config()
         self.__set_maxsize_limit_from_config()
         self.__set_dirconfig_from_config()
-
-    def __set_target_dir_from_config(self):
-        if self.__configuration is None:
-            raise ValueError("No configuration set.")
-        self.__target_dir = self.__configuration.get_destination_path()
 
     def __set_maxsize_limit_from_config(self):
         if self.__configuration is None:
@@ -677,7 +671,7 @@ class FileCollectorConfigFacade(object):
         return self.__maxsize
 
     def get_target_dir(self):
-        return self.__target_dir
+        return self.__eff_local_targetdir
 
     def get_dirconfig_local(self):
         """Returns the directory configuration stored in a list of pairs (name, value).

@@ -210,22 +210,15 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
         try:
             _dest = self.get_destination()
             _eff_path = self.__mount_uri(_dest)
-
-            if _eff_path is not None: # None means local path was mounted            
-                if self._configuration is not None:
-                    self._logger.debug("Modify value of target in referenced configuration to `%s`" % _eff_path)
-                    self._configuration.set("general", "target", _eff_path)
-                    self._logger.debug("\n%s" % str(self._configuration))
-                else:
-                    self._logger.debug("No configuration set. Value of target is not modified.")
-
             if _eff_path is None:
                 self._eff_path = _dest
             else:
                 self._eff_path = _eff_path
 
-            if self._eff_path is None:
+            if (self._eff_path is None) or (not self._eff_path.startswith(local_file_utils.PATHSEP)):
                 raise exceptions.FileAccessException("Unable to mount target")
+            if not local_file_utils.path_exists(self._eff_path):
+                raise exceptions.FileAccessException("Unable to mount target: Path does not exist")
 
         except SBException, error:
             self._logger.error("Error in mount callback function. Overwriting previous errors.")
@@ -233,7 +226,7 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
                 raise
 
         if self._initialize_callback is not None:
-            self._logger.debug("Calling additional callback in gio_fam._mount_cb: %s" % self._initialize_callback)
+            self._logger.debug("Calling additional callback in fuse_fam._mount_cb: %s" % self._initialize_callback)
             self._initialize_callback(error)
 
         if error is None:
@@ -331,6 +324,21 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
 
         return _effpath
 
+    def get_eff_fullpath(self, *args):
+        _base = local_file_utils.normpath(*args)
+        _eff_path = self.get_eff_path()
+        self._logger.debug("Effective path: `%s`" % _eff_path)
+        self._logger.debug("Base path: `%s`" % _base)
+        _res = None
+        if _eff_path is not None:
+            _res = local_file_utils.normpath(_eff_path, _base)
+        return _res
+
+    def get_snapshot_path(self, snpname):
+        _base = self.query_mount_uri()
+        _snppath = local_file_utils.normpath(_base, snpname)
+        return _snppath
+
     def query_dest_fs_info(self):
         (_size, _free) = local_file_utils.query_fs_info(self._eff_path)
         return (_size, _free)
@@ -349,20 +357,21 @@ class  FuseTargetHandler(interfaces.ITargetHandler):
         _res = True
         return _res
 
-    def dest_eff_path_exists(self):
+    def get_use_iopipe(self):
+        _res = False
+        return _res
+
+    def dest_path_exists(self):
         """The effective path denotes the local mountpoint of the actual remote or local target.
         It is required in order to give it to TAR as parameter (tar does not support gio).
         It is checked using GIO and native access functions.
         """
-        _effpath = self._eff_path
-        _res = False
-
-        assert _effpath != ""
-        assert _effpath is not None
-        assert _effpath.startswith(local_file_utils.PATHSEP)
-
-        _res = local_file_utils.path_exists(_effpath)
-        return _res
+        _path = self.query_mount_uri()
+        assert _path != ""
+        assert _path is not None
+        assert _path.startswith(local_file_utils.PATHSEP)
+        _res_gio = local_file_utils.path_exists(_path)
+        return _res_gio
 
     def test_destination(self):
         _effpath = self._eff_path

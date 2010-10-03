@@ -202,7 +202,7 @@ class BackupProfileHandler(object):
         self.logger.info(_("Snapshot is being committed"))
         self.__state.set_state('start')
 #        self.__state.set_state('commit')
-        self.__snapshot.commit(_publish_progress, _supports_publish)
+        self.__snapshot.commit(self.__fam_target_hdl, _publish_progress, _supports_publish)
 
 #TODO: add state purging
         # purge
@@ -256,7 +256,8 @@ class BackupProfileHandler(object):
     def __create_collector_obj(self):
         """Factory method that returns instance of `FileCollector`.
         """
-        _configfac = filecollect.FileCollectorConfigFacade(self.config)
+        _eff_local_dest_path = self.__fam_target_hdl.get_eff_path()
+        _configfac = filecollect.FileCollectorConfigFacade(self.config, _eff_local_dest_path)
         _collect = filecollect.FileCollector(self.__snapshot, _configfac)
         if not self.__snapshot.isfull():
             _base = self.__snapshot.getBaseSnapshot()
@@ -335,7 +336,7 @@ class BackupProfileHandler(object):
         self.logger.info(_("Backup destination: %s") % _target_display_name)
 
         # Check if the target dir exists, but Do not create any directories. 
-        if not self.__fam_target_hdl.dest_eff_path_exists():
+        if not self.__fam_target_hdl.dest_path_exists():
             self.logger.warning(_("Unable to find destination directory."))
             self.__state.set_state('target-not-found')
 
@@ -352,7 +353,7 @@ class BackupProfileHandler(object):
                         raise exceptions.BackupCanceledError
 
                     elif _retry == constants.RETRY_TRUE:
-                        if self.__fam_target_hdl.dest_eff_path_exists():
+                        if self.__fam_target_hdl.dest_path_exists():
                             pass
                         else:
                             self.logger.warning(_("Unable to find destination directory even after retry."))
@@ -435,6 +436,7 @@ class BackupProfileHandler(object):
         else:
             snpname = "%s.ful" % snpname
 
-        tdir = _fop.joinpath(self.config.get("general", "target"), snpname)
+        tdir = self.__fam_target_hdl.get_snapshot_path(snpname)
+        self.logger.debug("Snapshot path: %s" % tdir)
 
         return (tdir, base)

@@ -35,10 +35,11 @@ class RestoreManager(object):
     """
     """
 
-    def __init__(self):
+    def __init__(self, targethandler):
         """
         """
         self.logger = log.LogFactory.getLogger()
+        self.__fam_target_hdl = targethandler
         self._fop = fam.get_file_operations_facade_instance()
 
     def restore(self, snapshot, _file):
@@ -82,6 +83,11 @@ class RestoreManager(object):
                                     % {"filename": _file, "snapshotname" : snapshot.getName()})
                 return
 
+        _snpname = self._fop.get_basename(snapshot.getName())
+        _arname = self._fop.get_basename(snapshot.getArchive())
+        _larpath = self.__fam_target_hdl.get_eff_fullpath(_snpname, _arname)
+        self.logger.debug("eff. local path to archive: %s" % _larpath)
+
         suffix = None
         if backupFlag :
             now = datetime.datetime.now().isoformat("_").replace(":", ".")
@@ -96,7 +102,7 @@ class RestoreManager(object):
                 _tmpdir = tempfile.mkdtemp(dir = target, prefix = 'sbackup-restore_')
                 self.logger.debug("Restore tempdir: `%s`" % _tmpdir)
 
-                tar.extract(snapshot.getArchive(), _file, _tmpdir,
+                tar.extract(snapshot.getArchive(), _larpath, _file, _tmpdir,
                             bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
 
                 _file_in_target = self._fop.joinpath(target, self._fop.get_basename(_file))
@@ -114,24 +120,24 @@ class RestoreManager(object):
             else:
                 #the target is a file (i.e. the backuped file is restored under new name
                 parent = self._fop.get_dirname(target)
-                tar.extract(snapshot.getArchive(), _file, parent,
+                tar.extract(snapshot.getArchive(), _larpath, _file, parent,
                             bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
         else:
             # target is set to None or target not exists
             if target and not self._fop.path_exists(target) :
                 #target != None but target doesn't exists
                 self._fop.makedirs(target)
-                tar.extract(snapshot.getArchive(), _file, target,
+                tar.extract(snapshot.getArchive(), _larpath, _file, target,
                             splitsize = snapshot.getSplitedSize())
             else :
                 # Target = None , extract at the place it belongs
                 if self._fop.path_exists(_file) :
                     # file exist:
-                    tar.extract(snapshot.getArchive(), _file, target,
+                    tar.extract(snapshot.getArchive(), _larpath, _file, target,
                                 bckupsuffix = suffix, splitsize = snapshot.getSplitedSize())
                 else :
                     # file doesn't exist nothing to move, just extract
-                    tar.extract(snapshot.getArchive(), _file, target,
+                    tar.extract(snapshot.getArchive(), _larpath, _file, target,
                                 splitsize = snapshot.getSplitedSize())
 
     def revert(self, snapshot, directory):

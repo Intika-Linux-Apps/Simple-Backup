@@ -89,6 +89,10 @@ class GioTargetHandler(interfaces.ITargetHandler):
             _res = True
         return _res
 
+    def get_use_iopipe(self):
+        _res = True
+        return _res
+
     def set_configuration_ref(self, configuration):
         self._configuration = configuration
 
@@ -143,34 +147,14 @@ class GioTargetHandler(interfaces.ITargetHandler):
         """Callback method that gets called when mounting is finished.
         Takes errors occurred during the mount process as parameter.
         """
-        try:
-            if error is None:
-                _eff_path = self.get_eff_path()
-
-                if _eff_path is None:
-                    raise exceptions.FileAccessException("Unable to mount target")
-
-# test existence separate to enable umounting if path does not exist
-#                if self.dest_eff_path_exists() is False:
-#                    raise exceptions.FileAccessException("Destination path `%s` does not exist" % _eff_path)
-
-                if self._configuration is not None:
-                    self._logger.debug("Modify value of target in referenced configuration to `%s`" % _eff_path)
-                    self._configuration.set("general", "target", _eff_path)
-                    self._logger.debug("\n%s" % str(self._configuration))
-                else:
-                    self._logger.debug("No configuration set. Value of target is not modified.")
-
-        except exceptions.FileAccessException, error:
-            self._logger.error("Error in mount callback function: %s" % error)
-            if self._initialize_callback is None:
-                raise
-        finally:
-            self._in_progress = False # release lock
+        self._in_progress = False # release lock
 
         if self._initialize_callback is not None:
             self._logger.debug("Calling additional callback in gio_fam._mount_cb: %s" % self._initialize_callback)
             self._initialize_callback(error)
+        else:
+            if error is not None:
+                raise exceptions.FileAccessException("Unable to mount: %s" % error)
 
         if error is None:
             self._is_initialized = True
@@ -184,8 +168,19 @@ class GioTargetHandler(interfaces.ITargetHandler):
         self._is_initialized = False
 
     def get_eff_path(self):
-        _eff_path = self._dest_mount_hdl.get_eff_path()
+        _path = self.query_mount_uri()
+        _eff_path = GioOperations.get_eff_path(_path)
         return _eff_path
+
+    def get_eff_fullpath(self, *args):
+        _base = GioOperations.normpath(*args)
+        _eff_path = self.get_eff_path()
+        self._logger.debug("Effective path: `%s`" % _eff_path)
+        self._logger.debug("Base path: `%s`" % _base)
+        _res = None
+        if _eff_path is not None:
+            _res = GioOperations.normpath(_eff_path, _base)
+        return _res
 
     def query_dest_fs_info(self):
         (_size, _free) = self._dest_mount_hdl.query_fs_info()
@@ -197,14 +192,19 @@ class GioTargetHandler(interfaces.ITargetHandler):
     def query_mount_uri(self):
         return self._dest.query_mount_uri()
 
-    def dest_eff_path_exists(self):
+    def dest_path_exists(self):
         """The effective path denotes the local mountpoint of the actual remote or local target.
         It is required in order to give it to TAR as parameter (tar does not support gio).
         It is checked using GIO and native access functions.
         """
-        _effpath = self.get_eff_path()
-        _res_gio = GioOperations.path_exists(_effpath)
+        _path = self.query_mount_uri()
+        _res_gio = GioOperations.path_exists(_path)
         return _res_gio
 
     def test_destination(self):
         self._dest_mount_hdl.test_path()
+
+    def get_snapshot_path(self, snpname):
+        _base = self.query_mount_uri()
+        _snppath = GioOperations.normpath(_base, snpname)
+        return _snppath

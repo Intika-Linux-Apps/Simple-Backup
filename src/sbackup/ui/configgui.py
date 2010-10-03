@@ -540,7 +540,7 @@ class SBconfigGTK(GladeGnomeApp):
                 self.__set_target_option("default")
 
             else:
-                if not _dest.dest_eff_path_exists():
+                if not _dest.dest_path_exists():
                     self.__set_config_target_to_default()
                     self.__set_target_option("default")
 

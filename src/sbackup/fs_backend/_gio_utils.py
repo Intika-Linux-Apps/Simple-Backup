@@ -246,18 +246,6 @@ class GioMountHandler(object):
         else:
             self.__path_mount_info = None
 
-    def get_eff_path(self):
-        """Returns None in case of not mounted URIs.
-        """
-        if self.__uri is None:
-            raise ValueError("No URI set")
-        path = self.__uri.query_mount_uri()
-        self.__logger.debug("URI: %s" % path)
-        _gfile = gio.File(path)
-        _eff_path = _gfile.get_path()
-        self.__logger.debug("Effective path: `%s`" % _eff_path)
-        return _eff_path
-
     def mount(self):
         if self.__uri is None:
             raise ValueError("No URI set")
@@ -764,6 +752,15 @@ class GioOperations(interfaces.IOperations):
     @classmethod
     def joinpath(cls, *args):
         return pathparse.joinpath(*args)
+
+    @classmethod
+    def get_eff_path(cls, path):
+        _logger = log.LogFactory.getLogger()
+        _logger.debug("get effective path for URI: `%s`" % path)
+        _gfile = gio.File(path)
+        _eff_path = _gfile.get_path()
+        _logger.debug("Effective path: `%s`" % _eff_path)
+        return _eff_path
 
     @classmethod
     def get_dirname(cls, path):
