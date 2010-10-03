@@ -39,6 +39,7 @@ pynotify
 gettext
 python-setuptools
 pyGTK (>= 2.10)
+gvfs, gvfs-fuse, gvfs-backends
 
 fuse (for fuse plugins)
 python-pexpect (for ssh fuse plugin)
@@ -52,13 +53,15 @@ By default, Simple Backup will be installed under "/usr/local" folder.
 
 * Remove previously installed versions (using make or .deb packages)
 
-* Install python and python-gnome2 libraries, fuse-utils and pynotify.
+* Install python and python-gnome2 libraries and pynotify. Install
+  gvfs, gvfs-fuse, gvfs-backends or fuse-utils (in case you want to
+  use fuse-plugins):
   - probably it's already installed in your dist
 
   - On Ubuntu:
      sudo apt-get install gettext python-setuptools
      sudo apt-get install python-notify fuse-utils python-gnome python-glade\
-                          python-gtk
+                          python-gtk, gvfs, gvfs-fuse, gvfs-backends
 
 * Walk into the same directory as this README file
 * Type:
