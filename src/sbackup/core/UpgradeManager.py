@@ -164,6 +164,17 @@ class UpgradeManager(object):
             if s.getVersion() < Infos.SNPCURVERSION:
                 self.upgradeSnapshot(s)
 
+    def __stamp(self, snppath):
+        _fpath = self._fop.joinpath(snppath, "upgrade")
+        self._fop.writetofile(_fpath, "Upgrade in progress.")
+
+    def __unstamp(self, snppath):
+        _fpath = self._fop.joinpath(snppath, "upgrade")
+        try:
+            self._fop.force_delete(_fpath)
+        except (OSError, IOError), error:
+            self.logger.warning(_("Unable to remove upgrade stamp: %s") % error)
+
     def __upgrade_v12(self, snapshot):
         """Private method that actually processes the upgrade to
         version 1.2.
@@ -171,6 +182,7 @@ class UpgradeManager(object):
         """
         self.statusMessage = _("Upgrading from v1.0 to v1.2: %s") % str(snapshot)
         self.logger.info(self.statusMessage)
+        self.__stamp(snapshot.getPath())
         i = self._fop.openfile_for_read(self._fop.joinpath(snapshot.getPath(), "tree"))
         bfiles = pickle.load(i)
         n = self._fop.openfile_for_write(self._fop.joinpath(snapshot.getPath(), "flist"))
@@ -183,11 +195,13 @@ class UpgradeManager(object):
         i.close()
         self._fop.writetofile(self._fop.joinpath(snapshot.getPath(), "ver"), "1.2\n")
         snapshot.setVersion("1.2")
+        self.__unstamp(snapshot.getPath())
         self.statusNumber = 0.40
 
     def __upgrade_v13(self, snapshot):
         self.statusMessage = _("Upgrading to v1.3: %s") % str(snapshot)
         self.logger.info(self.statusMessage)
+        self.__stamp(snapshot.getPath())
         flist = self._fop.readfile(self._fop.joinpath(snapshot.getPath(), "flist")).split("\n")
         fprops = self._fop.readfile(self._fop.joinpath(snapshot.getPath(), "fprops")).split("\n")
         if len(flist) == len(fprops) :
@@ -208,11 +222,14 @@ class UpgradeManager(object):
         else:
             self._fop.delete(self._fop.joinpath(snapshot.getPath(), "ver"))
             raise SBException ("Damaged backup metainfo - disabling %s" % snapshot.getPath())
+        self.__unstamp(snapshot.getPath())
         self.statusNumber = 0.60
 
     def __upgrade_v14(self, snapshot):
         self.statusMessage = _("Upgrading to v1.4: %s") % str(snapshot)
         self.logger.info(self.statusMessage)
+        self.__stamp(snapshot.getPath())
+
         self._fop.delete(self._fop.joinpath(snapshot.getPath(), "ver"))
 
         if not self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "flist"))\
@@ -222,13 +239,14 @@ class UpgradeManager(object):
             raise SBException("Snapshot is invalid! One of the essential files does not exist.")
         self._fop.writetofile(self._fop.joinpath(snapshot.getPath(), "ver"), "1.4\n")
         snapshot.setVersion("1.4")
+        self.__unstamp(snapshot.getPath())
         self.statusNumber = 0.80
 
     def __upgrade_v15(self, snapshot):
         self.statusMessage = _("Upgrading to v1.5: %s") % str(snapshot)
         self.logger.info(self.statusMessage)
+        self.__stamp(snapshot.getPath())
         self.statusNumber = 0.80
-        self.logger.info(self.statusMessage)
         self._fop.delete(self._fop.joinpath(snapshot.getPath(), "ver"))
 
         if not self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "flist")):
@@ -347,6 +365,7 @@ class UpgradeManager(object):
         snapshot.setVersion("1.5")
         if self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "ver")):
             self.logger.debug("'ver' file created.")
+        self.__unstamp(snapshot.getPath())
         self.statusNumber = 1.00
 
 #    def __downgrade_v12 (self, snapshot):

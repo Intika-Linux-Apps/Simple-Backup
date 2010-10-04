@@ -165,9 +165,17 @@ class GladeWindow(object):
         if self.prev_window is None:
             gtk.main_quit()
 
+    def _show_infomessage(self, message_str, boxtitle = "",
+                               headline_str = "", secmsg_str = ""):
+        self._show_message(gtk.MESSAGE_INFO, message_str, boxtitle, headline_str, secmsg_str)
+
     def _show_errmessage(self, message_str, boxtitle = "",
                                headline_str = "", secmsg_str = ""):
-        """Shows a complex error message using markup.
+        self._show_message(gtk.MESSAGE_ERROR, message_str, boxtitle, headline_str, secmsg_str)
+
+    def _show_message(self, msgtype, message_str, boxtitle = "",
+                            headline_str = "", secmsg_str = ""):
+        """Shows message box using markup.
         
         @attention: gtk.MessageDialog is not fully thread-safe so it is
                     put in a critical section, here!
@@ -175,7 +183,7 @@ class GladeWindow(object):
         gtk.gdk.threads_enter()
         dialog = gtk.MessageDialog(
                     flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                    type = gtk.MESSAGE_ERROR,
+                    type = msgtype,
                     buttons = gtk.BUTTONS_CLOSE)
         if boxtitle.strip() != "":
             dialog.set_title(boxtitle)
@@ -243,14 +251,11 @@ class ProgressbarMixin(object):
         """Calling this method shows up the progressbar and starts
         the pulsing.
         
-        @attention: The progressbar can be started only once. Stop it before
-                    restarting!
-        @raise AssertionError: if another pulse timer is already running
-        
         @return: None
         """
         if self.__pulsetimer_id is not None:
-            raise AssertionError("Another pulse timer is already running!")
+            gobject.source_remove(self.__pulsetimer_id)
+            self.__pulsetimer_id = None
         self._progressbar.set_text("")
         self._progressbar.set_fraction(0.0)
         if self.__hide_when_stopped:
@@ -259,17 +264,12 @@ class ProgressbarMixin(object):
 
     def _stop_pulse(self):
         """Calling this method stops the progressbar.
-
-        @attention: The progressbar can not be stopped if it is not running.
-                    Start it before stopping!
-        @raise AssertionError: if no pulse timer is running
         
         @return: False
         @rtype:  Boolean
         """
-        if self.__pulsetimer_id is None:
-            raise AssertionError("Nothing to stop - no pulse timer is running!")
-        gobject.source_remove(self.__pulsetimer_id)
+        if self.__pulsetimer_id is not None:
+            gobject.source_remove(self.__pulsetimer_id)
         self.__pulsetimer_id = None
         if self.__hide_when_stopped:
             self._progressbar.hide()

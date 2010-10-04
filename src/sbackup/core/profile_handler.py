@@ -88,7 +88,6 @@ class BackupProfileHandler(object):
 
     def prepare(self):
         self.logger.info(_("Preparation of backup process"))
-        self.__state.set_state('prepare')
         _uri = self.config.get_destination_path()
         try:
             self.__fam_target_hdl.set_destination(_uri)
@@ -344,7 +343,7 @@ class BackupProfileHandler(object):
                 _time = 0
                 _retry = constants.RETRY_UNKNOWN
 
-                while (_time < constants.TIMEOUT_RETRY_TARGET_CHECK_SECONDS):
+                while (_time <= constants.TIMEOUT_RETRY_TARGET_CHECK_SECONDS):
                     time.sleep(constants.INTERVAL_RETRY_TARGET_CHECK_SECONDS)
                     _time = _time + constants.INTERVAL_RETRY_TARGET_CHECK_SECONDS
 #TODO: put the get_retry_target.. into State?

@@ -35,6 +35,7 @@ import subprocess
 import tempfile
 import shutil
 import re
+import sys
 
 from datetime import datetime
 
@@ -365,7 +366,9 @@ def _mk_tar_incr(snapshot, publish_progress, supports_publish):
     """
     LogFactory.getLogger().info(_("Launching TAR to make incremental backup."))
 
-    _env = { "GZIP" : GZIP_COMPRESSION_SPEED }
+    # LP #638072: no wildcards in excludes list
+    _env = { "GZIP" : GZIP_COMPRESSION_SPEED,
+             "TAR_OPTIONS" : "--no-wildcards --anchored --no-wildcards-match-slash" }
     _use_io_pipe = True
     _splitsize = snapshot.getSplitedSize()
     if _splitsize > 0:
@@ -434,7 +437,9 @@ def _mk_tar_full(snapshot, publish_progress, supports_publish):
     """
     LogFactory.getLogger().info(_("Launching TAR to make a full backup."))
 
-    _env = { "GZIP" : GZIP_COMPRESSION_SPEED }
+    # LP #638072: no wildcards in excludes list
+    _env = { "GZIP" : GZIP_COMPRESSION_SPEED,
+             "TAR_OPTIONS" : "--no-wildcards --anchored --no-wildcards-match-slash" }
     _use_io_pipe = True
     _splitsize = snapshot.getSplitedSize()
     if _splitsize > 0:
