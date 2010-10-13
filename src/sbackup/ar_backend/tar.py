@@ -35,7 +35,6 @@ import subprocess
 import tempfile
 import shutil
 import re
-import sys
 
 from datetime import datetime
 
