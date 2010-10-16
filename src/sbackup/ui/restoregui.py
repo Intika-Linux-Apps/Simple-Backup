@@ -102,7 +102,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.currentSnp = None
         self.currentsbdict = None
         self.currSnpFilesInfos = None
-        self.restoreman = RestoreManager()
+        self.restoreman = None
         self.snpman = None
         self.target = None
         self.__fam_target_hdl = fam.get_fam_target_handler_facade_instance()
@@ -169,8 +169,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.widgets['snplisttreeview'].set_sensitive(value)
         self.widgets['snpmanExpander'].set_sensitive(value)
         self.widgets['restoreExpander'].set_sensitive(value)
-        self.widgets['filelisttreeview'].set_sensitive(value)
-        self.widgets['buttonspool'].set_sensitive(value)
+        self.widgets['snpdetails'].set_sensitive(value)
 
     def _make_topwin_busy(self, busy, message = None):
         if busy:
@@ -205,8 +204,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             gobject.idle_add(self.__set_destination_done)
 
     def __set_destination_done(self):
-        self.target = self.__fam_target_hdl.get_eff_path()
-        if self.__fam_target_hdl.dest_eff_path_exists() is False: # no errors so far
+        self.target = self.__fam_target_hdl.query_mount_uri()
+        if self.__fam_target_hdl.dest_path_exists() is False: # no errors so far
             self.widgets['customradiob'].set_active(True)   # fall back to custom destination in case of error            
             gobject.idle_add(self._show_destination_error, _("Specified path does not exist"))
             self.__fam_target_hdl.set_terminate_callback(self._set_dest_failed_cb)
@@ -216,6 +215,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                 self.widgets['defaultfolderlabel'].set_text(self.__fam_target_hdl.query_dest_display_name())
 
             self.snpman = SnapshotManager(self.target)
+            self.restoreman = RestoreManager(self.__fam_target_hdl)
             self.widgets["restoreExpander"].set_expanded(False)
             self.__fill_calendar()
             today = time.localtime()    # select the current day
@@ -323,8 +323,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
             self.snplisttreestore.clear()
             self.flisttreestore.clear()
-            self.widgets['buttonspool'].set_sensitive(False)
             self.widgets['snpdetails'].set_sensitive(True)
+            self.widgets['buttonspool'].set_sensitive(False)
 
     def __clear_calendar(self):
         self.widgets['calendar'].clear_marks()
@@ -591,8 +591,8 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
         self.snplisttreestore.clear()
         self.flisttreestore.clear()
 
-        gobject.idle_add(self.widgets['buttonspool'].set_sensitive, False)
         gobject.idle_add(self.widgets['snpdetails'].set_sensitive, True)
+        gobject.idle_add(self.widgets['buttonspool'].set_sensitive, False)
 
         if snplist == []:
             self.snplisttreestore.append(None, [_("No backups found for this day."), None])
@@ -623,68 +623,72 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
 
     def on_restore_clicked(self, *args): #IGNORE:W0613
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
-        src = self.path_to_dir(tstore.get_path(iter))
-        dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = "Do you really want to restore backuped copy of '%s' ?" % src)
+        if iter is not None:
+            src = self.path_to_dir(tstore.get_path(iter))
+            dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = "Do you really want to restore backuped copy of '%s' ?" % src)
 
-        response = dialog.run()
-        dialog.destroy()
-        if response == gtk.RESPONSE_YES:
-            self.__restore_bg(mode = "restore",
-                        restore_callable = self.restoreman.restore,
-                        source = src, dirname = None)
+            response = dialog.run()
+            dialog.destroy()
+            if response == gtk.RESPONSE_YES:
+                self.__restore_bg(mode = "restore",
+                            restore_callable = self.restoreman.restore,
+                            source = src, dirname = None)
 
     def on_restoreas_clicked(self, *args): #IGNORE:W0613
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
-        src = self.path_to_dir(tstore.get_path(iter))
+        if iter is not None:
+            src = self.path_to_dir(tstore.get_path(iter))
 
-        dialog = gtk.FileChooserDialog(title = _("Select restore location") , action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-        dialog.set_filename(src)
-        result = dialog.run()
-        dirname = dialog.get_filename()
-        dialog.destroy()
-
-        if result == gtk.RESPONSE_OK:
-            dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = "Do you really want to restore backuped copy of '%s' to '%s' ?" % (src, dirname))
-            response = dialog.run()
+            dialog = gtk.FileChooserDialog(title = _("Select restore location") , action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+            dialog.set_filename(src)
+            result = dialog.run()
+            dirname = dialog.get_filename()
             dialog.destroy()
-            if response == gtk.RESPONSE_YES:
-                self.__restore_bg(mode = "restore_as",
-                            restore_callable = self.restoreman.restoreAs,
-                            source = src, dirname = dirname)
+
+            if result == gtk.RESPONSE_OK:
+                dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = "Do you really want to restore backuped copy of '%s' to '%s' ?" % (src, dirname))
+                response = dialog.run()
+                dialog.destroy()
+                if response == gtk.RESPONSE_YES:
+                    self.__restore_bg(mode = "restore_as",
+                                restore_callable = self.restoreman.restoreAs,
+                                source = src, dirname = dirname)
 
     def on_revert_clicked(self, *args): #IGNORE:W0613
         tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
-        src = self.path_to_dir(tstore.get_path(iter))
-        dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = _("Do you really want to revert '%s'?") % src)
+        if iter is not None:
+            src = self.path_to_dir(tstore.get_path(iter))
+            dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = _("Do you really want to revert '%s'?") % src)
 
-        response = dialog.run()
-        dialog.destroy()
-        if response == gtk.RESPONSE_YES:
-            self.__restore_bg(mode = "revert",
-                        restore_callable = self.restoreman.revert,
-                        source = src, dirname = None)
-
-    def on_revertas_clicked(self, *args): #IGNORE:W0613
-        tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
-        src = self.path_to_dir(tstore.get_path(iter))
-
-        dialog = gtk.FileChooserDialog(title = _("Select revert location") , action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-        dialog.set_filename(src)
-        result = dialog.run()
-        dirname = dialog.get_filename()
-        dialog.destroy()
-
-        if result == gtk.RESPONSE_OK:
-            dialog = gtk.MessageDialog(parent = None, flags = 0,
-                        type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO,
-                        message_format = _("Do you really want to revert '%(source)s' to '%(dir)s'?")\
-                        % {'source' : src, 'dir' : dirname})
             response = dialog.run()
             dialog.destroy()
             if response == gtk.RESPONSE_YES:
-                self.__restore_bg(mode = "revert_as",
-                            restore_callable = self.restoreman.revertAs,
-                            source = src, dirname = dirname)
+                self.__restore_bg(mode = "revert",
+                            restore_callable = self.restoreman.revert,
+                            source = src, dirname = None)
+
+    def on_revertas_clicked(self, *args): #IGNORE:W0613
+        tstore, iter = self.widgets['filelisttreeview'].get_selection().get_selected()
+        if iter is not None:
+            src = self.path_to_dir(tstore.get_path(iter))
+
+            dialog = gtk.FileChooserDialog(title = _("Select revert location") , action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+            dialog.set_filename(src)
+            result = dialog.run()
+            dirname = dialog.get_filename()
+            dialog.destroy()
+
+            if result == gtk.RESPONSE_OK:
+                dialog = gtk.MessageDialog(parent = None, flags = 0,
+                            type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO,
+                            message_format = _("Do you really want to revert '%(source)s' to '%(dir)s'?")\
+                            % {'source' : src, 'dir' : dirname})
+                response = dialog.run()
+                dialog.destroy()
+                if response == gtk.RESPONSE_YES:
+                    self.__restore_bg(mode = "revert_as",
+                                restore_callable = self.restoreman.revertAs,
+                                source = src, dirname = dirname)
 
     def __restore_bg(self, mode, restore_callable, source, dirname = None):
         """Helper method that creates a thread for the restoration process
