@@ -168,7 +168,7 @@ class FuseOperations(interfaces.IOperations):
         try:
             file_desc.close()
         except IOError, error:
-            raise FileAccessException("Error in 'close_stream': %s" % error)
+            raise FileAlreadyClosedError(_("Error while closing stream: %s") % error)
 
 def get_scheme_from_service(service):
     if not isinstance(service, types.IntType):
