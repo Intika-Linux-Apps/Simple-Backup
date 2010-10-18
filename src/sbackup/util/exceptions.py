@@ -164,7 +164,7 @@ class RemoteUmountFailedError(FileAccessException):
 
     """
 
-class FileAlreadyClosedException(SBException) :
+class FileAlreadyClosedError(SBException) :
     """This Exception is thrown when a file or stream cannot be closed because it is already closed.
 
     """

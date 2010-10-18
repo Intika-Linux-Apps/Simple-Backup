@@ -1050,8 +1050,8 @@ class SnapshotFile(object):
             header += c
         try:
             _FOP.close_stream(fd)
-        except FileAlreadyClosedException, error:
-            log.LogFactory.getLogger().error(_("message: %s") % error)
+        except FileAlreadyClosedError, error:
+            log.LogFactory.getLogger().warn(_("File was already closed (ignored): %s") % error)
 
         return header
 
