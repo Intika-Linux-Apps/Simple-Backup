@@ -825,7 +825,7 @@ class GioOperations(interfaces.IOperations):
             if error.code == gio.ERROR_CLOSED:
                 raise FileAlreadyClosedException(_("Error while closing stream: %s") % error)
             else:
-                raise FileAccessException(get_gio_errmsg(error, "Error in 'close_stream'"))
+                raise FileAccessException(get_gio_errmsg(error, _("Error while closing stream")))
 
 def get_gio_errmsg(error, title):
     _error_descr = errorcodes[error.code]
