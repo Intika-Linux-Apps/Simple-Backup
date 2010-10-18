@@ -2,8 +2,9 @@ Install
 =======
 
 1. Remove previously installed versions (using make or .deb packages)
-2. make && sudo make install
-3. sudo sbackupconfig
+2. install dependencies
+3. make && sudo make install
+4. sudo sbackupconfig
 
 See INSTALL file for more information.
 

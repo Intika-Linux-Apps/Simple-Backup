@@ -415,7 +415,7 @@ class Snapshot(object):
     def isFollowLinks(self):
         return self.__followlinks
 
-    def commit(self, publish_progress = False, supports_publish = True):
+    def commit(self, targethandler, publish_progress = False, supports_publish = True):
         """Commit snapshot data (i.e. write to disk)
         
         :param publish_progress: Flag whether to call checkpoint script
@@ -430,7 +430,7 @@ class Snapshot(object):
         self.commitexcludefile()
         self.commitpackagefile()
         self.commitflistFiles()
-        self.__commit_archive(publish_progress, supports_publish)
+        self.__commit_archive(targethandler, publish_progress, supports_publish)
         self.commitverfile()
 
     def addToIncludeFlist (self, item) :
@@ -645,6 +645,6 @@ class Snapshot(object):
         fe.close()
         return _res
 
-    def __commit_archive(self, publish_progress, supports_publish):
+    def __commit_archive(self, targethandler, publish_progress, supports_publish):
         " Make the backup on the disk "
-        tar.mk_archive(self, publish_progress, supports_publish)
+        tar.mk_archive(self, targethandler, publish_progress, supports_publish)

@@ -37,8 +37,8 @@ class ITargetHandler(object):
     def terminate(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "terminate"))
 
-    def dest_eff_path_exists(self):
-        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "dest_eff_path_exists"))
+    def dest_path_exists(self):
+        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "dest_path_exists"))
 
     def query_dest_display_name(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "query_dest_display_name"))
@@ -70,11 +70,20 @@ class ITargetHandler(object):
     def get_eff_path(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "get_eff_path"))
 
+    def get_eff_fullpath(self, *args):
+        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "get_eff_fullpath"))
+
+    def get_snapshot_path(self, snpname):
+        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "get_snapshot_path"))
+
     def is_local(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "is_local"))
 
     def get_supports_publish(self):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "get_supports_publish"))
+
+    def get_use_iopipe(self):
+        raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "get_use_iopipe"))
 
     def set_use_mainloop(self, use):
         raise NotImplementedError(_get_notimplemented_msg("ITargetHandler", "set_use_mainloop"))

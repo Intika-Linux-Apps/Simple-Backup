@@ -34,7 +34,7 @@ gconftool=$(shell which gconftool-2)
 export GCONF_CONFIG_SOURCE=$(shell if test -x "$(gconftool)"; then $(gconftool) --get-default-source; fi)
 
 # available languages UI
-PO=ar bg ca cs de en_AU en_CA en_GB es fi fr gl he hu id it lv ms nb nl oc pl pt pt_BR ru sv tr uk zh_CN zh_TW
+PO=ar bg ca cs de en_AU en_CA en_GB es fi fr gl he hu id it lv ms nb nl oc pl pt pt_BR ru sv tr uk zh_CN zh_TW da el fa is ja kk ko kw ro sr sw
 
 # available languages Help/Manual
 HELPLANG=C

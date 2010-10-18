@@ -136,14 +136,14 @@ class UpgradeManager(object):
 #                else :
 #                    raise SBException("Downgrade to version '%s' isn't supported " % str(version))
 
-    def need_upgrade(self, target_eff_path):
+    def need_upgrade(self, target_path):
         """Checks if there is something to upgrade. If there are snapshots
         that should be upgraded True is returned otherwise False.
         
         """
         res = False
         self.logger.info("Checking for snapshots stored in old formats")
-        snpman = SnapshotManager.SnapshotManager(target_eff_path)
+        snpman = SnapshotManager.SnapshotManager(target_path)
         snps = snpman.get_snapshots_allformats()
         for csnp in snps:
             if csnp.getVersion() != Infos.SNPCURVERSION:
