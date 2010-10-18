@@ -45,7 +45,6 @@ from sbackup.fs_backend import fam
 
 from sbackup.util.log import LogFactory
 from sbackup.util.structs import SBdict
-from sbackup.util.exceptions import SBException, FileAlreadyClosedException
 from sbackup.util import exceptions
 from sbackup.util import constants
 from sbackup.util import system

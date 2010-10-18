@@ -16,7 +16,6 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-from sbackup.util.exceptions import FileAccessException
 """
 :mod:`sbackup.util.fuse_utils` -- file access management using FUSE
 ========================================================================
@@ -34,7 +33,7 @@ from sbackup.util import local_file_utils
 from sbackup.util import interfaces
 from sbackup.util import structs
 from sbackup.util import pathparse
-
+from sbackup.util import exceptions
 
 #TODO: move available services into FUSE plugin manager and retrieve them dynamically
 REMOTE_SERVICE_SFTP = 101
