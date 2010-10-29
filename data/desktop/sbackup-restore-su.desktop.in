@@ -2,19 +2,21 @@
 Type=Application
 #
 Name=Simple Backup-Restoration
+Name[fr]=Simple Backup-Restauration
 Name[de]=Simple Backup-Wiederherstellung
 Name[pt_BR]=Restauração de Backup
 Name[es]=Restauración de copia de seguridad
 Name[ja]=バックアップの復元
 #
 Comment=Simple Backup restoration tool for admins. Requires superuser rights.
+Name[fr]=Outil de Restauration de Simple Backup pour les administrateurs. Requiers les droits de superutilisateur. 
 Comment[de]=Simple Backup Wiederherstellung für Admins. Erfordert Superuser-Rechte.
 Comment[pt_BR]=Restaure seu backup feito anteriormente. Requires superuser rights.
 Comment[es]=Restauración de Simple Backup para administradores. Requiere privilegios de superusuario.
 Comment[ja]=バックアップの復元ツールを起動します
 #
 GenericName=Restoration tool
-GenericName[fr_FR]=Utilitaire de restauration
+GenericName[fr]=Utilitaire de restauration
 GenericName[de]=Backup Wiederherstellung
 GenericName[es]=Herramienta de restauración
 #

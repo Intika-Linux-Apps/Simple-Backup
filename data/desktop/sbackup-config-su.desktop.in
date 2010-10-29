@@ -2,19 +2,20 @@
 Type=Application
 #
 Name=Simple Backup-Configuration
-Name[fr]=Configurateur de la Simple Backup
 Name[de]=Simple Backup-Einstellungen
 Name[pt_BR]=Configuração do Backup
 Name[es]=Configuración de Simple Backup
 Name[ja]=バックアップの設定
 #
 Comment=Simple Backup configuration tool for admins. Requires superuser rights.
+Name[fr]=Outil de configuration de Simple Backup pour les administrateurs. Requiers les droits de superutilisateur. 
 Comment[de]=Simple Backup Konfiguration für Administratoren. Erfordert Superuser-Rechte.
 Comment[pt_BR]=Configure como seus backups são feitos. Requires superuser rights.
 Comment[es]=Configuración de Simple Backup para administradores. Requiere privilegios de superusuario.
 Comment[ja]=バックアップの設定・実行ツールを起動します
 #
 GenericName=Backup configuration tool
+GenericName[fr]=Utilitaire de sauvegarde
 GenericName[de]=Backup Einstellungen
 GenericName[es]=Herramienta de copia de seguridad
 #
