@@ -204,10 +204,14 @@ def drop_privileges():
 def set_grp(groupname):
     # [Bug 112540] : Let the admin group have read access to the backup dirs
     if os.geteuid() == 0:
-        try :
-            os.setgid(grp.getgrnam(groupname).gr_gid)
-        except (KeyError, OSError), error:
-            print "Failed to set GID to `admin`: %s" % error
+        try:
+            _gid = grp.getgrnam(groupname).gr_gid
+            os.setgid(_gid)
+        except KeyError:
+            # LP #696183:
+            print "Group not changed to `%s`: unknown group" % groupname
+        except OSError, error:
+            print "Failed to set GID to `%s`: %s" % (groupname, error)
 
 
 def nice():
