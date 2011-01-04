@@ -28,6 +28,7 @@
 
 
 import urlparse
+import urllib
 import datetime
 import types
 
@@ -194,10 +195,10 @@ class UriParser(object):
             self.__port = splituri.port
 
         if splituri.username is not None:
-            self.__username = splituri.username
+            self.__username = urllib.unquote(splituri.username)
 
         if splituri.password is not None:
-            self.__password = splituri.password
+            self.__password = urllib.unquote(splituri.password)
 
         if splituri.hostname is None:
             self.__hostname = ""
@@ -238,7 +239,7 @@ class UriParser(object):
 
         _user = ""
         if self.__username is not None:
-            _user = "%s@" % self.__username
+            _user = "%s@" % urllib.quote(self.__username, "")
 
         _path = self.__path.strip("/")
         if _path != "":
@@ -282,8 +283,9 @@ def construct_remote_uri_from_tupel(scheme, hostname, port, path, username, pass
     if scheme not in VALID_URI_SCHEMES:
         raise ValueError
 
+    # Within the user and password field, any ":", "@", or "/" must be encoded.
     _host = hostname.rstrip("/")
-    _user = username
+    _user = urllib.quote(username, "")
     _pass = ""
     _port = ""
     _path = path.strip("/")
@@ -292,7 +294,8 @@ def construct_remote_uri_from_tupel(scheme, hostname, port, path, username, pass
         _path = "/%s" % _path
 
     if password != "":
-        _pass = ":%s" % password
+        _pass = urllib.quote(password, "")
+        _pass = ":%s" % _pass
 
     if _user != "" or _pass != "":
         _host = "@%s" % hostname
