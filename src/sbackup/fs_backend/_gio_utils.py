@@ -469,13 +469,22 @@ class GioOperations(interfaces.IOperations):
         """
         _src = gio.File(src)
         _dest = gio.File(dest)
-        _src, _dest = cls._prepare_copy(_src, _dest)
-        _src.copy(_dest, flags = gio.FILE_COPY_OVERWRITE)
-        try:
-            _src.copy_attributes(_dest, flags = gio.FILE_COPY_ALL_METADATA)
-        except gio.Error:
-            raise exceptions.CopyFileAttributesError(\
-                            "Unable to copy file attributes (permissions etc.) of file '%s'." % dest)
+
+        # the source must be a file and exist
+        if not cls.__exists(_src):
+            raise IOError("Given copy source `%s` does not exist" % _src.get_parse_name())
+        if cls.__isfile(_src):
+            _src, _dest = cls._prepare_copy(_src, _dest)
+            _src.copy(_dest, flags = gio.FILE_COPY_OVERWRITE)
+            try:
+                _src.copy_attributes(_dest, flags = gio.FILE_COPY_ALL_METADATA)
+            except gio.Error:
+                raise exceptions.CopyFileAttributesError(\
+                            "Unable to copy file attributes (permissions etc.) of file `%s`."\
+                            % _src.get_parse_name())
+        else:
+            _logger = log.LogFactory.getLogger()
+            _logger.warning("Given copy source `%s` is not a file. Skipped." % _src.get_parse_name())
 
     @classmethod
     def _prepare_copy(cls, src_gfile, dst_gfile):
@@ -486,12 +495,6 @@ class GioOperations(interfaces.IOperations):
         
         @todo: Implement test case for symbolic links!
         """
-        # the source must be a file and exist
-        if not cls.__exists(src_gfile):
-            raise IOError("Given copy source '%s' does not exist" % src_gfile.get_parse_name())
-        if not cls.__isfile(src_gfile):
-            raise IOError("Given copy source '%s' is not a file" % src_gfile.get_parse_name())
-
         _src_uri = src_gfile.get_uri()
         _dst_uri = dst_gfile.get_uri()
 
