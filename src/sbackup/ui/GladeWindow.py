@@ -25,6 +25,7 @@ import os.path
 
 import gtk.glade
 import gobject
+import glib
 
 
 PROGRESSBAR_PULSE_INTERVAL = 150
@@ -190,14 +191,14 @@ class GladeWindow(object):
 
         _hdl = headline_str.strip(" \n\t")
         if _hdl != "":
-            _hdl = "<b>%s</b>\n\n" % _hdl
-        _msg = "%s%s" % (_hdl, message_str)
+            _hdl = "<b>%s</b>\n\n" % (glib.markup_escape_text(_hdl))
+        _msg = "%s%s" % (_hdl, glib.markup_escape_text(message_str))
         dialog.set_markup(_msg)
 
         # an optional secondary message is added
         _sec = secmsg_str.strip(" \n\t")
         if _sec != "":
-            _sec = "<small>%s</small>" % (_sec)
+            _sec = "<small>%s</small>" % (glib.markup_escape_text(_sec))
             dialog.format_secondary_markup(_sec)
 
         # show the message box and destroy it afterwards

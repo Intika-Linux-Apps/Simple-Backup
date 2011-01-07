@@ -24,6 +24,7 @@ import time
 from gettext import gettext as _
 
 import gobject
+import glib
 import dbus.mainloop.glib
 import gtk
 
@@ -848,7 +849,7 @@ class SBackupdIndicatorHandler(object):
 
     def get_targetnotfound_error_msg(self):
         target = self._backup_dbus_obj.get_target()
-        msg = _("<b>Unable to find specified target directory</b>\n\nThe specified target directory '%s' was not found.\n\n") % target
+        msg = _("<b>Unable to find specified target directory</b>\n\nThe specified target directory '%s' was not found.\n\n") % (glib.markup_escape_text(target))
         msg = msg + _("You can try to use the specified target again or cancel the profile execution. The specified destination is automatically used in %s seconds.")
         return msg
 
