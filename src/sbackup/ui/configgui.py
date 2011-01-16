@@ -1764,6 +1764,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtpto_changed(self, *args): #IGNORE:W0613
+        self.__check_for_section("report")
         if self.widgets['smtpto'].get_text() != "":
             self.configman.set("report", "to", self.widgets['smtpto'].get_text())
             self.isConfigChanged()
@@ -1772,6 +1773,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtpserver_changed(self, *args): #IGNORE:W0613
+        self.__check_for_section("report")
         if self.widgets['smtpserver'].get_text() != "":
             self.configman.set("report", "smtpserver", self.widgets['smtpserver'].get_text())
             self.isConfigChanged()
@@ -1780,6 +1782,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtpport_changed(self, *args):
+        self.__check_for_section("report")
         if self.widgets['smtpport'].get_text() != "":
             self.configman.set("report", "smtpport", self.widgets['smtpport'].get_text())
             self.isConfigChanged()
@@ -1788,6 +1791,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtplogin_changed(self, *args):
+        self.__check_for_section("report")
         if self.widgets['smtplogin'].get_text() != "":
             self.configman.set("report", "smtpuser", self.widgets['smtplogin'].get_text())
             self.isConfigChanged()
@@ -1796,6 +1800,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtppassword_changed(self, *args):
+        self.__check_for_section("report")
         if self.widgets['smtppassword'].get_text() != "":
             self.configman.set("report", "smtppassword", self.widgets['smtppassword'].get_text())
             self.isConfigChanged()
@@ -1804,6 +1809,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_crtfilechooser_selection_changed(self, *args):
+        self.__check_for_section("report")
         smtpcert = self.widgets['crtfilechooser'].get_filename()
         if smtpcert != None and os.path.isfile(smtpcert):
             self.configman.set("report", "smtpcert", self.widgets['crtfilechooser'].get_filename())
@@ -1811,6 +1817,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.logger.debug("Certificate : " + str(self.configman.get("report", "smtpcert")))
 
     def on_keyfilechooser_selection_changed(self, *args):
+        self.__check_for_section("report")
         smtpkey = self.widgets['keyfilechooser'].get_filename()
         if smtpkey != None and os.path.isfile(smtpkey):
             self.configman.set("report", "smtpkey", smtpkey)
