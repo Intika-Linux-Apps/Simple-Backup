@@ -36,6 +36,7 @@ import time
 
 import gtk
 import gobject
+import glib
 
 
 from GladeWindow import GladeWindow
@@ -994,9 +995,9 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
         source = self.__source
         msgs = self.__messages[self.__mode]
         if dirname is None:
-            begin_msg = msgs["msg_progress"] % (source)
+            begin_msg = msgs["msg_progress"] % (glib.markup_escape_text(source))
         else:
-            begin_msg = msgs["msg_progress"] % {"source" : source, "dirname" : dirname}
+            begin_msg = msgs["msg_progress"] % {"source" : glib.markup_escape_text(source), "dirname" : glib.markup_escape_text(dirname)}
 
         self.widgets['button_close'].set_sensitive(False)
         self.widgets['txt_title'].set_markup(msgs["msg_headline"])
@@ -1013,9 +1014,9 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
         source = self.__source
         msgs = self.__messages[self.__mode]
         if dirname is None:
-            msg_sucess = msgs["msg_sucess"] % (source)
+            msg_sucess = msgs["msg_sucess"] % (glib.markup_escape_text(source))
         else:
-            msg_sucess = msgs["msg_sucess"] % {"source" : source, "dirname" : dirname}
+            msg_sucess = msgs["msg_sucess"] % {"source" : glib.markup_escape_text(source), "dirname" : glib.markup_escape_text(dirname)}
 
         self._stop_pulse()
         self.widgets['restore_progressbar'].hide()
@@ -1035,9 +1036,9 @@ class RestoreDialog(GladeWindow, ProgressbarMixin):
         source = self.__source
         msgs = self.__messages[self.__mode]
         if dirname is None:
-            msg_failure = msgs["msg_failure"] % (source)
+            msg_failure = msgs["msg_failure"] % (glib.markup_escape_text(source))
         else:
-            msg_failure = msgs["msg_failure"] % {"source" : source, "dirname" : dirname}
+            msg_failure = msgs["msg_failure"] % {"source" : glib.markup_escape_text(source), "dirname" : glib.markup_escape_text(dirname)}
 
         msg_failure = "%s\n%s." % (msg_failure, str(failure))
 

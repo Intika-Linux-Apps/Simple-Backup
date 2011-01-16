@@ -86,13 +86,27 @@ def copyfile(src, dst):
     
     @raise CopyFileAttributesError: if the permissions could not be copied
     """
-    prep_src, prep_dst = _prepare_copy(src, dst)
-    shutil.copyfile(prep_src, prep_dst)
-    try:
-        shutil.copystat(prep_src, prep_dst)
-    except OSError:
-        raise exceptions.CopyFileAttributesError(\
-                        "Unable to copy file attributes (permissions etc.) of file '%s'." % prep_dst)
+    # only absolute paths are supported
+    if not os.path.isabs(src):
+        raise ValueError("Given copy source `%s` must be absolute" % src)
+    if not os.path.isabs(dst):
+        raise ValueError("Given copy destination `%s` must be absolute" % dst)
+
+    # the source must be a file and exist
+    if not os.path.exists(src):
+        raise IOError("Given copy source `%s` does not exist" % src)
+    if os.path.isfile(src):
+        prep_src, prep_dst = _prepare_copy(src, dst)
+        shutil.copyfile(prep_src, prep_dst)
+        try:
+            shutil.copystat(prep_src, prep_dst)
+        except OSError:
+            raise exceptions.CopyFileAttributesError(\
+                            "Unable to copy file attributes (permissions etc.) of file `%s`." % src)
+    else:
+        _logger = log.LogFactory.getLogger()
+        _logger.warning("Given copy source `%s` is not a file. Skipped." % src)
+
 
 def _prepare_copy(src, dst):
     """Helper function that prepares the given paths for copying
@@ -102,26 +116,6 @@ def _prepare_copy(src, dst):
     
     @todo: Implement test case for symbolic links!
     """
-    # firstly the types are checked
-    if not isinstance(src, types.StringTypes):
-        raise TypeError("Given parameter must be a string. "\
-                        "Got %s instead" % (type(src)))
-    if not isinstance(dst, types.StringTypes):
-        raise TypeError("Given parameter must be a string. "\
-                        "Got %s instead" % (type(dst)))
-
-    # only absolute paths are supported
-    if not os.path.isabs(src):
-        raise ValueError("Given copy source '%s' must be absolute" % src)
-    if not os.path.isabs(dst):
-        raise ValueError("Given copy destination '%s' must be absolute" % dst)
-
-    # the source must be a file and exist
-    if not os.path.exists(src):
-        raise IOError("Given copy source '%s' does not exist" % src)
-    if not os.path.isfile(src):
-        raise IOError("Given copy source '%s' is not a file" % src)
-
     _src_file = os.path.basename(src)
     _src_dir = os.path.dirname(src)
 

@@ -26,6 +26,7 @@ import sys
 import types
 
 import gobject
+import glib
 import gtk
 
 from sbackup.util import log
@@ -1763,6 +1764,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtpto_changed(self, *args): #IGNORE:W0613
+        self.__check_for_section("report")
         if self.widgets['smtpto'].get_text() != "":
             self.configman.set("report", "to", self.widgets['smtpto'].get_text())
             self.isConfigChanged()
@@ -1771,6 +1773,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtpserver_changed(self, *args): #IGNORE:W0613
+        self.__check_for_section("report")
         if self.widgets['smtpserver'].get_text() != "":
             self.configman.set("report", "smtpserver", self.widgets['smtpserver'].get_text())
             self.isConfigChanged()
@@ -1779,6 +1782,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtpport_changed(self, *args):
+        self.__check_for_section("report")
         if self.widgets['smtpport'].get_text() != "":
             self.configman.set("report", "smtpport", self.widgets['smtpport'].get_text())
             self.isConfigChanged()
@@ -1787,6 +1791,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtplogin_changed(self, *args):
+        self.__check_for_section("report")
         if self.widgets['smtplogin'].get_text() != "":
             self.configman.set("report", "smtpuser", self.widgets['smtplogin'].get_text())
             self.isConfigChanged()
@@ -1795,6 +1800,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_smtppassword_changed(self, *args):
+        self.__check_for_section("report")
         if self.widgets['smtppassword'].get_text() != "":
             self.configman.set("report", "smtppassword", self.widgets['smtppassword'].get_text())
             self.isConfigChanged()
@@ -1803,6 +1809,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
 
     def on_crtfilechooser_selection_changed(self, *args):
+        self.__check_for_section("report")
         smtpcert = self.widgets['crtfilechooser'].get_filename()
         if smtpcert != None and os.path.isfile(smtpcert):
             self.configman.set("report", "smtpcert", self.widgets['crtfilechooser'].get_filename())
@@ -1810,6 +1817,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.logger.debug("Certificate : " + str(self.configman.get("report", "smtpcert")))
 
     def on_keyfilechooser_selection_changed(self, *args):
+        self.__check_for_section("report")
         smtpkey = self.widgets['keyfilechooser'].get_filename()
         if smtpkey != None and os.path.isfile(smtpkey):
             self.configman.set("report", "smtpkey", smtpkey)
@@ -1919,7 +1927,7 @@ class SBconfigGTK(GladeGnomeApp):
         if prfName == ConfigManagerStaticData.get_default_profilename():
             _forbid_default_profile_removal()
         else :
-            warning = _("<b>Delete configuration profile?</b>\n\nYou are trying to remove a configuration profile. You will not be able to restore it. If you are not sure, use the 'enable|disable' functionality instead.\n\nDo you really want to delete the profile '%(name)s'?") % {'name': prfName}
+            warning = _("<b>Delete configuration profile?</b>\n\nYou are trying to remove a configuration profile. You will not be able to restore it. If you are not sure, use the 'enable|disable' functionality instead.\n\nDo you really want to delete the profile '%(name)s'?") % {'name': glib.markup_escape_text(prfName)}
             dialog = gtk.MessageDialog(type = gtk.MESSAGE_WARNING, flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_YES_NO)
             dialog.set_markup(warning)
             response = dialog.run()
@@ -1992,7 +2000,7 @@ class SBconfigGTK(GladeGnomeApp):
         label = self.widgets["label_dialog_default_settings_content"]
         btn_cancel = self.widgets['btn_cancel_default_settings']
 
-        txt = _("<big><b>Set default values for current profile?</b></big>\nThis will restore the default values for the profile currently edited: '%s'.\n\nThese predefined settings are recommended for most users. Check whether they are appropriate for your use before saving the changed configuration.") % self.configman.getProfileName()
+        txt = _("<big><b>Set default values for current profile?</b></big>\nThis will restore the default values for the profile currently edited: '%s'.\n\nThese predefined settings are recommended for most users. Check whether they are appropriate for your use before saving the changed configuration.") % glib.markup_escape_text(self.configman.getProfileName())
 
         label.set_line_wrap(True)
         label.set_markup(txt)
