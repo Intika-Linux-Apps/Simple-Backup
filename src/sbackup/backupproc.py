@@ -157,6 +157,7 @@ class SBackupProc(object):
         :todo: Transfer this functionality to a specialized class!
         
         """
+        self.logger.debug("Send email report")
         if self.__bprofilehdl.config.has_option("report", "from") :
             _from = self.__bprofilehdl.config.get("report", "from")
         else :
@@ -182,6 +183,8 @@ class SBackupProc(object):
                 _content = _("Unable to find log file.")
 
         server = smtplib.SMTP()
+        if self.logger.isEnabledFor(10):
+            server.set_debuglevel(True)
         msg = MIMEMultipart()
 
         msg['Subject'] = _title
@@ -279,7 +282,6 @@ class SBackupProc(object):
                 self.__bprofilehdl.prepare()
                 self.__bprofilehdl.process()
                 self.__exitcode = self.__bprofilehdl.finish()
-                self.__bprofilehdl = None
 
             except exceptions.BackupCanceledError:
                 self.__on_backup_canceled()
@@ -288,6 +290,7 @@ class SBackupProc(object):
                 self.__on_backup_error(error)
 
             self.__on_proc_finish()
+            self.__bprofilehdl = None
 
         self.__terminate_notifiers()
         return self.__exitcode
