@@ -1176,7 +1176,7 @@ class ConfigManager(ConfigParser.ConfigParser):
             else :
                 server.connect(self.get("report", "smtpserver"))
 
-            if self.has_option("report", "smtptls") and self.get("report", "smtptls") == 1 :
+            if self.has_option("report", "smtptls") and self.get("report", "smtptls") == "1":
                 if self.has_option("report", "smtpcert") and self.has_option("report", "smtpkey") :
                     server.starttls(self.get("report", "smtpkey"), self.get("report", "smtpcert"))
                 else :

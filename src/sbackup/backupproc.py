@@ -206,7 +206,7 @@ class SBackupProc(object):
             else :
                 server.connect(self.__bprofilehdl.config.get("report", "smtpserver"))
         if self.__bprofilehdl.config.has_option("report", "smtptls") and\
-                    self.__bprofilehdl.config.get("report", "smtptls") == 1 :
+                    self.__bprofilehdl.config.get("report", "smtptls") == "1":
             if self.__bprofilehdl.config.has_option("report", "smtpcert") and\
                     self.__bprofilehdl.config.has_option("report", "smtpkey") :
                 server.starttls(self.__bprofilehdl.config.get("report", "smtpkey"),
