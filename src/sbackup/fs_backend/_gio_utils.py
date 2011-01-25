@@ -226,7 +226,9 @@ class GioMountHandler(object):
                                                                     "*"*len(self.__uri.password)))
             mount_op.set_username(self.__uri.username)
 #            mount_op.set_domain() # required for samba
-            mount_op.set_password(self.__uri.password)
+            # don't set password if none is given (LP #701403)
+            if self.__uri.password is not None:
+                mount_op.set_password(self.__uri.password)
             mount_op.reply(gio.MOUNT_OPERATION_HANDLED)
         else:
             raise exceptions.RemoteMountFailedError("Max. number of password inputs reached. Aborted.")
