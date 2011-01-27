@@ -541,7 +541,14 @@ class ConfigManager(ConfigParser.ConfigParser):
                     if _item[0] == "remote":
                         pass
                     else:
-                        _res.append((_item[0].replace("\\x3d", "="), int(_item[1])))
+                        try:
+                            _res.append((_item[0].replace("\\x3d", "="), int(_item[1])))
+                        except ValueError, error:
+                            _msg = _("Error while processing configuration:\n\n"\
+                                     "%(error)s in line `%(line)s`.\n\n"\
+                                     "Please check your configuration file.") % {"error" : str(error),
+                                                                                 "line" : _item[0]}
+                            raise exceptions.NonValidOptionException(_msg)
         return _res
 
     def get_followlinks(self):
