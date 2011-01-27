@@ -346,8 +346,7 @@ def set_display_from_session():
 def _set_envvar_from_session(key):
     _value = os.environ.get(key)
     if _value is None:
-        _session = get_session_name()
-        _env = get_session_environment(_session)
+        _env = get_session_environment()
         if _env is not None:
             _nvalue = _env.get(key)
             print "Updating %s to: %s" % (key, _nvalue)
@@ -355,40 +354,19 @@ def _set_envvar_from_session(key):
                 os.environ[key] = _nvalue
 
 
-def get_session_name():
-    _session = ""
-    if grep_pid("gnome-session") is not None:
-        _session = "gnome"
-    elif grep_pid("ksmserver") is not None:
-        _session = "kde"
-#TODO: Cover other DEs (LXDE, KDE...) here and above!
-    return _session
-
 #TODO: implement Singleton class for access to environment
-def get_session_environment(session):
+def get_session_environment():
     mod_env = None
-    if session == "gnome":
-#        print "Gnome session running"
-        mod_env = _get_gnome_session_environment()
-
-    elif session == "kde":
-#        print "KDE session running"
-        mod_env = _get_kde_session_environment()
-
+    if grep_pid("x-session-manager") is not None:
+        mod_env = _get_session_env(session = "x-session-manager")
+    elif grep_pid("gnome-session") is not None:
+        mod_env = _get_session_env(session = "gnome-session")
+    elif grep_pid("ksmserver") is not None:
+        mod_env = _get_session_env(session = "ksmserver")
     else:
         mod_env = None
-        print "Neither Gnome nor KDE session is running"
+        print "No desktop session found"
     return mod_env
-
-
-def _get_gnome_session_environment():
-    _mod_env = _get_session_env(session = "gnome-session")
-    return _mod_env
-
-
-def _get_kde_session_environment():
-    _mod_env = _get_session_env(session = "ksmserver")
-    return _mod_env
 
 
 def _get_session_env(session):
@@ -449,7 +427,7 @@ def grep_pid(processname):
     try:
         _pid = int(output)
     except ValueError:
-        print "Unable to get PID of process '%s'." % processname
+#        print "Unable to get PID of process '%s'." % processname
         _pid = None
     return _pid
 

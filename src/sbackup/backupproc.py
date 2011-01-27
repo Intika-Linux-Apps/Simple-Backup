@@ -433,18 +433,10 @@ class SBackupApp(object):
                  user who owns the session.
         :note: import D-Bus related modules only if using D-Bus is enabled                 
         """
-        from sbackup.util import dbus_support
-
-        print "Now launching indicator application (status icon)."
+        print "Attempt to launch indicator application (status icon)."
         _path_to_app = get_resource_file(constants.INDICATORAPP_FILE)
 
-        session = dbus_support.get_session_name()   # a full DE is supposed         
-        if session == "":   # in empty environments, it might impossible to connect to D-Bus session server
-            print "No DE found using D-Bus. Looking for process id."
-            session = system.get_session_name()
-
-        session_env = system.get_session_environment(session)
-
+        session_env = system.get_session_environment()
         if session_env is None:
             print "No desktop session found. Indicator application is not started."
         else:
