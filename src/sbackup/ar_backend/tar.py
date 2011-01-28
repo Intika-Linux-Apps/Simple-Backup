@@ -95,7 +95,7 @@ def extract(sourcear, eff_local_sourcear, restore_file, dest , bckupsuffix = Non
     # tar option  -p, --same-permissions, --preserve-permissions:
     # ignore umask when extracting files (the default for root)
 
-    options = ["-xp", "--ignore-failed-read", "--occurrence=1", "--backup=existing", "--totals"]
+    options = ["-xp", "--ignore-failed-read", "--backup=existing", "--totals"]
 
     archType = getArchiveType(sourcear)
     _logger.debug("Archive type: %s" % archType)
