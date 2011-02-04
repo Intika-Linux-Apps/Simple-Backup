@@ -811,6 +811,8 @@ class ConfigManager(ConfigParser.ConfigParser):
                 for key in self.options(section):
                     if (not self.valid_options.has_key(section)):
                         raise exceptions.NotValidSectionException (_("section [%(section)s] in '%(configfile)s' should not exist, aborting") % {'section': section, 'configfile' :self.conffile})
+                    if key == 'stop_if_no_target':
+                        self.logger.warning("Obsolete option `%s` in configuration found. Ignored." % key)
                     if (self.valid_options[section].has_key(key) or self.valid_options[section].has_key('*')):
                         continue
                     raise exceptions.NonValidOptionException ("key '%s' in section '%s' in file '%s' is not known, a typo possibly?" % (key, section, self.conffile))
@@ -1392,6 +1394,7 @@ class ConfigManagerStaticData(object):
                            'purge'         : str,
                            'run4others'     : int,
                            'followlinks'     : int,
+                           'stop_if_no_target' : int,
                         'packagecmd'    : str},
      'log'             : {'level' : int , 'file' : str },
      'report'         : {'from' :str, 'to' : str, 'smtpserver' : str,
