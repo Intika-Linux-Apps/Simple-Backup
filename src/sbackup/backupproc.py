@@ -157,6 +157,7 @@ class SBackupProc(object):
         :todo: Transfer this functionality to a specialized class!
         
         """
+        self.logger.debug("Send email report")
         if self.__bprofilehdl.config.has_option("report", "from") :
             _from = self.__bprofilehdl.config.get("report", "from")
         else :
@@ -182,6 +183,8 @@ class SBackupProc(object):
                 _content = _("Unable to find log file.")
 
         server = smtplib.SMTP()
+        if self.logger.isEnabledFor(10):
+            server.set_debuglevel(True)
         msg = MIMEMultipart()
 
         msg['Subject'] = _title
@@ -203,7 +206,7 @@ class SBackupProc(object):
             else :
                 server.connect(self.__bprofilehdl.config.get("report", "smtpserver"))
         if self.__bprofilehdl.config.has_option("report", "smtptls") and\
-                    self.__bprofilehdl.config.get("report", "smtptls") == 1 :
+                    self.__bprofilehdl.config.get("report", "smtptls") == "1":
             if self.__bprofilehdl.config.has_option("report", "smtpcert") and\
                     self.__bprofilehdl.config.has_option("report", "smtpkey") :
                 server.starttls(self.__bprofilehdl.config.get("report", "smtpkey"),
@@ -279,7 +282,6 @@ class SBackupProc(object):
                 self.__bprofilehdl.prepare()
                 self.__bprofilehdl.process()
                 self.__exitcode = self.__bprofilehdl.finish()
-                self.__bprofilehdl = None
 
             except exceptions.BackupCanceledError:
                 self.__on_backup_canceled()
@@ -288,6 +290,7 @@ class SBackupProc(object):
                 self.__on_backup_error(error)
 
             self.__on_proc_finish()
+            self.__bprofilehdl = None
 
         self.__terminate_notifiers()
         return self.__exitcode
@@ -430,18 +433,10 @@ class SBackupApp(object):
                  user who owns the session.
         :note: import D-Bus related modules only if using D-Bus is enabled                 
         """
-        from sbackup.util import dbus_support
-
-        print "Now launching indicator application (status icon)."
+        print "Attempt to launch indicator application (status icon)."
         _path_to_app = get_resource_file(constants.INDICATORAPP_FILE)
 
-        session = dbus_support.get_session_name()   # a full DE is supposed         
-        if session == "":   # in empty environments, it might impossible to connect to D-Bus session server
-            print "No DE found using D-Bus. Looking for process id."
-            session = system.get_session_name()
-
-        session_env = system.get_session_environment(session)
-
+        session_env = system.get_session_environment()
         if session_env is None:
             print "No desktop session found. Indicator application is not started."
         else:

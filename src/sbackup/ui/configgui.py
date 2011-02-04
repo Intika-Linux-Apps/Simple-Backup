@@ -578,40 +578,59 @@ class SBconfigGTK(GladeGnomeApp):
         if not isinstance(probe_fs, types.BooleanType):
             raise TypeError("Given parameter must be of boolean type. "\
                             "Got %s instead." % (type(probe_fs)))
-        # General
-        self.__fill_max_inc_widgets_from_config()
-        self.__fill_compression_widgets_from_config()
-        self.__fill_splitsize_widgets_from_config()
+        try:
+            # General
+            self.__fill_max_inc_widgets_from_config()
+            self.__fill_compression_widgets_from_config()
+            self.__fill_splitsize_widgets_from_config()
 
-        # dirconfig and excludes
-        self.__fill_dir_widgets_from_config()
-        self.__fill_regex_widgets_from_config()
+            # dirconfig and excludes
+            self.__fill_dir_widgets_from_config()
+            self.__fill_regex_widgets_from_config()
 
-        # other exclude reasons
-        self.__fill_max_filesize_widgets_from_config()
-        self.__fill_followlinks_widgets_from_config()
+            # other exclude reasons
+            self.__fill_max_filesize_widgets_from_config()
+            self.__fill_followlinks_widgets_from_config()
 
-        # target (= destination)
-        self.__fill_destination_widgets()
+            # target (= destination)
+            self.__fill_destination_widgets()
 
-        # schedule - with probing the filesystem or without
-        if probe_fs:
-            sched_func = self.configman.get_schedule_and_probe
+            # schedule - with probing the filesystem or without
+            if probe_fs:
+                sched_func = self.configman.get_schedule_and_probe
+            else:
+                sched_func = self.configman.get_schedule
+            self.__fill_schedule_widgets(from_func = sched_func)
+
+            # Purging
+            self.__fill_purge_widgets_from_config()
+
+            # Log and report
+            self.__fill_log_widgets_from_config()
+            self.__fill_report_widgets_from_config()
+
+            self.__fill_statusbar_from_config()
+        except exceptions.NonValidOptionException, error:
+            gobject.idle_add(self.__config_invalid_cb, error, probe_fs)
         else:
-            sched_func = self.configman.get_schedule
-        self.__fill_schedule_widgets(from_func = sched_func)
+#            self.__set_default_focus()
+            self.isConfigChanged()
 
-        # Purging
-        self.__fill_purge_widgets_from_config()
-
-        # Log and report
-        self.__fill_log_widgets_from_config()
-        self.__fill_report_widgets_from_config()
-
-        self.__fill_statusbar_from_config()
-
-#        self.__set_default_focus()
-        self.isConfigChanged()
+    def __config_invalid_cb(self, error, probe_fs):
+        dialog = gtk.MessageDialog(type = gtk.MESSAGE_ERROR,
+                                   flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                                   buttons = gtk.BUTTONS_CLOSE,
+                                   message_format = _("%s\n\n"\
+                                                      "A backup profile using default values was created. "\
+                                                      "Save the new configuration in order to use it or "\
+                                                      "check your existing configuration file manually.\n\n"\
+                                                      "Important note: Saving will overwrite your "\
+                                                      "existing invalid configuration.") % str(error))
+        dialog.run()
+        dialog.destroy()
+        self.configman = ConfigManager.ConfigManager()
+        self.orig_configman = None
+        gobject.idle_add(self._fill_widgets_from_config, probe_fs)
 
 #    def __set_default_focus(self):
 #        self.widgets['label_general_page'].grab_focus()

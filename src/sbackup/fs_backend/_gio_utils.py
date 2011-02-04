@@ -226,10 +226,13 @@ class GioMountHandler(object):
                                                                     "*"*len(self.__uri.password)))
             mount_op.set_username(self.__uri.username)
 #            mount_op.set_domain() # required for samba
-            mount_op.set_password(self.__uri.password)
+            # don't set password if none is given (LP #701403)
+            if self.__uri.password is not None:
+                mount_op.set_password(self.__uri.password)
             mount_op.reply(gio.MOUNT_OPERATION_HANDLED)
         else:
-            raise exceptions.RemoteMountFailedError("Max. number of password inputs reached. Aborted.")
+            self._error = exceptions.RemoteMountFailedError("Max. number of password inputs reached. Aborted.")
+            mount_op.reply(gio.MOUNT_OPERATION_ABORTED)
 
     def _set_mount_flag(self, obj, required):
         if self.__uri is None:
@@ -346,6 +349,11 @@ class GioMountHandler(object):
             if error.code == gio.ERROR_ALREADY_MOUNTED:
                 self.__logger.info(_("Path is already mounted."))
                 error = None
+            elif error.code == gio.ERROR_FAILED_HANDLED:
+                self.__logger.error(get_gio_errmsg(error, "Mount failed"))
+                if self._error is not None:
+                    self.__logger.error(str(self._error))
+                    error = self._error
             else:
                 self.__logger.error(get_gio_errmsg(error, "Error in `_do_mount`"))
         except glib.GError, error:

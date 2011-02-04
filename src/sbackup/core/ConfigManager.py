@@ -541,7 +541,14 @@ class ConfigManager(ConfigParser.ConfigParser):
                     if _item[0] == "remote":
                         pass
                     else:
-                        _res.append((_item[0].replace("\\x3d", "="), int(_item[1])))
+                        try:
+                            _res.append((_item[0].replace("\\x3d", "="), int(_item[1])))
+                        except ValueError, error:
+                            _msg = _("Error while processing configuration:\n\n"\
+                                     "%(error)s in line `%(line)s`.\n\n"\
+                                     "Please check your configuration file.") % {"error" : str(error),
+                                                                                 "line" : _item[0]}
+                            raise exceptions.NonValidOptionException(_msg)
         return _res
 
     def get_followlinks(self):
@@ -804,6 +811,8 @@ class ConfigManager(ConfigParser.ConfigParser):
                 for key in self.options(section):
                     if (not self.valid_options.has_key(section)):
                         raise exceptions.NotValidSectionException (_("section [%(section)s] in '%(configfile)s' should not exist, aborting") % {'section': section, 'configfile' :self.conffile})
+                    if key == 'stop_if_no_target':
+                        self.logger.warning("Obsolete option `%s` in configuration found. Ignored." % key)
                     if (self.valid_options[section].has_key(key) or self.valid_options[section].has_key('*')):
                         continue
                     raise exceptions.NonValidOptionException ("key '%s' in section '%s' in file '%s' is not known, a typo possibly?" % (key, section, self.conffile))
@@ -1176,7 +1185,7 @@ class ConfigManager(ConfigParser.ConfigParser):
             else :
                 server.connect(self.get("report", "smtpserver"))
 
-            if self.has_option("report", "smtptls") and self.get("report", "smtptls") == 1 :
+            if self.has_option("report", "smtptls") and self.get("report", "smtptls") == "1":
                 if self.has_option("report", "smtpcert") and self.has_option("report", "smtpkey") :
                     server.starttls(self.get("report", "smtpkey"), self.get("report", "smtpcert"))
                 else :
@@ -1385,6 +1394,7 @@ class ConfigManagerStaticData(object):
                            'purge'         : str,
                            'run4others'     : int,
                            'followlinks'     : int,
+                           'stop_if_no_target' : int,
                         'packagecmd'    : str},
      'log'             : {'level' : int , 'file' : str },
      'report'         : {'from' :str, 'to' : str, 'smtpserver' : str,
