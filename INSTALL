@@ -60,8 +60,9 @@ By default, Simple Backup will be installed under "/usr/local" folder.
 
   - On Ubuntu:
      sudo apt-get install gettext python-setuptools
-     sudo apt-get install python-notify fuse-utils python-gnome python-glade\
-                          python-gtk, gvfs, gvfs-fuse, gvfs-backends
+     sudo apt-get install python-notify fuse-utils python-gnome2 python-glade2
+     sudo apt-get install python-gtk2 gvfs gvfs-fuse gvfs-backends
+     sudo apt-get install gconf2 desktop-file-utils
 
 * Walk into the same directory as this README file
 * Type:
