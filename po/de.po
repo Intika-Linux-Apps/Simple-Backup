@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: sbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-04 21:54+0100\n"
-"PO-Revision-Date: 2010-09-29 23:08+0000\n"
+"PO-Revision-Date: 2011-02-04 23:36+0000\n"
 "Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-10-01 09:04+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-02-05 05:37+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: src/sbackup/backupproc.py:169 src/sbackup/pkginfo.py:68
 #, python-format
@@ -44,7 +44,7 @@ msgstr ""
 "Kritischer Fehler: Es wurde keine Konfiguration für das Standardprofil "
 "gefunden!\n"
 "\n"
-"Es wird mit den verbleibenden Profilen fort gefahren."
+"Es wird mit den verbleibenden Profilen fortgefahren."
 
 #: src/sbackup/backupproc.py:300
 msgid "Backup was canceled by user."
@@ -60,7 +60,7 @@ msgstr "Während der Sicherung trat folgender Fehler auf:"
 
 #: src/sbackup/backupproc.py:328
 msgid "Error when sending email:"
-msgstr "Fehler beim Versenden der E-Mail"
+msgstr "Fehler beim Versenden der E-Mail:"
 
 #: src/sbackup/backupproc.py:359
 msgid "The following error(s) occurred before:"
@@ -91,11 +91,11 @@ msgstr "Betreuer:"
 
 #: src/sbackup/pkginfo.py:47
 msgid "Former maintainers:"
-msgstr ""
+msgstr "Ehemalige Betreuer:"
 
 #: src/sbackup/pkginfo.py:51
 msgid "Contributors:"
-msgstr "Beitragende:"
+msgstr "Mitwirkende:"
 
 #: src/sbackup/pkginfo.py:56
 msgid "translator-credits"
@@ -103,7 +103,11 @@ msgstr ""
 "Übersetzer\n"
 "\n"
 "Launchpad Contributions:\n"
-"  Jean-Peer Lorenz https://launchpad.net/~peer.loz"
+"  Andreas Tarp https://launchpad.net/~andreas-tarp\n"
+"  Georg Engelmann https://launchpad.net/~georg-engelmann\n"
+"  Jean-Peer Lorenz https://launchpad.net/~peer.loz\n"
+"  Martin Schröder https://launchpad.net/~martinschroeder\n"
+"  toomuch https://launchpad.net/~toomuch"
 
 #: src/sbackup/ar_backend/tar.py:109 src/sbackup/ar_backend/tar.py:167
 #: src/sbackup/ar_backend/tar.py:213
@@ -113,19 +117,19 @@ msgstr "Ungültiger Archivtyp."
 #: src/sbackup/ar_backend/tar.py:123
 #, python-format
 msgid "Effective path for `%s` is not available"
-msgstr ""
+msgstr "Effektiver Pfad für `%s` ist nicht verfügbar"
 
 #: src/sbackup/ar_backend/tar.py:294
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to get effective path for `%s`"
-msgstr "Auf das Zielverzeichnis konnte nicht zugegriffen werden: %s"
+msgstr "Kann keinen gültigen Pfad für `%s` finden"
 
 #: src/sbackup/ar_backend/tar.py:338
 msgid ""
 "For the moment split functionality is not compatible with compress option."
 msgstr ""
-"Zur Zeit ist das Aufteilen von Sicherungen nicht kompatibel mit "
-"komprimierten Sicherungen."
+"Zur Zeit ist das Aufteilen von Sicherungen nicht kompatibel zur "
+"Komprimierungsfunktion."
 
 #: src/sbackup/ar_backend/tar.py:347 src/sbackup/ar_backend/tar.py:408
 #: src/sbackup/core/profile_handler.py:288
@@ -150,7 +154,8 @@ msgstr ""
 
 #: src/sbackup/ar_backend/tar.py:402
 msgid "Falling back to full backup."
-msgstr "Es wird auf die Erstellung einer vollen Sicherung zurück gefallen."
+msgstr ""
+"Es wird auf die Erstellung einer vollständigen Sicherung ausgewichen."
 
 #: src/sbackup/ar_backend/tar.py:444
 msgid "Launching TAR to make a full backup."
@@ -204,13 +209,13 @@ msgstr "TAR gab Warnungen zurück, konnte aber erfolgreich beendet werden."
 #: src/sbackup/ar_backend/tar.py:540
 msgid "Unable to finish successfully. TAR terminated with errors."
 msgstr ""
-"Sicherung war nicht erfolgreich. TAR  wurde auf grund von Fehler vorzeitig "
+"Sicherung war nicht erfolgreich. TAR  wurde aufgrund von Fehlern vorzeitig "
 "beendet."
 
 #: src/sbackup/ar_backend/tar.py:721
 #, python-format
 msgid "Unable to terminate backend process: %s"
-msgstr "Der Backend-Prozess konnte nicht beendet werden: %s"
+msgstr "Der Hintergrund-Prozess konnte nicht beendet werden: %s"
 
 #: src/sbackup/ar_backend/tar.py:754
 msgid "Included"
@@ -282,6 +287,11 @@ msgid ""
 "\n"
 "Please check your configuration file."
 msgstr ""
+"Fehler beim Verarbeiten der Konfiguration:\n"
+"\n"
+"%(error)s in Zeile `%(line)s`.\n"
+"\n"
+"Bitte die Konfigurationsdatei überprüfen."
 
 #: src/sbackup/core/ConfigManager.py:588 src/sbackup/core/ConfigManager.py:622
 #, python-format
@@ -365,7 +375,7 @@ msgid ""
 msgstr ""
 "Es wurde eine Zertifikatsdatei und eine Schlüsseldatei festgelegt, obwohl "
 "die Option SSL (smtptls=1) nicht gesetzt ist.\n"
-"Aktiviere SSL um ein Zertifikat und einen Schlüssel zu verwenden."
+"Aktivieren Sie SSL, um ein Zertifikat und einen Schlüssel zu verwenden."
 
 #: src/sbackup/core/ConfigManager.py:1178
 msgid ""
@@ -381,7 +391,7 @@ msgstr "Standardprofil"
 
 #: src/sbackup/core/ConfigManager.py:1370
 msgid "Unknown Profile"
-msgstr "unbekanntes Profil"
+msgstr "Unbekanntes Profil"
 
 #: src/sbackup/core/ConfigManager.py:1423
 msgid "Unlimited"
@@ -448,8 +458,8 @@ msgid ""
 "File '%(filename)s' not found in snapshot's [%(snapshotname)s] files list, "
 "Skipped."
 msgstr ""
-"Datei '%(filename)s' wurde nicht in der Dateiliste der Sicherung [%"
-"(snapshotname)s] gefunden. Wird übersprungen."
+"Datei '%(filename)s' wurde nicht in der Dateiliste der Sicherung "
+"[%(snapshotname)s] gefunden. Wird übersprungen."
 
 #: src/sbackup/core/SnapshotManager.py:119
 #, python-format
@@ -485,8 +495,8 @@ msgstr ""
 #: src/sbackup/core/SnapshotManager.py:312
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 "Die Datengrundlage eine Sicherung kann nicht auf eine jüngere Sicherung "
 "umgestellt werden: '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' "
@@ -512,7 +522,8 @@ msgstr "Ausgangssicherung des Sicherung '%s' ist nicht gesetzt."
 
 #: src/sbackup/core/SnapshotManager.py:784
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 "Sicherung '%s' ist bereits eine vollständige Sicherung, es gibt nichts zu "
 "tun (wird nicht in eine volle Sicherung umgewandelt)."
@@ -684,8 +695,8 @@ msgstr "Verfügbarer Speicherplatz ist '%s'."
 #: src/sbackup/core/profile_handler.py:253
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (free: %"
-"(freespace)s, required: %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup (free: "
+"%(freespace)s, required: %(neededspace)s)."
 msgstr ""
 "Für die geplante Sicherung ist nicht genügend freier Speicher im "
 "Zielverzeichnis verfügbar (frei: %(freespace)s, benötigt: %(neededspace)s)."
@@ -724,7 +735,8 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:325
 #, python-format
 msgid "Processing of profile failed with error: %s\n"
-msgstr "Die Bearbeitung des Sicherungsprofils ist fehlgeschlagen. Fehler: %s\n"
+msgstr ""
+"Die Bearbeitung des Sicherungsprofils ist fehlgeschlagen. Fehler: %s\n"
 
 #: src/sbackup/core/profile_handler.py:336
 #, python-format
@@ -780,6 +792,8 @@ msgid ""
 "%(file)s doesn't contain valid value. Ignoring incomplete or non - backup "
 "directory. "
 msgstr ""
+"%(file)s enthält keinen gültigen Wert. Unvollständiges oder unbekanntes "
+"Verzeichnis wird ignoriert. "
 
 #: src/sbackup/core/snapshot.py:484
 #, python-format
@@ -880,32 +894,33 @@ msgstr "Testen des festgelegten Pfades auf Existenz mittels GIO"
 
 #: src/sbackup/fs_backend/_gio_utils.py:859
 msgid "Create testdir"
-msgstr ""
+msgstr "Erstelle Testverzeichnis"
 
 #: src/sbackup/fs_backend/_gio_utils.py:864
 msgid "Test testfile for existence"
-msgstr ""
+msgstr "Testdatei auf Existenz prüfen"
 
 #: src/sbackup/fs_backend/_gio_utils.py:871
 msgid "Create file"
-msgstr ""
+msgstr "Datei erstellen"
 
 #: src/sbackup/fs_backend/_gio_utils.py:878
 msgid "Re-read test file"
-msgstr ""
+msgstr "Testdatei erneut einlesen"
 
 #: src/sbackup/fs_backend/_gio_utils.py:890
 msgid "Remove file"
-msgstr ""
+msgstr "Datei entfernen"
 
 #: src/sbackup/fs_backend/_gio_utils.py:892
 msgid "Remove dir"
-msgstr ""
+msgstr "Verzeichnis entfernen"
 
 #: src/sbackup/fuse_plugins/__init__.py:160
 #, python-format
 msgid "Unable to import plugin `%(plugin_name)s`: %(error_cause)s "
 msgstr ""
+"Plugin `%(plugin_name)s` konnte nicht importiert werden: %(error_cause)s "
 
 #: src/sbackup/fuse_plugins/ftpFuseFAM.py:117
 #, python-format
@@ -926,8 +941,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/ftpFuseFAM.py:141
 msgid "FTP schema is: ftp://user:pass@server/anything"
 msgstr ""
-"Schema für FTP ist: ftp://benutzername:passwort@servername.com/"
-"ein_beliebiger_pfad"
+"Schema für FTP ist: "
+"ftp://benutzername:passwort@servername.com/ein_beliebiger_pfad"
 
 #: src/sbackup/fuse_plugins/ftpFuseFAM.py:188
 #, python-format
@@ -949,7 +964,8 @@ msgstr ""
 
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:138
 msgid "SFTP schema is like : sftp://user:pass@server/anything"
-msgstr "Das Format für SFTP-Adressen lautet: sftp://user:pass@server/anything"
+msgstr ""
+"Das Format für SFTP-Adressen lautet: sftp://user:pass@server/anything"
 
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:185
 #, python-format
@@ -972,27 +988,27 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:137
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
-"Das sshfs-Kommando '%(command)s' wurde nicht korrekt ausgeführt. Ausgabe => %"
-"(erroroutput)s "
+"Das sshfs-Kommando '%(command)s' wurde nicht korrekt ausgeführt. Ausgabe => "
+"%(erroroutput)s "
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:142
 msgid "SSH schema is like : ssh://user:pass@example.com:33/home/user/backup/"
 msgstr ""
-"Schema für SSH ist: ssh://benutzername:passwort@servername.com:portnummer/"
-"ein_beliebiger_pfad"
+"Schema für SSH ist: "
+"ssh://benutzername:passwort@servername.com:portnummer/ein_beliebiger_pfad"
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:158
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
-"Fehler beim Prüfen des Schema 'ssh://benutzername:passwort@servername.com:"
-"portnummer/ein_beliebiger_pfad' mit '%s' (Der Schrägstrich '/' nach der "
-"Serverangabe ist notwendig)."
+"Fehler beim Prüfen des Schema "
+"'ssh://benutzername:passwort@servername.com:portnummer/ein_beliebiger_pfad' "
+"mit '%s' (Der Schrägstrich '/' nach der Serverangabe ist notwendig)."
 
 #: src/sbackup/ui/GladeWindow.py:210
 msgid ""
@@ -1010,6 +1026,10 @@ msgid ""
 "\n"
 "%s."
 msgstr ""
+"Während des Zugriffs auf das Backup Zielverzeichnis ist folgender Fehler "
+"aufgetreten:\n"
+"\n"
+"%s."
 
 #: src/sbackup/ui/GladeWindow.py:212 src/sbackup/ui/restoregui.py:817
 #: src/sbackup/ui/restoregui.py:871
@@ -1103,6 +1123,14 @@ msgid ""
 "\n"
 "Important note: Saving will overwrite your existing invalid configuration."
 msgstr ""
+"%s\n"
+"\n"
+"Es wurde ein Sicherungsprofil, welches die Standardwerte verwendet, erzeugt. "
+"Bitte die neuen Einstellungen speichern um sie zu verwenden oder die "
+"existierende Konfigurationsdatei manuell überprüfen.\n"
+"\n"
+"Wichtiger Hinweis: Speichern des Profils überschreibt die existierenden "
+"ungültigen Einstellungen."
 
 #: src/sbackup/ui/configgui.py:641
 #, python-format
@@ -1165,7 +1193,7 @@ msgstr "Sicherungsvorgang gestartet"
 #: src/sbackup/ui/configgui.py:2038
 #, python-format
 msgid "Unexpected dialog response: %s"
-msgstr ""
+msgstr "Unerwartete Dialog Antwort: %s"
 
 #: src/sbackup/ui/configgui.py:967
 msgid "Include file..."
@@ -1227,35 +1255,35 @@ msgstr "Nicht unterstütztes Zeichen"
 
 #: src/sbackup/ui/configgui.py:1621
 msgid "Connect to remote destination"
-msgstr ""
+msgstr "Verbinde mit entferntem Ziel"
 
 #: src/sbackup/ui/configgui.py:1669
 msgid "Mount was sucessful (no errors)"
-msgstr ""
+msgstr "Einhängen war erfolgreich (keine Fehler)"
 
 #: src/sbackup/ui/configgui.py:1680
 msgid "Unable to mount host"
-msgstr ""
+msgstr "Einhängen des Servers fehlgeschlagen"
 
 #: src/sbackup/ui/configgui.py:1689
 msgid "Umount was sucessful (no errors)"
-msgstr ""
+msgstr "Aushängen war erfolgreich (keine Fehler)"
 
 #: src/sbackup/ui/configgui.py:1699
 msgid "Unable to unmount host"
-msgstr ""
+msgstr "unmounten des Ziels fehlgeschlagen"
 
 #: src/sbackup/ui/configgui.py:1729
 msgid "Perfom tests on remote host"
-msgstr ""
+msgstr "Führe Tests auf entferntem Computer durch"
 
 #: src/sbackup/ui/configgui.py:1742
 msgid "Unable to access remote destination"
-msgstr ""
+msgstr "Zugriff auf entfernten Server erfolglos"
 
 #: src/sbackup/ui/configgui.py:1746
 msgid "All tests passed"
-msgstr ""
+msgstr "Alle Tests erfolgreich abgeschlossen"
 
 #: src/sbackup/ui/configgui.py:1910
 msgid ""
@@ -1291,13 +1319,20 @@ msgid ""
 "\n"
 "Do you really want to delete the profile '%(name)s'?"
 msgstr ""
+"<b>Lösche Konfigurationsdatei?</b>\n"
+"\n"
+"Sie versuchen eine Konfigurationsprofil zu löschen. Rückgängigmachen der "
+"Aktion ist unmöglich. Wenn sie nicht sicher sind, nutzen sie bitte "
+"alternativ die \"aktivieren|deaktivieren\" Funktion.\n"
+"\n"
+"Möchten sie das Profil '%(name)s' wirklich löschen?"
 
 #: src/sbackup/ui/configgui.py:2022
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -1321,6 +1356,10 @@ msgid ""
 "The default profile cannot be removed. In the case you want to use just a "
 "single profile, please set up the default profile accordingly."
 msgstr ""
+"<b>Löschen des Standardprofils nicht möglich</b>\n"
+"\n"
+"Das Standardprofil kann nicht gelöscht werden. Wenn sie nur ein einziges "
+"Profil nutzen wollen konfigurieren sie bitte das Standardprofil entsprechend."
 
 #: src/sbackup/ui/configgui.py:2071
 msgid ""
@@ -1329,6 +1368,10 @@ msgid ""
 "The default profile cannot be disabled. In the case you want to use just a "
 "single profile, please set up the default profile accordingly."
 msgstr ""
+"<b>Löschen des Standardprofils nicht möglich</b>\n"
+"\n"
+"Das Standardprofil kann nicht deaktiviert werden. Wenn sie nur ein einziges "
+"Profil nutzen wollen konfigurieren sie bitte das Standardprofil entsprechend."
 
 #: src/sbackup/ui/configgui.py:2085
 msgid ""
@@ -1340,10 +1383,18 @@ msgid ""
 "Please modify the settings according to your needs and save the "
 "configuration in order to use it."
 msgstr ""
+"<b>Kein Backupprofil gefunden.</b>\n"
+"\n"
+"Es wurde kein Standardprofil gefunden. Sie haben Simple Backup vermutlich "
+"zum ersten mal gestartet. Ein Backup Profil mit Standardwerten wurde "
+"erstellt.\n"
+"\n"
+"Bitte passen sie die Werte an ihre Bedürfnisse an und speichern sie das "
+"Profil um es anschließend nutzen zu können."
 
 #: src/sbackup/ui/configgui.py:2098
 msgid "Please select a profile."
-msgstr ""
+msgstr "Bitte ein Profil wählen."
 
 #: src/sbackup/ui/indicator_core.py:117
 msgid "there was a problem initializing the pynotify module"
@@ -1353,7 +1404,7 @@ msgstr "Es gab ein Problem beim Laden des pynotify Modul."
 #: src/sbackup/ui/indicator_core.py:221 src/sbackup/ui/indicator_core.py:243
 #, python-format
 msgid "Connection to notification-daemon failed: %s"
-msgstr ""
+msgstr "Verbindung zu Benachrichtigungsdienst fehlgeschlagen: %s"
 
 #: src/sbackup/ui/indicator_core.py:306
 msgid "Simple Backup"
@@ -1369,17 +1420,19 @@ msgstr "Sicherung abbrechen"
 
 #: src/sbackup/ui/indicator_core.py:416
 msgid "Connection to D-Bus service lost."
-msgstr ""
+msgstr "Verbindung zu D-Bus Dienst verloren."
 
 #: src/sbackup/ui/indicator_core.py:441
 msgid "re-connection was successful"
-msgstr ""
+msgstr "Verbindung wiederhergestellt"
 
 #: src/sbackup/ui/indicator_core.py:480
 msgid ""
 "No backup in progress and connection to D-Bus service lost. Simple Backup "
 "Indicator is being terminated."
 msgstr ""
+"Verbindung zum D-Bus Dienst wurde unterbrochen und es findet keine Sicherung "
+"statt. Simple Backup Statusanzeige wird beendet."
 
 #: src/sbackup/ui/indicator_core.py:509
 msgid "Starting backup session"
@@ -1394,11 +1447,13 @@ msgid ""
 "There are snapshots with old snapshot format. Please upgrade these using the "
 "Restoration tool if you want to use them."
 msgstr ""
+"Es sind snapshots in einem alten Format vorhanden. Bitte konvertieren sie "
+"diese mit Hilfe des Restoration Tools um sie nutzen zu können."
 
 #: src/sbackup/ui/indicator_core.py:538
 #, python-format
 msgid "Unknown D-Bus event `%s` received."
-msgstr ""
+msgstr "Unbekanntes D-Bus Ereignis `%s` erhalten."
 
 #: src/sbackup/ui/indicator_core.py:579
 msgid "Try again"
@@ -1409,11 +1464,13 @@ msgid ""
 "Attempt of starting another instance of Simple Backup while this one is "
 "already running."
 msgstr ""
+"Es wurde versucht eine weitere Instanz von Simple Backup zu starten obwohl "
+"bereits diese Instanz läuft."
 
 #: src/sbackup/ui/indicator_core.py:659
 #, python-format
 msgid "Unable to present window: %s"
-msgstr ""
+msgstr "Fenster konnte nicht angezeigt werden: %s"
 
 #: src/sbackup/ui/indicator_core.py:675
 #, python-format
@@ -1427,7 +1484,7 @@ msgstr "Laufenden Sicherungsvorgang abbrechen?"
 
 #: src/sbackup/ui/indicator_core.py:696
 msgid "Unable to cancel backup process."
-msgstr ""
+msgstr "Sicherungsvorgang konnte nicht abgebrochen werden."
 
 #: src/sbackup/ui/indicator_core.py:758
 #, python-format
@@ -1452,22 +1509,22 @@ msgstr "Verbleibende Zeit: %s"
 #: src/sbackup/ui/indicator_core.py:807
 #, python-format
 msgid "PID of backup process being canceled: %s"
-msgstr ""
+msgstr "PID des abzubrechenden Sicherungsvorgangs: %s"
 
 #: src/sbackup/ui/indicator_core.py:812
 #, python-format
 msgid "Unable to send signal to process %s"
-msgstr ""
+msgstr "Konnte kein Signal an Prozess %s senden"
 
 #: src/sbackup/ui/indicator_core.py:813
 #, python-format
 msgid "Sending signal using gksu to process %s"
-msgstr ""
+msgstr "Sende Signal mittels gksu an Prozess %s"
 
 #: src/sbackup/ui/indicator_core.py:817
 #, python-format
 msgid "Sending signal using gksu to process %s failed"
-msgstr ""
+msgstr "Senden des Signals mittels gksu an Prozess %s fehlgeschlagen"
 
 #: src/sbackup/ui/indicator_core.py:852
 #, python-format
@@ -1477,6 +1534,10 @@ msgid ""
 "The specified target directory '%s' was not found.\n"
 "\n"
 msgstr ""
+"<b>Angegebener Zielordner nicht verfügbar</b>\n"
+"\n"
+"Der angegebene Pfad '%s' kann nicht gefunden werden.\n"
+"\n"
 
 #: src/sbackup/ui/indicator_core.py:853
 #, python-format
@@ -1549,12 +1610,12 @@ msgstr "Ein Fehler trat auf"
 
 #: src/sbackup/ui/indicator_core.py:1011
 msgid "Another `Simple Backup Indicator` is already running."
-msgstr ""
+msgstr "Eine andere `Simple Backup Statusanzeige` läuft bereits."
 
 #: src/sbackup/ui/indicator_core.py:1035
 #, python-format
 msgid "Initialization of GTK+ failed: %s"
-msgstr ""
+msgstr "Initialisierung von GTK+ fehlgeschlagen: %s"
 
 #: src/sbackup/ui/misc.py:294
 #, python-format
@@ -1571,10 +1632,16 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
+"Ein unbekannter Fehler ist aufgetreten. Schließen Sie dieses Fenster und "
+"starten Sie die Anwendung neu.\n"
+"\n"
+"Bitte melden Sie diesen Fehler unter: https://bugs.launchpad.net/sbackup.\n"
+"\n"
+"%s"
 
 #: src/sbackup/ui/misc.py:325
 msgid "Sorry, this should not have happened"
-msgstr ""
+msgstr "Entschuldigung, das hätte nicht passieren dürfen"
 
 #: src/sbackup/ui/restoregui.py:78
 msgid "Restore..."
@@ -1615,11 +1682,11 @@ msgstr "Status"
 
 #: src/sbackup/ui/restoregui.py:187
 msgid "Connect to destination..."
-msgstr ""
+msgstr "Verbinde mit Zielverzeichnis..."
 
 #: src/sbackup/ui/restoregui.py:211
 msgid "Specified path does not exist"
-msgstr ""
+msgstr "Der angegebene Pfad existiert nicht"
 
 #: src/sbackup/ui/restoregui.py:257
 msgid "Ready"
@@ -1627,7 +1694,7 @@ msgstr "Fertig"
 
 #: src/sbackup/ui/restoregui.py:371
 msgid "No destination specified"
-msgstr ""
+msgstr "Kein Sicherungsziel angegeben"
 
 #: src/sbackup/ui/restoregui.py:388
 msgid "Choose a source folder"
@@ -1651,7 +1718,7 @@ msgstr "Einlesen der Dateien der Sicherung..."
 
 #: src/sbackup/ui/restoregui.py:552
 msgid "Simple Backup restore error"
-msgstr ""
+msgstr "Simple Backup Wiederherstellungsfehler"
 
 #: src/sbackup/ui/restoregui.py:553
 msgid "An error occurred while reading snapshot"
@@ -1675,6 +1742,9 @@ msgid ""
 "Snapshot version is not supported (Only %(supportedversion)s is supported). "
 "Version '%(currentversion)s' found. You should upgrade it. "
 msgstr ""
+"Diese Version der Sicherung wird nicht unterstützt (nur Version "
+"%(supportedversion)s wird unterstützt). Version '%(currentversion)s' wurde "
+"gefunden. Sie sollten die Sicherung upgraden. "
 
 #: src/sbackup/ui/restoregui.py:643
 msgid "Select restore location"
@@ -1714,27 +1784,35 @@ msgid ""
 "\n"
 "Are you sure that you want to upgrade the snapshot now?"
 msgstr ""
+"Wenn Sie die gewählte Sicherungsdatei '%s' aktualisieren, kann das Ihre "
+"Sicherung für diesen Zeitpunkt zerstören. Sie können die Aktion nicht "
+"rückgängig machen. Es wird empfohlen, dass Sie eine Kopie der "
+"Sicherungsdatei erstellen, bevor Sie sie aktualisieren. Der "
+"Aktualisierungsprozess dauert eine Weile, haben Sie einen Augenblick "
+"Geduld.\n"
+"\n"
+"Sind Sie sicher, dass Sie die Sicherungsdatei jetzt aktualisieren möchten?"
 
 #: src/sbackup/ui/restoregui.py:796
 msgid "Do you really want to upgrade snapshot?"
-msgstr ""
+msgstr "Möchten Sie die Sicherung wirklich aktualisieren?"
 
 #: src/sbackup/ui/restoregui.py:800
 #, python-format
 msgid "Upgrade snapshot '%s'"
-msgstr ""
+msgstr "Sicherung aktualisieren '%s'"
 
 #: src/sbackup/ui/restoregui.py:809
 msgid "Snapshot was sucessfully upgraded."
-msgstr ""
+msgstr "Sicherung wurde erfolgreich aktualisiert."
 
 #: src/sbackup/ui/restoregui.py:810
 msgid "Simple Backup upgrade"
-msgstr ""
+msgstr "Einfache Aktualisierung der Sicherungsdatei"
 
 #: src/sbackup/ui/restoregui.py:811
 msgid "Upgrade finished"
-msgstr ""
+msgstr "Upgrade beendet"
 
 #: src/sbackup/ui/restoregui.py:814
 #, python-format
@@ -1742,6 +1820,8 @@ msgid ""
 "While attempting to upgrade snapshot the following error occurred:\n"
 "%s"
 msgstr ""
+"Beim Versuch die Sicherung zu aktualisieren trat folgender Fehler auf:\n"
+"%s"
 
 #: src/sbackup/ui/restoregui.py:817
 msgid "Unable to upgrade snapshot"
@@ -1761,10 +1841,14 @@ msgid ""
 "\n"
 "Are you sure that you want to remove the snapshot permanently?"
 msgstr ""
+"Wenn sie die gewählte Sicherungsdatei '%s' löschen, geht die Sicherung für "
+"diesen Zeitpunkt verloren. Sie können die Aktion nicht rückgängig machen.\n"
+"\n"
+"Sind Sie sicher, dass Sie die Sicherungsdatei endgültig löschen wollen?"
 
 #: src/sbackup/ui/restoregui.py:860
 msgid "Do you really want to remove snapshot?"
-msgstr ""
+msgstr "Möchten Sie diese Sicherung wirklich entfernen?"
 
 #: src/sbackup/ui/restoregui.py:869
 #, python-format
@@ -1772,10 +1856,12 @@ msgid ""
 "While attempting to delete snapshot the following error occurred:\n"
 "%s"
 msgstr ""
+"Beim Löschen der Sicherung trat folgender Fehler auf:\n"
+"%s"
 
 #: src/sbackup/ui/restoregui.py:872
 msgid "Unable to delete snapshot"
-msgstr ""
+msgstr "Sicherung konnte nicht gelöscht werden"
 
 #: src/sbackup/ui/restoregui.py:878
 #, python-format
@@ -1785,20 +1871,25 @@ msgid ""
 "\n"
 "Remove all of these child snapshots in order to delete this snapshot."
 msgstr ""
+"Die gewählte Sicherungsdatei '%s' wird von aktuelleren Sicherungen als "
+"Grundlage verwendet.\n"
+"\n"
+"Löschen Sie alle abhängigen Sicherungen, um diese Sicherungsdatei löschen zu "
+"können."
 
 #: src/sbackup/ui/restoregui.py:880
 msgid "Unable to remove snapshot"
-msgstr ""
+msgstr "Konnte Sicherung nicht entfernen."
 
 #: src/sbackup/ui/restoregui.py:888
 msgid "Termination in progress"
-msgstr ""
+msgstr "Aktion wird abgebrochen"
 
 #: src/sbackup/ui/restoregui.py:904 src/sbackup/ui/restoregui.py:910
 #: src/sbackup/ui/restoregui.py:916 src/sbackup/ui/restoregui.py:922
 #: data/ui/sbackup-restore.glade:1039
 msgid "Simple Backup restoration"
-msgstr ""
+msgstr "Simple Backup Wiederherstellung"
 
 #: src/sbackup/ui/restoregui.py:905 src/sbackup/ui/restoregui.py:911
 msgid "<b>Restoring of selected files</b>"
@@ -1821,6 +1912,9 @@ msgid ""
 "\n"
 "Following error occurred:\n"
 msgstr ""
+"Die Wiederherstellung von <tt>'%s'</tt> schlug fehl.\n"
+"\n"
+"Folgender Fehler trat auf:\n"
 
 #: src/sbackup/ui/restoregui.py:912
 #, python-format
@@ -1848,6 +1942,10 @@ msgid ""
 "\n"
 "Following error occurred:\n"
 msgstr ""
+"Die Wiederherstellung von <tt>'%(source)s'</tt>\n"
+"to <tt>'%(dirname)s'</tt> schlug fehl.\n"
+"\n"
+"Folgender Fehler trat auf::\n"
 
 #: src/sbackup/ui/restoregui.py:917 src/sbackup/ui/restoregui.py:923
 msgid "<b>Reverting selected files</b>"
@@ -1870,6 +1968,9 @@ msgid ""
 "\n"
 "Following error occurred:\n"
 msgstr ""
+"Die Wiederherstellung von <tt>'%s'</tt> war nicht erfolgreich.\n"
+"\n"
+"Es trat folgender Fehler auf:\n"
 
 #: src/sbackup/ui/restoregui.py:924
 #, python-format
@@ -1897,11 +1998,15 @@ msgid ""
 "\n"
 "Following error occurred:\n"
 msgstr ""
+"Die Wiederherstellung von <tt>'%(source)s'</tt> nach <tt>'%(dirname)s'</tt> "
+"war nicht erfolgreich.\n"
+"\n"
+"Es trat folgender Fehler auf:\n"
 
 #: src/sbackup/util/__init__.py:439
 #, python-format
 msgid "%(mb)d MiB %(kb)d KiB"
-msgstr ""
+msgstr "%(mb)d MiB %(kb)d KiB"
 
 #: src/sbackup/util/__init__.py:442
 #, python-format
@@ -1911,7 +2016,7 @@ msgstr "%(mb)d MiB %(kb)d KiB %(bytes)d"
 #: src/sbackup/util/__init__.py:447
 #, python-format
 msgid "%(mb)d MB %(kb)d kB"
-msgstr ""
+msgstr "%(mb)d MB %(kb)d kB"
 
 #: src/sbackup/util/__init__.py:450
 #, python-format
@@ -1931,7 +2036,8 @@ msgstr ""
 
 #: src/sbackup/util/filecollect.py:364
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 "Datei '%(file)s' kann nicht zum Lesen geöffnet werden. Zeitüberschreitung "
 "beim Öffnen."
@@ -1960,8 +2066,8 @@ msgstr ""
 msgid ""
 "File '%(file)s' exceeds maximum file size ( %(filesize)s > %(maxsize)s)."
 msgstr ""
-"Datei '%(file)s' überschreitet die maximale Dateigröße  ( %(filesize)s > %"
-"(maxsize)s)."
+"Datei '%(file)s' überschreitet die maximale Dateigröße  ( %(filesize)s > "
+"%(maxsize)s)."
 
 #: src/sbackup/util/filecollect.py:424
 #, python-format
@@ -1993,7 +2099,7 @@ msgstr "Keine Verzeichnisse zum Sichern festgelegt."
 
 #: src/sbackup/util/lock.py:76
 msgid "Another application instance is already running."
-msgstr ""
+msgstr "Eine andere Instanz des Programms läuft bereits."
 
 #: src/sbackup/util/lock.py:78
 msgid "Invalid lock file found. Is being removed."
@@ -2007,6 +2113,8 @@ msgstr "Lock-Datei konnte nicht entfernt werden: %s"
 #: src/sbackup/util/lock.py:132 src/sbackup/util/lock.py:144
 msgid "Unable to remove lock file: File not found."
 msgstr ""
+"Die Lock-Datei konnte nicht entfernt werden, da die Datei nicht gefunden "
+"wurde."
 
 #: data/ui/sbackup-config.glade:11
 msgid "Exclude file type"
@@ -2039,7 +2147,8 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:257
 msgid "Enter the remote target to include"
-msgstr "Geben Sie einen entfernten Ordner/Datei an, der gesichert werden soll"
+msgstr ""
+"Geben Sie einen entfernten Ordner/Datei an, der gesichert werden soll"
 
 #: data/ui/sbackup-config.glade:278
 msgid "Choose a plugin to get the format"
@@ -2079,6 +2188,9 @@ msgid ""
 "performing a backup. Each profile has its own set of settings including "
 "backup destination, backup format etc."
 msgstr ""
+"Sie können mehrere Profile einrichten, die ausgeführt werden, wenn eine "
+"Sicherung durchgeführt wird. Jedes Profil hat seine eigenen Einstellungen, "
+"die Sicherungsziel, Format der Sicherung etc. enthalten."
 
 #: data/ui/sbackup-config.glade:613
 msgid "<b>Configuration profiles</b>"
@@ -2130,7 +2242,7 @@ msgstr "Profilverwaltung..."
 
 #: data/ui/sbackup-config.glade:1058
 msgid "Make backup now"
-msgstr ""
+msgstr "Die Sicherung jetzt durchführen"
 
 #: data/ui/sbackup-config.glade:1079
 msgid "_Help"
@@ -2179,6 +2291,8 @@ msgid ""
 "Compression format\n"
 "Default is set to uncompressed backups."
 msgstr ""
+"Kompressionsformat\n"
+"Der Standard sind unkomprimierte Sicherungen."
 
 #: data/ui/sbackup-config.glade:1290 data/ui/sbackup-config.glade:1403
 msgid ""
@@ -2217,7 +2331,7 @@ msgstr "MiB"
 
 #: data/ui/sbackup-config.glade:1405
 msgid "Split backup archives into several chunks"
-msgstr ""
+msgstr "Teile die Sicherungsarchive in mehrere Teile"
 
 #: data/ui/sbackup-config.glade:1438 data/ui/sbackup-config.glade:2627
 #: data/ui/sbackup-config.glade:2863 data/ui/sbackup-config.glade:3111
@@ -2235,7 +2349,7 @@ msgstr "Allgemein"
 
 #: data/ui/sbackup-config.glade:1495
 msgid "<b>Included files and directories</b>"
-msgstr ""
+msgstr "<b>Einbezogene Dateien und Verzeichnisse</b>"
 
 #: data/ui/sbackup-config.glade:1570 data/ui/sbackup-config.glade:1818
 #: data/ui/sbackup-config.glade:2023 data/ui/sbackup-config.glade:2181
@@ -2256,7 +2370,7 @@ msgstr "Zu sichernde Daten"
 
 #: data/ui/sbackup-config.glade:1739
 msgid "<b>Excluded files and directories</b>"
-msgstr ""
+msgstr "<b>Ausgeschlossene Dateien und Verzeichnisse</b>"
 
 #: data/ui/sbackup-config.glade:1952
 msgid "Paths"
@@ -2312,7 +2426,7 @@ msgstr "Zielverzeichnis auswählen"
 
 #: data/ui/sbackup-config.glade:2526
 msgid "Use a remote site"
-msgstr ""
+msgstr "Einen entfernten Speicher verwenden"
 
 #: data/ui/sbackup-config.glade:2568
 msgid "ssh://username:password@example.com/remote/dir/"
@@ -2320,7 +2434,7 @@ msgstr "ssh://benutzername:kennwort@beispiel.com/entfernt/ordner/"
 
 #: data/ui/sbackup-config.glade:2580
 msgid "Connect..."
-msgstr ""
+msgstr "Verbinde..."
 
 #: data/ui/sbackup-config.glade:2672
 msgid ""
@@ -2347,6 +2461,8 @@ msgid ""
 "This option will make a backup not at a precise time but when the computer "
 "is up. "
 msgstr ""
+"Mit dieser Einstellung wird die Sicherung nicht zu einer bestimmten Zeit "
+"durchgeführt, sondern, wenn der Computer eingeschaltet ist. "
 
 #: data/ui/sbackup-config.glade:2761
 msgid "_Custom"
@@ -2393,7 +2509,7 @@ msgstr "Zeitplan"
 
 #: data/ui/sbackup-config.glade:2955
 msgid "Enable purging of old backups"
-msgstr ""
+msgstr "Löschen von alten Sicherungen einschalten"
 
 #: data/ui/sbackup-config.glade:2983
 msgid "Simple cut-off: Erase all backups older than"
@@ -2413,6 +2529,13 @@ msgid ""
 "Keep one backup per quarter from 2nd last year\n"
 "Keep one backup per year further into past</small>"
 msgstr ""
+"<small>In die Vergangenheit weniger werdend behalten:\n"
+"Eine Sicherung von gestern behalten\n"
+"Eine Sicherung pro Tag aus der letzten Woche behalten\n"
+"Eine Sicherung pro Woche aus dem letzten Monat behalten\n"
+"Eine Sicherung pro Monat aus dem letzten Jahr behalten\n"
+"Eine Sicherung pro Vierteljahr aus dem vorletzen Jahr behalten\n"
+"Eine Sicherung pro Jahr aus jedem vorherigen Jahr behalten.</small>"
 
 #: data/ui/sbackup-config.glade:3116
 msgid "Show help topic about purging of backups."
@@ -2532,35 +2655,35 @@ msgstr "_Setzen"
 
 #: data/ui/sbackup-config.glade:3935
 msgid "Set remote target"
-msgstr ""
+msgstr "Entferntes Ziel festlegen"
 
 #: data/ui/sbackup-config.glade:3957
 msgid "Type of service"
-msgstr ""
+msgstr "Art des Dienstes"
 
 #: data/ui/sbackup-config.glade:3997
 msgid "Hostname"
-msgstr ""
+msgstr "Rechnername"
 
 #: data/ui/sbackup-config.glade:4027
 msgid "<b>Details</b>"
-msgstr ""
+msgstr "<b>Details</b>"
 
 #: data/ui/sbackup-config.glade:4157
 msgid "Show password"
-msgstr ""
+msgstr "Passwort anzeigen"
 
 #: data/ui/sbackup-config.glade:4217
 msgid "_Connect"
-msgstr ""
+msgstr "_Verbinden"
 
 #: data/ui/sbackup-config.glade:4293
 msgid "Make a full backup"
-msgstr ""
+msgstr "Eine vollständige Sicherung durchführen"
 
 #: data/ui/sbackup-restore.glade:38
 msgid "<b>Backup destination</b>"
-msgstr ""
+msgstr "<b>Sicherungsziel</b>"
 
 #: data/ui/sbackup-restore.glade:52
 msgid "Displays the manual in Help browser."
@@ -2568,43 +2691,51 @@ msgstr "Zeigt das Handbuch im Hilfebrowser."
 
 #: data/ui/sbackup-restore.glade:85
 msgid "Default profile's destination"
-msgstr ""
+msgstr "Standardziel für Profile"
 
 #: data/ui/sbackup-restore.glade:90
 msgid ""
 "Set backup destination to the place specified in default configuration "
 "profile"
 msgstr ""
+"Den Ort der Sicherung auf den Ort einstellen, der im Standard-Profil "
+"angegeben ist."
 
 #: data/ui/sbackup-restore.glade:137
 msgid "Custom destination"
-msgstr ""
+msgstr "Eigenes Ziel"
 
 #: data/ui/sbackup-restore.glade:143
 msgid ""
 "Select a backup destination on your harddisk or at a remote site. Press "
 "Apply when ready."
 msgstr ""
+"Wählen Sie einen Ort für die Sicherung auf Ihrer Festplatte oder an einem "
+"entfernten Ort. Klicken Sie Anwenden, wenn Sie fertig sind."
 
 #: data/ui/sbackup-restore.glade:184
 msgid "Choose a destination folder. For remote sites fill URI in text field"
 msgstr ""
+"Wählen Sie einen Ziel-Ordner. Für entfernte Orte tragen Sie die URI in das "
+"Textfeld ein."
 
 #: data/ui/sbackup-restore.glade:201
 msgid "Change destination to path specified in left text field"
-msgstr ""
+msgstr "Das Ziel in den Pfad ändern, der im linken Textfeld definiert ist"
 
 #: data/ui/sbackup-restore.glade:266
 msgid "Select a bold printed date to get the list of backups for that date."
 msgstr ""
+"Wählen Sie ein fett gedrucktes Datum aus, um eine Liste mit Sicherungen für "
+"dieses Datum zu erhalten."
 
 #: data/ui/sbackup-restore.glade:310
 msgid "Available backups"
-msgstr ""
+msgstr "Verfügbare Sicherungen"
 
 #: data/ui/sbackup-restore.glade:398
 msgid "Delete snapshot"
-msgstr ""
+msgstr "Schnappschuss löschen"
 
 #: data/ui/sbackup-restore.glade:436
 msgid "Delete"
@@ -2612,7 +2743,7 @@ msgstr "Entfernen"
 
 #: data/ui/sbackup-restore.glade:475
 msgid "Upgrade snapshot"
-msgstr ""
+msgstr "Sicherungsdatei aktualisieren"
 
 #: data/ui/sbackup-restore.glade:515
 msgid "Upgrade"
@@ -2624,7 +2755,7 @@ msgstr "<b>Verlauf der Sicherungen</b>"
 
 #: data/ui/sbackup-restore.glade:579
 msgid "Current base:"
-msgstr ""
+msgstr "Derzeitige Datengrundlage:"
 
 #: data/ui/sbackup-restore.glade:620
 msgid "Select a snapshot on this list to rebase on it."
@@ -2642,11 +2773,11 @@ msgstr "<b>Verwaltung von Sicherungen</b>"
 
 #: data/ui/sbackup-restore.glade:785
 msgid "Snapshot details"
-msgstr ""
+msgstr "Details der Sicherung"
 
 #: data/ui/sbackup-restore.glade:850 data/ui/sbackup-restore.glade:867
 msgid "Restores files/directories from the selected snapshot"
-msgstr ""
+msgstr "Wiederherstellung von Dateien/Ordner aus der ausgewählten Sicherung"
 
 #: data/ui/sbackup-restore.glade:862
 msgid "Restore"
@@ -2657,6 +2788,8 @@ msgid ""
 "Restores files/directories recursively starting from the base snapshot to "
 "the selected snapshot"
 msgstr ""
+"Rekursive Wiederherstellung von Dateien/Ordner aus der ausgewählten "
+"Sicherung beginnend mit der ersten Ausgangssicherung"
 
 #: data/ui/sbackup-restore.glade:896
 msgid "Revert"
@@ -2703,11 +2836,10 @@ msgstr "Inhalt"
 #~ msgstr "Ungültiger Wert für das Zielverzeichnis: "
 
 #~ msgid ""
-#~ "Got a non valid snapshot '%(name)s' due to name convention : %"
-#~ "(error_cause)s "
+#~ "Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s "
 #~ msgstr ""
-#~ "Ungültige Sicherung '%(name)s' gefunden, fehlerhaftes Namensformat: %"
-#~ "(error_cause)s "
+#~ "Ungültige Sicherung '%(name)s' gefunden, fehlerhaftes Namensformat: "
+#~ "%(error_cause)s "
 
 #~ msgid "Deleting snapshot: '%(snp)s'."
 #~ msgstr "Löschen der Sicherung: '%(snp)s'."
@@ -2737,8 +2869,8 @@ msgstr "Inhalt"
 #~ msgstr "Zielverzeichnis ist nicht schreibbar."
 
 #~ msgid ""
-#~ "Please change target directory and test writability of the target "
-#~ "directory by pressing \"Test\" button on the right."
+#~ "Please change target directory and test writability of the target directory "
+#~ "by pressing \"Test\" button on the right."
 #~ msgstr ""
 #~ "Bitte ändern Sie das Zielverzeichnis und testen Sie, ob Schreiben möglich "
 #~ "ist durch Anklicken des 'Test'-Buttons."
@@ -2750,22 +2882,21 @@ msgstr "Inhalt"
 #~ msgstr "Deaktivieren"
 
 #~ msgid ""
-#~ "You can't %s the Default Profile. Please use it if you need only one "
-#~ "profile."
+#~ "You can't %s the Default Profile. Please use it if you need only one profile."
 #~ msgstr ""
 #~ "Das Standardprofil kann nicht %s werden. Bitte nutze es, falls du nur ein "
 #~ "Profil benötigst."
 
 #~ msgid ""
 #~ "The program is going to be terminated. Please make sure the missing "
-#~ "directory exists (e.g. by mounting an external disk) or change the "
-#~ "specified target in '(Not So) Simple Backup-Configuration' tool and "
-#~ "restart this application."
+#~ "directory exists (e.g. by mounting an external disk) or change the specified "
+#~ "target in '(Not So) Simple Backup-Configuration' tool and restart this "
+#~ "application."
 #~ msgstr ""
 #~ "Die Anwendung wird beendet. Bitte sicherstellen, dass das fehlende "
-#~ "Verzeichnis existiert (z.B. durch das Anschließen einer externen "
-#~ "Festplatte) oder das festgelegte Zielverzeichnis in '(Not So) Simple "
-#~ "Backup-Einstellungen' ändern. Anschließend diese Anwendung erneut starten."
+#~ "Verzeichnis existiert (z.B. durch das Anschließen einer externen Festplatte) "
+#~ "oder das festgelegte Zielverzeichnis in '(Not So) Simple Backup-"
+#~ "Einstellungen' ändern. Anschließend diese Anwendung erneut starten."
 
 #~ msgid "An error occurred during initialization:"
 #~ msgstr "Während der Initialisierung ist ein Fehler aufgetreten:"
@@ -2793,20 +2924,20 @@ msgstr "Inhalt"
 
 #~ msgid "Unable to make a proper backup. TAR was terminated."
 #~ msgstr ""
-#~ "Es konnte keine fehlerfreie Sicherung erstellt werden. TAR wurde "
-#~ "vorzeitig abgebrochen."
+#~ "Es konnte keine fehlerfreie Sicherung erstellt werden. TAR wurde vorzeitig "
+#~ "abgebrochen."
 
 #~ msgid ""
-#~ "This dialogue helps you to manage your configuration profiles. You can "
-#~ "set up a number of configuration profiles that will be run by sbackup "
-#~ "when it starts the backup. Thanks to this you can configure backups of "
-#~ "different kinds to different places."
+#~ "This dialogue helps you to manage your configuration profiles. You can set "
+#~ "up a number of configuration profiles that will be run by sbackup when it "
+#~ "starts the backup. Thanks to this you can configure backups of different "
+#~ "kinds to different places."
 #~ msgstr ""
-#~ "Dieser Dialog hilft bei der Verwaltung von Profilen. Es können eine "
-#~ "Vielzahl von Profilen mit jeweils eigenen und unabhängigen "
-#~ "Konfigurationen erstellt werden, die während des Sicherungsvorgangs "
-#~ "abgearbeitet werden. Mit Hilfe von Profilen können unterschiedliche Arten "
-#~ "von Sicherungen in unterschiedliche Zielverzeichnisse erstellt werden."
+#~ "Dieser Dialog hilft bei der Verwaltung von Profilen. Es können eine Vielzahl "
+#~ "von Profilen mit jeweils eigenen und unabhängigen Konfigurationen erstellt "
+#~ "werden, die während des Sicherungsvorgangs abgearbeitet werden. Mit Hilfe "
+#~ "von Profilen können unterschiedliche Arten von Sicherungen in "
+#~ "unterschiedliche Zielverzeichnisse erstellt werden."
 
 #~ msgid ""
 #~ "Choose the compression format that you want to apply.\n"
@@ -2817,8 +2948,8 @@ msgstr "Inhalt"
 
 #~ msgid ""
 #~ "Split the backup archive into small pieces (value in MiB).\n"
-#~ "<b>Important note:</b> This functionality is not compatible with "
-#~ "compressed backups!"
+#~ "<b>Important note:</b> This functionality is not compatible with compressed "
+#~ "backups!"
 #~ msgstr ""
 #~ "Das Sicherungsarchiv in Teilstücke aufteilen (Wert in MiB).\n"
 #~ "<b>Wichtiger Hinweis:</b> Diese Funktion kann nicht in Verbindung mit "
@@ -2832,8 +2963,8 @@ msgstr "Inhalt"
 #~ "existing directory to a previous state...</b>"
 #~ msgstr ""
 #~ "<b>Mit diesem Dialog können Sicherungen verwaltet werden, Dateien wieder "
-#~ "hergestellt, vorherige Zustände von vorhandenen Verzeichnissen "
-#~ "restauriert werden...</b>"
+#~ "hergestellt, vorherige Zustände von vorhandenen Verzeichnissen restauriert "
+#~ "werden...</b>"
 
 #~ msgid ""
 #~ "Select the directory in which you have your backups.\n"
@@ -2867,8 +2998,8 @@ msgstr "Inhalt"
 
 #~ msgid "Select a snapshot and change its base to another snapshot."
 #~ msgstr ""
-#~ "Ausgangssicherung einer inkrementellen Sicherung auf eine andere "
-#~ "Sicherung umstellen."
+#~ "Ausgangssicherung einer inkrementellen Sicherung auf eine andere Sicherung "
+#~ "umstellen."
 
 #~ msgid "BackupManager created "
 #~ msgstr "BackupManager wurde erzeugt "
@@ -2896,11 +3027,11 @@ msgstr "Inhalt"
 #~ msgstr "Sicherheit"
 
 #~ msgid ""
-#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > %"
-#~ "(maxsize)s), it has to be exclude "
+#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > "
+#~ "%(maxsize)s), it has to be exclude "
 #~ msgstr ""
-#~ "'%(file)s' Dateigröße ist größer als festgelegte Maximalgröße ( %"
-#~ "(filesize)s > %(maxsize)s), wird ausgelassen "
+#~ "'%(file)s' Dateigröße ist größer als festgelegte Maximalgröße ( %(filesize)s "
+#~ "> %(maxsize)s), wird ausgelassen "
 
 #~ msgid "got an error with '%(file)s' : %(error)s"
 #~ msgstr "Fehler bei '%(file)s' : %(error)s"
@@ -2923,13 +3054,13 @@ msgstr "Inhalt"
 #~ "When setting a username (resp password), password (resp username) is "
 #~ "mandatory"
 #~ msgstr ""
-#~ "Beim Festlegen eines Benutzernamens (bzw. Kennwortes) ist die Angabe "
-#~ "eines Kennwortes (bzw. Benutzernamens) zwingend"
+#~ "Beim Festlegen eines Benutzernamens (bzw. Kennwortes) ist die Angabe eines "
+#~ "Kennwortes (bzw. Benutzernamens) zwingend"
 
 #~ msgid "Choose the SSL option (smtptls=1) to be able to use Cert and Key"
 #~ msgstr ""
-#~ "Wählen Sie die Option SSL (smtptls=1) um ein Zertifikat und einen "
-#~ "Schlüssel zu verwenden (Cert & Key)"
+#~ "Wählen Sie die Option SSL (smtptls=1) um ein Zertifikat und einen Schlüssel "
+#~ "zu verwenden (Cert & Key)"
 
 #~ msgid "I didn't find the log file. Please set it up in sbackup.conf "
 #~ msgstr ""
@@ -2946,8 +3077,8 @@ msgstr "Inhalt"
 #~ msgstr "Empfänger dieser E-Mail setzen"
 
 #~ msgid ""
-#~ "Please enter the new profile name in the <b>Profile name</b> entry and "
-#~ "check the <b>Enable</b> checkbox to enable it."
+#~ "Please enter the new profile name in the <b>Profile name</b> entry and check "
+#~ "the <b>Enable</b> checkbox to enable it."
 #~ msgstr ""
 #~ "Bitte geben Sie einen Namen für das neue Profil im Feld <b>Name des "
 #~ "Profils</b> ein und setzen Sie einen Haken bei <b>Profil verwenden</b> um "
@@ -3008,8 +3139,8 @@ msgstr "Inhalt"
 
 #~ msgid "This is a user friendly backup solution for common desktop needs."
 #~ msgstr ""
-#~ "Dies ist eine benutzerfreundliche Backup-Lösung für alltägliche Aufgaben "
-#~ "im Desktop-Bereich."
+#~ "Dies ist eine benutzerfreundliche Backup-Lösung für alltägliche Aufgaben im "
+#~ "Desktop-Bereich."
 
 #~ msgid "Terminating FUSE FILE ACCESS MANAGER!"
 #~ msgstr "Beenden des FUSE File Access Manager!"

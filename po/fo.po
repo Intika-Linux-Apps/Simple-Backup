@@ -1,4 +1,4 @@
-# Icelandic translation for sbackup
+# Faroese translation for sbackup
 # Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
 # This file is distributed under the same license as the sbackup package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
@@ -8,9 +8,10 @@ msgstr ""
 "Project-Id-Version: sbackup\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-02-04 21:54+0100\n"
-"PO-Revision-Date: 2010-10-05 13:34+0000\n"
-"Last-Translator: Jean-Peer Lorenz <Unknown>\n"
-"Language-Team: Icelandic <is@li.org>\n"
+"PO-Revision-Date: 2010-11-30 23:49+0000\n"
+"Last-Translator: Launchpad Translations Administrators "
+"<rosetta@launchpad.net>\n"
+"Language-Team: Faroese <fo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -371,32 +372,32 @@ msgstr ""
 #: src/sbackup/core/ConfigManager.py:1429 src/sbackup/ui/configgui.py:279
 #: src/sbackup/ui/configgui.py:1418
 msgid "Custom"
-msgstr "Sérniðið"
+msgstr ""
 
 #: src/sbackup/core/ConfigManager.py:1431
 msgid "MP3 Music"
-msgstr "MP3 Tónlist"
+msgstr ""
 
 #: src/sbackup/core/ConfigManager.py:1432
 msgid "AVI Video"
-msgstr "AVI Video"
+msgstr ""
 
 #: src/sbackup/core/ConfigManager.py:1433
 #: src/sbackup/core/ConfigManager.py:1434
 msgid "MPEG Video"
-msgstr "MPEG Video"
+msgstr ""
 
 #: src/sbackup/core/ConfigManager.py:1435
 msgid "Matrjoshka Video"
-msgstr "Matrjoshka Video"
+msgstr ""
 
 #: src/sbackup/core/ConfigManager.py:1436
 msgid "OGG Multimedia container"
-msgstr "OGG Margmiðlunar skrár"
+msgstr ""
 
 #: src/sbackup/core/ConfigManager.py:1437
 msgid "CD Images"
-msgstr "CD myndir"
+msgstr ""
 
 #: src/sbackup/core/RestoreManager.py:80
 #, python-format
@@ -998,15 +999,15 @@ msgstr ""
 
 #: src/sbackup/ui/configgui.py:732
 msgid "Already included item !"
-msgstr "Þessi skrá/mappa hefur þegar verið valin !"
+msgstr ""
 
 #: src/sbackup/ui/configgui.py:747
 msgid "Already excluded item !"
-msgstr "Hef þegar útilokað þennan hlut"
+msgstr ""
 
 #: src/sbackup/ui/configgui.py:759 src/sbackup/ui/configgui.py:1458
 msgid "Empty expression. Please enter a valid regular expression."
-msgstr "Tóm segð. Sláðu in gilda regexp segð."
+msgstr ""
 
 #: src/sbackup/ui/configgui.py:774 src/sbackup/ui/configgui.py:1472
 msgid "Provided regular expression is not valid."
@@ -1015,7 +1016,6 @@ msgstr ""
 #: src/sbackup/ui/configgui.py:782
 msgid "Empty filename or path. Please enter a valid filename or path."
 msgstr ""
-"Tómt skráarheiti eða tóm slóð. Sláðu inn gilt skráarheiti eða gilda slóð."
 
 #: src/sbackup/ui/configgui.py:791
 msgid ""
@@ -1051,7 +1051,7 @@ msgstr ""
 
 #: src/sbackup/ui/configgui.py:974 src/sbackup/ui/configgui.py:1029
 msgid "All files"
-msgstr "Allar skrár"
+msgstr ""
 
 #: src/sbackup/ui/configgui.py:994
 msgid "Include folder..."
@@ -1465,7 +1465,7 @@ msgstr ""
 
 #: src/sbackup/ui/restoregui.py:154 data/ui/sbackup-config.glade:4063
 msgid "Path"
-msgstr "Slóð"
+msgstr ""
 
 #: src/sbackup/ui/restoregui.py:159
 msgid "State"
@@ -1489,7 +1489,7 @@ msgstr ""
 
 #: src/sbackup/ui/restoregui.py:388
 msgid "Choose a source folder"
-msgstr "Veldu áfangastað"
+msgstr ""
 
 #: src/sbackup/ui/restoregui.py:405
 msgid "Reading snapshots..."
@@ -1501,7 +1501,7 @@ msgstr ""
 
 #: src/sbackup/ui/restoregui.py:458 src/sbackup/ui/restoregui.py:496
 msgid "Loading ..."
-msgstr "Hleð ..."
+msgstr ""
 
 #: src/sbackup/ui/restoregui.py:539
 msgid "Reading files from snapshot..."
@@ -1536,7 +1536,7 @@ msgstr ""
 
 #: src/sbackup/ui/restoregui.py:643
 msgid "Select restore location"
-msgstr "Veldu staðsetningu fyrir endurheimtu gögnin"
+msgstr ""
 
 #: src/sbackup/ui/restoregui.py:662
 #, python-format
@@ -1850,31 +1850,29 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:11
 msgid "Exclude file type"
-msgstr "Útiloka skáargerð"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:26
 msgid "Standard file types:"
-msgstr "Hefðbundin skráarsnið"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:63
 msgid "Custom defined file type with "
-msgstr "Skráarsnið sem enda á "
+msgstr ""
 
 #: data/ui/sbackup-config.glade:93
 msgid "file extension"
-msgstr "."
+msgstr ""
 
 #: data/ui/sbackup-config.glade:163
 msgid "Exclude by regex"
-msgstr "Útiloka með regex"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:180
 msgid ""
 "Enter a regular expression.\n"
 "Files and directories matching this expression will be excluded from backup."
 msgstr ""
-"Sláðu inn regex segð.\n"
-"Skrár og möppur sem passa við segðina verða útilokaðar frá afritunartökuni."
 
 #: data/ui/sbackup-config.glade:257
 msgid "Enter the remote target to include"
@@ -1935,7 +1933,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:915 data/ui/sbackup-restore.glade:7
 msgid "Simple Backup Suite"
-msgstr "Simple Backup Suite"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:932
 msgid "_File"
@@ -2015,7 +2013,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1330
 msgid "Do a full backup at least once every"
-msgstr "Framkvæma heildarafritun á amk."
+msgstr ""
 
 #: data/ui/sbackup-config.glade:1339
 msgid ""
@@ -2025,7 +2023,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1356 data/ui/sbackup-config.glade:3015
 msgid "days"
-msgstr "daga fresti."
+msgstr ""
 
 #: data/ui/sbackup-config.glade:1370
 msgid " "
@@ -2051,7 +2049,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1475
 msgid "General"
-msgstr "Almennt"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:1495
 msgid "<b>Included files and directories</b>"
@@ -2064,15 +2062,15 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1620 data/ui/sbackup-config.glade:1868
 msgid "Add File"
-msgstr "Bæta við skrá"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:1671 data/ui/sbackup-config.glade:1919
 msgid "Add Directory"
-msgstr "Bæta við möppu"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:1718
 msgid "Include"
-msgstr "Til afritunar"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:1739
 msgid "<b>Excluded files and directories</b>"
@@ -2080,7 +2078,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1952
 msgid "Paths"
-msgstr "Slóðir"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:2074 data/ui/sbackup-config.glade:2232
 msgid "Add"
@@ -2088,7 +2086,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2109
 msgid "File types"
-msgstr "Gerðir"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:2267
 msgid ""
@@ -2110,7 +2108,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2400
 msgid "Exclude"
-msgstr "Útiloka"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:2421
 msgid "Use default backup directory"
@@ -2122,11 +2120,11 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2472
 msgid "Use custom local backup directory"
-msgstr "Nota valda möppu undir afritun"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:2500
 msgid "Select the destination folder"
-msgstr "Veldu möppu"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:2526
 msgid "Use a remote site"
@@ -2134,7 +2132,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2568
 msgid "ssh://username:password@example.com/remote/dir/"
-msgstr "ssh://notandi:lykilorð@tölvunafn/slóð/á/möppu"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:2580
 msgid "Connect..."
@@ -2148,7 +2146,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2704
 msgid "Destination"
-msgstr "Áfangastaður"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:2725
 msgid "_No scheduled backups"
@@ -2231,16 +2229,14 @@ msgid ""
 "<small>Note: Additionally all incomplete and irrecoverable backups will be "
 "erased as long as there is a complete backup snapshot made later on.</small>"
 msgstr ""
-"Ath: Til viðbótar þá verður öllum ókláruðum og skemmdum afritum hent svo "
-"lengi sem það er til nýrri útgáfa."
 
 #: data/ui/sbackup-config.glade:3184
 msgid "Purging"
-msgstr "Geymsla afrita"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:3186
 msgid "Cleaning old backups"
-msgstr "Hreinsa gömul afrit"
+msgstr ""
 
 #: data/ui/sbackup-config.glade:3209
 msgid "<b>Logging</b>"
@@ -2452,7 +2448,7 @@ msgstr ""
 
 #: data/ui/sbackup-restore.glade:862
 msgid "Restore"
-msgstr "Endurheimta"
+msgstr ""
 
 #: data/ui/sbackup-restore.glade:882 data/ui/sbackup-restore.glade:901
 msgid ""

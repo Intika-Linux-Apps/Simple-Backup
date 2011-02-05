@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: sbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-04 21:54+0100\n"
-"PO-Revision-Date: 2010-09-24 23:56+0000\n"
+"PO-Revision-Date: 2010-10-05 13:26+0000\n"
 "Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: English (Canada) <en_CA@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-09-29 05:45+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-02-05 05:38+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: src/sbackup/backupproc.py:169 src/sbackup/pkginfo.py:68
 #, python-format
@@ -460,11 +460,11 @@ msgstr ""
 #: src/sbackup/core/SnapshotManager.py:312
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 
 #: src/sbackup/core/SnapshotManager.py:319
 #, python-format
@@ -487,7 +487,8 @@ msgstr "Base of snapshot '%s' is not set."
 
 #: src/sbackup/core/SnapshotManager.py:784
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 
@@ -524,7 +525,8 @@ msgstr "Upgrading to v1.5: %s"
 #: src/sbackup/core/UpgradeManager.py:300
 #, python-format
 msgid "The SNAR file already exist for snapshot '%s'. It is not overwritten."
-msgstr "The SNAR file already exist for snapshot '%s'. It is not overwritten."
+msgstr ""
+"The SNAR file already exist for snapshot '%s'. It is not overwritten."
 
 #: src/sbackup/core/profile_handler.py:90
 msgid "Preparation of backup process"
@@ -650,8 +652,8 @@ msgstr "Available disk size is '%s'."
 #: src/sbackup/core/profile_handler.py:253
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (free: %"
-"(freespace)s, required: %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup (free: "
+"%(freespace)s, required: %(neededspace)s)."
 msgstr ""
 
 #: src/sbackup/core/profile_handler.py:273
@@ -920,24 +922,25 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:137
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:142
 msgid "SSH schema is like : ssh://user:pass@example.com:33/home/user/backup/"
-msgstr "SSH schema is like : ssh://user:pass@example.com:33/home/user/backup/"
+msgstr ""
+"SSH schema is like : ssh://user:pass@example.com:33/home/user/backup/"
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:158
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 
 #: src/sbackup/ui/GladeWindow.py:210
 msgid ""
@@ -1221,15 +1224,15 @@ msgstr ""
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
 msgstr ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -1847,8 +1850,10 @@ msgstr "File '%(file)s' is not accessible with error '%(error)s'."
 
 #: src/sbackup/util/filecollect.py:364
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
-msgstr "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
+msgstr ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 
 #: src/sbackup/util/filecollect.py:368
 #, python-format
@@ -2348,7 +2353,8 @@ msgstr "<b>Logging</b>"
 
 #: data/ui/sbackup-config.glade:3234
 msgid "Debug is just for debbuging purpose.Info is the recommended setting"
-msgstr "Debug is just for debbuging purpose. Info is the recommended setting."
+msgstr ""
+"Debug is just for debbuging purpose. Info is the recommended setting."
 
 #: data/ui/sbackup-config.glade:3236
 msgid "Log level"
@@ -2356,7 +2362,8 @@ msgstr "Log level"
 
 #: data/ui/sbackup-config.glade:3248
 msgid "Debug is just for debbuging purpose. Info is the recommended setting."
-msgstr "Debug is just for debbuging purpose. Info is the recommended setting."
+msgstr ""
+"Debug is just for debbuging purpose. Info is the recommended setting."
 
 #: data/ui/sbackup-config.glade:3274
 msgid "Log file directory"
@@ -2602,11 +2609,9 @@ msgstr "Content"
 #~ msgstr "Invalid value of the target directory : "
 
 #~ msgid ""
-#~ "Got a non valid snapshot '%(name)s' due to name convention : %"
-#~ "(error_cause)s "
+#~ "Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s "
 #~ msgstr ""
-#~ "Got a non valid snapshot '%(name)s' due to name convention : %"
-#~ "(error_cause)s "
+#~ "Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s "
 
 #~ msgid "Deleting snapshot: '%(snp)s'."
 #~ msgstr "Deleting snapshot: '%(snp)s'."
@@ -2634,11 +2639,11 @@ msgstr "Content"
 #~ msgstr "Target directory is writable."
 
 #~ msgid ""
-#~ "Please change target directory and test writability of the target "
-#~ "directory by pressing \"Test\" button on the right."
+#~ "Please change target directory and test writability of the target directory "
+#~ "by pressing \"Test\" button on the right."
 #~ msgstr ""
-#~ "Please change target directory and test writeability of the target "
-#~ "directory by pressing \"Test\" button on the right."
+#~ "Please change target directory and test writeability of the target directory "
+#~ "by pressing \"Test\" button on the right."
 
 #~ msgid "remove"
 #~ msgstr "remove"
@@ -2647,22 +2652,20 @@ msgstr "Content"
 #~ msgstr "disable"
 
 #~ msgid ""
-#~ "You can't %s the Default Profile. Please use it if you need only one "
-#~ "profile."
+#~ "You can't %s the Default Profile. Please use it if you need only one profile."
 #~ msgstr ""
-#~ "You can't %s the Default Profile. Please use it if you need only one "
-#~ "profile."
+#~ "You can't %s the Default Profile. Please use it if you need only one profile."
 
 #~ msgid ""
 #~ "The program is going to be terminated. Please make sure the missing "
-#~ "directory exists (e.g. by mounting an external disk) or change the "
-#~ "specified target in '(Not So) Simple Backup-Configuration' tool and "
-#~ "restart this application."
+#~ "directory exists (e.g. by mounting an external disk) or change the specified "
+#~ "target in '(Not So) Simple Backup-Configuration' tool and restart this "
+#~ "application."
 #~ msgstr ""
 #~ "The program is going to be terminated. Please make sure the missing "
-#~ "directory exists (e.g. by mounting an external disk) or change the "
-#~ "specified target in '(Not So) Simple Backup-Configuration' tool and "
-#~ "restart this application."
+#~ "directory exists (e.g. by mounting an external disk) or change the specified "
+#~ "target in '(Not So) Simple Backup-Configuration' tool and restart this "
+#~ "application."
 
 #~ msgid "An error occurred during initialization:"
 #~ msgstr "An error occurred during initialization:"
@@ -2692,15 +2695,15 @@ msgstr "Content"
 #~ msgstr "Unable to make a proper backup. TAR was terminated."
 
 #~ msgid ""
-#~ "This dialogue helps you to manage your configuration profiles. You can "
-#~ "set up a number of configuration profiles that will be run by sbackup "
-#~ "when it starts the backup. Thanks to this you can configure backups of "
-#~ "different kinds to different places."
+#~ "This dialogue helps you to manage your configuration profiles. You can set "
+#~ "up a number of configuration profiles that will be run by sbackup when it "
+#~ "starts the backup. Thanks to this you can configure backups of different "
+#~ "kinds to different places."
 #~ msgstr ""
-#~ "This dialogue helps you to manage your configuration profiles. You can "
-#~ "set up a number of configuration profiles that will be run by sbackup "
-#~ "when it starts the backup. Thanks to this you can configure backups of "
-#~ "different kinds to different places."
+#~ "This dialogue helps you to manage your configuration profiles. You can set "
+#~ "up a number of configuration profiles that will be run by sbackup when it "
+#~ "starts the backup. Thanks to this you can configure backups of different "
+#~ "kinds to different places."
 
 #~ msgid ""
 #~ "Choose the compression format that you want to apply.\n"
@@ -2711,12 +2714,12 @@ msgstr "Content"
 
 #~ msgid ""
 #~ "Split the backup archive into small pieces (value in MiB).\n"
-#~ "<b>Important note:</b> This functionality is not compatible with "
-#~ "compressed backups!"
+#~ "<b>Important note:</b> This functionality is not compatible with compressed "
+#~ "backups!"
 #~ msgstr ""
 #~ "Split the backup archive into small pieces (value in MiB).\n"
-#~ "<b>Important note:</b> This functionality is not compatible with "
-#~ "compressed backups!"
+#~ "<b>Important note:</b> This functionality is not compatible with compressed "
+#~ "backups!"
 
 #~ msgid "<b>Remote paths</b>"
 #~ msgstr "<b>Remote paths</b>"
@@ -2734,8 +2737,8 @@ msgstr "Content"
 #~ "plugins you have installed."
 #~ msgstr ""
 #~ "Select the directory in which you have your backups.\n"
-#~ "You can use a <b>local</b> or <b>distant</b> directory depending on the "
-#~ "plug-ins you have installed."
+#~ "You can use a <b>local</b> or <b>distant</b> directory depending on the plug-"
+#~ "ins you have installed."
 
 #~ msgid "Use the default directory : "
 #~ msgstr "Use the default directory : "

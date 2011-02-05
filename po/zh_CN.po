@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: sbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-04 21:54+0100\n"
-"PO-Revision-Date: 2010-09-25 00:26+0000\n"
+"PO-Revision-Date: 2010-10-05 13:28+0000\n"
 "Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-09-29 05:45+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-02-05 05:38+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: src/sbackup/backupproc.py:169 src/sbackup/pkginfo.py:68
 #, python-format
@@ -29,11 +29,11 @@ msgstr ""
 
 #: src/sbackup/backupproc.py:178 src/sbackup/core/profile_handler.py:278
 msgid "No log file specified."
-msgstr ""
+msgstr "未指定日志文件。"
 
 #: src/sbackup/backupproc.py:183
 msgid "Unable to find log file."
-msgstr ""
+msgstr "找不到日志文件。"
 
 #: src/sbackup/backupproc.py:251
 msgid ""
@@ -46,7 +46,7 @@ msgstr ""
 
 #: src/sbackup/backupproc.py:300
 msgid "Backup was canceled by user."
-msgstr ""
+msgstr "备份被用户取消"
 
 #: src/sbackup/backupproc.py:305
 msgid "An error occurred during the cancellation of backup:"
@@ -54,11 +54,11 @@ msgstr ""
 
 #: src/sbackup/backupproc.py:311
 msgid "An error occurred during the backup:"
-msgstr ""
+msgstr "备份时出错："
 
 #: src/sbackup/backupproc.py:328
 msgid "Error when sending email:"
-msgstr ""
+msgstr "发送邮件时出错："
 
 #: src/sbackup/backupproc.py:359
 msgid "The following error(s) occurred before:"
@@ -80,7 +80,7 @@ msgstr ""
 
 #: src/sbackup/pkginfo.py:43
 msgid "Maintainers:"
-msgstr ""
+msgstr "维护者:"
 
 #: src/sbackup/pkginfo.py:47
 msgid "Former maintainers:"
@@ -88,13 +88,14 @@ msgstr ""
 
 #: src/sbackup/pkginfo.py:51
 msgid "Contributors:"
-msgstr ""
+msgstr "贡献者："
 
 #: src/sbackup/pkginfo.py:56
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Jean-Peer Lorenz https://launchpad.net/~peer.loz"
+"  Jean-Peer Lorenz https://launchpad.net/~peer.loz\n"
+"  唐微南 https://launchpad.net/~twn39"
 
 #: src/sbackup/ar_backend/tar.py:109 src/sbackup/ar_backend/tar.py:167
 #: src/sbackup/ar_backend/tar.py:213
@@ -120,7 +121,7 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:288
 #, python-format
 msgid "Unable to change permissions for file '%s'."
-msgstr ""
+msgstr "无法改变文件 '%s' 的权限。"
 
 #: src/sbackup/ar_backend/tar.py:356
 #, python-format
@@ -161,7 +162,7 @@ msgstr ""
 msgid ""
 "TAR returned messages:\n"
 "%s"
-msgstr ""
+msgstr "TAR 返回信息：%s"
 
 #: src/sbackup/ar_backend/tar.py:527
 msgid "TAR has been finished successfully."
@@ -194,7 +195,7 @@ msgstr ""
 
 #: src/sbackup/ar_backend/tar.py:754
 msgid "Included"
-msgstr ""
+msgstr "包含"
 
 #: src/sbackup/ar_backend/tar.py:754
 msgid "Not changed"
@@ -202,7 +203,7 @@ msgstr ""
 
 #: src/sbackup/ar_backend/tar.py:754
 msgid "Directory"
-msgstr ""
+msgstr "目录"
 
 #: src/sbackup/ar_backend/tar.py:782
 msgid "Line must be a string"
@@ -219,7 +220,7 @@ msgstr ""
 #: src/sbackup/ar_backend/tar.py:884
 #, python-format
 msgid "File '%s' does not exist."
-msgstr ""
+msgstr "文件‘%s’不存在."
 
 #: src/sbackup/ar_backend/tar.py:1014 src/sbackup/ar_backend/tar.py:1048
 #: src/sbackup/ar_backend/tar.py:1148
@@ -443,8 +444,8 @@ msgstr ""
 #: src/sbackup/core/SnapshotManager.py:312
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:319
@@ -468,7 +469,8 @@ msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:784
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:824
@@ -630,8 +632,8 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:253
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (free: %"
-"(freespace)s, required: %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup (free: "
+"%(freespace)s, required: %(neededspace)s)."
 msgstr ""
 
 #: src/sbackup/core/profile_handler.py:273
@@ -888,8 +890,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:137
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:142
@@ -899,8 +901,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:158
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
 
 #: src/sbackup/ui/GladeWindow.py:210
@@ -1167,8 +1169,8 @@ msgstr ""
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -1779,7 +1781,8 @@ msgstr ""
 
 #: src/sbackup/util/filecollect.py:364
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
 #: src/sbackup/util/filecollect.py:368
@@ -2231,9 +2234,7 @@ msgstr ""
 msgid ""
 "<small>Note: Additionally all incomplete and irrecoverable backups will be "
 "erased as long as there is a complete backup snapshot made later on.</small>"
-msgstr ""
-"<small>注意:如果存在新的备份快照，将会删除额外的不完全和不可恢复的备份</"
-"small>"
+msgstr "<small>注意:如果存在新的备份快照，将会删除额外的不完全和不可恢复的备份</small>"
 
 #: data/ui/sbackup-config.glade:3184
 msgid "Purging"
@@ -2516,7 +2517,6 @@ msgstr ""
 #~ msgstr "我们没有“%(file)s” 的读权限，需要排除：%(error)s "
 
 #~ msgid ""
-#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > %"
-#~ "(maxsize)s), it has to be exclude "
-#~ msgstr ""
-#~ "'%(file)s'的大小比指定的大（%(filesize)s > %(maxsize)s)，必须排除。 "
+#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > "
+#~ "%(maxsize)s), it has to be exclude "
+#~ msgstr "'%(file)s'的大小比指定的大（%(filesize)s > %(maxsize)s)，必须排除。 "
