@@ -1,11 +1,11 @@
-This package was debianized by Jean-Peer Lorenz <peer.loz@gmx.net> Sun, 03 Oct 2010 15:24:48 +0200
+This package was debianized by Jean-Peer Lorenz <peer.loz@gmx.net> Tue, 08 Feb 2011 13:58:43 +0100
 
 It was downloaded from: https://launchpad.net/sbackup/
 
 Upstream Authors: Jean-Peer Lorenz <peer.loz@gmx.net>
                   Ouattara Oumar Aziz <wattazoum@gmail.com>
 
-Copyright: copyright (c) 2008-2010 by Jean-Peer Lorenz
+Copyright: copyright (c) 2008-2011 by Jean-Peer Lorenz
            copyright (c) 2007-2010 by Ouattara Oumar Aziz
            copyright (c) 2005-2007 by Aigars Mahinovs
 
@@ -28,6 +28,6 @@ License:
 On Debian systems, the complete text of the GNU General
 Public License can be found in `/usr/share/common-licenses/GPL'.
 
-The Debian packaging is (C) 2009-2010, Jean-Peer Lorenz <peer.loz@gmx.net>,
+The Debian packaging is (C) 2009-2011, Jean-Peer Lorenz <peer.loz@gmx.net>,
 (C) 2008-2010, Ouattara Oumar Aziz <wattazoum@gmail.com>,
 (C) 2005-2007 Aigars Mahinovs and is licensed under the GPL, see above.
