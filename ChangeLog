@@ -26,7 +26,7 @@ sbackup (0.11.4)
   * refer to dependent packages 'gconf2', 'desktop-file-utils' in install file
   * translations updated
   * translations added: fo
-  
+
 sbackup (0.11.3)
   * [Fix] LP: #645543 "Cannot concatenate str and error object" error prevents
                       incremental backups
