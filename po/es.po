@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: sbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-04 21:54+0100\n"
-"PO-Revision-Date: 2010-09-24 23:58+0000\n"
-"Last-Translator: Paco Molinero <paco@byasl.com>\n"
+"PO-Revision-Date: 2010-12-22 06:40+0000\n"
+"Last-Translator: Jorge Prediger <jorgeprediger@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-09-29 05:45+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-02-05 05:38+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: src/sbackup/backupproc.py:169 src/sbackup/pkginfo.py:68
 #, python-format
@@ -25,15 +25,15 @@ msgstr ""
 #: src/sbackup/backupproc.py:173
 #, python-format
 msgid "[SBackup] [%(profile)s] Report of %(date)s"
-msgstr ""
+msgstr "[SBackup] [%(profile)s] Reporte del %(date)s"
 
 #: src/sbackup/backupproc.py:178 src/sbackup/core/profile_handler.py:278
 msgid "No log file specified."
-msgstr ""
+msgstr "No se especifico un archivo de registro."
 
 #: src/sbackup/backupproc.py:183
 msgid "Unable to find log file."
-msgstr ""
+msgstr "No se encontró ningún archivo de registro."
 
 #: src/sbackup/backupproc.py:251
 msgid ""
@@ -46,19 +46,19 @@ msgstr ""
 
 #: src/sbackup/backupproc.py:300
 msgid "Backup was canceled by user."
-msgstr ""
+msgstr "Copia de seguridad cancelada por el usuario."
 
 #: src/sbackup/backupproc.py:305
 msgid "An error occurred during the cancellation of backup:"
-msgstr ""
+msgstr "Se produjo un error durante la cancelación de copia de seguridad:"
 
 #: src/sbackup/backupproc.py:311
 msgid "An error occurred during the backup:"
-msgstr ""
+msgstr "Ocurrió un error durante la copia de seguridad:"
 
 #: src/sbackup/backupproc.py:328
 msgid "Error when sending email:"
-msgstr ""
+msgstr "Error al enviar el correo electrónico:"
 
 #: src/sbackup/backupproc.py:359
 msgid "The following error(s) occurred before:"
@@ -70,6 +70,8 @@ msgid ""
 "Backup is not being started.\n"
 "%s"
 msgstr ""
+"La copia de seguridad no se ha iniciado.\n"
+"%s"
 
 #: src/sbackup/pkginfo.py:40
 msgid ""
@@ -80,7 +82,7 @@ msgstr ""
 
 #: src/sbackup/pkginfo.py:43
 msgid "Maintainers:"
-msgstr ""
+msgstr "Encargados de mantenimiento:"
 
 #: src/sbackup/pkginfo.py:47
 msgid "Former maintainers:"
@@ -88,7 +90,7 @@ msgstr ""
 
 #: src/sbackup/pkginfo.py:51
 msgid "Contributors:"
-msgstr ""
+msgstr "Colaboradores:"
 
 #: src/sbackup/pkginfo.py:56
 msgid "translator-credits"
@@ -96,12 +98,13 @@ msgstr ""
 "traductor-créditos\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Jorge Prediger https://launchpad.net/~jorgeprediger\n"
 "  Paco Molinero https://launchpad.net/~franciscomol"
 
 #: src/sbackup/ar_backend/tar.py:109 src/sbackup/ar_backend/tar.py:167
 #: src/sbackup/ar_backend/tar.py:213
 msgid "Invalid archive type."
-msgstr ""
+msgstr "Tipo de archivo inválido."
 
 #: src/sbackup/ar_backend/tar.py:123
 #, python-format
@@ -131,11 +134,12 @@ msgstr ""
 
 #: src/sbackup/ar_backend/tar.py:372
 msgid "Launching TAR to make incremental backup."
-msgstr ""
+msgstr "Ejecutando TAR para realizar respaldo incremental."
 
 #: src/sbackup/ar_backend/tar.py:401
 msgid "Unable to find the SNAR file to make an incremental backup."
 msgstr ""
+"No se pudo encontrar el archivo SNAR para realizar un respaldo incremental."
 
 #: src/sbackup/ar_backend/tar.py:402
 msgid "Falling back to full backup."
@@ -143,7 +147,7 @@ msgstr ""
 
 #: src/sbackup/ar_backend/tar.py:444
 msgid "Launching TAR to make a full backup."
-msgstr ""
+msgstr "Ejecutando TAR para realizar respaldo completo."
 
 #: src/sbackup/ar_backend/tar.py:511
 msgid "Leading '/' from member names were removed."
@@ -156,7 +160,7 @@ msgstr ""
 #: src/sbackup/ar_backend/tar.py:522
 #, python-format
 msgid "TAR returned a message: %s"
-msgstr ""
+msgstr "TAR ha devuelto un mensaje: %s"
 
 #: src/sbackup/ar_backend/tar.py:524
 #, python-format
@@ -164,15 +168,17 @@ msgid ""
 "TAR returned messages:\n"
 "%s"
 msgstr ""
+"TAR ha devuelto estos mensajes:\n"
+"%s"
 
 #: src/sbackup/ar_backend/tar.py:527
 msgid "TAR has been finished successfully."
-msgstr ""
+msgstr "TAR ha terminado exitosamente."
 
 #: src/sbackup/ar_backend/tar.py:531
 #, python-format
 msgid "TAR returned a warning: %s"
-msgstr ""
+msgstr "TAR devolvió una advertencia: %s"
 
 #: src/sbackup/ar_backend/tar.py:533
 #, python-format
@@ -180,14 +186,16 @@ msgid ""
 "TAR returned warnings:\n"
 "%s"
 msgstr ""
+"TAR devolvió estas advertencias:\n"
+"%s"
 
 #: src/sbackup/ar_backend/tar.py:536
 msgid "TAR returned warnings but has been finished successfully."
-msgstr ""
+msgstr "TAR devolvió advertencias pero finalizo con éxito."
 
 #: src/sbackup/ar_backend/tar.py:540
 msgid "Unable to finish successfully. TAR terminated with errors."
-msgstr ""
+msgstr "No se pudo finalizar correctamente. TAR finalizo con errores."
 
 #: src/sbackup/ar_backend/tar.py:721
 #, python-format
@@ -221,7 +229,7 @@ msgstr "Directorio de Dump inconsistente : 'control' esta vacio"
 #: src/sbackup/ar_backend/tar.py:884
 #, python-format
 msgid "File '%s' does not exist."
-msgstr ""
+msgstr "El archivo '%s' no existe"
 
 #: src/sbackup/ar_backend/tar.py:1014 src/sbackup/ar_backend/tar.py:1048
 #: src/sbackup/ar_backend/tar.py:1148
@@ -235,12 +243,13 @@ msgstr "Se requiere un archivo de instantánea"
 #: src/sbackup/ar_backend/tar.py:1417
 #, python-format
 msgid "Directory does not exist: %s."
-msgstr ""
+msgstr "El directorio no existe: %s."
 
 #: src/sbackup/core/ConfigManager.py:330
 #, python-format
 msgid "Profile settings are being read from file '%s'."
 msgstr ""
+"Las configuraciones del perfil se están leyendo desde el archivo '%s'."
 
 #: src/sbackup/core/ConfigManager.py:333
 #, python-format
@@ -274,8 +283,8 @@ msgstr ""
 msgid ""
 "Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )"
 msgstr ""
-"No se ha podido evluar '%(parameter)s' como diccionario (el valor tiene = '%"
-"(value)r' )"
+"No se ha podido evluar '%(parameter)s' como diccionario (el valor tiene = "
+"'%(value)r' )"
 
 #: src/sbackup/core/ConfigManager.py:638
 msgid "You must provide a dictionary."
@@ -310,11 +319,14 @@ msgstr ""
 #: src/sbackup/core/ConfigManager.py:895
 msgid "No schedule defined in configuration file. Probing from filesystem."
 msgstr ""
+"No hay tarea programada definida en el archivo de configuración. Probando "
+"desde el sistema de archivo."
 
 #: src/sbackup/core/ConfigManager.py:988
 #: src/sbackup/core/ConfigManager.py:1000
 msgid "The config file is not set yet into this ConfigManager"
-msgstr "El archivo de configuración no está listo todavía en el ConfigManager"
+msgstr ""
+"El archivo de configuración no está listo todavía en el ConfigManager"
 
 #: src/sbackup/core/ConfigManager.py:1163
 msgid "No receiver set."
@@ -322,15 +334,19 @@ msgstr ""
 
 #: src/sbackup/core/ConfigManager.py:1165
 msgid "No SMTP server set."
-msgstr ""
+msgstr "No se ha configurado un servidor SMTP."
 
 #: src/sbackup/core/ConfigManager.py:1168
 msgid "Username set but no password specified."
 msgstr ""
+"Se ha configurado un nombre de usuario pero no se ha especificado una "
+"contraseña."
 
 #: src/sbackup/core/ConfigManager.py:1171
 msgid "Password set but no username specified."
 msgstr ""
+"Se ha configurado una contraseña pero no se ha especificado un nombre de "
+"usuario."
 
 #: src/sbackup/core/ConfigManager.py:1174
 msgid ""
@@ -359,23 +375,23 @@ msgstr "Sin límite"
 
 #: src/sbackup/core/ConfigManager.py:1424
 msgid "100 MiB"
-msgstr ""
+msgstr "100 MiB"
 
 #: src/sbackup/core/ConfigManager.py:1425
 msgid "250 MiB"
-msgstr ""
+msgstr "250 MiB"
 
 #: src/sbackup/core/ConfigManager.py:1426
 msgid "650 MiB"
-msgstr ""
+msgstr "650 MiB"
 
 #: src/sbackup/core/ConfigManager.py:1427
 msgid "2 GiB (FAT16)"
-msgstr ""
+msgstr "2 GiB (FAT16)"
 
 #: src/sbackup/core/ConfigManager.py:1428
 msgid "4 GiB (FAT32)"
-msgstr ""
+msgstr "4 GiB (FAT32)"
 
 #: src/sbackup/core/ConfigManager.py:1429 src/sbackup/ui/configgui.py:279
 #: src/sbackup/ui/configgui.py:1418
@@ -445,13 +461,14 @@ msgstr "No hay necesidad de rehacer un snapshot completo '%s'"
 #, python-format
 msgid ""
 "'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken "
-msgstr "'%(snapshotToRebase)s'  no tiene un archivo 'base', puede estar roto "
+msgstr ""
+"'%(snapshotToRebase)s'  no tiene un archivo 'base', puede estar roto "
 
 #: src/sbackup/core/SnapshotManager.py:312
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 "No se puede rehacer un snapshot en uno mas nuevo : '%(snapshotToRebase)s' <= "
 "'%(NewBaseSnapshot)s' "
@@ -464,7 +481,7 @@ msgstr ""
 #: src/sbackup/core/SnapshotManager.py:556
 #, python-format
 msgid "An error occurred when pulling snapshot '%s'."
-msgstr ""
+msgstr "Ocurrió un error al tomar la instantánea '%s'."
 
 #: src/sbackup/core/SnapshotManager.py:595
 msgid "The snarfile header is incomplete !"
@@ -477,7 +494,8 @@ msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:784
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:824
@@ -514,10 +532,11 @@ msgstr "Actualizando a v1.5: %s"
 #, python-format
 msgid "The SNAR file already exist for snapshot '%s'. It is not overwritten."
 msgstr ""
+"El archivo SNAR ya existía en la instantánea '%s'. No se ha sobreescrito."
 
 #: src/sbackup/core/profile_handler.py:90
 msgid "Preparation of backup process"
-msgstr ""
+msgstr "Preparación del proceso de copia de seguridad"
 
 #: src/sbackup/core/profile_handler.py:133
 msgid ""
@@ -541,7 +560,7 @@ msgstr ""
 
 #: src/sbackup/core/profile_handler.py:165
 msgid "Problem when setting the packages list: "
-msgstr ""
+msgstr "Hubo un problema al configurar la lista de paquetes: "
 
 #: src/sbackup/core/profile_handler.py:169
 msgid "Setting Excludes File."
@@ -576,7 +595,7 @@ msgstr ""
 
 #: src/sbackup/core/profile_handler.py:218
 msgid "Backup process finished."
-msgstr ""
+msgstr "Ha finalizado el proceso de respaldo."
 
 #: src/sbackup/core/profile_handler.py:225
 msgid "Inspect file system and collect file infos"
@@ -584,32 +603,32 @@ msgstr ""
 
 #: src/sbackup/core/profile_handler.py:236
 msgid "Summary of backup"
-msgstr ""
+msgstr "Resumen de la copia de seguridad"
 
 #: src/sbackup/core/profile_handler.py:237
 #, python-format
 msgid "Number of directories: %s."
-msgstr ""
+msgstr "Número de directorios: %s."
 
 #: src/sbackup/core/profile_handler.py:238
 #, python-format
 msgid "Total number of files: %s."
-msgstr ""
+msgstr "Número total de archivos: %s."
 
 #: src/sbackup/core/profile_handler.py:239
 #, python-format
 msgid "Number of symlinks: %s."
-msgstr ""
+msgstr "Número de enlaces simbólicos: %s."
 
 #: src/sbackup/core/profile_handler.py:240
 #, python-format
 msgid "Number of files included in snapshot: %s."
-msgstr ""
+msgstr "Número de archivos incluidos en la instantánea: %s."
 
 #: src/sbackup/core/profile_handler.py:241
 #, python-format
 msgid "Number of new files (also included): %s."
-msgstr ""
+msgstr "Número de archivos nuevos (también incluidos): %s."
 
 #: src/sbackup/core/profile_handler.py:242
 #, python-format
@@ -624,7 +643,7 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:244
 #, python-format
 msgid "Number of items to be excluded by config: %s."
-msgstr ""
+msgstr "Número de elementos excluidos por configuración: %s."
 
 #: src/sbackup/core/profile_handler.py:245
 #, python-format
@@ -634,13 +653,13 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:251
 #, python-format
 msgid "Available disk size is '%s'."
-msgstr ""
+msgstr "El tamaño de disco disponible es '%s'."
 
 #: src/sbackup/core/profile_handler.py:253
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (free: %"
-"(freespace)s, required: %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup (free: "
+"%(freespace)s, required: %(neededspace)s)."
 msgstr ""
 
 #: src/sbackup/core/profile_handler.py:273
@@ -873,8 +892,8 @@ msgid ""
 "Error matching the schema 'ftp://user:pass@server/anything' with '%s' (The "
 "'/' after server is mandatory)"
 msgstr ""
-"Error de concordancia del esquema 'ftp://user:pass@server/anything' con '%"
-"s' (se requiere '/' después del nombre del servidor)"
+"Error de concordancia del esquema 'ftp://user:pass@server/anything' con '%s' "
+"(se requiere '/' después del nombre del servidor)"
 
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:114
 #, python-format
@@ -885,7 +904,8 @@ msgstr ""
 
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:138
 msgid "SFTP schema is like : sftp://user:pass@server/anything"
-msgstr "El esquema de una dirección SFTP es: sftp://user:pass@server/anything"
+msgstr ""
+"El esquema de una dirección SFTP es: sftp://user:pass@server/anything"
 
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:185
 #, python-format
@@ -893,8 +913,8 @@ msgid ""
 "Error matching the schema 'sftp://user:pass@server/anything' with '%s' (The "
 "'/' after server is mandatory)"
 msgstr ""
-"Error de concordancia del esquema 'sftp://user:pass@server/anything' con '%"
-"s' (se requiere '/' después del nombre del servidor)"
+"Error de concordancia del esquema 'sftp://user:pass@server/anything' con "
+"'%s' (se requiere '/' después del nombre del servidor)"
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:81
 #, python-format
@@ -902,14 +922,14 @@ msgid ""
 "Error matching the schema 'ssh://user:pass@example.com/home/' with '%s' (The "
 "'/' after server is mandatory)"
 msgstr ""
-"Error de concordancia del esquema 'ssh://user:pass@server/anything' con '%"
-"s' (se requiere '/' después del nombre del servidor)"
+"Error de concordancia del esquema 'ssh://user:pass@server/anything' con '%s' "
+"(se requiere '/' después del nombre del servidor)"
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:137
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:142
@@ -919,8 +939,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:158
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
 
 #: src/sbackup/ui/GladeWindow.py:210
@@ -1192,8 +1212,8 @@ msgstr ""
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -1806,7 +1826,8 @@ msgstr ""
 
 #: src/sbackup/util/filecollect.py:364
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
 #: src/sbackup/util/filecollect.py:368
@@ -2525,24 +2546,22 @@ msgstr "Contenido"
 #~ msgstr "El directorio de destino se puede escribir."
 
 #~ msgid ""
-#~ "Please change target directory and test writability of the target "
-#~ "directory by pressing \"Test\" button on the right."
+#~ "Please change target directory and test writability of the target directory "
+#~ "by pressing \"Test\" button on the right."
 #~ msgstr ""
 #~ "Por favor, cambie el directorio de destino y compruebe si se permite la "
 #~ "escritura en él presionando el botón \"Test\" de la derecha."
 
 #~ msgid "I didn't find the log file. Please set it up in sbackup.conf "
 #~ msgstr ""
-#~ "No encontré el archivo de registro. Por favor especifíquelo en sbackup."
-#~ "conf "
+#~ "No encontré el archivo de registro. Por favor especifíquelo en sbackup.conf "
 
 #~ msgid "Set the reciever of this mail"
 #~ msgstr "Establecer receptor de este correo"
 
 #~ msgid "Choose the SSL option (smtptls=1) to be able to use Cert and Key"
 #~ msgstr ""
-#~ "Seleccione la opción de SSL (smtptls=1) para poder usar certificado y "
-#~ "clave"
+#~ "Seleccione la opción de SSL (smtptls=1) para poder usar certificado y clave"
 
 #~ msgid "Save to file ..."
 #~ msgstr "Guardar al archivo..."
@@ -2557,8 +2576,7 @@ msgstr "Contenido"
 #~ msgstr "No se pued escribir en el destino "
 
 #~ msgid ""
-#~ "Got a non valid snapshot '%(name)s' due to name convention : %"
-#~ "(error_cause)s "
+#~ "Got a non valid snapshot '%(name)s' due to name convention : %(error_cause)s "
 #~ msgstr ""
 #~ "'%(name)s' no es una instantánea válida debido a la convención en los "
 #~ "nombres: %(error_cause)s "
@@ -2659,12 +2677,12 @@ msgstr "Contenido"
 #~ msgstr "Directorio no existente: %s"
 
 #~ msgid ""
-#~ "Please enter the new profile name in the <b>Profile name</b> entry and "
-#~ "check the <b>Enable</b> checkbox to enable it."
+#~ "Please enter the new profile name in the <b>Profile name</b> entry and check "
+#~ "the <b>Enable</b> checkbox to enable it."
 #~ msgstr ""
-#~ "Por favor, introduzca el nuevo nombre de perfil en la entrada de "
-#~ "<b>Nombre de perfil</b> y compruebe que está activada la opción de "
-#~ "<b>Activar</b> para habilitarlo."
+#~ "Por favor, introduzca el nuevo nombre de perfil en la entrada de <b>Nombre "
+#~ "de perfil</b> y compruebe que está activada la opción de <b>Activar</b> para "
+#~ "habilitarlo."
 
 #~ msgid "gtk-no"
 #~ msgstr "gtk-no"
@@ -2706,11 +2724,11 @@ msgstr "Contenido"
 #~ msgstr "Parámetros"
 
 #~ msgid ""
-#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > %"
-#~ "(maxsize)s), it has to be exclude "
+#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > "
+#~ "%(maxsize)s), it has to be exclude "
 #~ msgstr ""
-#~ "El Tamaño de '%(file)s' es mayor que el especificado ( %(filesize)s > %"
-#~ "(maxsize)s), ha de ser excluido. "
+#~ "El Tamaño de '%(file)s' es mayor que el especificado ( %(filesize)s > "
+#~ "%(maxsize)s), ha de ser excluido. "
 
 #~ msgid "Deleting '%(snp)s' for purge !"
 #~ msgstr "Borrando '%(snp)s' para purgar !"

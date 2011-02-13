@@ -92,6 +92,8 @@ errorcodes = {
     gio.ERROR_WRONG_ETAG : exceptions.ErrorDescription(gio.ERROR_WRONG_ETAG, "ERROR_WRONG_ETAG", "File's Entity Tag was incorrect.")
 }
 
+MSG_UNKNOWN_ERROR_CODE = _("Unknown error code:")
+
 
 MAX_NUMBER_ASK_PASSWORD = 4
 
@@ -828,8 +830,12 @@ class GioOperations(interfaces.IOperations):
 
 
 def get_gio_errmsg(error, title):
-    _error_descr = errorcodes[error.code]
-    _msg = "%s: %s [%s - %s]" % (title, error, _error_descr.name, _error_descr.message)
+    _msg = "%s: %s" % (title, error)
+    try:
+        _error_descr = errorcodes[error.code]
+        _msg = "%s [%s - %s]" % (_msg, _error_descr.name, _error_descr.message)
+    except KeyError:
+        _msg = "%s [%s %s]" % (_msg, MSG_UNKNOWN_ERROR_CODE, error.code)
     return _msg
 
 

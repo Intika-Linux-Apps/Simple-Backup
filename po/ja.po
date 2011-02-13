@@ -6,16 +6,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sbackup\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-02-04 21:54+0100\n"
-"PO-Revision-Date: 2010-09-24 21:40+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2010-10-05 13:28+0000\n"
+"Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-09-29 05:44+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-02-05 05:37+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: src/sbackup/backupproc.py:169 src/sbackup/pkginfo.py:68
 #, python-format
@@ -78,19 +78,21 @@ msgstr ""
 
 #: src/sbackup/pkginfo.py:43
 msgid "Maintainers:"
-msgstr ""
+msgstr "メンテナ:"
 
 #: src/sbackup/pkginfo.py:47
 msgid "Former maintainers:"
-msgstr ""
+msgstr "以前のメンテナ:"
 
 #: src/sbackup/pkginfo.py:51
 msgid "Contributors:"
-msgstr ""
+msgstr "貢献者:"
 
 #: src/sbackup/pkginfo.py:56
 msgid "translator-credits"
 msgstr ""
+"Launchpad Contributions:\n"
+"  Hiroshi Tagawa https://launchpad.net/~kuponuga"
 
 #: src/sbackup/ar_backend/tar.py:109 src/sbackup/ar_backend/tar.py:167
 #: src/sbackup/ar_backend/tar.py:213
@@ -439,8 +441,8 @@ msgstr ""
 #: src/sbackup/core/SnapshotManager.py:312
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:319
@@ -464,7 +466,8 @@ msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:784
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:824
@@ -626,8 +629,8 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:253
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (free: %"
-"(freespace)s, required: %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup (free: "
+"%(freespace)s, required: %(neededspace)s)."
 msgstr ""
 
 #: src/sbackup/core/profile_handler.py:273
@@ -884,8 +887,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:137
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:142
@@ -895,8 +898,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:158
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
 
 #: src/sbackup/ui/GladeWindow.py:210
@@ -1013,9 +1016,7 @@ msgstr ""
 
 #: src/sbackup/ui/configgui.py:782
 msgid "Empty filename or path. Please enter a valid filename or path."
-msgstr ""
-"ファイル名またはパスが無効です。正しいファイル名またはパスを入力してくださ"
-"い。"
+msgstr "ファイル名またはパスが無効です。正しいファイル名またはパスを入力してください。"
 
 #: src/sbackup/ui/configgui.py:791
 msgid ""
@@ -1165,8 +1166,8 @@ msgstr ""
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -1777,7 +1778,8 @@ msgstr ""
 
 #: src/sbackup/util/filecollect.py:364
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
 #: src/sbackup/util/filecollect.py:368
@@ -1873,8 +1875,7 @@ msgid ""
 "Files and directories matching this expression will be excluded from backup."
 msgstr ""
 "正規表現を入力してください。\n"
-"正規表現にマッチしたファイルとディレクトリはバックアップ対象から除外されま"
-"す。"
+"正規表現にマッチしたファイルとディレクトリはバックアップ対象から除外されます。"
 
 #: data/ui/sbackup-config.glade:257
 msgid "Enter the remote target to include"
@@ -1915,7 +1916,7 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:613
 msgid "<b>Configuration profiles</b>"
-msgstr ""
+msgstr "<b>プロファイルの設定</b>"
 
 #: data/ui/sbackup-config.glade:785
 msgid ""
@@ -1924,14 +1925,17 @@ msgid ""
 "Please enter the new profile name and set the according checkbox in order to "
 "enable resp. disable it."
 msgstr ""
+"<b>新しいプロファイルを追加する</b>\n"
+"\n"
+"新しいプロファイル名を入力し、有効にするときはチェックボックスをチェックしてください。"
 
 #: data/ui/sbackup-config.glade:810
 msgid "Profile name"
-msgstr ""
+msgstr "プロファイル名"
 
 #: data/ui/sbackup-config.glade:836
 msgid "Enabled"
-msgstr ""
+msgstr "有効"
 
 #: data/ui/sbackup-config.glade:915 data/ui/sbackup-restore.glade:7
 msgid "Simple Backup Suite"
@@ -1939,15 +1943,15 @@ msgstr "シンプルバックアップスイート"
 
 #: data/ui/sbackup-config.glade:932
 msgid "_File"
-msgstr ""
+msgstr "ファイル(_F)"
 
 #: data/ui/sbackup-config.glade:971
 msgid "Save as..."
-msgstr ""
+msgstr "別名で保存..."
 
 #: data/ui/sbackup-config.glade:1008
 msgid "_Tools"
-msgstr ""
+msgstr "ツール(_T)"
 
 #: data/ui/sbackup-config.glade:1016 data/ui/sbackup-config.glade:1140
 msgid "Set default settings..."
@@ -1955,43 +1959,43 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:1037
 msgid "Profile Manager..."
-msgstr ""
+msgstr "プロファイルマネージャ"
 
 #: data/ui/sbackup-config.glade:1058
 msgid "Make backup now"
-msgstr ""
+msgstr "すぐにバックアップ"
 
 #: data/ui/sbackup-config.glade:1079
 msgid "_Help"
-msgstr ""
+msgstr "ヘルプ(_H)"
 
 #: data/ui/sbackup-config.glade:1087
 msgid "_View all help topics"
-msgstr ""
+msgstr "すべてのヘルプトピックスを表示(_V)"
 
 #: data/ui/sbackup-config.glade:1103
 msgid "_About this program"
-msgstr ""
+msgstr "このプログラムについて(_A)"
 
 #: data/ui/sbackup-config.glade:1154
 msgid "Reload configuration"
-msgstr ""
+msgstr "設定の再読込み"
 
 #: data/ui/sbackup-config.glade:1168
 msgid "Save configuration"
-msgstr ""
+msgstr "設定を保存する"
 
 #: data/ui/sbackup-config.glade:1191
 msgid "Make a backup now"
-msgstr ""
+msgstr "すぐにバックアップする"
 
 #: data/ui/sbackup-config.glade:1214
 msgid "Open the profile manager"
-msgstr ""
+msgstr "プロファイルマネージャを開く"
 
 #: data/ui/sbackup-config.glade:1215
 msgid "Profiles"
-msgstr ""
+msgstr "プロファイル"
 
 #: data/ui/sbackup-config.glade:1253
 msgid ""
@@ -1999,12 +2003,17 @@ msgid ""
 "gzip\n"
 "bzip2"
 msgstr ""
+"圧縮しない\n"
+"gzip\n"
+"bzip2"
 
 #: data/ui/sbackup-config.glade:1271
 msgid ""
 "Compression format\n"
 "Default is set to uncompressed backups."
 msgstr ""
+"圧縮フォーマット\n"
+"初期設定ではバックアップを圧縮しません。"
 
 #: data/ui/sbackup-config.glade:1290 data/ui/sbackup-config.glade:1403
 msgid ""
@@ -2012,6 +2021,8 @@ msgid ""
 "support large files. This functionality can not be used if the backup is "
 "compressed."
 msgstr ""
+"スナップショットを分割することにより大きなファイルをサポートしていないファイルシステムでバックアップを作成することができます。この機能はバックアップの圧縮"
+"と併用できません。"
 
 #: data/ui/sbackup-config.glade:1330
 msgid "Do a full backup at least once every"
@@ -2021,7 +2032,7 @@ msgstr "完全バックアップを以下の間隔で行う"
 msgid ""
 "Unless a set number of days has passed since the last full backup, "
 "incremental backups will be done."
-msgstr ""
+msgstr "最後の完全バックアップから設定した日数が経過するまで、増分バックアップを実行します。"
 
 #: data/ui/sbackup-config.glade:1356 data/ui/sbackup-config.glade:3015
 msgid "days"
@@ -2029,21 +2040,21 @@ msgstr "日"
 
 #: data/ui/sbackup-config.glade:1370
 msgid " "
-msgstr ""
+msgstr " "
 
 #: data/ui/sbackup-config.glade:1380 data/ui/sbackup-config.glade:2323
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: data/ui/sbackup-config.glade:1405
 msgid "Split backup archives into several chunks"
-msgstr ""
+msgstr "バックアップアーカイブを分割する"
 
 #: data/ui/sbackup-config.glade:1438 data/ui/sbackup-config.glade:2627
 #: data/ui/sbackup-config.glade:2863 data/ui/sbackup-config.glade:3111
 #: data/ui/sbackup-config.glade:3856
 msgid "Help"
-msgstr ""
+msgstr "ヘルプ"
 
 #: data/ui/sbackup-config.glade:1442 data/ui/sbackup-config.glade:2632
 msgid "Show help topic about configuration GUI."
@@ -2055,12 +2066,12 @@ msgstr "全般"
 
 #: data/ui/sbackup-config.glade:1495
 msgid "<b>Included files and directories</b>"
-msgstr ""
+msgstr "<b>バックアップするファイルとフォルダ</b>"
 
 #: data/ui/sbackup-config.glade:1570 data/ui/sbackup-config.glade:1818
 #: data/ui/sbackup-config.glade:2023 data/ui/sbackup-config.glade:2181
 msgid "Remove"
-msgstr ""
+msgstr "削除"
 
 #: data/ui/sbackup-config.glade:1620 data/ui/sbackup-config.glade:1868
 msgid "Add File"
@@ -2076,7 +2087,7 @@ msgstr "含めるファイル"
 
 #: data/ui/sbackup-config.glade:1739
 msgid "<b>Excluded files and directories</b>"
-msgstr ""
+msgstr "<b>除外するファイルとフォルダ</b>"
 
 #: data/ui/sbackup-config.glade:1952
 msgid "Paths"
@@ -2084,7 +2095,7 @@ msgstr "パス"
 
 #: data/ui/sbackup-config.glade:2074 data/ui/sbackup-config.glade:2232
 msgid "Add"
-msgstr ""
+msgstr "追加"
 
 #: data/ui/sbackup-config.glade:2109
 msgid "File types"
@@ -2094,19 +2105,19 @@ msgstr "ファイルの種類"
 msgid ""
 "Regular\n"
 "Expressions"
-msgstr ""
+msgstr "正規表現"
 
 #: data/ui/sbackup-config.glade:2288
 msgid "Do not backup files bigger than"
-msgstr ""
+msgstr "これより大きいファイルをバックアップしない"
 
 #: data/ui/sbackup-config.glade:2344
 msgid "Follow symbolic links"
-msgstr ""
+msgstr "シンボリックリンクをたどる"
 
 #: data/ui/sbackup-config.glade:2373
 msgid "Others"
-msgstr ""
+msgstr "その他"
 
 #: data/ui/sbackup-config.glade:2400
 msgid "Exclude"
@@ -2114,11 +2125,11 @@ msgstr "除外するファイル"
 
 #: data/ui/sbackup-config.glade:2421
 msgid "Use default backup directory"
-msgstr ""
+msgstr "初期設定のバックアップフォルダを使用する"
 
 #: data/ui/sbackup-config.glade:2446
 msgid "/var/backup"
-msgstr ""
+msgstr "/var/backup"
 
 #: data/ui/sbackup-config.glade:2472
 msgid "Use custom local backup directory"
@@ -2130,7 +2141,7 @@ msgstr "バックアップ先を指定してください"
 
 #: data/ui/sbackup-config.glade:2526
 msgid "Use a remote site"
-msgstr ""
+msgstr "リモートサイトを使用する"
 
 #: data/ui/sbackup-config.glade:2568
 msgid "ssh://username:password@example.com/remote/dir/"
@@ -2138,13 +2149,13 @@ msgstr "ssh://ユーザ名:パスワード@ホストのアドレス/ディレク
 
 #: data/ui/sbackup-config.glade:2580
 msgid "Connect..."
-msgstr ""
+msgstr "接続..."
 
 #: data/ui/sbackup-config.glade:2672
 msgid ""
 "<i>The selected destination is not writeable with current permissions. "
 "Backups cannot be stored there.</i>"
-msgstr ""
+msgstr "<i>指定したフォルダには書き込み権限が無いのでバックアップを保存できません。</i>"
 
 #: data/ui/sbackup-config.glade:2704
 msgid "Destination"
@@ -2152,25 +2163,25 @@ msgstr "出力先"
 
 #: data/ui/sbackup-config.glade:2725
 msgid "_No scheduled backups"
-msgstr ""
+msgstr "定期的なバックアップを行わない(_N)"
 
 #: data/ui/sbackup-config.glade:2742
 msgid "_Simple"
-msgstr ""
+msgstr "シンプル(_S)"
 
 #: data/ui/sbackup-config.glade:2747
 msgid ""
 "This option will make a backup not at a precise time but when the computer "
 "is up. "
-msgstr ""
+msgstr "このオプションは正確な時刻にバックアップを作成するのではなく、コンピュータが起動しているときに作成します。 "
 
 #: data/ui/sbackup-config.glade:2761
 msgid "_Custom"
-msgstr ""
+msgstr "カスタム(_C)"
 
 #: data/ui/sbackup-config.glade:2781
 msgid "Do backups"
-msgstr ""
+msgstr "バックアップの間隔"
 
 #: data/ui/sbackup-config.glade:2798
 msgid "Cron time definition"
@@ -2183,6 +2194,10 @@ msgid ""
 "weekly\n"
 "monthly"
 msgstr ""
+"1時間おき\n"
+"毎日\n"
+"毎週\n"
+"毎月"
 
 #: data/ui/sbackup-config.glade:2867
 msgid "Show help topic about scheduled backups."
@@ -2197,19 +2212,19 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:2937
 msgid "Schedule"
-msgstr ""
+msgstr "スケジュール"
 
 #: data/ui/sbackup-config.glade:2955
 msgid "Enable purging of old backups"
-msgstr ""
+msgstr "古いバックアップの削除を有効にする"
 
 #: data/ui/sbackup-config.glade:2983
 msgid "Simple cut-off: Erase all backups older than"
-msgstr ""
+msgstr "シンプル: 次の日数が経過したバックアップを削除する"
 
 #: data/ui/sbackup-config.glade:3039
 msgid "Logarithmic"
-msgstr ""
+msgstr "対数的"
 
 #: data/ui/sbackup-config.glade:3065
 msgid ""
@@ -2221,6 +2236,13 @@ msgid ""
 "Keep one backup per quarter from 2nd last year\n"
 "Keep one backup per year further into past</small>"
 msgstr ""
+"<small>古くなるにつれてバックアップの保存数が少なくなります:\n"
+"前日のバックアップはすべて保持します\n"
+"1週間前までのバックアップは1日あたり1個保持します\n"
+"1月前までのバックアップは1週間あたり1個保持します\n"
+"1年前までのバックアップは1ヶ月あたり1個保持します\n"
+"2年前までのバックアップは3ヶ月あたり1個保持します\n"
+"それよりも前のバックアップは1年あたり1個保持します</small>"
 
 #: data/ui/sbackup-config.glade:3116
 msgid "Show help topic about purging of backups."
@@ -2230,9 +2252,7 @@ msgstr ""
 msgid ""
 "<small>Note: Additionally all incomplete and irrecoverable backups will be "
 "erased as long as there is a complete backup snapshot made later on.</small>"
-msgstr ""
-"<small>注意: 新しく完全なバックアップが作られた際に、全ての不完全なバックアッ"
-"プは消去されます。</small>"
+msgstr "<small>注意: 新しく完全なバックアップが作られた際に、全ての不完全なバックアップは消去されます。</small>"
 
 #: data/ui/sbackup-config.glade:3184
 msgid "Purging"
@@ -2244,7 +2264,7 @@ msgstr "古くなったバックアップを削除"
 
 #: data/ui/sbackup-config.glade:3209
 msgid "<b>Logging</b>"
-msgstr ""
+msgstr "<b>ログ</b>"
 
 #: data/ui/sbackup-config.glade:3234
 msgid "Debug is just for debbuging purpose.Info is the recommended setting"
@@ -2252,19 +2272,19 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:3236
 msgid "Log level"
-msgstr ""
+msgstr "ログレベル"
 
 #: data/ui/sbackup-config.glade:3248
 msgid "Debug is just for debbuging purpose. Info is the recommended setting."
-msgstr ""
+msgstr "Debug はあくまでデバッグ向けのもので、推奨される設定は Info です。"
 
 #: data/ui/sbackup-config.glade:3274
 msgid "Log file directory"
-msgstr ""
+msgstr "ログファイル・ディレクトリ"
 
 #: data/ui/sbackup-config.glade:3320
 msgid "<b>Report by mail</b>"
-msgstr ""
+msgstr "<b>メールで報告</b>"
 
 #: data/ui/sbackup-config.glade:3350
 msgid "From"
@@ -2272,11 +2292,11 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:3361
 msgid "SMTP server"
-msgstr ""
+msgstr "SMTP サーバ"
 
 #: data/ui/sbackup-config.glade:3375 data/ui/sbackup-config.glade:4053
 msgid "Port"
-msgstr ""
+msgstr "ポート"
 
 #: data/ui/sbackup-config.glade:3391
 msgid "To"
@@ -2284,47 +2304,47 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:3478
 msgid "Use a username and password"
-msgstr ""
+msgstr "ユーザ名とパスワードを使用する"
 
 #: data/ui/sbackup-config.glade:3508 data/ui/sbackup-config.glade:4075
 msgid "Username"
-msgstr ""
+msgstr "ユーザ名"
 
 #: data/ui/sbackup-config.glade:3540 data/ui/sbackup-config.glade:4124
 msgid "Password"
-msgstr ""
+msgstr "パスワード"
 
 #: data/ui/sbackup-config.glade:3584
 msgid "Use secure connection"
-msgstr ""
+msgstr "安全な接続を使用する"
 
 #: data/ui/sbackup-config.glade:3615
 msgid "Choose a certificate file"
-msgstr ""
+msgstr "証明書ファイルを選択してください"
 
 #: data/ui/sbackup-config.glade:3629
 msgid "Key"
-msgstr ""
+msgstr "鍵"
 
 #: data/ui/sbackup-config.glade:3645
 msgid "Certificate"
-msgstr ""
+msgstr "証明書"
 
 #: data/ui/sbackup-config.glade:3659
 msgid "Choose a key file"
-msgstr ""
+msgstr "鍵ファイルを選択してください"
 
 #: data/ui/sbackup-config.glade:3731
 msgid "Test _mail settings"
-msgstr ""
+msgstr "メール設定をテスト(_M)"
 
 #: data/ui/sbackup-config.glade:3772
 msgid "Report"
-msgstr ""
+msgstr "レポート"
 
 #: data/ui/sbackup-config.glade:3811
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: data/ui/sbackup-config.glade:3860
 msgid "Show help topic about default values."
@@ -2332,87 +2352,87 @@ msgstr ""
 
 #: data/ui/sbackup-config.glade:3893
 msgid "_Set"
-msgstr ""
+msgstr "設定(_S)"
 
 #: data/ui/sbackup-config.glade:3935
 msgid "Set remote target"
-msgstr ""
+msgstr "リモートターゲットを設定"
 
 #: data/ui/sbackup-config.glade:3957
 msgid "Type of service"
-msgstr ""
+msgstr "サービスの種類"
 
 #: data/ui/sbackup-config.glade:3997
 msgid "Hostname"
-msgstr ""
+msgstr "ホスト名"
 
 #: data/ui/sbackup-config.glade:4027
 msgid "<b>Details</b>"
-msgstr ""
+msgstr "<b>詳細</b>"
 
 #: data/ui/sbackup-config.glade:4157
 msgid "Show password"
-msgstr ""
+msgstr "パスワードを表示"
 
 #: data/ui/sbackup-config.glade:4217
 msgid "_Connect"
-msgstr ""
+msgstr "接続(_C)"
 
 #: data/ui/sbackup-config.glade:4293
 msgid "Make a full backup"
-msgstr ""
+msgstr "完全バックアップを作成"
 
 #: data/ui/sbackup-restore.glade:38
 msgid "<b>Backup destination</b>"
-msgstr ""
+msgstr "<b>バックアップフォルダ</b>"
 
 #: data/ui/sbackup-restore.glade:52
 msgid "Displays the manual in Help browser."
-msgstr ""
+msgstr "ヘルプブラウザでマニュアルを表示する"
 
 #: data/ui/sbackup-restore.glade:85
 msgid "Default profile's destination"
-msgstr ""
+msgstr "初期設定のバックアップフォルダ"
 
 #: data/ui/sbackup-restore.glade:90
 msgid ""
 "Set backup destination to the place specified in default configuration "
 "profile"
-msgstr ""
+msgstr "初期設定のプロファイルで指定されているバックアップフォルダに設定します"
 
 #: data/ui/sbackup-restore.glade:137
 msgid "Custom destination"
-msgstr ""
+msgstr "カスタム"
 
 #: data/ui/sbackup-restore.glade:143
 msgid ""
 "Select a backup destination on your harddisk or at a remote site. Press "
 "Apply when ready."
-msgstr ""
+msgstr "ハードディスクやリモートサイトにあるバックアップフォルダを選択して適用を押してください。"
 
 #: data/ui/sbackup-restore.glade:184
 msgid "Choose a destination folder. For remote sites fill URI in text field"
-msgstr ""
+msgstr "バックアップフォルダを選択します。リモートサイトにある場合はテクストフィールドに URI を入力してください。"
 
 #: data/ui/sbackup-restore.glade:201
 msgid "Change destination to path specified in left text field"
-msgstr ""
+msgstr "左のテキストフィールドで指定したパスにバックアップフォルダを変更します。"
 
 #: data/ui/sbackup-restore.glade:266
 msgid "Select a bold printed date to get the list of backups for that date."
-msgstr ""
+msgstr "太字の日付を選択すると、その日のバックアップ一覧を表示します。"
 
 #: data/ui/sbackup-restore.glade:310
 msgid "Available backups"
-msgstr ""
+msgstr "利用可能なバックアップ"
 
 #: data/ui/sbackup-restore.glade:398
 msgid "Delete snapshot"
-msgstr ""
+msgstr "スナップショットを削除"
 
 #: data/ui/sbackup-restore.glade:436
 msgid "Delete"
-msgstr ""
+msgstr "削除"
 
 #: data/ui/sbackup-restore.glade:475
 msgid "Upgrade snapshot"
@@ -2466,7 +2486,7 @@ msgstr ""
 
 #: data/ui/sbackup-restore.glade:939
 msgid "<b>Restoration Management</b>"
-msgstr ""
+msgstr "<b>復元の管理</b>"
 
 #: data/ui/sbackup-restore.glade:964
 msgid "<b>Export Management</b>"

@@ -1,3 +1,35 @@
+sbackup (0.11.4ubuntu1) maverick; urgency=low
+
+  * [Fix] LP: #714916 Unhandled error in gio backend when looking up
+                      verbose error message
+  * [Fix] LP: #662613 sbackup crashes with 'NonValidOptionException'
+  * [Fix] LP: #709338 Restore/revert of non-toplevel items produces only
+                      empty folders
+  * [Fix] LP: #689016 Uncaught error 'invalid literal for int() when
+                      processing invalid configuration files
+  * [Fix] LP: #697386 RemoteMountFailedError 'Max. number of password inputs
+                      reached' not handled properly
+  * [Fix] LP: #697654 No desktop session found: no notification icon:
+  * [Fix] LP: #701403 Unable to use remote target without giving a password:
+  * [Fix] LP: #588578 Email notification/reporting doesn't work with GMAIL
+  * [Fix] LP: #706037 Email reports not working; enable debug output
+                      for sending mail
+  * [Fix] LP: #683990 Uncaught 'NoSectionError' when adding report settings
+                      (SMTP server etc.)
+  * [Fix] LP: #695613 Empty notification popup due to invalid markup
+  * [Fix] LP: #671785 Parsing remote URIs fails when username or password
+  					  contains special characters; quote special characters
+  					  to comply with RFC 1738 sec. 3.1
+  * [Fix] LP: #675361 Restore process fails with error 'is not a file' while
+                      copying
+  * [Fix] LP: #696183 Failed to set GID to `admin`; improved handling of
+                      non-existent user groups
+  * refer to dependent packages 'gconf2', 'desktop-file-utils' in install file
+  * translations updated
+  * translations added: fo
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Tue, 08 Feb 2011 13:58:43 +0100
+
 sbackup (0.11.3ubuntu1) maverick; urgency=low
 
   * [Fix] LP: #645543 "Cannot concatenate str and error object" error prevents

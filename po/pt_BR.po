@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: sbackup\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-04 21:54+0100\n"
-"PO-Revision-Date: 2010-09-25 00:19+0000\n"
+"PO-Revision-Date: 2010-10-05 13:24+0000\n"
 "Last-Translator: Vítor Avelino <vitor88@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-09-29 05:45+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-02-05 05:38+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: src/sbackup/backupproc.py:169 src/sbackup/pkginfo.py:68
 #, python-format
@@ -30,11 +30,11 @@ msgstr ""
 
 #: src/sbackup/backupproc.py:178 src/sbackup/core/profile_handler.py:278
 msgid "No log file specified."
-msgstr ""
+msgstr "Nenhum arquivo de log especificado"
 
 #: src/sbackup/backupproc.py:183
 msgid "Unable to find log file."
-msgstr ""
+msgstr "Foi impossível achar o arquivo de log."
 
 #: src/sbackup/backupproc.py:251
 msgid ""
@@ -46,19 +46,19 @@ msgstr ""
 
 #: src/sbackup/backupproc.py:300
 msgid "Backup was canceled by user."
-msgstr ""
+msgstr "Backup cancelado pelo usuário"
 
 #: src/sbackup/backupproc.py:305
 msgid "An error occurred during the cancellation of backup:"
-msgstr ""
+msgstr "Um erro ocorreu durante o cancelamento da cópia de segurança:"
 
 #: src/sbackup/backupproc.py:311
 msgid "An error occurred during the backup:"
-msgstr ""
+msgstr "Um erro ocorreu durante o processo de cópia:"
 
 #: src/sbackup/backupproc.py:328
 msgid "Error when sending email:"
-msgstr ""
+msgstr "Erro ao enviar email:"
 
 #: src/sbackup/backupproc.py:359
 msgid "The following error(s) occurred before:"
@@ -70,6 +70,8 @@ msgid ""
 "Backup is not being started.\n"
 "%s"
 msgstr ""
+"Backup não está sendo iniciado.\n"
+"%s"
 
 #: src/sbackup/pkginfo.py:40
 msgid ""
@@ -77,10 +79,13 @@ msgid ""
 "want to help by submitting bugs, by translating or anything else please "
 "visit our website."
 msgstr ""
+"Isso é uma solução amigável de backup para as necessidades comuns de uma "
+"estação de trabalho. Se você quer ajudar mandando bugs, traduzindo ou "
+"qualquer outra coisa por favor visite nossa página."
 
 #: src/sbackup/pkginfo.py:43
 msgid "Maintainers:"
-msgstr ""
+msgstr "Mantenedores:"
 
 #: src/sbackup/pkginfo.py:47
 msgid "Former maintainers:"
@@ -88,7 +93,7 @@ msgstr ""
 
 #: src/sbackup/pkginfo.py:51
 msgid "Contributors:"
-msgstr ""
+msgstr "Colaboradores:"
 
 #: src/sbackup/pkginfo.py:56
 msgid "translator-credits"
@@ -96,12 +101,14 @@ msgstr ""
 "Jonh Wendell <wendell@bani.com.br>\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Alexsandro Haag https://launchpad.net/~alexsandro-haag\n"
+"  Kauan Mocelin https://launchpad.net/~kauanmocelin\n"
 "  Vítor Avelino https://launchpad.net/~vitoravelino"
 
 #: src/sbackup/ar_backend/tar.py:109 src/sbackup/ar_backend/tar.py:167
 #: src/sbackup/ar_backend/tar.py:213
 msgid "Invalid archive type."
-msgstr ""
+msgstr "Tipo de arquivo inválido"
 
 #: src/sbackup/ar_backend/tar.py:123
 #, python-format
@@ -127,15 +134,16 @@ msgstr ""
 #: src/sbackup/ar_backend/tar.py:356
 #, python-format
 msgid "Unable to remove temporary file `%(file)s`: %(error)s"
-msgstr ""
+msgstr "Impossível remover o arquivo temporário '%(file)s': %(error)s"
 
 #: src/sbackup/ar_backend/tar.py:372
 msgid "Launching TAR to make incremental backup."
-msgstr ""
+msgstr "Iniciando TAR para fazer backup incremental."
 
 #: src/sbackup/ar_backend/tar.py:401
 msgid "Unable to find the SNAR file to make an incremental backup."
 msgstr ""
+"Não foi possível encontrar o arquivo SNAR para fazer um backup incremental."
 
 #: src/sbackup/ar_backend/tar.py:402
 msgid "Falling back to full backup."
@@ -408,7 +416,8 @@ msgstr "Imagem de CD"
 #: src/sbackup/core/RestoreManager.py:80
 #, python-format
 msgid "File '%s' not found in the backup snapshot files list"
-msgstr "Arquivo '%s' não encontrado na lista de arquivos do snapshot de backup"
+msgstr ""
+"Arquivo '%s' não encontrado na lista de arquivos do snapshot de backup"
 
 #: src/sbackup/core/RestoreManager.py:82
 #, python-format
@@ -446,8 +455,8 @@ msgstr ""
 #: src/sbackup/core/SnapshotManager.py:312
 #, python-format
 msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%"
-"(NewBaseSnapshot)s' "
+"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+"'%(NewBaseSnapshot)s' "
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:319
@@ -471,7 +480,8 @@ msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:784
 #, python-format
-msgid "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
+msgid ""
+"Snapshot '%s' is already Full, nothing to do (not changing it to full)."
 msgstr ""
 
 #: src/sbackup/core/SnapshotManager.py:824
@@ -633,8 +643,8 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:253
 #, python-format
 msgid ""
-"Not enough free space in the target directory for the planned backup (free: %"
-"(freespace)s, required: %(neededspace)s)."
+"Not enough free space in the target directory for the planned backup (free: "
+"%(freespace)s, required: %(neededspace)s)."
 msgstr ""
 
 #: src/sbackup/core/profile_handler.py:273
@@ -891,8 +901,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:137
 #, python-format
 msgid ""
-"The sshfs command '%(command)s' didn't perform normally. Output => %"
-"(erroroutput)s "
+"The sshfs command '%(command)s' didn't perform normally. Output => "
+"%(erroroutput)s "
 msgstr ""
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:142
@@ -902,8 +912,8 @@ msgstr ""
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:158
 #, python-format
 msgid ""
-"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%"
-"s' (The '/' after server is mandatory)"
+"Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
+"(The '/' after server is mandatory)"
 msgstr ""
 
 #: src/sbackup/ui/GladeWindow.py:210
@@ -1172,8 +1182,8 @@ msgstr ""
 #, python-format
 msgid ""
 "<big><b>Set default values for current profile?</b></big>\n"
-"This will restore the default values for the profile currently edited: '%"
-"s'.\n"
+"This will restore the default values for the profile currently edited: "
+"'%s'.\n"
 "\n"
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
@@ -1784,7 +1794,8 @@ msgstr ""
 
 #: src/sbackup/util/filecollect.py:364
 #, python-format
-msgid "File '%(file)s' cannot be opened for read access. Operation timed out."
+msgid ""
+"File '%(file)s' cannot be opened for read access. Operation timed out."
 msgstr ""
 
 #: src/sbackup/util/filecollect.py:368
@@ -2492,13 +2503,13 @@ msgstr "Conteúdo"
 
 #~ msgid "This is a user friendly backup solution for common desktop needs."
 #~ msgstr ""
-#~ "Isso é uma solução amigável de backup para as necessidades cotidianas de "
-#~ "um desktop."
+#~ "Isso é uma solução amigável de backup para as necessidades cotidianas de um "
+#~ "desktop."
 
 #~ msgid "I didn't find the log file. Please set it up in sbackup.conf "
 #~ msgstr ""
-#~ "Eu não encontrei o arquivo de registro. Por favor, configure-o em sbackup."
-#~ "conf "
+#~ "Eu não encontrei o arquivo de registro. Por favor, configure-o em "
+#~ "sbackup.conf "
 
 #~ msgid "Target '%s' directory is excluded"
 #~ msgstr "Diretório alvo '%s' está excluído"
@@ -2525,11 +2536,11 @@ msgstr "Conteúdo"
 #~ msgstr "Expressão regular inválida ('%s')"
 
 #~ msgid ""
-#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > %"
-#~ "(maxsize)s), it has to be exclude "
+#~ "'%(file)s' size is higher than the specified one ( %(filesize)s > "
+#~ "%(maxsize)s), it has to be exclude "
 #~ msgstr ""
-#~ "'%(file)s' tamanho é maior do que o especificado ( %(filesize)s > %"
-#~ "(maxsize)s), o arquivo tem que ser excluído "
+#~ "'%(file)s' tamanho é maior do que o especificado ( %(filesize)s > "
+#~ "%(maxsize)s), o arquivo tem que ser excluído "
 
 #~ msgid ""
 #~ "We don't have read access to '%(file)s', it has to be exclude : %(error)s "
