@@ -1,4 +1,4 @@
-sbackup (0.11.4ubuntu1) maverick; urgency=low
+sbackup (0.11.4-0ubuntu1) natty; urgency=low
 
   * [Fix] LP: #714916 Unhandled error in gio backend when looking up
                       verbose error message
@@ -24,9 +24,8 @@ sbackup (0.11.4ubuntu1) maverick; urgency=low
                       copying
   * [Fix] LP: #696183 Failed to set GID to `admin`; improved handling of
                       non-existent user groups
-  * refer to dependent packages 'gconf2', 'desktop-file-utils' in install file
-  * translations updated
-  * translations added: fo
+  * [Fix] LP: #507177 update translations
+  * debian/control: added gconf2 and desktop-file-utils to Depends
 
  -- Jean-Peer Lorenz <peer.loz@gmx.net>  Tue, 08 Feb 2011 13:58:43 +0100
 
