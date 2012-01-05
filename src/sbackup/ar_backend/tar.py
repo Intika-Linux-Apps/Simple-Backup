@@ -248,6 +248,7 @@ def __prepare_common_opts(snapshot, targethandler, publish_progress, use_io_pipe
     _snpname = snapshot.getName()
     options = ["-cS", "--directory=%s" % _FOP.pathsep,
                "--ignore-failed-read",
+               "--no-check-device",
                "--blocking-factor", str(constants.TAR_BLOCKING_FACTOR),
                "--totals"
               ]
