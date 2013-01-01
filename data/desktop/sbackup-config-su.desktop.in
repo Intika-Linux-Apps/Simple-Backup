@@ -1,12 +1,12 @@
 [Desktop Entry]
 Type=Application
 #
-Name=Simple Backup-Configuration
-Name[fr]=Configurateur de la Simple Backup
-Name[de]=Simple Backup-Einstellungen
-Name[pt_BR]=Configuração do Backup
-Name[es]=Configuración de Simple Backup
-Name[ja]=バックアップの設定
+Name=Simple Backup-Configuration for admins
+Name[fr]=Configurateur de la Simple Backup (for admins)
+Name[de]=Simple Backup-Einstellungen für Admins
+Name[pt_BR]=Configuração do Backup (for admins)
+Name[es]=Configuración de Simple Backup (for admins)
+Name[ja]=バックアップの設定 (for admins)
 #
 Comment=Simple Backup configuration tool for admins. Requires superuser rights.
 Comment[de]=Simple Backup Konfiguration für Administratoren. Erfordert Superuser-Rechte.
