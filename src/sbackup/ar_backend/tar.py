@@ -313,6 +313,11 @@ def __prepare_common_opts(snapshot, targethandler, publish_progress, use_io_pipe
         _checkpsize = _snpsize / _ncheckp
         _checkp = int(_checkpsize / constants.TAR_RECORDSIZE)
         if _checkp > 0:
+            # LP: #875634
+            # Sometimes the calculation of the space required goes badly wrong
+            # and we could end-up with _checkp=1 for 30GB to save, making tar
+            # VERY slow. Fix: set minimum value to 100
+            _checkp = max(100, _checkp)
             options.append("--checkpoint=%s" % _checkp)
             _progessf = util.get_resource_file(resource_name = "sbackup-progress")
             options.append('--checkpoint-action=exec=%s' % _progessf)
