@@ -1,6 +1,6 @@
 #   Simple Backup - process a certain profile (a distinct configuration)
 #
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -85,6 +85,29 @@ class BackupProfileHandler(object):
         self.__fam_target_hdl = fam.get_fam_target_handler_facade_instance()
 
         self.logger.debug("Instance of BackupProfileHandler created.")
+
+    def do_hook(self, hookname):
+        """Runs scripts optionally defined in section 'hooks' of
+        configuration file. Currently defined are
+        * pre-backup - before preparation of backup starts
+        * post-backup - after completion and finishing of backup
+        
+        """
+        #LP #173490
+        import commands
+        hooks = None
+        if self.config.has_option('hooks', hookname):
+            hooks = str(self.config.get('hooks', hookname)).split(",")
+    
+        if hooks is not None:
+            self.logger.info(_("Running of hooks: %s") % hookname)
+            for hook in hooks:
+                result = commands.getstatusoutput(hook)
+                if( 0 != result[0]):
+                    raise exceptions.HookedScriptError(\
+                      "Hook %s returned error: '%s' (exit code=%s)" % (hookname,
+                                                                    result[1],
+                                                                    result[0]))
 
     def prepare(self):
         self.logger.info(_("Preparation of backup process"))

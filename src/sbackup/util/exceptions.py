@@ -1,6 +1,6 @@
 #   Simple Backup - definition of custom exceptions
 #
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -72,6 +72,11 @@ class ApplicationLockError(SBException) :
 class BackupCanceledError(SBException) :
     """This Exception is thrown if the backup process is canceled from
     the indicator gui.
+    """
+    
+class HookedScriptError(SBException) :
+    """This Exception is thrown if a script run pre/post backup returns
+    exitcodes != 0.
     """
 
 class NotValidSnapshotException(SBException) :

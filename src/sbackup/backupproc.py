@@ -1,6 +1,6 @@
 #   Simple Backup - the actual backup service
 #
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -279,9 +279,11 @@ class SBackupProc(object):
 
                 self.__write_errors_to_log()
 
+                self.__bprofilehdl.do_hook('pre-backup')
                 self.__bprofilehdl.prepare()
                 self.__bprofilehdl.process()
                 self.__exitcode = self.__bprofilehdl.finish()
+                self.__bprofilehdl.do_hook('post-backup')
 
             except exceptions.BackupCanceledError:
                 self.__on_backup_canceled()

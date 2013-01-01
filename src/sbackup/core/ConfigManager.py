@@ -1,6 +1,6 @@
 #   Simple Backup - configuration file handling
 #
-#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2009-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -1404,6 +1404,7 @@ class ConfigManagerStaticData(object):
      'dirconfig'    : { '*' : str },
      'exclude'         : { 'regex' : list, 'maxsize' : int },
      'places'         : { 'prefix' : str },
+     'hooks'        : {'pre-backup': list, 'post-backup': list },
      'schedule'     : {'anacron' : str , 'cron' : str }
     }
 
