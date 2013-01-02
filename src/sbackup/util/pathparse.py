@@ -191,9 +191,13 @@ class UriParser(object):
         assert splituri.fragment == "" #IGNORE:E1103
         assert splituri.query == "" #IGNORE:E1103
 
-        if splituri.port is not None:
-            self.__port = splituri.port
-
+        #LP #670646 ignore errors parsing port
+        try:
+            if splituri.port is not None:
+                self.__port = splituri.port
+        except ValueError:  
+            pass
+            
         if splituri.username is not None:
             self.__username = urllib.unquote(splituri.username)
 
