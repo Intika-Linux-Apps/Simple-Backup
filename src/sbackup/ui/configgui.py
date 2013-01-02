@@ -979,7 +979,7 @@ class SBconfigGTK(GladeGnomeApp):
         if response == gtk.RESPONSE_OK:
             _file = _prepare_filename(dialog.get_filename())
             _enc_file = _escape_path(_file)
-            if not self.already_inc(self.configman.items("dirconfig"), _enc_file):
+            if not self.already_inc(self.configman.items("dirconfig", raw = True), _enc_file):
                 self.include.append([_file])
                 self.configman.set("dirconfig", _enc_file, "1")
                 self.isConfigChanged()
@@ -1002,7 +1002,7 @@ class SBconfigGTK(GladeGnomeApp):
         if response == gtk.RESPONSE_OK:
             _dir = _prepare_dirname(dialog.get_filename())
             _enc_dir = _escape_path(_dir)
-            if not self.already_inc(self.configman.items("dirconfig"), _enc_dir):
+            if not self.already_inc(self.configman.items("dirconfig", raw = True), _enc_dir):
                 self.include.append([_dir])
                 self.configman.set("dirconfig", _enc_dir, "1")
                 self.isConfigChanged()
@@ -1034,7 +1034,7 @@ class SBconfigGTK(GladeGnomeApp):
         if response == gtk.RESPONSE_OK:
             _file = _prepare_filename(dialog.get_filename())
             _enc_file = _escape_path(_file)
-            if not self.already_inc(self.configman.items("dirconfig"), _enc_file):
+            if not self.already_inc(self.configman.items("dirconfig", raw = True), _enc_file):
                 self.ex_paths.append([_file])
                 self.configman.set("dirconfig", _enc_file, "0")
                 self.isConfigChanged()
@@ -1053,7 +1053,7 @@ class SBconfigGTK(GladeGnomeApp):
         if response == gtk.RESPONSE_OK:
             _dir = _prepare_dirname(dialog.get_filename())
             _enc_dir = _escape_path(_dir)
-            if not self.already_ex(self.configman.items("dirconfig"), _enc_dir):
+            if not self.already_ex(self.configman.items("dirconfig", raw = True), _enc_dir):
                 self.ex_paths.append([_dir])
                 self.configman.set("dirconfig", _enc_dir, "0")
                 self.isConfigChanged()
