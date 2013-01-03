@@ -151,9 +151,9 @@ class BackupProfileHandler(object):
         except exceptions.SBException, exc:
             self.logger.warning(str(exc))
 
-        if needupgrade:
+        if needupgrade: # don't recommend upgrading!
             self.__state.set_state('needupgrade')
-            _msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using 'Simple Backup-Restoration' if you want to use them.")
+            _msg = _("There are snapshots stored in outdated snapshot formats. Please use an old version of sbackup if you want to access them.")
             self.logger.warning(_msg)
 
         # get basic informations about new snapshot
