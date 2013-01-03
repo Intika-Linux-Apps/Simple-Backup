@@ -1333,6 +1333,10 @@ class ConfigurationFileHandler(object):
         if not os.path.exists(tempdir) :
             os.mkdir(tempdir)
 
+        #LP #785495: make the temp directory RWX only by owner
+        if (os.stat(tempdir).st_mode & 0777) != 0700:
+            os.chmod(tempdir,0700)
+            
         return tempdir
 
     def get_profilename(self, conffile):
