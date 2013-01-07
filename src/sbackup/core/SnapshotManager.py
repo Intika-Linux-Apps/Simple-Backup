@@ -1,6 +1,6 @@
 #   Simple Backup - snapshot handling
 #
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,6 @@ import datetime
 import time
 import types
 
-
 from sbackup.pkginfo import Infos
 from sbackup.fs_backend import fam
 
@@ -57,6 +56,7 @@ from sbackup.util.exceptions import RebaseSnpException
 from sbackup.util.exceptions import RebaseFullSnpForbidden
 from sbackup.util.exceptions import RemoveSnapshotHasChildsError
 from sbackup.util.exceptions import NotSupportedError
+from sbackup.util.exceptions import FileAccessException
 
 
 _EXT_CORRUPT_SNP = ".corrupt"
@@ -200,6 +200,12 @@ class SnapshotManager(object):
         for _snppath in listing :
             _snpname = self._fop.get_basename(_snppath)
             _stamp = self._fop.joinpath(_snppath, "upgrade")
+            try:
+                self._fop.test_dir_access(_snppath)
+            except FileAccessException, error:
+                self.logger.info("Unable to access `%s'. Skipped." % _snppath)
+                continue
+
             if _snpname.endswith(_EXT_CORRUPT_SNP):
                 self.logger.info("Corrupt snapshot `%s` found. Skipped." % _snpname)
                 continue

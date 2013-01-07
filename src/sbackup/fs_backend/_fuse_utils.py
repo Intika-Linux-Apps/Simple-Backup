@@ -1,6 +1,6 @@
 #   Simple Backup - file access management using FUSE
 #
-#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ from gettext import gettext as _
 import types
 
 from sbackup.util import local_file_utils
+from sbackup.util import exceptions
 from sbackup.util import interfaces
 from sbackup.util import structs
 from sbackup.util import pathparse
@@ -64,6 +65,10 @@ class FuseOperations(interfaces.IOperations):
 
     def __init__(self):
         interfaces.IOperations.__init__(self)
+        
+    @classmethod
+    def chmod_no_rwx_grp_oth(cls, path):
+        local_file_utils.chmod_no_rwx_grp_oth(path)
 
     @classmethod
     def path_exists(cls, path):
@@ -157,6 +162,14 @@ class FuseOperations(interfaces.IOperations):
     @classmethod
     def is_link(cls, path):
         return local_file_utils.is_link(path)
+
+    @classmethod
+    def test_dir_access(cls, path):
+        try:
+            local_file_utils.listdir(path)
+        except Exception, error:
+            raise exceptions.FileAccessException(\
+                    "Unable to list directory content: %s" % error)
 
     @classmethod
     def is_dir(cls, path):

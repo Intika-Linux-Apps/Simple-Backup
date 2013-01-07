@@ -1,6 +1,6 @@
 #   Simple Backup - Operation System related utilities
 #
-#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import glib
 
 PATHSEP = os.sep
 UNIX_PERM_ALL_WRITE = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
+UNIX_PERM_GRPOTH_NORWX = ~(stat.S_IRWXG | stat.S_IRWXO)
 
 
 COMMAND_GREP = "grep"

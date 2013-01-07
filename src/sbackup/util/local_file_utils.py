@@ -1,6 +1,6 @@
 #   Simple Backup - unified file handling using (Python's) native functions
 #
-#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2009-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -354,6 +354,21 @@ def _add_write_permission(path, recursive = True):
                 _add_write_permission(_entrypath)
             else:
                 _add_write_permission(_entrypath, recursive = False)
+
+def chmod_no_rwx_grp_oth(path):
+    """Sets write permissions for user only for
+    given directory or file (*not* recursive). 
+    """
+    try:
+        fstats = os.stat(path)
+        fmode = fstats.st_mode
+        fmode = fmode & system.UNIX_PERM_GRPOTH_NORWX
+        os.chmod(path, fmode)
+    except Exception, error:
+        _msg = "Unable to set permissions: %s" % str(error)
+        _logger = log.LogFactory.getLogger()
+        _logger.warning(_msg)
+        return
 
 def rename(src, dst):
     # avoids (misused) move operations using `rename`
