@@ -208,6 +208,15 @@ def force_delete(path):
     _add_write_permission(path, recursive = True)
     delete(path)
 
+def destinsrc(src, dst):
+    src = os.path.abspath(src)
+    dst = os.path.abspath(dst)
+    if not src.endswith(os.path.sep):
+        src += os.path.sep
+    if not dst.endswith(os.path.sep):
+        dst += os.path.sep
+    return dst.startswith(src)
+
 def force_move(src, dst):
     """Modified version of `shutil.move` that uses `nssb_copytree`
     and even removes read-only files/directories.
@@ -218,7 +227,7 @@ def force_move(src, dst):
         os.rename(src, dst)
     except OSError:
         if os.path.isdir(src):
-            if shutil.destinsrc(src, dst):
+            if destinsrc(src, dst):
                 raise shutil.Error("Cannot move a directory '%s' into itself "\
                                    "'%s'." % (src, dst))
 #            _copytree(src, dst, symlinks = True)
