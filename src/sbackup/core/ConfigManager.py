@@ -1663,13 +1663,13 @@ class _DefaultConfiguration(Configuration):
     def __init__(self):
         Configuration.__init__(self)
 
-        self._regex_excludes = "\.mp3$,\.avi$,\.mpeg$,\.mkv$,\.ogg$,\.iso$,"\
-                               "/home/[^/]+?/\.gvfs/,"\
-                               "/home/[^/]+?/\.thumbnails/,"\
-                               "/home/[^/]+?/\..+/[tT]rash/,"\
-                               "/home/[^/]+?/\..+/[cC]ache/,"\
+        self._regex_excludes = "^/home/[^/]+?/\.gvfs(/|$),"\
+                               "^/home/[^/]+?/\.thumbnails(/|$),"\
+                               "^/home/[^/]+?/\..+/[tT]rash(/|$),"\
+                               "^/home/[^/]+?/\.cache(/|$),"\
+                               "^/home/[^/]+?/\..+/[cC]ache(/|$),"\
+                               "^/home/[^/]+?/\..+/lock(/|$),"\
                                "~$"
-
         self._maxinc = 7
         self._cformat = 'none'
         self._follow_links = False
