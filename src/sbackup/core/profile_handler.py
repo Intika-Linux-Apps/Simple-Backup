@@ -38,7 +38,6 @@ import time
 
 from sbackup.fs_backend import fam
 from sbackup.core.SnapshotManager import SnapshotManager
-from sbackup.core.UpgradeManager import UpgradeManager
 from sbackup.core import snapshot
 
 from sbackup import util
@@ -77,7 +76,6 @@ class BackupProfileHandler(object):
         self.__profilename = self.config.getProfileName()
         self.__state.set_profilename(self.__profilename)
 
-        self.__um = UpgradeManager()
         self.__snpman = None
 
         self.__snapshot = None
@@ -127,7 +125,6 @@ class BackupProfileHandler(object):
         """Runs the whole backup process:
         
         1. check pre-conditions
-        2. test for upgrades (but don't perform)
         3. purge snapshots (if configured)
         4. open new snapshot containing common metadata (full or incr.
             depending on existing one, base, settings etc.)
@@ -139,23 +136,7 @@ class BackupProfileHandler(object):
         assert self.__fam_target_hdl.is_initialized()
 
         self.__snpman = SnapshotManager(self.__fam_target_hdl.query_mount_uri())
-
-        # Upgrade Target
-        # But we should not upgrade without user's agreement!
-        # Solution 1: add an option: AutoAupgrade = True/False
-        #          2: start with a new and full dump and inform the user that
-        #              there are snapshots in older versions 
-        needupgrade = False
-        try:
-            needupgrade = self.__um.need_upgrade(self.__fam_target_hdl.query_mount_uri())
-        except exceptions.SBException, exc:
-            self.logger.warning(str(exc))
-
-        if needupgrade: # don't recommend upgrading!
-            self.__state.set_state('needupgrade')
-            _msg = _("There are snapshots stored in outdated snapshot formats. Please use an old version of sbackup if you want to access them.")
-            self.logger.warning(_msg)
-
+        
         # get basic informations about new snapshot
         self.__state.set_state('prepare')
         (snppath, base) = self.__retrieve_basic_infos(force_full_snp = self.__full_snp)

@@ -301,14 +301,6 @@ class Snapshot(object):
             _arn = self._fop.joinpath(self.getPath(), "files.tar.gz")
             if self._fop.path_exists(_arn):
                 return _arn
-
-            elif self.getVersion() == "1.4":
-                self.logger.warning("The tgz name is deprecated, please upgrade Snapshot to Version 1.5")
-                _arn = self._fop.joinpath(self.getPath(), "files.tgz")
-                if self._fop.path_exists(_arn):
-                    return _arn
-                else :
-                    problem = True
             else :
                 problem = True
 

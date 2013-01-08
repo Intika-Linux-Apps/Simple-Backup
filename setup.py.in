@@ -21,7 +21,6 @@ setup(name = '@pkgname@',
                                        'scripts/sbackup-run',
                                      'scripts/sbackup-config-gtk',
                                      'scripts/sbackup-restore-gtk',
-                                     'scripts/sbackup-upgrade-backups',
                                      'scripts/sbackupconfig.py',
 
                                      'scripts/multipleTarScript',
