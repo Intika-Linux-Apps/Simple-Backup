@@ -248,7 +248,6 @@ class FileCollector(object):
         self.__configuration = None
 
         # stats of last processed file
-        self.__exists_func = None
         self.__stat_func = None
         self.__fstats = None
         self.__fislink = None
@@ -302,10 +301,8 @@ class FileCollector(object):
                retrieval of file stats selected here.
         """
         if self.__snapshot.isFollowLinks():
-            self.__exists_func = os.path.exists
             self.__stat_func = os.stat
         else:
-            self.__exists_func = os.path.lexists
             self.__stat_func = os.lstat
         self.__collect_stats.clear()
 
@@ -329,21 +326,11 @@ class FileCollector(object):
     def __is_not_accessable(self, path):
         """Tests whether the given `path` can be accessed (i.e. exists and is readable).
         """
-        # return true if the file doesn't exist
-        try:
-            if not self.__exists_func(path):
-                self.__logger.warning(_("File '%(file)s' does not exist.") % {'file' : path})
-                return True
-        except OSError:
-            return True
-
         # get the stats, If not possible, the file has to be exclude, return True
         try:
             self.__fstats = self.__stat_func(path)
             self.__fisdir = local_file_utils.is_dir(path)
             self.__fislink = local_file_utils.is_link(path)
-#            self.__fisdir = self.__local_fop.is_dir(path)
-#            self.__fislink = self.__local_fop.is_link(path)
         except Exception, _exc:    #IGNORE:W0703
             self.__logger.warning(_("File '%(file)s' is not accessable with error '%(error)s'.")\
                                     % {'file' : path, 'error' : str(_exc)})
@@ -549,7 +536,7 @@ class FileCollector(object):
         else:
             self.__collect_stats.count_skip_file()
 
-    def __prepare_excl_regex(self):
+    def __compile_excl_regex(self):
         """Prepares (i.e. compiles) Regular Expressions used for excluding files from flist.
         """
         self.__logger.debug("Prepare Regular Expressions used for file exclusion.")
@@ -617,7 +604,7 @@ class FileCollector(object):
         the backup.
         """
         self.__prepare_collecting()
-        self.__prepare_excl_regex()
+        self.__compile_excl_regex()
         self.__prepare_explicit_flists()
         util.enable_timeout_alarm()
 
