@@ -43,8 +43,6 @@ from sbackup.managers.SnapshotManager import debug_snarfile_to_list
 from sbackup import util
 from sbackup.util.log import LogFactory
 from sbackup.util.exceptions import SBException
-from sbackup.util.exceptions import RebaseFullSnpForbidden
-from sbackup.util.exceptions import RebaseSnpException
 
 
 LOGLEVEL = 100
@@ -235,47 +233,6 @@ class _TestSnapshotRemoveV2Paths(_TestSnapshotManagerPathsBase):
     _reltar_input = "state3.inc.tar.lzma"
     _reltar_results = ""
     _result_snar = ""
-
-
-class _TestSnapshotRebaseOnestepIncrPaths(_TestSnapshotManagerPathsBase):
-    """Path definitions for re-basing of snapshots. The input data is
-    identical to Version 2 mentioned above (3 snapshots of generic data).
-    
-    Reference results are snapshots created from state 1 and state 3
-    without intermediate state 2. Such setup must give the same results
-    as the removal of the intermediate snapshot from 3 incremental ones.
-    """
-    _relpath_prefix = "rebase"
-    # relative paths to test input, working directory and (targeted) results
-    _relpath_input = "input"
-    _relpath_wd = "working-dir/onestep_incr"
-    _relpath_results = "reference-results/target-results-onestep_incr"
-
-    # file names for certain test case
-    _reltar_input = "state3.inc.tar.lzma"
-    _reltar_results = "state1-3.direct.inc.tar.lzma"
-    _result_snar = "onestep_incr-res.snar"
-
-
-class _TestSnapshotRebaseOnestepFulPaths(_TestSnapshotManagerPathsBase):
-    """Path definitions for re-basing of snapshots. The input
-    data is identical to Version 2 mentioned above (3 snapshots
-    of generic data). Defines different reference results compared
-    to `_TestSnapshotRebaseOnestepIncrPaths`.
-    
-    Reference result is a full backup of state 2 since the full (base)
-    snapshot of state 1 is removed during the test. 
-    """
-    _relpath_prefix = "rebase"
-    # relative paths to test input, working directory and (targeted) results
-    _relpath_input = "input"
-    _relpath_wd = "working-dir/onestep_ful"
-    _relpath_results = "reference-results/target-results-onestep_ful"
-
-    # file names for certain test case
-    _reltar_input = "state3.inc.tar.lzma"
-    _reltar_results = "state2.ful.tar.lzma"
-    _result_snar = "onestep_ful-res.snar"
 
 # end of path definition
 
@@ -579,136 +536,6 @@ class TestSnapshotManagerFromDisk(_TestSnapshotManagerBase):
 #    def test_get_snp_history(self):
 #        raise NotImplementedError
 
-    def test_rebase_ful_forbidden(self):
-        """Test if rebase of full snapshot is forbidden
-        """
-        snp_list = self.snpman.get_snapshots_allformats(forceReload = True)
-        snp_ful = snp_list[2]
-
-        self.assertTrue(snp_ful.isfull())
-        self.assertRaises(RebaseFullSnpForbidden, self.snpman.rebaseSnapshot,
-                          snp_ful)
-
-    def test_rebase_same_forbidden(self):
-        """Re-basing of a snapshot on itself (the same snapshot) is not allowed
-        """
-        snp_list = self.snpman.get_snapshots_allformats(forceReload = True)
-        snp_torebase = snp_list[0]
-        snp_newbase = snp_list[0]
-        self.assertRaises(RebaseSnpException, self.snpman.rebaseSnapshot,
-                          snp_torebase, snp_newbase)
-
-    def test_rebase_younger_forbidden(self):
-        """Re-basing of snapshot on a younger snapshot is not allowed
-        """
-        snp_list = self.snpman.get_snapshots_allformats(forceReload = True)
-        snp_torebase = snp_list[1]
-        snp_newbase = snp_list[0]
-        self.assertRaises(RebaseSnpException, self.snpman.rebaseSnapshot,
-                          snp_torebase, snp_newbase)
-
-    def test_rebase_onestep_ful_forbidden(self):
-        """Re-basing of a full snapshot is not allowed
-
-        @todo: Should raise a RebaseFullSnpForbidden exception!
-        """
-        snp_list = self.snpman.get_snapshots_allformats(forceReload = True)
-        snp_ful = snp_list[2]
-
-        self.assertTrue(snp_ful.isfull())
-        self.assertRaises(SBException, self.snpman._rebaseOnLastSnp,
-                          snp_ful)
-
-
-class TestSnapshotRebaseOnestepIncr(_TestSnapshotManagerBase):
-    """Testsuite which re-bases an incremental snapshot on another
-    incremental snapshot in one step (i.e. directly on the following
-    base snapshot).
-    """
-    _path_class = _TestSnapshotRebaseOnestepIncrPaths
-
-    def test_rebaseonlast_inc_on_inc_snar(self):
-        """Test snar file when re-basing an incremental snapshot to the next available base (grandfather)
-        """
-        snp_list = self.snpman.get_snapshots_allformats(forceReload = True)
-        snp_inc = snp_list[0]
-        snp_inc_older = snp_list[1]
-
-        self.assertFalse(snp_inc.isfull())
-        self.assertFalse(snp_inc_older.isfull())
-
-        snp_inc = self.snpman._rebaseOnLastSnp(snapshot = snp_inc)
-
-        self._compare_snar_files(snapshot = snp_inc,
-                                 snarfile = self._path_class.get_res_snar())
-
-    def test_rebaseonlast_inc_on_inc_tar(self):
-        """Test Tar archive when Re-basing an incremental snapshot to the next available base (grandfather)
-        """
-        snp_list = self.snpman.get_snapshots_allformats(forceReload = True)
-        snp_inc = snp_list[0]
-        snp_inc_older = snp_list[1]
-
-        self.assertFalse(snp_inc.isfull())
-        self.assertFalse(snp_inc_older.isfull())
-
-        snp_inc = self.snpman._rebaseOnLastSnp(snapshot = snp_inc)
-
-        self._setup_workingdir_paths()
-        self._compare_tar_archives(snapshot_path = self.snppath[0],
-                                   result_path = self.res_snppath[0])
-
-#    def testGetRevertState(self):
-#        """
-#        """
-#        snapshots = self.snpman.getSnapshots()
-#        revertstate = self.snpman.getRevertState(snapshots[0], os.sep)
-#        self.assertEqual(len(revertstate),3)
-#        for k, v in revertstate.iteritems() :
-#            print(k+" = "+str(v)) 
-#        self.assertFalse(revertstate[os.path.abspath('./test-datas/backupdir/2007-05-17_13.45.45.609201.wattazoum-vm.ful')].has_key("/home/wattazoum/Desktop/sbackup-test/d17/"))
-#        revertstate = self.snpman.getRevertState(snapshots[1], "/home/wattazoum/Desktop/sbackup-test/")
-#        self.assertEqual(len(revertstate),2)
-#        self.assertFalse(revertstate[os.path.abspath('./test-datas/backupdir/2007-05-17_13.45.45.609201.wattazoum-vm.ful')].has_key("/home/wattazoum/Desktop/sbackup-test/d17/"))
-#        self.assertTrue(revertstate[os.path.abspath('./test-datas/backupdir/2007-05-17_19.45.08.812921.wattazoum-vm.inc')].has_key("/home/wattazoum/Desktop/sbackup-test/d17/"))
-
-
-class TestSnapshotRebaseOnestepFul(_TestSnapshotManagerBase):
-    """Testsuite which rebases an incremental snapshot on a full
-    snapshot in one step (i.e. directly on the following base snapshot).
-    """
-    _path_class = _TestSnapshotRebaseOnestepFulPaths
-
-    def test_rebaseonlast_inc_on_ful_snar(self):
-        """
-        """
-        snp_list = self.snpman.get_snapshots_allformats(forceReload = True)
-        snp_inc = snp_list[1]
-        snp_ful = snp_list[2]
-
-        self.assertFalse(snp_inc.isfull())
-        self.assertTrue(snp_ful.isfull())
-
-        snp_inc = self.snpman._rebaseOnLastSnp(snapshot = snp_inc)
-
-        self._compare_snar_files(snapshot = snp_inc,
-                                 snarfile = self._path_class.get_res_snar())
-
-    def test_rebaseonlast_inc_on_ful_tar(self):
-        """Test Tar archive when Re-basing an incremental snapshot to the next available base (grandfather)
-        """
-        snp_list = self.snpman.get_snapshots_allformats(forceReload = True)
-        snp_inc = snp_list[1]
-        snp_ful = snp_list[2]
-
-        self.assertFalse(snp_inc.isfull())
-        self.assertTrue(snp_ful.isfull())
-
-        snp_inc = self.snpman._rebaseOnLastSnp(snapshot = snp_inc)
-
-        self._setup_workingdir_paths()
-        self._compare_tar_archives(snapshot_path = self.snppath[1],
-                                   result_path = self.res_snppath[0])
 
 
 class _TestSnapshotRemoveBase(_TestSnapshotManagerBase):
@@ -855,8 +682,6 @@ def suite():
         [
          _loader(TestSnapshotManager),
          _loader(TestSnapshotManagerFromDisk),
-         _loader(TestSnapshotRebaseOnestepFul),
-         _loader(TestSnapshotRebaseOnestepIncr),
          _loader(TestSnapshotRemoveV1),
          _loader(TestSnapshotRemoveV2)
         ])

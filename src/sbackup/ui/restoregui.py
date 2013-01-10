@@ -776,33 +776,6 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             else:
                 self.widgets["deleteBox"].hide()
 
-    def on_rebaseButton_toggled(self, *args):
-        if self.widgets['rebaseButton'].get_active():
-            self.widgets['snphistoryFrame'].show()
-            histlist = self.snpman.getSnpHistory(self.currentSnp)
-            for snapshot in histlist:
-                self.historylisttreestore.append(None, [snapshot.getName()])
-        else :
-            # get the selected base and rebase on it.
-            tstore, iter = self.widgets['historytv'].get_selection().get_selected()
-            if iter :
-                snp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter, 0)))
-                try:
-                    message = _("Do you really want to rebase '%(current)s' on '%(base)s' ?") % {"current" : self.currentSnp, "base" : snp}
-                    dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = message)
-                    response = dialog.run()
-                    dialog.destroy()
-                    if response == gtk.RESPONSE_YES:
-                        self.snpman.rebaseSnapshot(self.currentSnp, snp)
-                except Exception, e:
-                    self.logger.error(str(e))
-                    self.logger.error(traceback.format_exc())
-                    dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-                    dialog.run()
-                    dialog.destroy()
-            self.widgets['snphistoryFrame'].hide()
-            self.historylisttreestore.clear()
-
     def on_deleteButton_clicked(self, *args):
         if self.currentSnp is not None:
             if self.snpman.is_standalone_snapshot(self.currentSnp):

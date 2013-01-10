@@ -52,8 +52,6 @@ from sbackup.util.log import LogFactory
 from sbackup.util.exceptions import SBException
 from sbackup.util.exceptions import NotValidSnapshotException
 from sbackup.util.exceptions import NotValidSnapshotNameException
-from sbackup.util.exceptions import RebaseSnpException
-from sbackup.util.exceptions import RebaseFullSnpForbidden
 from sbackup.util.exceptions import RemoveSnapshotHasChildsError
 from sbackup.util.exceptions import NotSupportedError
 from sbackup.util.exceptions import FileAccessException
@@ -68,11 +66,8 @@ class SnapshotManager(object):
     :todo: Remove instance variables 'status' and implement an observer\
            pattern or progress function hooks! 
     
-    :note: Rebasing of snapshots is currently disabled due to severe performance issues.
-            Adapt to use FAM before re-enabling!
+    :note: Rebasing of snapshots is disabled due to severe performance issues.
     """
-
-    REBASEDIR = "rebasetmp"
 
     def __init__(self, destination):
         """Default constructor. Takes the path to the target backup
@@ -258,312 +253,6 @@ class SnapshotManager(object):
         ###
         return snps
 
-    def exportSnapshot(self, snapshot, target, rebase = False):
-        """There are two ways of exporting a snapshot. You can either
-        copy the dir to the target or re-base the snapshot before copying it.
-         
-        :todo: Think about a plugins system that will be used to export on\
-               TAPE, on DVD and so on.
-           
-        :attention: Not implemented yet!
-        """
-        raise NotSupportedError
-
-    def rebaseSnapshot(self, torebase, newbase = None):
-        """The re-base operation is the changing of the base of a
-        snapshot. Basically, for 3 snapshots A, B and C that means,
-        if we re-base C to A, we can now remove B without problems.
-        The informations originally contained in C will be updated
-        to keep the changes occurred in B inside C.
-        
-        Re-basing is done by doing many one-step re-base operation
-        one after another.
-        
-        Re-base principle:
-        snp1 -> snp2 -> snp3 -> snp4
-        
-        - re-base snp3 on snp1 (snp3 has the newer version of the file it contains)
-        - remove snp3 "ver" file ( means the snapshot is being processed )
-        - for each file in snp2 :
-        - if included in snp3 -> pass
-        - if not : push the file in snp3
-        - when finished, checks and merge the includes.list and excludes.list
-        - change the base file content to the new base
-        - write the "ver" file
-        
-        If an error is encountered -> cancel Rebase ( we shouldn't
-        loose the snapshot !)
-
-        :raise SBException: if torebase is a full backup or newbase is ealier
-        
-        :todo: Remove status message from this non-gui class!
-        
-        """
-        self.logger.info("Re-base of snapshot '%s' - new base: '%s'" % (torebase, newbase))
-
-        # checks before processing 
-        if torebase.isfull() :
-            raise RebaseFullSnpForbidden(\
-               _("No need to rebase a full snapshot '%s'") % torebase.getName())
-        if not torebase.getBase():
-            raise RebaseSnpException(_("'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken ")\
-                                         % {'snapshotToRebase':torebase.getName()})
-
-        # check if the new base is earlier
-        if newbase and torebase.getName() <= newbase.getName() :
-            raise RebaseSnpException(_("Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= '%(NewBaseSnapshot)s' ")\
-                    % { 'snapshotToRebase':torebase.getName(),
-                        'NewBaseSnapshot': newbase.getName() })
-
-        currentTorebase = torebase
-
-        while currentTorebase.getBase():
-            self.statusMessage = _("Rebasing '%(current)s' on '%(base)s'")\
-                                    % {    "current": currentTorebase,
-                                        "base" : currentTorebase.getBase()}
-            self.logger.info(self.statusMessage)
-            currentTorebase = self._rebaseOnLastSnp(currentTorebase)
-            # re-basing finished?
-            if newbase and currentTorebase.getBase():
-# TODO: replace <= by is_older/is_younger!                
-                if currentTorebase.getBase() <= newbase.getName():
-                    break
-
-    def __is_older(self, to_rebase, new_base):
-        """Checks if the ??? is more recent than ???
-        
-        :todo: Not fully implemented and not used by now. Use it!
-        """
-        _res = True
-        if to_rebase.getBaseSnapshot().getName() <= new_base.getName():
-            pass
-
-    def convertToFullSnp(self, snapshot):
-        """Re-base a snapshot till the full one and then make it full.
-
-        :param snapshot: the snapshot to make full
-        :type snapshot: `Snapshot`
-
-        """
-        self.rebaseSnapshot(snapshot)
-
-    def _pullSnpContent(self, snapshot, topullSnp):
-        """Move the 'topullSnp' snapshot content to the 'snapshot' snapshot
-        
-        ====================
-        Merging of snapshots
-        ====================
-        
-        A) on directory level (records in SnapshotFiles)
-        ================================================
-        
-        1. certain directory exists in both snapshots: the directory still
-           exists in target/merged snapshot
-        2. directory is contained in current snapshot but is not contained
-           in origin snapshot: the directory exists in target/merged snapshot
-        3. directory exists in origin snapshot, but does not exist in target
-           snapshot: directory was removed or excluded and does not exist
-           in merged snapshot
-         
-        B) on level of files within directories
-        =======================================
-
-        Files must be considerated if the parent directory which contains
-        a certain file still exists in the target/merged snapshot. The
-        same relations as on directory level hold for files.
-        
-        :param snapshot: the snapshot to push in
-        :type snapshot: Snapshot
-        :param topullSnp: The snapshot to pull
-        :type topullSnp: Snapshot
-        
-        """
-        # Details on implementation
-        #
-        # 1. create a temporary directory inside of the rebased snapshot
-        # 2. merge the SNAR files, this gives a list of files/directories
-        #    to be moved from the base snapshot (to pull snp) into the
-        #    rebased snapshot; the snar header from the destination snapshot
-        #    (i.e. the child) is used
-        # 3. merge the include and exclude file lists
-        #
-
-        # Utilities functions everything should be done in temporary files #
-        def makeTmpTAR():
-            """
-            How is the temporary archive created?
-            
-            1. the list of files which need to are extracted from the base
-               snapshot is written to file
-            2. these files are extracted from the base snapshot
-            3. 
-            
-            @todo: Check available disk space prior.
-            """
-            # write temp flist created from the temporary partial snar file
-            flist_name = self._fop.normpath(tmpdir, "flist.tmp")
-
-            self.logger.info("Writing the temporary Files list to make the transfer")
-#            print "  %s" % flist_name
-#            print "Striping leading '/', separating entries with NULL"
-
-            flistd = open(flist_name, 'w')
-            for _fnam in _files_extract:
-#                print _fnam
-                flistd.write(_fnam.lstrip(self._fop.pathsep) + '\0')
-            flistd.close()
-
-            self.logger.info("Make a temporary tar file by transfering the "\
-                             "files from base")
-            tmptardir = self._fop.normpath(tmpdir, "tempTARdir")
-            if self._fop.path_exists(tmptardir):
-                self._fop.delete(tmptardir)
-            self._fop.makedir(tmptardir)
-
-            # extract files that are stored in temporary flist
-            tar.extract2(topullSnp.getArchive(), flist_name,
-                          tmptardir, additionalOpts = ["--no-recursion"])
-
-            # uncompress the tar file so that we can append files to it
-            archive = snapshot.getArchive()
-            if not tar.getArchiveType(archive):
-                raise SBException("Invalid archive file '%s'" % archive)
-            else :
-                arvtype = tar.getArchiveType(archive)
-                if arvtype == "gzip" :
-                    Util.launch("gunzip", [archive])
-                    archive = archive[:-3]
-                elif arvtype == "bzip2" :
-                    Util.launch("bunzip2", [archive])
-                    archive = archive[:-4]
-                # else : the archive is already uncompressed
-
-            # finally append them to the current
-            # archive (resp. the temporary working copy)
-            # we use the flist from above
-            tar.appendToTarFile(desttar = archive, fileslist = flist_name,
-                            workingdir = tmptardir + self._fop.pathsep, additionalOpts = None)
-
-            # re-compress
-            if arvtype == "gzip" :
-                Util.launch("gzip", [archive])
-            elif arvtype == "bzip2" :
-                Util.launch("bzip2", [archive])
-
-            self._fop.force_delete(tmptardir)
-
-        def mergeIncludesList():
-            destf_path = self._fop.normpath(tmpdir, "includes.list.tmp")
-
-            srcfd = open(topullSnp.getIncludeFListFile())
-            incl_topull = srcfd.readlines()
-            srcfd.close()
-
-            srcfd = open(snapshot.getIncludeFListFile())
-            incl_snp = srcfd.readlines()
-            srcfd.close()
-
-            incl_dest = Util.list_union(incl_topull, incl_snp)
-
-            destfd = open(destf_path, 'w')
-            destfd.writelines(incl_dest)
-            destfd.close()
-
-        def mergeExcludesList():
-            destf_path = self._fop.normpath(tmpdir, "excludes.list.tmp")
-
-            srcfd = open(topullSnp.getExcludeFListFile())
-            excl_topull = srcfd.readlines()
-            srcfd.close()
-
-            srcfd = open(snapshot.getExcludeFListFile())
-            excl_snp = srcfd.readlines()
-            srcfd.close()
-
-            excl_dest = Util.list_union(excl_topull, excl_snp)
-
-            destfd = open(destf_path, 'w')
-            destfd.writelines(excl_dest)
-            destfd.close()
-
-        def movetoFinaldest():
-            self.logger.debug("Move all temporary files to their final destination")
-            # SNAR file
-            _tmpname = self._fop.normpath(tmpdir, "snar.final.tmp")
-            if self._fop.path_exists(snapshot.getSnarFile()) :
-                self._fop.delete(snapshot.getSnarFile())
-            self._fop.rename(_tmpname, snapshot.getSnarFile())
-
-            # Includes.list
-            if self._fop.path_exists(snapshot.getIncludeFListFile()) :
-                self._fop.delete(snapshot.getIncludeFListFile())
-            self._fop.rename(tmpdir + self._fop.pathsep + "includes.list.tmp",
-                      snapshot.getIncludeFListFile())
-
-            # Excludes.list
-            if self._fop.path_exists(snapshot.getIncludeFListFile()) :
-                self._fop.delete(snapshot.getExcludeFListFile())
-            self._fop.rename(tmpdir + self._fop.pathsep + "excludes.list.tmp",
-                      snapshot.getExcludeFListFile())
-
-        # process:
-        try :
-            self.statusNumber = 0.00
-
-            # create a temporary directory within the target snapshot
-            tmpdir = self._fop.joinpath(snapshot.getPath(), self.REBASEDIR)
-            if self._fop.path_exists(tmpdir):
-                self._fop.force_delete(tmpdir) # to ensure we have write permissions
-            self._fop.makedir(tmpdir)
-
-            # specify full path to final (temporary) snar file
-            _tmpfinal = self._fop.normpath(tmpdir, "snar.final.tmp")
-
-            # create temporary SNAR file and copy the header, then merge
-            finalsnar = self._copy_empty_snar(snapshot, _tmpfinal)
-#            _snp_excl = snapshot.read_excludeflist_from_file()
-#            print ">>> getExcludeFlist"
-#            print "%s" % _snp_excl
-#            assert isinstance(_snp_excl, set)
-            _files_extract = self._merge_snarfiles(snapshot.getSnapshotFileInfos(),
-                                            snapshot.read_excludeflist_from_file(),
-                                            topullSnp.getSnapshotFileInfos(),
-                                            finalsnar)
-
-            self.statusNumber = 0.35
-            mergeIncludesList()
-
-            self.statusNumber = 0.45
-            mergeExcludesList()
-
-            self.statusNumber = 0.55
-            makeTmpTAR()
-
-            self.statusNumber = 0.75
-            movetoFinaldest()
-
-            # clean Temporary files 
-            self.statusNumber = 0.85
-            self._fop.delete(tmpdir)
-
-            self.statusNumber = 0.95
-            snapshot.commitverfile()
-            self.statusNumber = 1.00
-
-            self.statusNumber = None
-            self.statusMessage = None
-            self.substatusMessage = None
-        except Exception, _exc:
-
-            _msg = _("An error occurred when pulling snapshot '%s'.") % \
-                    topullSnp.getName()
-            self.logger.error(_msg)
-            self.logger.error(str(_exc))
-            self.logger.error(traceback.format_exc())
-
-            self.__cancelPull(snapshot)
-            raise _exc
-
     def _copy_empty_snar(self, snp_source, copydest):
         """Creates an empty SnapshotInfo-file with the name 'copydest'
         from the SnapshotInfo-file contained in given source snapshot. Empty
@@ -722,52 +411,6 @@ class SnapshotManager(object):
             res_snpfinfo.addRecord(_final_record)
         return files_to_extract
 
-    def _rebaseOnLastSnp(self, snapshot):
-        """One step re-base: the given `snapshot` is re-based one-step
-        back in history, i.e. on the base of its own base snapshot. This
-        is the smallest possible re-base operation. If the base of the
-        given `snapshot` was incremental its base is set as new base
-        snapshot. If the father snapshot was a full dump, the re-based
-        `snapshot` is made to a full one.
-        
-        Re-base principle:
-            dependencies before re-basing:
-            a)    snapshot (inc)
-                        -> snpapshot's father (inc)
-                                    -> snapshot's grand-father (inc or full)
-            b)    snapshot (inc) -> snpapshot's father (full)
-
-            after re-basing:
-            a)    snapshot (inc) -> snapshot's grand-father (inc or full)
-            b)    snapshot (full)
-        
-        
-        :todo: Implement tests for this method!
-        
-        """
-        if not snapshot.getBase():
-            raise SBException(_("Base of snapshot '%s' is not set.")\
-                                 % snapshot.getName())
-
-        # get the base (father) and grand-father of processed snapshot
-        basesnp = snapshot.getBaseSnapshot()
-        newbase = basesnp.getBase()
-
-        # process the merging
-        self._pullSnpContent(snapshot, basesnp)
-        # now the snapshot does not depend on the base any longer
-
-#TODO: after merging snapshots: if the merged snapshot is full now, the base
-#      file should be renamed in the merge routine?? No!
-
-        # set the new base
-        if newbase:
-            snapshot.setBase(newbase)
-            snapshot.commitbasefile()
-        else:
-            snapshot = self.__makeSnpFull(snapshot)
-        return snapshot
-
     def __makeSnpFull(self, snapshot):
         """Make an inc snapshot to a full one.
                 
@@ -813,29 +456,6 @@ class SnapshotManager(object):
 
         return res_snp
 
-    def __cancelPull(self, snapshot):
-        """To be able to handle well the cancellation of a pull
-        of a snapshot from another, we will need to not modify
-        the snapshot till the last moment. This means, the infos
-        we want to add in the SNAR file should be created as a
-        temporary SNAR file. Same goes for the TAR file. So that
-        to cancel, we will just have to remove those temporary
-        files and restore the 'ver' file.
-        
-        """
-        self.logger.info(_("Cancelling pull of snapshot '%s'") % snapshot.getName())
-        path = self._fop.joinpath(snapshot.getPath(), self.REBASEDIR)
-#        shutil.rmtree(path)
-        self._fop.delete(path)
-
-        if self._fop.path_exists(self._fop.joinpath(snapshot.getPath(), "files.tar")):
-            format = snapshot.getFormat()
-            if format == "gzip":
-                Util.launch("gzip", [self._fop.joinpath(snapshot.getPath(), "files.tar")])
-            elif format == "bzip2":
-                Util.launch("bzip2", [self._fop.joinpath(snapshot.getPath(), "files.tar")])
-        snapshot.commitverfile()
-
     def _retrieve_childsnps(self, snapshot):
         """Retrieves all snapshots that rely on the given parent
         `snapshot` and returns a list containing all child snapshots.
@@ -877,29 +497,12 @@ class SnapshotManager(object):
         """Public method that removes a given snapshot safely. The removal
         of a snapshot is more complicated than just to remove the snapshot
         directory since a snapshots could be the base of other snapshots.
-        We need to rebase all of these depending snapshots before removing
-        the given snapshot.
         
         :param snapshot: the snapshot to be removed
         :type snapshot: `Snapshot`
         
-        :todo: Refactor by using method `_retrieve_childsnps`!
-        
         :note; Currently removal of freestanding snapshots is supported only.
         """
-#        _this_snp_name = snapshot.getName()
-#
-#        self.logger.info(_("Deleting snapshot: '%(snp)s'.") % {'snp' : snapshot})
-#        if snapshot.isfull():
-#            self.__remove_full_snapshot(snapshot)
-#        else:
-#            # rebase all child snapshots to the base of this snapshot
-#            listing = self.get_snapshots(forceReload = True)
-#            for snp in listing:
-#                if snp.getBase() == _this_snp_name:
-#                    self.rebaseSnapshot(snp, snapshot.getBaseSnapshot())
-#            self._remove_standalone_snapshot(snapshot)
-#            listing = self.get_snapshots(forceReload = True)
         self._remove_standalone_snapshot(snapshot)
 
     def remove_snapshot_forced(self, snapshot):
@@ -908,43 +511,6 @@ class SnapshotManager(object):
         self.logger.debug("Removing '%s'" % snapshot.getName())
         self._fop.delete(snapshot.getPath())
         self.get_snapshots(forceReload = True)
-
-
-    def __remove_full_snapshot(self, snapshot):
-        """Method that removes the given full backup snapshot. The removal of
-        a full anspshot is only possible if the full snapshot is not be the
-        base of any other snapshot. To ensure this pre-condition 2 cases
-        are thinkable.
-        
-        1. The snapshot is already stand-alone, i.e. isn't the base of any other.
-        2. The snapshot must be merged with any of its child snapshots and the
-           reference removed.
-        """
-        _ful_snp_name = snapshot.getName()
-        self.logger.info("Deleting full snapshot '%(snp)s'."
-                            % {'snp' : _ful_snp_name})
-        if not snapshot.isfull():
-            raise ValueError("Snapshot must be a full snapshot!")
-
-        # rebase all childs of this snapshot
-        listing = self.get_snapshots(forceReload = True)
-        for snp in listing :
-            if snp.getBase() == _ful_snp_name:
-                self.logger.debug("Rebase child snapshot '%s'" % (snp))
-                self.rebaseSnapshot(snp)
-
-        # check if the full snapshot is no longer the base of any other
-        listing = self.get_snapshots(forceReload = True)
-        is_standalone = True
-        for snp in listing:
-            if snp.getBase() == _ful_snp_name:
-                is_standalone = False
-                break
-        if is_standalone:
-            self._remove_standalone_snapshot(snapshot)
-        else:
-            raise RemoveSnapshotHasChildsError("The removal of a full snapshot is "\
-                "not possible as long as this is the base of other snapshots.")
 
     def compareSnapshots(self, snap1, snap2):
         """Compare 2 snapshots and return and SBdict with the

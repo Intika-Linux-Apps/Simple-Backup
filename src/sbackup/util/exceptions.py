@@ -109,16 +109,6 @@ class TimeoutError(SBException):
     """Thrown when an IO operation times out.
     """
 
-class RebaseSnpException(SBException):
-    """Thrown for rebase exception
-    
-    """
-
-class RebaseFullSnpForbidden(RebaseSnpException):
-    """Thrown when trying to rebase a full snapshot
-
-    """
-
 class RemoveSnapshotHasChildsError(SBackupError):
     """Is raised if snapshot removal fails.
     """

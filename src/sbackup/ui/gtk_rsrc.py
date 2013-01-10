@@ -316,9 +316,7 @@ def get_restoregui_widgets():
         'restoreas',
         'revert',
         'revertas',
-        'RebaseBox',
         'txt_current_base',
-        'rebaseButton',
         'deleteBox',
         'deleteButton',
         'snphistoryFrame',
@@ -350,7 +348,6 @@ def get_restoregui_handlers():
         'on_revertas_clicked',
         'on_restoreExpander_activate',
         'on_snpmanExpander_activate',
-        'on_rebaseButton_toggled',
         'on_deleteButton_clicked',
         'on_exportmanExpander_activate'
         ]
