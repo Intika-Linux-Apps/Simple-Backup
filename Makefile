@@ -114,6 +114,7 @@ install: check install-package install-po install-help install-bin install-data
 	chmod +x $(libdir)/sbackup-config-gtk
 	chmod +x $(libdir)/sbackup-restore-gtk
 	chmod +x $(libdir)/sbackupconfig.py
+	chmod +x $(libdir)/sbackup-legacy-restore
 
 # application's binaries
 install-bin:
@@ -121,6 +122,7 @@ install-bin:
 	ln -sf ../share/sbackup/sbackup-run $(bindir)/sbackup
 	ln -sf ../share/sbackup/sbackup-config-gtk $(bindir)/sbackup-config-gtk
 	ln -sf ../share/sbackup/sbackup-restore-gtk $(bindir)/sbackup-restore-gtk
+	ln -sf ../share/sbackup/sbackup-legacy-restore $(bindir)/sbackup-legacy-restore
 	ln -sf ../share/sbackup/sbackupconfig.py $(sbindir)/sbackupconfig
 
 # python package
@@ -180,6 +182,7 @@ uninstall-bin:
 	rm -f $(bindir)/sbackup
 	rm -f $(bindir)/sbackup-config-gtk
 	rm -f $(bindir)/sbackup-restore-gtk
+	rm -f $(bindir)/sbackup-legacy-restore
 	rm -f $(sbindir)/sbackupconfig
 
 uninstall-package:

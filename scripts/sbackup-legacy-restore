@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+#
+# sbackup - legacy support for restore operation
+#
+#   Copyright (c)2013: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2005-2008: Aigars Mahinovs <aigarius@debian.org>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+# Running this command will restore a file or directory from backup.
+# This is also a backend for Gnome GUI.
+
+
+import os
+import sys
+
+from sbackup import legacy_restore
+
+
+if __name__ == "__main__":
+    # Check for root privileges
+#    if os.getuid() != 0:
+#        print "Root or sudo privileges required!"
+#        sys.exit(1)
+
+    if len(sys.argv) == 2 and sys.argv[1] == '--gui':
+        legacy_restore.SRestoreGTK()
+        
+    else:
+        r = legacy_restore.SRestore()
+        if len(sys.argv) == 3:
+            ret = r.restore( sys.argv[1], sys.argv[2] )
+        elif len(sys.argv) == 4:
+            ret = r.restore( sys.argv[1], sys.argv[2], sys.argv[3] )
+        else:
+            print "sbackup command line restore utility (legacy support)\n"
+            print " Usage: sbackup-legacy-restore BACKUP_PATH FILE_OR_DIR_TO_RESTORE [TARGET_DIR]"
+            print " Note: BACKUP_PATH must include the snapshot subdirectory name, for example:"
+            print "  /var/backup/2005-08-09_14.59.38.441112.myhost.ful/"
+            print " Use 'sbackup-legacy-restore --gui' for more ease of use.\n"
+            sys.exit(1)
+            
+        if not ret:
+            print "Restore FAILED! Please check you parameters."
