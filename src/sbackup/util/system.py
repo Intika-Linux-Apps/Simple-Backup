@@ -357,16 +357,17 @@ def _set_envvar_from_session(key):
 
 #TODO: implement Singleton class for access to environment
 def get_session_environment():
+    #FIXME: support Unity, Mate, Cinnamon
+    _sessionnames = ("x-session-manager", "gnome-session", "gnome-shell",
+                     "ksmserver")
     mod_env = None
-    if grep_pid("x-session-manager") is not None:
-        mod_env = _get_session_env(session = "x-session-manager")
-    elif grep_pid("gnome-session") is not None:
-        mod_env = _get_session_env(session = "gnome-session")
-    elif grep_pid("ksmserver") is not None:
-        mod_env = _get_session_env(session = "ksmserver")
-    else:
-        mod_env = None
-        print "No desktop session found"
+    for _name in _sessionnames:
+        if grep_pid(_name) is not None:
+            mod_env = _get_session_env(session = _name)
+            print "Desktop session %s found" % _name
+            break
+    if mod_env is None:
+        print "No Desktop session found"
     return mod_env
 
 
@@ -423,8 +424,19 @@ def exec_command_returncode(args, env = None):
 
 
 def grep_pid(processname):
+    """
+    note for using pgrep: The process name used for matching is limited to
+    the 15 characters present in the output of /proc/pid/stat. Use
+    the -f option to match against the complete command line /proc/pid/cmdline.
+    
+    therefore here a full RegEx is applied to complete command lines:
+    pgreg -f "^(/(.+/)*)?processname($|\s+.+)
+    
+    """
     _pid = None
-    output = exec_command_stdout(args = ["pgrep", processname])
+    output = exec_command_stdout(args = ["pgrep", "-f",
+                                    "^(/(.+/)*)?%s($|\s+.+)" % processname])
+    print "DEBUG: pgrep %s = %s" % (processname, output)
     try:
         _pid = int(output)
     except ValueError:
