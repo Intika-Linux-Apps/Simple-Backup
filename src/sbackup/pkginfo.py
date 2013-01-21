@@ -1,6 +1,8 @@
+# This Python file uses the following encoding: utf-8
+#
 #   Simple Backup - package info
 #
-#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -39,21 +41,36 @@ class Infos(object):
     VERSION = util.get_version_number()
     DESCRIPTION = _("This is a user friendly backup solution for common desktop needs. If you want to help by submitting bugs, by translating or anything else please visit our website.")
     WEBSITE = "https://launchpad.net/sbackup/"
-    COPYRIGHT = "2005-2011 The Simple Backup authors"
+    COPYRIGHT = "2005-2013 The Simple Backup authors"
     AUTHORS = [_("Maintainers:"),
                "Jean-Peer Lorenz <peer.loz@gmx.net>",
                "Oumar Aziz Ouattara <wattazoum@gmail.com>",
                "",
                _("Former maintainers:"),
-               "Aigars Mahinovs <aigarius@debian.org>",
-               "Jonh Wendell <wendell@bani.com.br>",
+               "Aigars Mahinovs",
+               "Jonh Wendell",
                "",
                _("Contributors:"),
-               "Martin Schaaf <mascha@ma-scha.de>",
+               "Martin Schaaf",
                "Florian Achleitner",
-               "Andreas Sliwka <goff@johalla.de>"
+               "Andreas Sliwka",
+               "Rogach (platon7pronko)",
+               "Felix Griewald (tiiunder)",
+               "Marc Deslauriers",
+               "Thibault Godouet",
+               "Anton Feenstra",
+               "Derek Ditch",
+               "Bernd Wurst",
+               "Simon Déziel",
+               "drakosha",
+               "bytebybyte",
+               "Marcel Stimberg",
+               "Oliver Gerlich"
               ]
-    TRANSLATORS = _("translator-credits")
+    TRANSLATORS = "\n".join([_("translator-credits"),
+                             "",
+                             "Japanese translation: Thanks to Hajime Mizuno"
+                            ])
 
 
 #TODO: remove snapshot version from here!
