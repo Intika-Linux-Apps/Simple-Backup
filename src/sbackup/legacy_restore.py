@@ -29,6 +29,7 @@ import os.path
 import re
 import threading
 import time
+import traceback
 
 import sbackup.util as Util
 
@@ -45,22 +46,12 @@ try:
     import gnomevfs
 except ImportError:
     import gnome.vfs as gnomevfs
+    
+from sbackup.ui import misc
+sys.excepthook = misc.except_hook_threaded
 
 
 _LEGACY_RESTOREGUI_GLADE = Util.get_resource_file('sbackup-legacy-restore.glade')
-
-
-def error_dialog(message, parent = None):
-    """
-    Displays an error message.
-    """
-    
-    dialog = gtk.MessageDialog(parent = parent, type = gtk.MESSAGE_ERROR,
-                               buttons = gtk.BUTTONS_OK,
-                               flags = gtk.DIALOG_MODAL)
-    dialog.set_markup(message)
-    dialog.run()
-    dialog.destroy()
 
 
 class SRestore:
@@ -147,14 +138,14 @@ class SRestore:
 
         return True
 
-        def islocal( self, uri ):
-                local = True
-                try:
-                    if not gnomevfs.URI( uri ).is_local:
-                        local = False
-                except:
-                    pass
-                return local
+    def islocal( self, uri ):
+        local = True
+        try:
+            if not gnomevfs.URI( uri ).is_local:
+                local = False
+        except:
+            pass
+        return local
 
     def extract( self, backup, spath, tdir ):
         tarline = "tar -xzp --occurrence=1 --ignore-failed-read -C '"+tdir+"' "
@@ -514,9 +505,14 @@ class RestoreThread(threading.Thread):
             r.restore( self.tdir, self.src, self.dst )
             del r
         except:
-            err_msg = sys.exc_info()[1]
-            error_dialog("An unexpected error occured!\n%s.\nRestoring process may be incomplete!" % err_msg )
-
+            _exc = traceback.format_exc()
+            misc.show_errdialog_threaded(message_str = "An uncaught error "\
+                        "occurred. Close this message window and restart the "\
+                        "application.\n\nPlease report this error on "\
+                        "https://bugs.launchpad.net/sbackup.",
+                        parent = None,
+                        headline_str = "Sorry, this should not have happened",
+                        secmsg_str = _exc)
         self.alive = False
         self.progressThread.cancel = True
 
