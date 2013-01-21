@@ -40,8 +40,112 @@ The reason is that there are 2 packages for import in
 that case, it might occur name conflicts: in your development environment and
 in the Python site-packages directory.
 
-If you know what you are doing you can run development code for testing
-as follows:
+ALTERNATIVE A - recommended
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use helper scripts shipped with sbackup (based on fresh wheezy installation)
+
+0. Install bazaar and set your Launchpad ID
+
+	~$ sudo apt-get install bzr
+		You have not informed bzr of your Launchpad ID, and you must do this to
+		write to Launchpad or access private data.  See "bzr help launchpad-login".
+		-> inform bzr of ID
+
+	install bzrtools and bzr-gtk (if you want to)
+	see: bzr help gtk
+
+
+    bzr whoami "Firstname Lastname <your@email.org>"
+	bzr launchpad-login <username>
+
+	see: https://help.launchpad.net/YourAccount/CreatingAnSSHKeyPair
+	add ssh key (or copy .ssh from another machine)
+	
+
+
+1. create a directory for your local branch
+
+	~$ mkdir Dokumente/sbackup
+	~$ cd Dokumente/sbackup
+
+
+2. checkout branch
+
+	~/Dokumente/sbackup$ bzr branch lp:sbackup/0.11
+		Branched 244 revisions.
+		~/Dokumente/sbackup$ cd 0.11/
+		~/Dokumente/sbackup/0.11$ ls
+		AUTHORS    COPYING  debian  HACKING  INSTALL   METAINFO  nssbackup.ChangeLog  README   setup.py.in  tests  tools
+		ChangeLog  data     doc     help     Makefile  NEWS      po                   scripts  src          TODO
+
+	~/Dokumente/sbackup/0.11$ bzr log -r-2..
+		
+		------------------------------------------------------------
+		revno: 244
+		committer: Jean-Peer Lorenz <peer.loz@gmx.net>
+		branch nick: 0.11
+		timestamp: Thu 2012-01-05 18:03:14 +0100
+		message:
+		  * updated changelog
+		------------------------------------------------------------
+		revno: 243
+		committer: Jean-Peer Lorenz <peer.loz@gmx.net>
+		branch nick: 0.11
+		timestamp: Thu 2012-01-05 18:02:50 +0100
+		message:
+		  * [Fix] LP: #768080 incremental snapshots store more files than needed:
+		  add TAR option '--no-check-device'. Thanks to Rogach (platon7pronko) and
+		  Felix Griewald (tiiunder) for the patch.
+
+
+3. You have successfully branched sbackup to your local harddrive!
+
+
+4. Before actually running scripts in order to test modifications, please setup
+your development environment by means of following script:
+
+	~/Dokumente/sbackup/0.11$ source tools/setup-dev.sh
+	=SBACKUP DEVELOPMENT= user@host:~/Dokumente/sbackup/0.11/scripts$ 
+
+
+5. You are now in a dedicated environment (note the leading
+'=SBACKUP DEVELOPMENT= ' in front of your prompt). It is changed into
+the 'script' directory of your branch.
+
+Execute scripts as you like,
+e.g. run a backup with
+	./sbackup-run --no-dbus --config-file=<path to your test config file>
+
+or full backups with
+	./sbackup-run --no-dbus --full --config-file=<path to your test config file>
+
+or restore with
+	./sbackup-restore --config=<path to your test config file> <name of snapshot>
+
+
+6. To finish hacking, just exit the development environment by typing 'exit'
+
+7. optional: you can also call './tools/teardown-dev.sh' at any time in order
+to clean up your branch and remove temporary files and installed language files.
+
+
+8. push changes
+   bzr bind lp:~nssbackup-dev/sbackup/0.11 in case the checkout was done
+   before bzr launchpad-login call; be sure your SSH keys are in place
+
+   bzr push
+
+   when getting error "http does not support mkdir()", try:
+   bzr push --remember bzr+ssh://bazaar.launchpad.net/~nssbackup-dev/sbackup/0.11
+	
+
+
+ALTERNATIVE B
+~~~~~~~~~~~~~
+
+Prepare setup manually. If you know what you are doing you can run development
+code for testing as follows:
 
 1. Add your development directory to the Python path. Do this in a shell, so
    it does not affect the whole system! You can use the following commands:
