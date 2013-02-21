@@ -50,6 +50,7 @@ source $metainfofile
 appname=$PKGNAME
 
 version_pack=$(grep --max-count=1 "^$PKGNAME ($VERFULL" $changelog|cut -d "(" -f 2 -|cut -d ")" -f 1 -)
+echo "version_pack:" $version_pack
 
 echo "-------------------------------------------------------"
 echo "Packaging tool for "$appname
@@ -131,7 +132,7 @@ if test "$1" = "tarball"; then
 else
     REL_DESTAPPDIR="$appname-$version_pack"
     destdir=$PACKDIR"/"$version_pack
-    TARNAME=$appname"_"$version_pack
+    TARNAME=$appname"_"$VERFULL
     ORIGTARNAME="$TARNAME.orig$TAREXT"
 fi
 
@@ -313,7 +314,9 @@ case "$1" in
 
     binary)
         echo; echo "building binary packages"
-        rm -f "$ORIGTARNAME"
+        #rm -f "$ORIGTARNAME"
+        # original tarball is required in packaging dir
+        cp $PACKDIR/$ORIGTARNAME $destdir/$ORIGTARNAME
         
         # we move the Debian directory back into the exported source in order
         # to build the deb packages
