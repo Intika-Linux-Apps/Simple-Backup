@@ -9,7 +9,7 @@ Name[es]=Restauración de copia de seguridad
 Name[ja]=バックアップの復元
 #
 Comment=Simple Backup restoration tool for non-admins.
-Name[fr]=Outil de Restauration de Simple Backup pour les non-administrateurs.
+Comment[fr]=Outil de Restauration de Simple Backup pour les non-administrateurs.
 Comment[de]=Simple Backup Wiederherstellung für Nicht-Admins.
 Comment[pt_BR]=Restaure seu backup feito anteriormente (non-admins).
 Comment[es]=Restauración de copia de seguridad para no administradores.
