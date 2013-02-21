@@ -1,4 +1,67 @@
-sbackup (0.11.4ubuntu1) maverick; urgency=low
+sbackup (0.11.5-0~bpo70+1) wheezy; urgency=low
+
+  * translations updated
+  * [Fix] LP: #1000171 make it backwards compatible because upgrade-backups
+                       is incredibly slow and not reliable:
+                       added restore utility which provides legacy support
+                       using the 0.10.5 algorithm. Command must be
+                       executed from terminal: 'sbackup-legacy-restore
+                       BACKUP_PATH FILE_OR_DIR_TO_RESTORE [TARGET_DIR]'
+                       or for more ease of use with GTK gui:
+                      'sbackup-legacy-restore --gui'.
+  * remove 'backup upgrade' feature and 'rebase snapshot' feature since it
+    is not reliable and can cause severe user data loss
+  * [Fix] LP: #1097465 Regular expressions defined in default configuration
+                       can be improved:
+                       -do not exclude specific types of files e.g. mp3, avi
+                       -fix regex for .gvfs, trash, cache etc. so these apply
+                        to 'top-level' directories
+                       -add a default regex for lock directories
+                        (e.g. $HOME/.mozilla/lock)
+                       -add a default regex for $HOME/.cache directory
+  * [Fix] LP: #785512 Backup files are not protect from local user access:
+                      make the snapshot directories RWX only by owner
+                      (existing snapshots are not affected by this fix).
+  * Apply patch from Simon Déziel to make the temp directory
+                      RWX only by owner instead of by all. (LP: #785495)
+  * [Fix] LP: #330680 fails if target path contains #:
+                      fixed by not allowing fragments when parsing target
+                      path and using quote/unquote to escape # properly
+                      (FIXME: this fix does not cover target paths containing
+                      special chars ; or ?)
+  * [Fix] LP: #980786 Don't complain about non-accessable excluded files:
+                      order of checks when inspecting file system revised. It
+                      is now first  checked whether a file is excluded before
+                      it is actually accessed.
+                      Thanks for Bernd Wurst for the suggestion.
+  * [Fix] LP: #670646 sbackup-gtk crashes while starting: invalid literal
+                      for int():
+                      ignore ValueError from urlparse when parsing port
+  * [Fix] LP: #888367 TypeError: argument of type 'int' is not iterable:
+                      Try to fix type error by not using interpolation when
+                      getting items From ConfigParser.
+  * [Fix] LP: #173490 Pre/Post backup script hooks:
+                      applied patch suggested by Derek Ditch
+  * [Fix] LP: #918099 System menu names should include 'admin' or similar:
+                      applied patch suggested by Anton (feenstra)
+  * [Fix] LP: #875634 sbackup's tar very slow due to erroneous backup size
+                      calculation:
+                      Sometimes the calculation of the space required goes
+                      badly wrong and we could end-up With _checkp=1 for
+                      30GB to save, making tar VERY slow.
+                      Fixed by setting minimum value to 100. Thanks to
+                      Thibault Godouet for the patch.
+  * added exception handling in case of not implemented
+                      'attach_to_status_icon' method (e.g. Debian Wheezy)
+  * [Fix] LP: #768080 incremental snapshots store more files than needed:
+                      add TAR option '--no-check-device'. Thanks to
+                      Rogach (platon7pronko) and Felix Griewald (tiiunder)
+                      for the patch.
+  * Correctly set package format to 3.0 (quilt). Thanks to Marc Deslauriers.
+
+ -- Jean-Peer Lorenz <peer.loz@gmx.net>  Mon, 21 Jan 2013 20:07:30 +0100
+
+sbackup (0.11.4-0ubuntu1) natty; urgency=low
 
   * [Fix] LP: #714916 Unhandled error in gio backend when looking up
                       verbose error message
@@ -18,15 +81,14 @@ sbackup (0.11.4ubuntu1) maverick; urgency=low
                       (SMTP server etc.)
   * [Fix] LP: #695613 Empty notification popup due to invalid markup
   * [Fix] LP: #671785 Parsing remote URIs fails when username or password
-  					  contains special characters; quote special characters
-  					  to comply with RFC 1738 sec. 3.1
+              contains special characters; quote special characters
+              to comply with RFC 1738 sec. 3.1
   * [Fix] LP: #675361 Restore process fails with error 'is not a file' while
                       copying
   * [Fix] LP: #696183 Failed to set GID to `admin`; improved handling of
                       non-existent user groups
-  * refer to dependent packages 'gconf2', 'desktop-file-utils' in install file
-  * translations updated
-  * translations added: fo
+  * [Fix] LP: #507177 update translations
+  * debian/control: added gconf2 and desktop-file-utils to Depends
 
  -- Jean-Peer Lorenz <peer.loz@gmx.net>  Tue, 08 Feb 2011 13:58:43 +0100
 

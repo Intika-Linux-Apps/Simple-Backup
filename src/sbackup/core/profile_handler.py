@@ -1,6 +1,6 @@
 #   Simple Backup - process a certain profile (a distinct configuration)
 #
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,6 @@ import time
 
 from sbackup.fs_backend import fam
 from sbackup.core.SnapshotManager import SnapshotManager
-from sbackup.core.UpgradeManager import UpgradeManager
 from sbackup.core import snapshot
 
 from sbackup import util
@@ -77,7 +76,6 @@ class BackupProfileHandler(object):
         self.__profilename = self.config.getProfileName()
         self.__state.set_profilename(self.__profilename)
 
-        self.__um = UpgradeManager()
         self.__snpman = None
 
         self.__snapshot = None
@@ -85,6 +83,29 @@ class BackupProfileHandler(object):
         self.__fam_target_hdl = fam.get_fam_target_handler_facade_instance()
 
         self.logger.debug("Instance of BackupProfileHandler created.")
+
+    def do_hook(self, hookname):
+        """Runs scripts optionally defined in section 'hooks' of
+        configuration file. Currently defined are
+        * pre-backup - before preparation of backup starts
+        * post-backup - after completion and finishing of backup
+        
+        """
+        #LP #173490
+        import commands
+        hooks = None
+        if self.config.has_option('hooks', hookname):
+            hooks = str(self.config.get('hooks', hookname)).split(",")
+    
+        if hooks is not None:
+            self.logger.info(_("Running of hooks: %s") % hookname)
+            for hook in hooks:
+                result = commands.getstatusoutput(hook)
+                if( 0 != result[0]):
+                    raise exceptions.HookedScriptError(\
+                      "Hook %s returned error: '%s' (exit code=%s)" % (hookname,
+                                                                    result[1],
+                                                                    result[0]))
 
     def prepare(self):
         self.logger.info(_("Preparation of backup process"))
@@ -104,7 +125,6 @@ class BackupProfileHandler(object):
         """Runs the whole backup process:
         
         1. check pre-conditions
-        2. test for upgrades (but don't perform)
         3. purge snapshots (if configured)
         4. open new snapshot containing common metadata (full or incr.
             depending on existing one, base, settings etc.)
@@ -116,23 +136,7 @@ class BackupProfileHandler(object):
         assert self.__fam_target_hdl.is_initialized()
 
         self.__snpman = SnapshotManager(self.__fam_target_hdl.query_mount_uri())
-
-        # Upgrade Target
-        # But we should not upgrade without user's agreement!
-        # Solution 1: add an option: AutoAupgrade = True/False
-        #          2: start with a new and full dump and inform the user that
-        #              there are snapshots in older versions 
-        needupgrade = False
-        try:
-            needupgrade = self.__um.need_upgrade(self.__fam_target_hdl.query_mount_uri())
-        except exceptions.SBException, exc:
-            self.logger.warning(str(exc))
-
-        if needupgrade:
-            self.__state.set_state('needupgrade')
-            _msg = _("There are snapshots stored in outdated snapshot formats. Please upgrade them using 'Simple Backup-Restoration' if you want to use them.")
-            self.logger.warning(_msg)
-
+        
         # get basic informations about new snapshot
         self.__state.set_state('prepare')
         (snppath, base) = self.__retrieve_basic_infos(force_full_snp = self.__full_snp)

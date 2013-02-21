@@ -31,7 +31,7 @@
 METAFILE="METAINFO"
 if [ ! -e $METAFILE ]; then
   echo "ERROR: file '"$METAFILE"' not found!"
-  echo "Please execute this script from the root directory of the branch."; echo
+  echo "Please make sure you are executing this script from the root directory of the branch."; echo
   exit 1
 #else
 #  echo "Found file '"$METAFILE"' contains:"; cat $METAFILE; echo; echo

@@ -1,7 +1,7 @@
 #   Simple Backup - Indicator application (status icon)
 #                   core implementation
 #
-#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2009-2010,2012,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -138,7 +138,9 @@ class PyNotifyMixin(INotifyMixin):
             if isinstance(self.__notif, self.__pynotif_mod.Notification):
                 try:
                     if self.__trayicon is not None:
-                        self.__notif.attach_to_status_icon(self.__trayicon)
+                        try:
+                            self.__notif.attach_to_status_icon(self.__trayicon)
+                        except AttributeError: pass
                     self.__notif.set_urgency(self.__pynotif_mod.URGENCY_LOW)
                     self.__notif.show()
                 except gobject.GError, exc:
@@ -181,7 +183,9 @@ class PyNotifyMixin(INotifyMixin):
             if isinstance(notif, self.__pynotif_mod.Notification):
                 try:
                     if self.__trayicon is not None:
-                        notif.attach_to_status_icon(self.__trayicon)
+                        try:
+                            notif.attach_to_status_icon(self.__trayicon)
+                        except AttributeError: pass
 
                     if mode == "critical":
                         notif.set_urgency(self.__pynotif_mod.URGENCY_CRITICAL)
@@ -532,8 +536,6 @@ class SBackupdIndicatorBase(INotifyMixin):
             self._set_menuitems_status_canceled()
             self._set_cancel_sensitive(sensitive = False)
 
-        elif event == 'needupgrade':
-            msg = _("There are snapshots with old snapshot format. Please upgrade these using the Restoration tool if you want to use them.")
         else:
             self.logger.warning(_("Unknown D-Bus event `%s` received.") % (event))
 

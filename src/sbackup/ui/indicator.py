@@ -19,7 +19,7 @@
 #
 
 import sys
-import appindicator
+import appindicator #@UnresolvedImport
 
 
 from sbackup import util

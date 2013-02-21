@@ -1,6 +1,6 @@
 #   Simple Backup - file access management using GIO/GVFS
 #
-#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -444,14 +444,22 @@ class GioOperations(interfaces.IOperations):
         interfaces.IOperations.__init__(self)
 
     @classmethod
-    def __exists(cls, gfile):
-        _res = gfile.query_exists()
-        return bool(_res)
-
-    @classmethod
     def path_exists(cls, path):
+        # `gfile.query_exists()' is not used since it returns True even
+        # if path is not accessible!
+        #XXX: rename into 'is_readable'?
         _gfileobj = gio.File(path)
-        return cls.__exists(_gfileobj)
+        try:
+            _ginfo = _gfileobj.query_info(attributes = gio.FILE_ATTRIBUTE_ACCESS_CAN_READ)
+            _can_read = _ginfo.get_attribute_boolean(gio.FILE_ATTRIBUTE_ACCESS_CAN_READ)
+        except gio.Error, error:
+            _can_read = False
+            if error.code == gio.ERROR_NOT_FOUND:
+                pass
+            else:
+                _logger = log.LogFactory.getLogger()
+                _logger.debug(get_gio_errmsg(error, "Unable to get attribute for path"))
+        return _can_read
 
     @classmethod
     def openfile_for_write(cls, path):
@@ -481,7 +489,7 @@ class GioOperations(interfaces.IOperations):
         _dest = gio.File(dest)
 
         # the source must be a file and exist
-        if not cls.__exists(_src):
+        if not cls.path_exists(src):
             raise IOError("Given copy source `%s` does not exist" % _src.get_parse_name())
         if cls.__isfile(_src):
             _src, _dest = cls._prepare_copy(_src, _dest)
@@ -589,6 +597,24 @@ class GioOperations(interfaces.IOperations):
                     cls._add_write_permission(_entryp, recursive = False)
 
     @classmethod
+    def chmod_no_rwx_grp_oth(cls, path):
+        """Sets write permissions for user only for
+        given directory or file (*not* recursive). 
+        """
+        _gfileobj = gio.File(path)
+        try:
+            _ginfo = _gfileobj.query_info(attributes = gio.FILE_ATTRIBUTE_UNIX_MODE)
+            _fmode = _ginfo.get_attribute_uint32(gio.FILE_ATTRIBUTE_UNIX_MODE)
+            _new_mode = _fmode & system.UNIX_PERM_GRPOTH_NORWX
+            _ginfo.set_attribute_uint32(gio.FILE_ATTRIBUTE_UNIX_MODE, _new_mode)
+            _gfileobj.set_attributes_from_info(_ginfo) # setting attributes directly seems broken
+        except gio.Error, error:
+            _msg = get_gio_errmsg(error, "Unable to set permissions")
+            _logger = log.LogFactory.getLogger()
+            _logger.warning(_msg)
+            return
+
+    @classmethod
     def force_delete(cls, path):
         cls._add_write_permission(path, recursive = True)
         cls.delete(path)
@@ -688,6 +714,15 @@ class GioOperations(interfaces.IOperations):
             else:
                 raise
         return _ftype
+
+    @classmethod
+    def test_dir_access(cls, path):
+        _gfileobj = gio.File(path)
+        try:
+            _gfileobj.enumerate_children('standard::name')
+        except gio.Error, error:
+            raise exceptions.FileAccessException(get_gio_errmsg(error,
+                                        "Unable to list directory content"))
 
     @classmethod
     def is_dir(cls, path):

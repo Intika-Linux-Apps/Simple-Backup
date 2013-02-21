@@ -1,6 +1,6 @@
 #   Simple Backup - Restoration GUI in GTK+
 #
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
+from sbackup.util.exceptions import NotSupportedError
 """
 :mod:`SBRestoreGTK` --- Restoration GUI in GTK+
 ================================================
@@ -49,7 +50,6 @@ from sbackup.util import log
 from sbackup.core.ConfigManager import ConfigManager, ConfigurationFileHandler
 from sbackup.core.SnapshotManager import SnapshotManager
 from sbackup.core.RestoreManager import RestoreManager
-from sbackup.core.UpgradeManager import UpgradeManager
 from sbackup.util.log import LogFactory
 import sbackup.ar_backend.tar as TAR
 from sbackup.pkginfo import Infos
@@ -611,7 +611,7 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
             if iter:
                 self.currentSnp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter, 0)))
                 if self.currentSnp.getVersion() != Infos.SNPCURVERSION:
-                    message = _("Snapshot version is not supported (Only %(supportedversion)s is supported). Version '%(currentversion)s' found. You should upgrade it. ") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
+                    message = _("Snapshot version is not supported (Only %(supportedversion)s is supported). Version '%(currentversion)s' found.") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
                     self.logger.warning(message)
                     dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = message)
                     dialog.run()
@@ -764,91 +764,17 @@ class SBRestoreGTK(GladeWindow, ProgressbarMixin):
                 _ver = self.currentSnp.getVersion()
                 self._make_topwin_busy(False)
                 if _ver == Infos.SNPCURVERSION:
-                    self.widgets["upgradeBox"].hide()
-#                    if self.currentSnp.isfull():
-#                        self.widgets["RebaseBox"].hide()
-#                    else:
-#                        self.widgets["RebaseBox"].show()
                     self.widgets["txt_current_base"].set_text(str(self.currentSnp.getBase()))
                     self.widgets["deleteBox"].show()
-                elif _ver < Infos.SNPCURVERSION :
-                    self.widgets["upgradeBox"].show()
-#                    self.widgets["RebaseBox"].hide()
-                    self.widgets["deleteBox"].hide()
                 else :
-                    self.widgets["upgradeBox"].hide()
-#                    self.widgets["RebaseBox"].hide()
                     self.widgets["deleteBox"].hide()
-                    message = _("The version of the snapshot is greater than the supported one!")
+                    message = _("Snapshot version is not supported (Only %(supportedversion)s is supported). Version '%(currentversion)s' found.") % {'supportedversion': Infos.SNPCURVERSION, 'currentversion':self.currentSnp.getVersion() }
+                    self.logger.warning(message)
                     dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = message)
                     dialog.run()
                     dialog.destroy()
             else:
-                self.widgets["upgradeBox"].hide()
-#                self.widgets["RebaseBox"].hide()
                 self.widgets["deleteBox"].hide()
-
-    def on_upgradeButton_clicked(self, *args): #IGNORE:W0613
-        message = _("Upgrading the selected snapshot `%s` might corrupt your backup for this particular point in time. You cannot undo this operation. It is recommended to create a copy of the snapshot directory before upgrading it. The upgrade process takes a while - be patient.\n\nAre you sure that you want to upgrade the snapshot now?")\
-                    % self.currentSnp
-        dialog = misc.msgdialog(message_str = message, msgtype = gtk.MESSAGE_QUESTION,
-                                parent = self.top_window, buttons = gtk.BUTTONS_YES_NO,
-                                headline_str = _("Do you really want to upgrade snapshot?"))
-        response = dialog.run()
-        dialog.destroy()
-        if response == gtk.RESPONSE_YES:
-            self._make_topwin_busy(True, _("Upgrade snapshot '%s'") % self.currentSnp.getName())
-            gobject.idle_add(self._upgrade)
-
-    def _upgrade(self):
-        um = UpgradeManager()
-        try:
-            self.logger.debug("Upgrade snapshot '%s'" % self.currentSnp.getName())
-            um.upgradeSnapshot(self.currentSnp)
-            gobject.idle_add(self._show_infomessage,
-                             _("Snapshot was sucessfully upgraded."),
-                                   _("Simple Backup upgrade"),
-                                   _("Upgrade finished"))
-        except Exception, error:
-            self.logger.exception("Error while upgrade snapshot: %s" % error)
-            _message_str = _("While attempting to upgrade snapshot the following error occurred:\n%s")\
-                                % error
-            gobject.idle_add(self._show_errmessage,
-                             _message_str, _("Simple Backup error"), _("Unable to upgrade snapshot"))
-        finally:
-            self._make_topwin_busy(False)
-
-        self.load_snapshotslist(self.widgets['calendar'].get_date())
-        self.widgets['snpmanExpander'].set_expanded(False)
-        self.on_snpmanExpander_activate()
-        self.widgets['snpmanExpander'].set_expanded(True)
-
-    def on_rebaseButton_toggled(self, *args):
-        if self.widgets['rebaseButton'].get_active():
-            self.widgets['snphistoryFrame'].show()
-            histlist = self.snpman.getSnpHistory(self.currentSnp)
-            for snapshot in histlist:
-                self.historylisttreestore.append(None, [snapshot.getName()])
-        else :
-            # get the selected base and rebase on it.
-            tstore, iter = self.widgets['historytv'].get_selection().get_selected()
-            if iter :
-                snp = self.snpman.get_snapshot_allformats(str(tstore.get_value(iter, 0)))
-                try:
-                    message = _("Do you really want to rebase '%(current)s' on '%(base)s' ?") % {"current" : self.currentSnp, "base" : snp}
-                    dialog = gtk.MessageDialog(parent = None, flags = 0, type = gtk.MESSAGE_QUESTION, buttons = gtk.BUTTONS_YES_NO, message_format = message)
-                    response = dialog.run()
-                    dialog.destroy()
-                    if response == gtk.RESPONSE_YES:
-                        self.snpman.rebaseSnapshot(self.currentSnp, snp)
-                except Exception, e:
-                    self.logger.error(str(e))
-                    self.logger.error(traceback.format_exc())
-                    dialog = gtk.MessageDialog(flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, buttons = gtk.BUTTONS_CLOSE, message_format = str(e))
-                    dialog.run()
-                    dialog.destroy()
-            self.widgets['snphistoryFrame'].hide()
-            self.historylisttreestore.clear()
 
     def on_deleteButton_clicked(self, *args):
         if self.currentSnp is not None:

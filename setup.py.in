@@ -17,11 +17,12 @@ setup(name = '@pkgname@',
       package_data = {'' : ['resources', 'metainfo']},
 
       data_files = [('share/sbackup', ['data/ui/sbackup-restore.glade',
+                                       'data/ui/sbackup-legacy-restore.glade',
                                        'data/ui/sbackup-config.glade',
                                        'scripts/sbackup-run',
                                      'scripts/sbackup-config-gtk',
                                      'scripts/sbackup-restore-gtk',
-                                     'scripts/sbackup-upgrade-backups',
+                                     'scripts/sbackup-legacy-restore',
                                      'scripts/sbackupconfig.py',
 
                                      'scripts/multipleTarScript',

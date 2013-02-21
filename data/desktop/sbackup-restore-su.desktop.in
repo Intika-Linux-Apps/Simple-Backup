@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
 #
-Name=Simple Backup-Restoration
-Name[de]=Simple Backup-Wiederherstellung
-Name[pt_BR]=Restauração de Backup
-Name[es]=Restauración de copia de seguridad
-Name[ja]=バックアップの復元
+Name=Simple Backup-Restoration for admins
+Name[de]=Simple Backup-Wiederherstellung für Admins
+Name[pt_BR]=Restauração de Backup (for admins)
+Name[es]=Restauración de copia de seguridad (for admins)
+Name[ja]=バックアップの復元 (for admins)
 #
 Comment=Simple Backup restoration tool for admins. Requires superuser rights.
 Comment[de]=Simple Backup Wiederherstellung für Admins. Erfordert Superuser-Rechte.

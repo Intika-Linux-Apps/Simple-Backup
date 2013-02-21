@@ -34,3 +34,6 @@
 ./src/sbackup.egg-info
 ./src/sbackup/metainfo
 ./src/sbackup/resources
+po/locale
+src/sbackup/metainfo.tmp
+scripts/sbackup

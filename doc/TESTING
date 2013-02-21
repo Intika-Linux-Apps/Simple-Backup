@@ -9,7 +9,6 @@ this MUST be tested:
 
 * the backup strategy (incremental/full backups)
 * purging of old backups
-* upgrade
 * backup in general
 
 Important: combination of both automated and static testdata!

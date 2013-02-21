@@ -171,9 +171,9 @@ class UriParser(object):
 #        contains password in plain text
 #        _logger.debug("set and parse uri: %s" % uri)
         self.__clear()
-        splituri = urlparse.urlsplit(uri)
+        splituri = urlparse.urlsplit(uri, scheme = "", allow_fragments = False)
         self.__uri = splituri.geturl()  # gets normalized URI
-        splituri = urlparse.urlsplit(self.__uri)
+        splituri = urlparse.urlsplit(self.__uri, scheme = "", allow_fragments = False)
 
 #        print "\nSplit uri:\n"
 #        print "url: %s" % splituri.geturl()
@@ -191,9 +191,13 @@ class UriParser(object):
         assert splituri.fragment == "" #IGNORE:E1103
         assert splituri.query == "" #IGNORE:E1103
 
-        if splituri.port is not None:
-            self.__port = splituri.port
-
+        #LP #670646 ignore errors parsing port
+        try:
+            if splituri.port is not None:
+                self.__port = splituri.port
+        except ValueError:  
+            pass
+            
         if splituri.username is not None:
             self.__username = urllib.unquote(splituri.username)
 
@@ -205,7 +209,7 @@ class UriParser(object):
         else:
             self.__hostname = splituri.hostname
 
-        self.__path = splituri.path #IGNORE:E1103
+        self.__path = urllib.quote(splituri.path) #IGNORE:E1103
 #        self.__uri_scheme = splituri.scheme #IGNORE:E1103
         if splituri.scheme == "" and self.__uri.startswith("/"):    #IGNORE:E1103
             self.__uri_scheme = "file"
@@ -216,8 +220,9 @@ class UriParser(object):
         _logger.debug("UriParser:\n%s" % self)
 
     def __construct_display_name(self):
+        _path = urllib.unquote(self.__path)
         if self.is_local():
-            _res = self.__path
+            _res = _path
         else:
             _user = ""
             _host = ""
@@ -225,7 +230,7 @@ class UriParser(object):
                 _user = "%s@" % self.__username
             if self.__hostname is not None:
                 _host = "%s" % self.__hostname
-            _res = "%s://%s%s%s" % (self.__uri_scheme, _user, _host, self.__path)
+            _res = "%s://%s%s%s" % (self.__uri_scheme, _user, _host, _path)
         return _res
 
     def query_mount_uri(self):

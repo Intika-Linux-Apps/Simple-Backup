@@ -1,6 +1,6 @@
 #   Simple Backup - snapshot definition
 #
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2008: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -111,7 +111,9 @@ class Snapshot(object):
             self.__validateSnapshot(self.__snapshotpath, self.__name)
         else : # Snapshot for creation
             self._fop.makedir(self.__snapshotpath)
-
+            #LP #785512: make the snapshot directory RWX only by owner
+            self._fop.chmod_no_rwx_grp_oth(self.__snapshotpath)
+    
     def __str__(self):
         "Return the snapshot name"
         return self.getName()
@@ -299,14 +301,6 @@ class Snapshot(object):
             _arn = self._fop.joinpath(self.getPath(), "files.tar.gz")
             if self._fop.path_exists(_arn):
                 return _arn
-
-            elif self.getVersion() == "1.4":
-                self.logger.warning("The tgz name is deprecated, please upgrade Snapshot to Version 1.5")
-                _arn = self._fop.joinpath(self.getPath(), "files.tgz")
-                if self._fop.path_exists(_arn):
-                    return _arn
-                else :
-                    problem = True
             else :
                 problem = True
 

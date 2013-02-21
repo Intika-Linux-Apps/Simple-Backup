@@ -7,33 +7,33 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sbackup\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-04 21:54+0100\n"
+"POT-Creation-Date: 2013-01-10 22:47+0100\n"
 "PO-Revision-Date: 2010-09-25 00:27+0000\n"
 "Last-Translator: Jean-Peer Lorenz <Unknown>\n"
 "Language-Team: Chinese (Taiwan) <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-02-05 05:38+0000\n"
-"X-Generator: Launchpad (build 12177)\n"
+"X-Launchpad-Export-Date: 2013-01-11 04:47+0000\n"
+"X-Generator: Launchpad (build 16412)\n"
 
-#: src/sbackup/backupproc.py:169 src/sbackup/pkginfo.py:68
+#: src/sbackup/backupproc.py:169 src/sbackup/pkginfo.py:85
 #, python-format
 msgid "SBackup Daemon <%(login)s@%(hostname)s>"
-msgstr ""
+msgstr "SBackup 常駐 <%(login)s@%(hostname)s>"
 
 #: src/sbackup/backupproc.py:173
 #, python-format
 msgid "[SBackup] [%(profile)s] Report of %(date)s"
-msgstr ""
+msgstr "[SBackup] [%(profile)s] 於 %(date)s 的報告"
 
-#: src/sbackup/backupproc.py:178 src/sbackup/core/profile_handler.py:278
+#: src/sbackup/backupproc.py:178 src/sbackup/core/profile_handler.py:282
 msgid "No log file specified."
-msgstr ""
+msgstr "沒有指定的日誌檔。"
 
 #: src/sbackup/backupproc.py:183
 msgid "Unable to find log file."
-msgstr ""
+msgstr "無法找到日誌檔。"
 
 #: src/sbackup/backupproc.py:251
 msgid ""
@@ -41,213 +41,224 @@ msgid ""
 "\n"
 "Now continue processing remaining profiles."
 msgstr ""
+"嚴重錯誤：未發現任何預設設定檔！\n"
+"\n"
+"現在將繼續進行其他設定檔的作業。"
 
-#: src/sbackup/backupproc.py:300
+#: src/sbackup/backupproc.py:302
 msgid "Backup was canceled by user."
-msgstr ""
+msgstr "備份動作已被使用者取消。"
 
-#: src/sbackup/backupproc.py:305
+#: src/sbackup/backupproc.py:307
 msgid "An error occurred during the cancellation of backup:"
-msgstr ""
+msgstr "取消備份作業時發生錯誤："
 
-#: src/sbackup/backupproc.py:311
+#: src/sbackup/backupproc.py:313
 msgid "An error occurred during the backup:"
-msgstr ""
+msgstr "備份過程中發生錯誤："
 
-#: src/sbackup/backupproc.py:328
+#: src/sbackup/backupproc.py:330
 msgid "Error when sending email:"
-msgstr ""
+msgstr "傳送郵件時發生錯誤："
 
-#: src/sbackup/backupproc.py:359
+#: src/sbackup/backupproc.py:361
 msgid "The following error(s) occurred before:"
-msgstr ""
+msgstr "之前遇到的錯誤："
 
-#: src/sbackup/backupproc.py:530
+#: src/sbackup/backupproc.py:532
 #, python-format
 msgid ""
 "Backup is not being started.\n"
 "%s"
 msgstr ""
+"備份尚未開始。\n"
+"%s"
 
-#: src/sbackup/pkginfo.py:40
+#: src/sbackup/pkginfo.py:42
 msgid ""
 "This is a user friendly backup solution for common desktop needs. If you "
 "want to help by submitting bugs, by translating or anything else please "
 "visit our website."
-msgstr ""
+msgstr "這是一個滿足桌面需求且容易上手的備份解決方案。若您想要回報 bug、翻譯或協助其他事項，請造訪我們的網站。"
 
-#: src/sbackup/pkginfo.py:43
+#: src/sbackup/pkginfo.py:45
 msgid "Maintainers:"
-msgstr ""
+msgstr "維護者："
 
-#: src/sbackup/pkginfo.py:47
+#: src/sbackup/pkginfo.py:49
 msgid "Former maintainers:"
-msgstr ""
+msgstr "前維護者："
 
-#: src/sbackup/pkginfo.py:51
+#: src/sbackup/pkginfo.py:53
 msgid "Contributors:"
-msgstr ""
+msgstr "貢獻者："
 
-#: src/sbackup/pkginfo.py:56
+#: src/sbackup/pkginfo.py:70
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Jean-Peer Lorenz https://launchpad.net/~peer.loz"
+"  Jean-Peer Lorenz https://launchpad.net/~peer.loz\n"
+"  Pin-hsien Li https://launchpad.net/~plesry\n"
+"  yiulok https://launchpad.net/~lkinglok"
 
 #: src/sbackup/ar_backend/tar.py:109 src/sbackup/ar_backend/tar.py:167
 #: src/sbackup/ar_backend/tar.py:213
 msgid "Invalid archive type."
-msgstr ""
+msgstr "無效的檔案類型。"
 
 #: src/sbackup/ar_backend/tar.py:123
 #, python-format
 msgid "Effective path for `%s` is not available"
-msgstr ""
+msgstr "「%s」的有效路徑並不可用"
 
-#: src/sbackup/ar_backend/tar.py:294
+#: src/sbackup/ar_backend/tar.py:295
 #, python-format
 msgid "Unable to get effective path for `%s`"
-msgstr ""
+msgstr "無法取得「%s」的有效路徑"
 
-#: src/sbackup/ar_backend/tar.py:338
+#: src/sbackup/ar_backend/tar.py:344
 msgid ""
 "For the moment split functionality is not compatible with compress option."
-msgstr ""
+msgstr "目前分割功能無法和壓縮選項相容。"
 
-#: src/sbackup/ar_backend/tar.py:347 src/sbackup/ar_backend/tar.py:408
-#: src/sbackup/core/profile_handler.py:288
+#: src/sbackup/ar_backend/tar.py:353 src/sbackup/ar_backend/tar.py:414
+#: src/sbackup/core/profile_handler.py:292
 #, python-format
 msgid "Unable to change permissions for file '%s'."
-msgstr ""
+msgstr "無法更改檔案「%s」的權限。"
 
-#: src/sbackup/ar_backend/tar.py:356
+#: src/sbackup/ar_backend/tar.py:362
 #, python-format
 msgid "Unable to remove temporary file `%(file)s`: %(error)s"
-msgstr ""
+msgstr "無法移除暫存檔案「%(file)s」：%(error)s"
 
-#: src/sbackup/ar_backend/tar.py:372
+#: src/sbackup/ar_backend/tar.py:378
 msgid "Launching TAR to make incremental backup."
-msgstr ""
+msgstr "啟動 TAR 以進行增量備份。"
 
-#: src/sbackup/ar_backend/tar.py:401
+#: src/sbackup/ar_backend/tar.py:407
 msgid "Unable to find the SNAR file to make an incremental backup."
-msgstr ""
+msgstr "未發現進行增量備份所需的 SNAR 檔。"
 
-#: src/sbackup/ar_backend/tar.py:402
+#: src/sbackup/ar_backend/tar.py:408
 msgid "Falling back to full backup."
-msgstr ""
+msgstr "回到完整備份模式。"
 
-#: src/sbackup/ar_backend/tar.py:444
+#: src/sbackup/ar_backend/tar.py:450
 msgid "Launching TAR to make a full backup."
-msgstr ""
+msgstr "啟動 TAR 以建立完整備份。"
 
-#: src/sbackup/ar_backend/tar.py:511
+#: src/sbackup/ar_backend/tar.py:517
 msgid "Leading '/' from member names were removed."
-msgstr ""
+msgstr "從成員名稱中移除前端的「/」。"
 
-#: src/sbackup/ar_backend/tar.py:513
+#: src/sbackup/ar_backend/tar.py:519
 msgid "Leading '/' from hard link targets were removed."
-msgstr ""
+msgstr "從硬連結目標中移除前端的「/」。"
 
-#: src/sbackup/ar_backend/tar.py:522
+#: src/sbackup/ar_backend/tar.py:528
 #, python-format
 msgid "TAR returned a message: %s"
-msgstr ""
+msgstr "TAR 傳回了一個訊息：%s"
 
-#: src/sbackup/ar_backend/tar.py:524
+#: src/sbackup/ar_backend/tar.py:530
 #, python-format
 msgid ""
 "TAR returned messages:\n"
 "%s"
 msgstr ""
-
-#: src/sbackup/ar_backend/tar.py:527
-msgid "TAR has been finished successfully."
-msgstr ""
-
-#: src/sbackup/ar_backend/tar.py:531
-#, python-format
-msgid "TAR returned a warning: %s"
-msgstr ""
+"TAR 傳回了訊息：\n"
+"%s"
 
 #: src/sbackup/ar_backend/tar.py:533
+msgid "TAR has been finished successfully."
+msgstr "TAR 已順利完成執行。"
+
+#: src/sbackup/ar_backend/tar.py:537
+#, python-format
+msgid "TAR returned a warning: %s"
+msgstr "TAR 傳回了一個警告：%s"
+
+#: src/sbackup/ar_backend/tar.py:539
 #, python-format
 msgid ""
 "TAR returned warnings:\n"
 "%s"
 msgstr ""
+"TAR 傳回了警告：\n"
+"%s"
 
-#: src/sbackup/ar_backend/tar.py:536
+#: src/sbackup/ar_backend/tar.py:542
 msgid "TAR returned warnings but has been finished successfully."
-msgstr ""
+msgstr "TAR 傳回了警告但成功完成執行。"
 
-#: src/sbackup/ar_backend/tar.py:540
+#: src/sbackup/ar_backend/tar.py:546
 msgid "Unable to finish successfully. TAR terminated with errors."
-msgstr ""
+msgstr "無法成功完成執行。TAR 因為錯誤而被中斷。"
 
-#: src/sbackup/ar_backend/tar.py:721
+#: src/sbackup/ar_backend/tar.py:727
 #, python-format
 msgid "Unable to terminate backend process: %s"
-msgstr ""
+msgstr "無法中止後端作業：%s"
 
-#: src/sbackup/ar_backend/tar.py:754
+#: src/sbackup/ar_backend/tar.py:760
 msgid "Included"
-msgstr ""
+msgstr "已包含"
 
-#: src/sbackup/ar_backend/tar.py:754
+#: src/sbackup/ar_backend/tar.py:760
 msgid "Not changed"
-msgstr ""
+msgstr "未改變"
 
-#: src/sbackup/ar_backend/tar.py:754
+#: src/sbackup/ar_backend/tar.py:760
 msgid "Directory"
-msgstr ""
+msgstr "資料夾"
 
-#: src/sbackup/ar_backend/tar.py:782
+#: src/sbackup/ar_backend/tar.py:788
 msgid "Line must be a string"
-msgstr ""
+msgstr "陣列必須為字串"
 
-#: src/sbackup/ar_backend/tar.py:798
+#: src/sbackup/ar_backend/tar.py:804
 msgid "Dumpdir inconsistancy : 'filename' is empty"
-msgstr ""
+msgstr "Dumpir 不符合：「filename」是空的"
 
-#: src/sbackup/ar_backend/tar.py:811
+#: src/sbackup/ar_backend/tar.py:817
 msgid "Dumpdir inconsistancy : 'control' is empty"
-msgstr ""
+msgstr "Dumpir 不符合：「control」是空的"
 
-#: src/sbackup/ar_backend/tar.py:884
+#: src/sbackup/ar_backend/tar.py:890
 #, python-format
 msgid "File '%s' does not exist."
-msgstr ""
+msgstr "檔案「%s」不存在。"
 
-#: src/sbackup/ar_backend/tar.py:1014 src/sbackup/ar_backend/tar.py:1048
-#: src/sbackup/ar_backend/tar.py:1148
+#: src/sbackup/ar_backend/tar.py:1020 src/sbackup/ar_backend/tar.py:1054
+#: src/sbackup/ar_backend/tar.py:1154
 msgid "The snarfile header is incomplete."
-msgstr ""
+msgstr "snar 檔案的標頭檔並不完全。"
 
-#: src/sbackup/ar_backend/tar.py:1317
+#: src/sbackup/ar_backend/tar.py:1323
 msgid "A SnapshotFile is required"
-msgstr ""
+msgstr "需要快照檔案"
 
-#: src/sbackup/ar_backend/tar.py:1417
+#: src/sbackup/ar_backend/tar.py:1423
 #, python-format
 msgid "Directory does not exist: %s."
-msgstr ""
+msgstr "資料夾不存在：%s。"
 
 #: src/sbackup/core/ConfigManager.py:330
 #, python-format
 msgid "Profile settings are being read from file '%s'."
-msgstr ""
+msgstr "從檔案「%s」讀取設定檔。"
 
 #: src/sbackup/core/ConfigManager.py:333
 #, python-format
 msgid ""
 "Profile settings are being set to default values. Configuration file is set "
 "to '%s'."
-msgstr ""
+msgstr "設定檔內的設定被設為預設值。設定檔為「%s」。"
 
 #: src/sbackup/core/ConfigManager.py:479
 msgid "Option 'target' is missing, aborting."
-msgstr ""
+msgstr "選項「target」已遺失，退出。"
 
 #: src/sbackup/core/ConfigManager.py:547
 #, python-format
@@ -258,72 +269,77 @@ msgid ""
 "\n"
 "Please check your configuration file."
 msgstr ""
+"在執行設定檔時發生錯誤：\n"
+"\n"
+"%(error)s 於行 「%(line)s」。\n"
+"\n"
+"請檢查您的設定檔案。"
 
 #: src/sbackup/core/ConfigManager.py:588 src/sbackup/core/ConfigManager.py:622
 #, python-format
 msgid ""
 "Unable to evaluate '%(parameter)s' as a dictionary (value got = '%(value)r')."
-msgstr ""
+msgstr "無法將「%(parameter)s」評估為字典物件 (得到的值為 = 「%(value)r」)。"
 
 #: src/sbackup/core/ConfigManager.py:614
 #, python-format
 msgid ""
 "Couldn't evaluate '%(parameter)s' as a dictionary (value got = '%(value)r' )"
-msgstr ""
+msgstr "無法將「%(parameter)s」評估為字典物件 (得到的值為 = 「%(value)r」)"
 
 #: src/sbackup/core/ConfigManager.py:638
 msgid "You must provide a dictionary."
-msgstr ""
+msgstr "您必須提供一個字典物件。"
 
 #: src/sbackup/core/ConfigManager.py:755
 #, python-format
 msgid "Log output for [%(profile)s] is directed to file '%(file)s'."
-msgstr ""
+msgstr "[%(profile)s] 的日誌檔輸出至檔案「%(file)s」。"
 
 #: src/sbackup/core/ConfigManager.py:762
 #, python-format
 msgid "Log output for [%s] is not directed into a file."
-msgstr ""
+msgstr "[%s] 的日誌檔並未輸出至檔案。"
 
 #: src/sbackup/core/ConfigManager.py:781
 #, python-format
 msgid "Unable to rename log file '%(src)s'->'%(dst)s': %(err)s"
-msgstr ""
+msgstr "無法重新命名日誌檔 「%(src)s」->「%(dst)s」：%(err)s"
 
 #: src/sbackup/core/ConfigManager.py:801
 #, python-format
 msgid "The config file '%s' couldn't be read!"
-msgstr ""
+msgstr "無法讀取設定檔「%s」！"
 
 #: src/sbackup/core/ConfigManager.py:813
 #, python-format
 msgid "section [%(section)s] in '%(configfile)s' should not exist, aborting"
-msgstr ""
+msgstr "「%(configfile)s」內的區塊 [%(section)s] 不應該存在，退出"
 
 #: src/sbackup/core/ConfigManager.py:895
 msgid "No schedule defined in configuration file. Probing from filesystem."
-msgstr ""
+msgstr "設定檔沒有定義排程。從檔案系統中探測。"
 
 #: src/sbackup/core/ConfigManager.py:988
 #: src/sbackup/core/ConfigManager.py:1000
 msgid "The config file is not set yet into this ConfigManager"
-msgstr ""
+msgstr "設定檔尚未從設定檔管理員中設置好"
 
 #: src/sbackup/core/ConfigManager.py:1163
 msgid "No receiver set."
-msgstr ""
+msgstr "尚未設定接收端。"
 
 #: src/sbackup/core/ConfigManager.py:1165
 msgid "No SMTP server set."
-msgstr ""
+msgstr "尚未設定 SMTP 伺服器。"
 
 #: src/sbackup/core/ConfigManager.py:1168
 msgid "Username set but no password specified."
-msgstr ""
+msgstr "帳號已設定，但尚未指定密碼。"
 
 #: src/sbackup/core/ConfigManager.py:1171
 msgid "Password set but no username specified."
-msgstr ""
+msgstr "密碼已設定，但尚未指定帳號。"
 
 #: src/sbackup/core/ConfigManager.py:1174
 msgid ""
@@ -331,582 +347,519 @@ msgid ""
 "set.\n"
 "Select SSL in order to use Certificate and Key."
 msgstr ""
+"憑證和密鑰檔已提供，但 SSL 選項 (smtptls=1) 尚未設置。\n"
+"選擇 SSL 以使用憑證和密鑰。"
 
 #: src/sbackup/core/ConfigManager.py:1178
 msgid ""
 "When specifying a SSL certificate or key file, a key file resp. certificate "
 "is mandatory."
-msgstr ""
+msgstr "在指定 SSL 憑證或密鑰檔時，鑰匙檔或憑證是必須準備的。"
 
-#: src/sbackup/core/ConfigManager.py:1369
+#: src/sbackup/core/ConfigManager.py:1373
 msgid "Default Profile"
-msgstr ""
+msgstr "預設設定檔"
 
-#: src/sbackup/core/ConfigManager.py:1370
+#: src/sbackup/core/ConfigManager.py:1374
 msgid "Unknown Profile"
-msgstr ""
-
-#: src/sbackup/core/ConfigManager.py:1423
-msgid "Unlimited"
-msgstr ""
-
-#: src/sbackup/core/ConfigManager.py:1424
-msgid "100 MiB"
-msgstr ""
-
-#: src/sbackup/core/ConfigManager.py:1425
-msgid "250 MiB"
-msgstr ""
-
-#: src/sbackup/core/ConfigManager.py:1426
-msgid "650 MiB"
-msgstr ""
-
-#: src/sbackup/core/ConfigManager.py:1427
-msgid "2 GiB (FAT16)"
-msgstr ""
+msgstr "未知的設定檔"
 
 #: src/sbackup/core/ConfigManager.py:1428
-msgid "4 GiB (FAT32)"
-msgstr ""
+msgid "Unlimited"
+msgstr "沒有限制"
 
-#: src/sbackup/core/ConfigManager.py:1429 src/sbackup/ui/configgui.py:279
-#: src/sbackup/ui/configgui.py:1418
-msgid "Custom"
-msgstr ""
+#: src/sbackup/core/ConfigManager.py:1429
+msgid "100 MiB"
+msgstr "100 MiB"
+
+#: src/sbackup/core/ConfigManager.py:1430
+msgid "250 MiB"
+msgstr "250 MiB"
 
 #: src/sbackup/core/ConfigManager.py:1431
-msgid "MP3 Music"
-msgstr ""
+msgid "650 MiB"
+msgstr "650 MiB"
 
 #: src/sbackup/core/ConfigManager.py:1432
-msgid "AVI Video"
-msgstr ""
+msgid "2 GiB (FAT16)"
+msgstr "2 GiB (FAT16)"
 
 #: src/sbackup/core/ConfigManager.py:1433
-#: src/sbackup/core/ConfigManager.py:1434
-msgid "MPEG Video"
-msgstr ""
+msgid "4 GiB (FAT32)"
+msgstr "4 GiB (FAT32)"
 
-#: src/sbackup/core/ConfigManager.py:1435
-msgid "Matrjoshka Video"
-msgstr ""
+#: src/sbackup/core/ConfigManager.py:1434 src/sbackup/ui/configgui.py:279
+#: src/sbackup/ui/configgui.py:1418
+msgid "Custom"
+msgstr "自訂"
 
 #: src/sbackup/core/ConfigManager.py:1436
-msgid "OGG Multimedia container"
-msgstr ""
+msgid "MP3 Music"
+msgstr "MP3 音樂檔"
 
 #: src/sbackup/core/ConfigManager.py:1437
+msgid "AVI Video"
+msgstr "AVI 影音檔"
+
+#: src/sbackup/core/ConfigManager.py:1438
+#: src/sbackup/core/ConfigManager.py:1439
+msgid "MPEG Video"
+msgstr "MPEG 影音檔"
+
+#: src/sbackup/core/ConfigManager.py:1440
+msgid "Matrjoshka Video"
+msgstr "Matrjoshka 影音檔"
+
+#: src/sbackup/core/ConfigManager.py:1441
+msgid "OGG Multimedia container"
+msgstr "OGG 多媒體容器"
+
+#: src/sbackup/core/ConfigManager.py:1442
 msgid "CD Images"
-msgstr ""
+msgstr "CD 映像檔"
 
 #: src/sbackup/core/RestoreManager.py:80
 #, python-format
 msgid "File '%s' not found in the backup snapshot files list"
-msgstr ""
+msgstr "備份快照的檔案列表中未發現檔案「%s」"
 
 #: src/sbackup/core/RestoreManager.py:82
 #, python-format
 msgid ""
 "File '%(filename)s' not found in snapshot's [%(snapshotname)s] files list, "
 "Skipped."
-msgstr ""
+msgstr "檔案「%(filename)s」未被發現於快照 [%(snapshotname)s] 的檔案列表，跳過。"
 
-#: src/sbackup/core/SnapshotManager.py:119
+#: src/sbackup/core/SnapshotManager.py:114
 #, python-format
 msgid "Snapshot '%s' not found "
-msgstr ""
+msgstr "未發現快照「%s」 "
+
+#: src/sbackup/core/SnapshotManager.py:210
+#, python-format
+msgid "Invalid snapshot `%(name)s` found: Name of snapshot not valid."
+msgstr "發現無效快照「%(name)s」：無效的快照名稱。"
 
 #: src/sbackup/core/SnapshotManager.py:213
 #, python-format
-msgid "Invalid snapshot `%(name)s` found: Name of snapshot not valid."
-msgstr ""
-
-#: src/sbackup/core/SnapshotManager.py:216
-#, python-format
 msgid "Invalid snapshot `%(name)s` found: %(error_cause)s."
-msgstr ""
+msgstr "發現無效快照「%(name)s」：%(error_cause)s。"
 
-#: src/sbackup/core/SnapshotManager.py:305
-#, python-format
-msgid "No need to rebase a full snapshot '%s'"
-msgstr ""
-
-#: src/sbackup/core/SnapshotManager.py:307
-#, python-format
-msgid ""
-"'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken "
-msgstr ""
-
-#: src/sbackup/core/SnapshotManager.py:312
-#, python-format
-msgid ""
-"Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
-"'%(NewBaseSnapshot)s' "
-msgstr ""
-
-#: src/sbackup/core/SnapshotManager.py:319
-#, python-format
-msgid "Rebasing '%(current)s' on '%(base)s'"
-msgstr ""
-
-#: src/sbackup/core/SnapshotManager.py:556
-#, python-format
-msgid "An error occurred when pulling snapshot '%s'."
-msgstr ""
-
-#: src/sbackup/core/SnapshotManager.py:595
+#: src/sbackup/core/SnapshotManager.py:286
 msgid "The snarfile header is incomplete !"
-msgstr ""
+msgstr "snar 檔案的標頭檔並不完全！"
 
-#: src/sbackup/core/SnapshotManager.py:747
-#, python-format
-msgid "Base of snapshot '%s' is not set."
-msgstr ""
-
-#: src/sbackup/core/SnapshotManager.py:784
+#: src/sbackup/core/SnapshotManager.py:429
 #, python-format
 msgid ""
 "Snapshot '%s' is already Full, nothing to do (not changing it to full)."
-msgstr ""
+msgstr "快照「%s」已經是完整的，不需做任何事 (不用將其變更為完整)。"
 
-#: src/sbackup/core/SnapshotManager.py:824
+#: src/sbackup/core/profile_handler.py:101
 #, python-format
-msgid "Cancelling pull of snapshot '%s'"
+msgid "Running of hooks: %s"
 msgstr ""
 
-#: src/sbackup/core/UpgradeManager.py:176
-#, python-format
-msgid "Unable to remove upgrade stamp: %s"
-msgstr ""
-
-#: src/sbackup/core/UpgradeManager.py:183
-#, python-format
-msgid "Upgrading from v1.0 to v1.2: %s"
-msgstr ""
-
-#: src/sbackup/core/UpgradeManager.py:202
-#, python-format
-msgid "Upgrading to v1.3: %s"
-msgstr ""
-
-#: src/sbackup/core/UpgradeManager.py:229
-#, python-format
-msgid "Upgrading to v1.4: %s"
-msgstr ""
-
-#: src/sbackup/core/UpgradeManager.py:246
-#, python-format
-msgid "Upgrading to v1.5: %s"
-msgstr ""
-
-#: src/sbackup/core/UpgradeManager.py:300
-#, python-format
-msgid "The SNAR file already exist for snapshot '%s'. It is not overwritten."
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:90
+#: src/sbackup/core/profile_handler.py:111
 msgid "Preparation of backup process"
-msgstr ""
+msgstr "準備備份作業"
 
-#: src/sbackup/core/profile_handler.py:133
-msgid ""
-"There are snapshots stored in outdated snapshot formats. Please upgrade them "
-"using 'Simple Backup-Restoration' if you want to use them."
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:142
+#: src/sbackup/core/profile_handler.py:146
 #, python-format
 msgid "Snapshot '%(name)s' is being made."
-msgstr ""
+msgstr "快照「%(name)s」建立。"
 
-#: src/sbackup/core/profile_handler.py:150
+#: src/sbackup/core/profile_handler.py:154
 #, python-format
 msgid "Setting Base to '%(value)s'."
-msgstr ""
+msgstr "基底設置為「%(value)s」。"
 
-#: src/sbackup/core/profile_handler.py:159
+#: src/sbackup/core/profile_handler.py:163
 msgid "Setting packages File."
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:165
-msgid "Problem when setting the packages list: "
-msgstr ""
+msgstr "設定包裝檔案。"
 
 #: src/sbackup/core/profile_handler.py:169
-msgid "Setting Excludes File."
-msgstr ""
+msgid "Problem when setting the packages list: "
+msgstr "當設定包裝列表時發生問題： "
 
-#: src/sbackup/core/profile_handler.py:177
+#: src/sbackup/core/profile_handler.py:173
+msgid "Setting Excludes File."
+msgstr "設定要被排除的檔案。"
+
+#: src/sbackup/core/profile_handler.py:181
 #, python-format
 msgid "Setting compression format to `%s`"
-msgstr ""
+msgstr "將壓縮格式設定為「%s」"
 
-#: src/sbackup/core/profile_handler.py:184
+#: src/sbackup/core/profile_handler.py:188
 #, python-format
 msgid "Setting size of archive chunks to %s"
-msgstr ""
+msgstr "將檔案分割大小設定為 %s"
 
-#: src/sbackup/core/profile_handler.py:191
+#: src/sbackup/core/profile_handler.py:195
 msgid "Option 'Follow symbolic links' is enabled."
-msgstr ""
+msgstr "選項「追隨符號連結」已啟用。"
 
-#: src/sbackup/core/profile_handler.py:193
+#: src/sbackup/core/profile_handler.py:197
 msgid "Option 'Follow symbolic links' is disabled."
-msgstr ""
+msgstr "選項「追隨符號連結」已停用。"
 
-#: src/sbackup/core/profile_handler.py:202
+#: src/sbackup/core/profile_handler.py:206
 msgid "Snapshot is being committed"
-msgstr ""
+msgstr "快照已經送出"
 
-#: src/sbackup/core/profile_handler.py:216
+#: src/sbackup/core/profile_handler.py:220
 #, python-format
 msgid "Error while purging old snapshots: %s"
-msgstr ""
+msgstr "在清理舊快照時發生錯誤：%s"
 
-#: src/sbackup/core/profile_handler.py:218
+#: src/sbackup/core/profile_handler.py:222
 msgid "Backup process finished."
-msgstr ""
+msgstr "備份作業完成。"
 
-#: src/sbackup/core/profile_handler.py:225
+#: src/sbackup/core/profile_handler.py:229
 msgid "Inspect file system and collect file infos"
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:236
-msgid "Summary of backup"
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:237
-#, python-format
-msgid "Number of directories: %s."
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:238
-#, python-format
-msgid "Total number of files: %s."
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:239
-#, python-format
-msgid "Number of symlinks: %s."
-msgstr ""
+msgstr "調查檔案系統並蒐集檔案資訊"
 
 #: src/sbackup/core/profile_handler.py:240
-#, python-format
-msgid "Number of files included in snapshot: %s."
-msgstr ""
+msgid "Summary of backup"
+msgstr "備份摘要"
 
 #: src/sbackup/core/profile_handler.py:241
 #, python-format
-msgid "Number of new files (also included): %s."
-msgstr ""
+msgid "Number of directories: %s."
+msgstr "資料夾數目：%s。"
 
 #: src/sbackup/core/profile_handler.py:242
 #, python-format
-msgid "Number of files skipped in incremental snapshot: %s."
-msgstr ""
+msgid "Total number of files: %s."
+msgstr "檔案總數：%s。"
 
 #: src/sbackup/core/profile_handler.py:243
 #, python-format
-msgid "Number of items forced to be excluded: %s."
-msgstr ""
+msgid "Number of symlinks: %s."
+msgstr "軟連結數量：%s。"
 
 #: src/sbackup/core/profile_handler.py:244
 #, python-format
-msgid "Number of items to be excluded by config: %s."
-msgstr ""
+msgid "Number of files included in snapshot: %s."
+msgstr "快照內的檔案數量：%s。"
 
 #: src/sbackup/core/profile_handler.py:245
 #, python-format
-msgid "Maximum free size required is '%s'."
-msgstr ""
+msgid "Number of new files (also included): %s."
+msgstr "新檔案數量 (加上已包含)：%s。"
 
-#: src/sbackup/core/profile_handler.py:251
+#: src/sbackup/core/profile_handler.py:246
+#, python-format
+msgid "Number of files skipped in incremental snapshot: %s."
+msgstr "增量快照中被跳過的檔案數量：%s。"
+
+#: src/sbackup/core/profile_handler.py:247
+#, python-format
+msgid "Number of items forced to be excluded: %s."
+msgstr "強制排除的物件數量：%s。"
+
+#: src/sbackup/core/profile_handler.py:248
+#, python-format
+msgid "Number of items to be excluded by config: %s."
+msgstr "設定排除的物件數量：%s。"
+
+#: src/sbackup/core/profile_handler.py:249
+#, python-format
+msgid "Maximum free size required is '%s'."
+msgstr "所需最大可用空間為「%s」。"
+
+#: src/sbackup/core/profile_handler.py:255
 #, python-format
 msgid "Available disk size is '%s'."
-msgstr ""
+msgstr "可用磁碟空間為「%s」。"
 
-#: src/sbackup/core/profile_handler.py:253
+#: src/sbackup/core/profile_handler.py:257
 #, python-format
 msgid ""
 "Not enough free space in the target directory for the planned backup (free: "
 "%(freespace)s, required: %(neededspace)s)."
-msgstr ""
+msgstr "目標資料夾沒有足夠空間給計劃的備份 (可用：%(freespace)s，所需：%(neededspace)s)。"
 
-#: src/sbackup/core/profile_handler.py:273
+#: src/sbackup/core/profile_handler.py:277
 msgid "Unable to copy log. File access is not initialized."
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:291
-#, python-format
-msgid "Unable to copy log file: %s"
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:293
-msgid "Unable to find logfile to copy into snapshot."
-msgstr ""
+msgstr "無法複製日誌檔。檔案存取尚未初始化。"
 
 #: src/sbackup/core/profile_handler.py:295
+#, python-format
+msgid "Unable to copy log file: %s"
+msgstr "無法複製日誌檔：%s"
+
+#: src/sbackup/core/profile_handler.py:297
+msgid "Unable to find logfile to copy into snapshot."
+msgstr "無法找到要複製進快照的日誌檔案。"
+
+#: src/sbackup/core/profile_handler.py:299
 msgid "No snapshot to copy logfile."
-msgstr ""
+msgstr "沒有要複製日誌檔的快照。"
 
-#: src/sbackup/core/profile_handler.py:302
+#: src/sbackup/core/profile_handler.py:306
 msgid "Processing of profile was canceled on user request\n"
-msgstr ""
+msgstr "設定檔作業因使用者要求而被取消\n"
 
-#: src/sbackup/core/profile_handler.py:319
+#: src/sbackup/core/profile_handler.py:323
 msgid "Processing of profile successfully finished (no errors)\n"
-msgstr ""
+msgstr "設定檔作業成功完成 (沒有任何錯誤)\n"
 
-#: src/sbackup/core/profile_handler.py:325
+#: src/sbackup/core/profile_handler.py:329
 #, python-format
 msgid "Processing of profile failed with error: %s\n"
-msgstr ""
-
-#: src/sbackup/core/profile_handler.py:336
-#, python-format
-msgid "Backup destination: %s"
-msgstr ""
+msgstr "設定檔作業發生錯誤而失敗：%s\n"
 
 #: src/sbackup/core/profile_handler.py:340
+#, python-format
+msgid "Backup destination: %s"
+msgstr "備份目的地：%s"
+
+#: src/sbackup/core/profile_handler.py:344
 msgid "Unable to find destination directory."
-msgstr ""
+msgstr "無法找到目的資料夾。"
 
-#: src/sbackup/core/profile_handler.py:359
+#: src/sbackup/core/profile_handler.py:363
 msgid "Unable to find destination directory even after retry."
-msgstr ""
+msgstr "再次嘗試仍無法找到目的資料夾。"
 
-#: src/sbackup/core/profile_handler.py:360
-#: src/sbackup/core/profile_handler.py:367
+#: src/sbackup/core/profile_handler.py:364
+#: src/sbackup/core/profile_handler.py:371
 #, python-format
 msgid "Target directory '%(target)s' does not exist."
-msgstr ""
+msgstr "目標資料夾「%(target)s」不存在。"
 
-#: src/sbackup/core/profile_handler.py:373
+#: src/sbackup/core/profile_handler.py:377
 #, python-format
 msgid "Unable to access destination: %s"
-msgstr ""
+msgstr "無法存取目的地：%s"
 
-#: src/sbackup/core/snapshot.py:132
+#: src/sbackup/core/snapshot.py:134
 msgid "Snapshot is inconsistent: __name is not set "
-msgstr ""
+msgstr "快照不符合：__name 並未設置 "
 
-#: src/sbackup/core/snapshot.py:143
+#: src/sbackup/core/snapshot.py:145
 #, python-format
 msgid "Name of snapshot '%s' doesn't match requirement"
-msgstr ""
+msgstr "快照名稱「%s」和所要求條件不符合"
 
-#: src/sbackup/core/snapshot.py:237
+#: src/sbackup/core/snapshot.py:239
 msgid "Snapshot is inconsistent: __snapshotpath is not set "
-msgstr ""
+msgstr "快照不符合：__snapshotpath 並未設置 "
 
-#: src/sbackup/core/snapshot.py:324
+#: src/sbackup/core/snapshot.py:318
 #, python-format
 msgid ""
 "The snapshot compression format is supposed to be '%s' but the corresponding "
 "well named file wasn't found"
-msgstr ""
+msgstr "快照的壓縮格式應該為「%s」，但並未發現與此相應的命名檔案"
 
-#: src/sbackup/core/snapshot.py:348
+#: src/sbackup/core/snapshot.py:342
 #, python-format
 msgid ""
 "%(file)s doesn't contain valid value. Ignoring incomplete or non - backup "
 "directory. "
-msgstr ""
+msgstr "%(file)s 未包含有效的值。忽略不完整或不需備份的資料夾。 "
 
-#: src/sbackup/core/snapshot.py:484
+#: src/sbackup/core/snapshot.py:478
 #, python-format
 msgid "Name of Snapshot not valid : %s"
-msgstr ""
+msgstr "快照名稱無效：%s"
 
-#: src/sbackup/core/snapshot.py:502
+#: src/sbackup/core/snapshot.py:496
 #, python-format
 msgid "Name of base not valid : %s"
-msgstr ""
+msgstr "基底名稱無效：%s"
 
-#: src/sbackup/core/snapshot.py:548
+#: src/sbackup/core/snapshot.py:542
 #, python-format
 msgid "Invalid name of snapshot: %s"
-msgstr ""
+msgstr "無效的快照名稱：%s"
 
-#: src/sbackup/core/snapshot.py:552
+#: src/sbackup/core/snapshot.py:546
 msgid "Unable to read mandatory file `ver`"
-msgstr ""
+msgstr "無法讀取必要檔案「ver」"
 
-#: src/sbackup/core/snapshot.py:597
+#: src/sbackup/core/snapshot.py:591
 msgid "Base name must be set for incremental backup."
-msgstr ""
+msgstr "必須設定基底名稱才能進行增量備份。"
 
 #: src/sbackup/fs_backend/_fuse_fam.py:106
 msgid "Initializing FUSE File Access Manager."
-msgstr ""
+msgstr "正在起始 FUSE 檔案存取管理員。"
 
 #: src/sbackup/fs_backend/_fuse_fam.py:129
 msgid "Terminating FUSE File Access Manager."
-msgstr ""
-
-#: src/sbackup/fs_backend/_fuse_utils.py:44
-#: src/sbackup/fs_backend/_gio_utils.py:107
-msgid "SFTP"
-msgstr ""
+msgstr "正在終止 FUSE 檔案存取管理員。"
 
 #: src/sbackup/fs_backend/_fuse_utils.py:45
-#: src/sbackup/fs_backend/_gio_utils.py:108
-msgid "SSH"
-msgstr ""
+#: src/sbackup/fs_backend/_gio_utils.py:109
+msgid "SFTP"
+msgstr "SFTP"
 
 #: src/sbackup/fs_backend/_fuse_utils.py:46
-#: src/sbackup/fs_backend/_gio_utils.py:109
+#: src/sbackup/fs_backend/_gio_utils.py:110
+msgid "SSH"
+msgstr "SSH"
+
+#: src/sbackup/fs_backend/_fuse_utils.py:47
+#: src/sbackup/fs_backend/_gio_utils.py:111
 msgid "FTP"
-msgstr ""
+msgstr "FTP"
 
 #: src/sbackup/fs_backend/_gio_fam.py:100
 msgid "Initializing GIO File Access Manager."
-msgstr ""
+msgstr "正在起始 GIO 檔案存取管理員。"
 
 #: src/sbackup/fs_backend/_gio_fam.py:114
 msgid "Terminating GIO File Access Manager."
+msgstr "正在終止 GIO 檔案存取管理員。"
+
+#: src/sbackup/fs_backend/_gio_utils.py:95
+msgid "Unknown error code:"
 msgstr ""
 
-#: src/sbackup/fs_backend/_gio_utils.py:110
+#: src/sbackup/fs_backend/_gio_utils.py:112
 msgid "NFS"
-msgstr ""
+msgstr "NFS"
 
-#: src/sbackup/fs_backend/_gio_utils.py:111
+#: src/sbackup/fs_backend/_gio_utils.py:113
 msgid "SMB"
-msgstr ""
-
-#: src/sbackup/fs_backend/_gio_utils.py:191
-msgid "Unable to get mount: path is not mounted"
-msgstr ""
+msgstr "SMB"
 
 #: src/sbackup/fs_backend/_gio_utils.py:193
-msgid "Unable to get mount: path not found when mounting (is probably local)"
-msgstr ""
+msgid "Unable to get mount: path is not mounted"
+msgstr "無法掛載：路徑尚未掛載"
 
 #: src/sbackup/fs_backend/_gio_utils.py:195
-#: src/sbackup/fs_backend/_gio_utils.py:198
+msgid "Unable to get mount: path not found when mounting (is probably local)"
+msgstr "無法掛載：掛載時未發現路徑 (可能為本地)"
+
+#: src/sbackup/fs_backend/_gio_utils.py:197
+#: src/sbackup/fs_backend/_gio_utils.py:200
 #, python-format
 msgid "Unable to get mount: %s"
-msgstr ""
+msgstr "無法掛載：%s"
 
-#: src/sbackup/fs_backend/_gio_utils.py:248
+#: src/sbackup/fs_backend/_gio_utils.py:250
 msgid "Unable to un-set mount flag: path is not stored"
-msgstr ""
+msgstr "無法取消設置掛載旗標：路徑未被存放"
 
-#: src/sbackup/fs_backend/_gio_utils.py:350
+#: src/sbackup/fs_backend/_gio_utils.py:352
 msgid "Path is already mounted."
-msgstr ""
+msgstr "路徑已被掛載。"
 
-#: src/sbackup/fs_backend/_gio_utils.py:378
+#: src/sbackup/fs_backend/_gio_utils.py:380
 msgid "Path is not mounted."
-msgstr ""
+msgstr "路徑尚未被掛載。"
 
-#: src/sbackup/fs_backend/_gio_utils.py:846
+#: src/sbackup/fs_backend/_gio_utils.py:887
 msgid "test specified path for existence using GIO"
-msgstr ""
+msgstr "使用 GIO 測試指定路徑是否存在"
 
-#: src/sbackup/fs_backend/_gio_utils.py:859
+#: src/sbackup/fs_backend/_gio_utils.py:900
 msgid "Create testdir"
-msgstr ""
+msgstr "建立測試資料夾"
 
-#: src/sbackup/fs_backend/_gio_utils.py:864
+#: src/sbackup/fs_backend/_gio_utils.py:905
 msgid "Test testfile for existence"
-msgstr ""
+msgstr "測試檔案是否存在"
 
-#: src/sbackup/fs_backend/_gio_utils.py:871
+#: src/sbackup/fs_backend/_gio_utils.py:912
 msgid "Create file"
-msgstr ""
+msgstr "建立檔案"
 
-#: src/sbackup/fs_backend/_gio_utils.py:878
+#: src/sbackup/fs_backend/_gio_utils.py:919
 msgid "Re-read test file"
-msgstr ""
+msgstr "重新讀取測試檔案"
 
-#: src/sbackup/fs_backend/_gio_utils.py:890
+#: src/sbackup/fs_backend/_gio_utils.py:931
 msgid "Remove file"
-msgstr ""
+msgstr "刪除檔案"
 
-#: src/sbackup/fs_backend/_gio_utils.py:892
+#: src/sbackup/fs_backend/_gio_utils.py:933
 msgid "Remove dir"
-msgstr ""
+msgstr "刪除資料夾"
 
 #: src/sbackup/fuse_plugins/__init__.py:160
 #, python-format
 msgid "Unable to import plugin `%(plugin_name)s`: %(error_cause)s "
-msgstr ""
+msgstr "無法匯入附加元件「%(plugin_name)s」：%(error_cause)s "
 
 #: src/sbackup/fuse_plugins/ftpFuseFAM.py:117
 #, python-format
 msgid ""
 "Couldn't found external application 'curlftpfs' needed for handling of ftp "
 "sites: %s"
-msgstr ""
+msgstr "無法找到處理 ftp 站台所需的外部程式「curlftpfs」：%s"
 
 #: src/sbackup/fuse_plugins/ftpFuseFAM.py:127
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:124
 #, python-format
 msgid "Couldn't mount '%(server)s' into '%(mountpoint)s' : %(error)s"
-msgstr ""
+msgstr "無法將「%(server)s」掛載至「%(mountpoint)s」：%(error)s"
 
 #: src/sbackup/fuse_plugins/ftpFuseFAM.py:141
 msgid "FTP schema is: ftp://user:pass@server/anything"
-msgstr ""
+msgstr "FTP 範例如右：ftp://user:pass@server/anything"
 
 #: src/sbackup/fuse_plugins/ftpFuseFAM.py:188
 #, python-format
 msgid ""
 "Error matching the schema 'ftp://user:pass@server/anything' with '%s' (The "
 "'/' after server is mandatory)"
-msgstr ""
+msgstr "「%s」和範例「ftp://user:pass@server/anything」配對錯誤 (伺服器網址後面必須有「/」存在)"
 
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:114
 #, python-format
 msgid ""
 "Couldn't found external application 'curlftpfs' needed for handling of sftp "
 "sites: %s"
-msgstr ""
+msgstr "無法找到處理 sftp 站台所需的外部程式「curlftpfs」：%s"
 
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:138
 msgid "SFTP schema is like : sftp://user:pass@server/anything"
-msgstr ""
+msgstr "SFTP 範例如右：sftp://user:pass@server/anything"
 
 #: src/sbackup/fuse_plugins/sftpFuseFAM.py:185
 #, python-format
 msgid ""
 "Error matching the schema 'sftp://user:pass@server/anything' with '%s' (The "
 "'/' after server is mandatory)"
-msgstr ""
+msgstr "「%s」和範例「sftp://user:pass@server/anything」配對錯誤 (伺服器網址後面必須有「/」存在)"
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:81
 #, python-format
 msgid ""
 "Error matching the schema 'ssh://user:pass@example.com/home/' with '%s' (The "
 "'/' after server is mandatory)"
-msgstr ""
+msgstr "「%s」和範例「ssh://user:pass@example.com/home/」配對錯誤 (伺服器網址後面必須有「/」存在)"
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:137
 #, python-format
 msgid ""
 "The sshfs command '%(command)s' didn't perform normally. Output => "
 "%(erroroutput)s "
-msgstr ""
+msgstr "sshfs 指令「%(command)s」沒有正常運作。輸出 => %(erroroutput)s "
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:142
 msgid "SSH schema is like : ssh://user:pass@example.com:33/home/user/backup/"
-msgstr ""
+msgstr "SSH 範例如右：ssh://user:pass@example.com:33/home/user/backup/"
 
 #: src/sbackup/fuse_plugins/sshFuseFAM.py:158
 #, python-format
 msgid ""
 "Error matching the schema 'ssh://user:pass@example.com:21/home/' with '%s' "
 "(The '/' after server is mandatory)"
-msgstr ""
+msgstr "「%s」和範例「ssh://user:pass@example.com:21/home/」配對錯誤 (伺服器網址後面必須有「/」存在)"
 
 #: src/sbackup/ui/GladeWindow.py:210
 msgid ""
 "Please make sure the missing directory exists (e.g. by mounting an external "
 "disk) or change the specified target."
-msgstr ""
+msgstr "請確認遺失的路徑確實存在 (比如從外部硬碟掛載)，或者將指定目標改成一個存在的路徑。"
 
 #: src/sbackup/ui/GladeWindow.py:211
 #, python-format
@@ -915,41 +868,43 @@ msgid ""
 "\n"
 "%s."
 msgstr ""
+"當存取備份目的地時發生下列錯誤：\n"
+"\n"
+"%s。"
 
-#: src/sbackup/ui/GladeWindow.py:212 src/sbackup/ui/restoregui.py:817
-#: src/sbackup/ui/restoregui.py:871
+#: src/sbackup/ui/GladeWindow.py:212 src/sbackup/ui/restoregui.py:797
 msgid "Simple Backup error"
-msgstr ""
+msgstr "Simple Backup 錯誤"
 
 #: src/sbackup/ui/GladeWindow.py:213
 msgid "Unable to access backup destination"
-msgstr ""
+msgstr "無法存取備份目的地"
 
 #: src/sbackup/ui/configgui.py:125
 msgid "Scheduled backups are available for Administrator users only."
-msgstr ""
+msgstr "排程備份只供系統管理員使用。"
 
 #: src/sbackup/ui/configgui.py:135 src/sbackup/ui/configgui.py:144
 msgid "Name"
-msgstr ""
+msgstr "名稱"
 
 #: src/sbackup/ui/configgui.py:152
 msgid "File Type"
-msgstr ""
+msgstr "檔案類型"
 
 #: src/sbackup/ui/configgui.py:187
 msgid "Enable"
-msgstr ""
+msgstr "啟用"
 
 #: src/sbackup/ui/configgui.py:188
 msgid "Profile Name"
-msgstr ""
+msgstr "設定檔名稱"
 
 #: src/sbackup/ui/configgui.py:285
 #, python-format
 msgid ""
 "Invalid or empty regular expression ('%s') found in configuration. Removed."
-msgstr ""
+msgstr "於設定檔中發現無效或空白的正規表達式(「%s」)。已移除。"
 
 #: src/sbackup/ui/configgui.py:292
 #, python-format
@@ -961,12 +916,18 @@ msgid ""
 "These expressions are not used and were\n"
 "removed from the configuration."
 msgstr ""
+"發現無效或空白的正規表達式\n"
+"於設定檔：\n"
+"「%s」\n"
+"\n"
+"這些表達式不會被使用，且\n"
+"已從設定檔中移除。"
 
 #: src/sbackup/ui/configgui.py:548
 msgid ""
 "Please make sure the missing directory exists (e.g. by mounting an external "
 "disk) or change the specified target to an existing one."
-msgstr ""
+msgstr "請確認遺失的路徑確實存在 (比如從外部硬碟掛載)，或者將指定目標改成一個存在的路徑。"
 
 #: src/sbackup/ui/configgui.py:549
 #, python-format
@@ -976,10 +937,13 @@ msgid ""
 "Attention: The target will be set to the default value. Check this on the "
 "destination settings page before saving the configuration."
 msgstr ""
+"備份目標「%s」並不存在。\n"
+"\n"
+"注意：目標將設定為預設值。在儲存設定前，請在目的設定頁面點選預設選項。"
 
 #: src/sbackup/ui/configgui.py:551
 msgid "Unable to open backup target"
-msgstr ""
+msgstr "無法開啟備份目標"
 
 #: src/sbackup/ui/configgui.py:623
 #, python-format
@@ -992,27 +956,32 @@ msgid ""
 "\n"
 "Important note: Saving will overwrite your existing invalid configuration."
 msgstr ""
+"%s\n"
+"\n"
+"一個使用預設值的備份設定檔已經建立。儲存新的設定以便使用，或者手動檢查您存在的設定檔。\n"
+"\n"
+"重要提醒：儲存將會覆寫您存在的無效設定。"
 
 #: src/sbackup/ui/configgui.py:641
 #, python-format
 msgid "Current profile: %s"
-msgstr ""
+msgstr "目前設定檔：%s"
 
 #: src/sbackup/ui/configgui.py:732
 msgid "Already included item !"
-msgstr ""
+msgstr "已經包含了此物件！"
 
 #: src/sbackup/ui/configgui.py:747
 msgid "Already excluded item !"
-msgstr ""
+msgstr "已經排除了此物件！"
 
 #: src/sbackup/ui/configgui.py:759 src/sbackup/ui/configgui.py:1458
 msgid "Empty expression. Please enter a valid regular expression."
-msgstr ""
+msgstr "空白的表達式。請輸入一個有效的正規表達式。"
 
 #: src/sbackup/ui/configgui.py:774 src/sbackup/ui/configgui.py:1472
 msgid "Provided regular expression is not valid."
-msgstr ""
+msgstr "提供的正規表達式無效。"
 
 #: src/sbackup/ui/configgui.py:782
 msgid "Empty filename or path. Please enter a valid filename or path."
@@ -1022,11 +991,11 @@ msgstr "空的檔案名稱或路徑。請輸入正確檔案名稱或路徑。"
 msgid ""
 "It seems the path you entered does not exists. Do you want to add this "
 "incorrect path?"
-msgstr ""
+msgstr "您輸入的路徑並不存在。要將這個不正確的路經加入？"
 
 #: src/sbackup/ui/configgui.py:820
 msgid "Save configuration as..."
-msgstr ""
+msgstr "儲存設定於..."
 
 #: src/sbackup/ui/configgui.py:887
 msgid ""
@@ -1035,20 +1004,23 @@ msgid ""
 "You can monitor the progress of the backup by means of the status indicator "
 "displayed in the notification area."
 msgstr ""
+"一個備份作業正於背景中執行。\n"
+"\n"
+"您可以從通知區顯示的進度指示器中觀察進度。"
 
 #: src/sbackup/ui/configgui.py:888
 msgid "Backup process started"
-msgstr ""
+msgstr "備份作業開始"
 
 #: src/sbackup/ui/configgui.py:893 src/sbackup/ui/configgui.py:1661
 #: src/sbackup/ui/configgui.py:2038
 #, python-format
 msgid "Unexpected dialog response: %s"
-msgstr ""
+msgstr "未預期的對話回復：%s"
 
 #: src/sbackup/ui/configgui.py:967
 msgid "Include file..."
-msgstr ""
+msgstr "包含檔案..."
 
 #: src/sbackup/ui/configgui.py:974 src/sbackup/ui/configgui.py:1029
 msgid "All files"
@@ -1056,99 +1028,99 @@ msgstr "所有檔案"
 
 #: src/sbackup/ui/configgui.py:994
 msgid "Include folder..."
-msgstr ""
+msgstr "包含資料夾..."
 
 #: src/sbackup/ui/configgui.py:1022
 msgid "Exclude file..."
-msgstr ""
+msgstr "排除檔案..."
 
 #: src/sbackup/ui/configgui.py:1045
 msgid "Exclude folder..."
-msgstr ""
+msgstr "排除資料夾..."
 
 #: src/sbackup/ui/configgui.py:1310
 msgid "Configuration has changed"
-msgstr ""
+msgstr "設定已變更"
 
 #: src/sbackup/ui/configgui.py:1311
 msgid ""
 "There are unsaved modifications. Please save the configuration or revert "
 "these changes before testing the mail settings."
-msgstr ""
+msgstr "有未被儲存的變更。請在測試郵件設定前儲存或回復所作的變更。"
 
 #: src/sbackup/ui/configgui.py:1317 src/sbackup/ui/configgui.py:1323
 msgid "Test mail settings"
-msgstr ""
+msgstr "測試郵件設定"
 
 #: src/sbackup/ui/configgui.py:1318
 msgid "The test failed with following output:"
-msgstr ""
+msgstr "測試失敗並傳回下列訊息："
 
 #: src/sbackup/ui/configgui.py:1324
 msgid "The test was successful."
-msgstr ""
+msgstr "測試成功。"
 
 #: src/sbackup/ui/configgui.py:1407 src/sbackup/ui/configgui.py:1450
 #, python-format
 msgid ""
 "The given expression contains unsupported characters ('%s'). Currently it is "
 "not possible to use these characters in exclude expressions."
-msgstr ""
+msgstr "給予的表達式包含未支援的字元(「%s」)。目前沒辦法在排除表達式中使用這些字元。"
 
 #: src/sbackup/ui/configgui.py:1410 src/sbackup/ui/configgui.py:1453
 msgid "Unsupported character"
-msgstr ""
+msgstr "未支援的字元"
 
 #: src/sbackup/ui/configgui.py:1621
 msgid "Connect to remote destination"
-msgstr ""
+msgstr "連接至遠端目的地"
 
 #: src/sbackup/ui/configgui.py:1669
 msgid "Mount was sucessful (no errors)"
-msgstr ""
+msgstr "掛載成功 (沒有任何錯誤)"
 
 #: src/sbackup/ui/configgui.py:1680
 msgid "Unable to mount host"
-msgstr ""
+msgstr "無法掛載主機"
 
 #: src/sbackup/ui/configgui.py:1689
 msgid "Umount was sucessful (no errors)"
-msgstr ""
+msgstr "卸載成功 (沒有任何錯誤)"
 
 #: src/sbackup/ui/configgui.py:1699
 msgid "Unable to unmount host"
-msgstr ""
+msgstr "無法卸載主機"
 
 #: src/sbackup/ui/configgui.py:1729
 msgid "Perfom tests on remote host"
-msgstr ""
+msgstr "開始對遠端主機的測試"
 
 #: src/sbackup/ui/configgui.py:1742
 msgid "Unable to access remote destination"
-msgstr ""
+msgstr "無法存取遠端目的地"
 
 #: src/sbackup/ui/configgui.py:1746
 msgid "All tests passed"
-msgstr ""
+msgstr "通過所有測試"
 
 #: src/sbackup/ui/configgui.py:1910
 msgid ""
 "The given name of the new profile is empty. Please enter a valid profile "
 "name."
-msgstr ""
+msgstr "新設定檔的名稱是空的。請輸入一個有效的設定檔名。"
 
 #: src/sbackup/ui/configgui.py:1911 src/sbackup/ui/configgui.py:1918
 msgid "Profile name not valid"
-msgstr ""
+msgstr "無效的設定檔名稱"
 
 #: src/sbackup/ui/configgui.py:1917
 msgid ""
 "The given name of the new profile already exists. Please enter another name."
-msgstr ""
+msgstr "給予新設定檔的名稱已存在。請輸入另外一個名稱。"
 
 #: src/sbackup/ui/configgui.py:1919
 msgid "Renaming of profiles is not supported."
-msgstr ""
+msgstr "不支援設定檔重新命名。"
 
 #: src/sbackup/ui/configgui.py:1949
 #, python-format
@@ -1161,6 +1133,11 @@ msgid ""
 "\n"
 "Do you really want to delete the profile '%(name)s'?"
 msgstr ""
+"<b>刪除組態設定檔？</b>\n"
+"\n"
+"您正嘗試要移除一個組態設定檔。您之後將無法回復它。不確定要這麼做的話，請改用「啟用|停用」功能。\n"
+"\n"
+"您真的要刪除設定檔「%(name)s」？"
 
 #: src/sbackup/ui/configgui.py:2022
 #, python-format
@@ -1172,10 +1149,14 @@ msgid ""
 "These predefined settings are recommended for most users. Check whether they "
 "are appropriate for your use before saving the changed configuration."
 msgstr ""
+"<big><b>將目前的設定檔設回預設值？</b></big>\n"
+"這將用預設值覆蓋目前所編輯的設定檔：「%s」。\n"
+"\n"
+"這些預定義的設定值，建議多數使用者使用。在儲存設定變更前，請檢查這些設定是否符合您的需求。"
 
 #: src/sbackup/ui/configgui.py:2032
 msgid "Default settings are being applied."
-msgstr ""
+msgstr "已採用預設值。"
 
 #: src/sbackup/ui/configgui.py:2057
 msgid ""
@@ -1184,6 +1165,9 @@ msgid ""
 "The default profile cannot be removed. In the case you want to use just a "
 "single profile, please set up the default profile accordingly."
 msgstr ""
+"<b>無法移除預設設定檔</b>\n"
+"\n"
+"預設設定檔無法被移除。若您只想使用一個設定檔，請將預設設定檔設定好。"
 
 #: src/sbackup/ui/configgui.py:2071
 msgid ""
@@ -1192,6 +1176,9 @@ msgid ""
 "The default profile cannot be disabled. In the case you want to use just a "
 "single profile, please set up the default profile accordingly."
 msgstr ""
+"<b>無法移除預設設定檔</b>\n"
+"\n"
+"預設設定檔無法被停用。若您只想使用一個設定檔，請將預設設定檔設定好。"
 
 #: src/sbackup/ui/configgui.py:2085
 msgid ""
@@ -1203,135 +1190,134 @@ msgid ""
 "Please modify the settings according to your needs and save the "
 "configuration in order to use it."
 msgstr ""
+"<b>未發現任何備份設定檔</b>\n"
+"\n"
+"沒有發現任何預設設定檔。這可能是因為您第一次執行 Simple Backup。已經建立一個使用預設值的設定檔。\n"
+"\n"
+"請依您的需求來調整設定並儲存以便使用。"
 
 #: src/sbackup/ui/configgui.py:2098
 msgid "Please select a profile."
-msgstr ""
+msgstr "請選擇一個設定檔。"
 
 #: src/sbackup/ui/indicator_core.py:117
 msgid "there was a problem initializing the pynotify module"
-msgstr ""
+msgstr "在初始 pynotify 模組時發生問題"
 
-#: src/sbackup/ui/indicator_core.py:146 src/sbackup/ui/indicator_core.py:193
-#: src/sbackup/ui/indicator_core.py:221 src/sbackup/ui/indicator_core.py:243
+#: src/sbackup/ui/indicator_core.py:148 src/sbackup/ui/indicator_core.py:197
+#: src/sbackup/ui/indicator_core.py:225 src/sbackup/ui/indicator_core.py:247
 #, python-format
 msgid "Connection to notification-daemon failed: %s"
-msgstr ""
+msgstr "和 notification-daemon 的連接失敗：%s"
 
-#: src/sbackup/ui/indicator_core.py:306
+#: src/sbackup/ui/indicator_core.py:310
 msgid "Simple Backup"
-msgstr ""
+msgstr "Simple Backup"
 
-#: src/sbackup/ui/indicator_core.py:312
+#: src/sbackup/ui/indicator_core.py:316
 msgid "Show message windows"
-msgstr ""
+msgstr "顯示訊息視窗"
 
-#: src/sbackup/ui/indicator_core.py:354 src/sbackup/ui/indicator_core.py:814
+#: src/sbackup/ui/indicator_core.py:358 src/sbackup/ui/indicator_core.py:816
 msgid "Cancel Backup"
-msgstr ""
+msgstr "取消備份"
 
-#: src/sbackup/ui/indicator_core.py:416
+#: src/sbackup/ui/indicator_core.py:420
 msgid "Connection to D-Bus service lost."
-msgstr ""
+msgstr "遺失和 D-Bus 服務的連接。"
 
-#: src/sbackup/ui/indicator_core.py:441
+#: src/sbackup/ui/indicator_core.py:445
 msgid "re-connection was successful"
-msgstr ""
+msgstr "重新連接成功"
 
-#: src/sbackup/ui/indicator_core.py:480
+#: src/sbackup/ui/indicator_core.py:484
 msgid ""
 "No backup in progress and connection to D-Bus service lost. Simple Backup "
 "Indicator is being terminated."
-msgstr ""
+msgstr "沒有備份作業正在執行，並遺失和 D-Bus 服務的連接。Simple Backup 指示器已被中止。"
 
-#: src/sbackup/ui/indicator_core.py:509
+#: src/sbackup/ui/indicator_core.py:513
 msgid "Starting backup session"
-msgstr ""
+msgstr "備份作業開始"
 
-#: src/sbackup/ui/indicator_core.py:523
+#: src/sbackup/ui/indicator_core.py:527
 msgid "Ending Backup Session"
-msgstr ""
+msgstr "備份作業結束"
 
-#: src/sbackup/ui/indicator_core.py:536
-msgid ""
-"There are snapshots with old snapshot format. Please upgrade these using the "
-"Restoration tool if you want to use them."
-msgstr ""
-
-#: src/sbackup/ui/indicator_core.py:538
+#: src/sbackup/ui/indicator_core.py:540
 #, python-format
 msgid "Unknown D-Bus event `%s` received."
-msgstr ""
+msgstr "收到未知的 D-Bus 事件「%s」。"
 
-#: src/sbackup/ui/indicator_core.py:579
+#: src/sbackup/ui/indicator_core.py:581
 msgid "Try again"
-msgstr ""
+msgstr "再試一次"
 
-#: src/sbackup/ui/indicator_core.py:649
+#: src/sbackup/ui/indicator_core.py:651
 msgid ""
 "Attempt of starting another instance of Simple Backup while this one is "
 "already running."
-msgstr ""
+msgstr "嘗試在 Simple Backup 執行時開啟另外一個實體。"
 
-#: src/sbackup/ui/indicator_core.py:659
+#: src/sbackup/ui/indicator_core.py:661
 #, python-format
 msgid "Unable to present window: %s"
-msgstr ""
+msgstr "無法顯示視窗：%s"
 
-#: src/sbackup/ui/indicator_core.py:675
+#: src/sbackup/ui/indicator_core.py:677
 #, python-format
 msgid "Do you really want to cancel the backup process of profile '%s'?"
-msgstr ""
+msgstr "您真的要取消設定檔「%s」的備份作業？"
 
-#: src/sbackup/ui/indicator_core.py:679
+#: src/sbackup/ui/indicator_core.py:681
 msgid "Cancel running backup process?"
-msgstr ""
+msgstr "取消進行中的備份作業？"
 
-#: src/sbackup/ui/indicator_core.py:696
+#: src/sbackup/ui/indicator_core.py:698
 msgid "Unable to cancel backup process."
-msgstr ""
-
-#: src/sbackup/ui/indicator_core.py:758
-#, python-format
-msgid "Profile: %s"
-msgstr ""
-
-#: src/sbackup/ui/indicator_core.py:759
-#, python-format
-msgid "Size of backup: %s"
-msgstr ""
+msgstr "無法取消備份作業。"
 
 #: src/sbackup/ui/indicator_core.py:760
 #, python-format
-msgid "%.1f%% processed"
-msgstr ""
+msgid "Profile: %s"
+msgstr "設定檔：%s"
 
 #: src/sbackup/ui/indicator_core.py:761
 #, python-format
-msgid "Remaining time: %s"
-msgstr ""
+msgid "Size of backup: %s"
+msgstr "備份檔大小：%s"
 
-#: src/sbackup/ui/indicator_core.py:807
+#: src/sbackup/ui/indicator_core.py:762
+#, python-format
+msgid "%.1f%% processed"
+msgstr "%.1f%% 已完成"
+
+#: src/sbackup/ui/indicator_core.py:763
+#, python-format
+msgid "Remaining time: %s"
+msgstr "剩餘時間：%s"
+
+#: src/sbackup/ui/indicator_core.py:809
 #, python-format
 msgid "PID of backup process being canceled: %s"
-msgstr ""
+msgstr "備份作業的 PID 被取消： %s"
 
-#: src/sbackup/ui/indicator_core.py:812
+#: src/sbackup/ui/indicator_core.py:814
 #, python-format
 msgid "Unable to send signal to process %s"
-msgstr ""
+msgstr "無法傳送訊息至作業 %s"
 
-#: src/sbackup/ui/indicator_core.py:813
+#: src/sbackup/ui/indicator_core.py:815
 #, python-format
 msgid "Sending signal using gksu to process %s"
-msgstr ""
+msgstr "使用 gksu 傳送訊息至作業 %s"
 
-#: src/sbackup/ui/indicator_core.py:817
+#: src/sbackup/ui/indicator_core.py:819
 #, python-format
 msgid "Sending signal using gksu to process %s failed"
-msgstr ""
+msgstr "使用 gksu 傳送訊息至作業 %s 失敗"
 
-#: src/sbackup/ui/indicator_core.py:852
+#: src/sbackup/ui/indicator_core.py:854
 #, python-format
 msgid ""
 "<b>Unable to find specified target directory</b>\n"
@@ -1339,86 +1325,90 @@ msgid ""
 "The specified target directory '%s' was not found.\n"
 "\n"
 msgstr ""
+"<b>無法找到指定的目標資料夾</b>\n"
+"\n"
+"未發現指定的目標資料夾「%s」。\n"
+"\n"
 
-#: src/sbackup/ui/indicator_core.py:853
+#: src/sbackup/ui/indicator_core.py:855
 #, python-format
 msgid ""
 "You can try to use the specified target again or cancel the profile "
 "execution. The specified destination is automatically used in %s seconds."
-msgstr ""
+msgstr "您可以再次嘗試使用指定的目標，或是取消設定檔的執行。該指定目的地在 %s 秒前被自動使用過。"
 
-#: src/sbackup/ui/indicator_core.py:880 src/sbackup/ui/indicator_core.py:922
-#: src/sbackup/ui/indicator_core.py:940 src/sbackup/ui/indicator_core.py:948
-#: src/sbackup/ui/indicator_core.py:965
+#: src/sbackup/ui/indicator_core.py:882 src/sbackup/ui/indicator_core.py:924
+#: src/sbackup/ui/indicator_core.py:942 src/sbackup/ui/indicator_core.py:950
+#: src/sbackup/ui/indicator_core.py:967
 msgid "unknown"
-msgstr ""
-
-#: src/sbackup/ui/indicator_core.py:901
-msgid "less than 1 minute"
-msgstr ""
+msgstr "未知"
 
 #: src/sbackup/ui/indicator_core.py:903
-msgid "about 2 minutes"
-msgstr ""
+msgid "less than 1 minute"
+msgstr "不超過 1 分鐘"
 
 #: src/sbackup/ui/indicator_core.py:905
-msgid "about 3 minutes"
-msgstr ""
+msgid "about 2 minutes"
+msgstr "大約 2 分鐘"
 
 #: src/sbackup/ui/indicator_core.py:907
-msgid "about 4 minutes"
-msgstr ""
+msgid "about 3 minutes"
+msgstr "大約 3 分鐘"
 
 #: src/sbackup/ui/indicator_core.py:909
-msgid "about 5 minutes"
-msgstr ""
+msgid "about 4 minutes"
+msgstr "大約 4 分鐘"
 
 #: src/sbackup/ui/indicator_core.py:911
+msgid "about 5 minutes"
+msgstr "大約 5 分鐘"
+
+#: src/sbackup/ui/indicator_core.py:913
 #, python-format
 msgid "about %.0f minutes"
-msgstr ""
+msgstr "大約 %.0f 分鐘"
 
-#: src/sbackup/ui/indicator_core.py:921
+#: src/sbackup/ui/indicator_core.py:923
 msgid "In progress"
-msgstr ""
+msgstr "進行中"
 
-#: src/sbackup/ui/indicator_core.py:931 src/sbackup/ui/indicator_core.py:957
+#: src/sbackup/ui/indicator_core.py:933 src/sbackup/ui/indicator_core.py:959
 msgid "finished"
-msgstr ""
+msgstr "完成"
 
-#: src/sbackup/ui/indicator_core.py:939
+#: src/sbackup/ui/indicator_core.py:941
 msgid "Progress: unknown"
-msgstr ""
+msgstr "進程：未知"
 
-#: src/sbackup/ui/indicator_core.py:946
+#: src/sbackup/ui/indicator_core.py:948
 msgid "Backup is being prepared"
-msgstr ""
+msgstr "備份準備中"
 
-#: src/sbackup/ui/indicator_core.py:947
+#: src/sbackup/ui/indicator_core.py:949
 msgid "Collecting file info"
-msgstr ""
+msgstr "收集資料中"
 
-#: src/sbackup/ui/indicator_core.py:956
+#: src/sbackup/ui/indicator_core.py:958
 msgid "Progress: canceled"
-msgstr ""
+msgstr "進程：取消"
 
-#: src/sbackup/ui/indicator_core.py:978
+#: src/sbackup/ui/indicator_core.py:980
 msgid "An error occurred"
-msgstr ""
+msgstr "發生錯誤"
 
-#: src/sbackup/ui/indicator_core.py:1011
+#: src/sbackup/ui/indicator_core.py:1013
 msgid "Another `Simple Backup Indicator` is already running."
-msgstr ""
+msgstr "另一個「Simple Backup 指示器」已經在執行當中。"
 
-#: src/sbackup/ui/indicator_core.py:1035
+#: src/sbackup/ui/indicator_core.py:1037
 #, python-format
 msgid "Initialization of GTK+ failed: %s"
-msgstr ""
+msgstr "GTK+ 初始化失敗：%s"
 
 #: src/sbackup/ui/misc.py:294
 #, python-format
 msgid "%s   (Administrator mode)"
-msgstr ""
+msgstr "%s   (系統管理員模式)"
 
 #: src/sbackup/ui/misc.py:324
 #, python-format
@@ -1430,39 +1420,44 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
+"發生不預期的錯誤。關閉這個訊息窗並重啟本程式。\n"
+"\n"
+"請至 https://bugs.launchpad.net/sbackup 回報該錯誤。\n"
+"\n"
+"%s"
 
 #: src/sbackup/ui/misc.py:325
 msgid "Sorry, this should not have happened"
-msgstr ""
+msgstr "抱歉，這本來不應該發生的"
 
 #: src/sbackup/ui/restoregui.py:78
 msgid "Restore..."
-msgstr ""
+msgstr "還原..."
 
-#: src/sbackup/ui/restoregui.py:79 data/ui/sbackup-restore.glade:845
+#: src/sbackup/ui/restoregui.py:79 data/ui/sbackup-restore.glade:765
 msgid "Restore as..."
-msgstr ""
+msgstr "還原至..."
 
 #: src/sbackup/ui/restoregui.py:80
 msgid "Revert..."
-msgstr ""
+msgstr "回溯..."
 
-#: src/sbackup/ui/restoregui.py:81 data/ui/sbackup-restore.glade:877
+#: src/sbackup/ui/restoregui.py:81 data/ui/sbackup-restore.glade:797
 msgid "Revert as..."
-msgstr ""
+msgstr "回溯至..."
 
 #: src/sbackup/ui/restoregui.py:128 data/ui/sbackup-restore.glade:111
-#: data/ui/sbackup-restore.glade:591
+#: data/ui/sbackup-restore.glade:511
 msgid "n.a."
-msgstr ""
+msgstr "不適用"
 
 #: src/sbackup/ui/restoregui.py:146 src/sbackup/ui/restoregui.py:163
 msgid "Snapshots"
-msgstr ""
+msgstr "快照"
 
 #: src/sbackup/ui/restoregui.py:147
 msgid "Version"
-msgstr ""
+msgstr "版本"
 
 #: src/sbackup/ui/restoregui.py:154 data/ui/sbackup-config.glade:4063
 msgid "Path"
@@ -1470,23 +1465,23 @@ msgstr "路徑"
 
 #: src/sbackup/ui/restoregui.py:159
 msgid "State"
-msgstr ""
+msgstr "狀態"
 
 #: src/sbackup/ui/restoregui.py:187
 msgid "Connect to destination..."
-msgstr ""
+msgstr "連接至目的地..."
 
 #: src/sbackup/ui/restoregui.py:211
 msgid "Specified path does not exist"
-msgstr ""
+msgstr "指定的目錄不存在"
 
 #: src/sbackup/ui/restoregui.py:257
 msgid "Ready"
-msgstr ""
+msgstr "就緒"
 
 #: src/sbackup/ui/restoregui.py:371
 msgid "No destination specified"
-msgstr ""
+msgstr "未指定任何目的地"
 
 #: src/sbackup/ui/restoregui.py:388
 msgid "Choose a source folder"
@@ -1494,45 +1489,45 @@ msgstr "選擇一個來源資料夾"
 
 #: src/sbackup/ui/restoregui.py:405
 msgid "Reading snapshots..."
-msgstr ""
+msgstr "讀取快照..."
 
 #: src/sbackup/ui/restoregui.py:428
 msgid "Reading directory content..."
-msgstr ""
+msgstr "讀取資料夾內容..."
 
 #: src/sbackup/ui/restoregui.py:458 src/sbackup/ui/restoregui.py:496
 msgid "Loading ..."
-msgstr "載入中"
+msgstr "載入中 ..."
 
 #: src/sbackup/ui/restoregui.py:539
 msgid "Reading files from snapshot..."
-msgstr ""
+msgstr "讀取快照內的檔案..."
 
 #: src/sbackup/ui/restoregui.py:552
 msgid "Simple Backup restore error"
-msgstr ""
+msgstr "Simple Backup 復原錯誤"
 
 #: src/sbackup/ui/restoregui.py:553
 msgid "An error occurred while reading snapshot"
-msgstr ""
+msgstr "讀取快照時發生錯誤"
 
 #: src/sbackup/ui/restoregui.py:557
 msgid "This snapshot seems empty."
-msgstr ""
+msgstr "這個快照是空的。"
 
 #: src/sbackup/ui/restoregui.py:576
 msgid "Reading backup snapshot..."
-msgstr ""
+msgstr "讀取備份快照..."
 
 #: src/sbackup/ui/restoregui.py:599
 msgid "No backups found for this day."
-msgstr ""
+msgstr "未發現任何該天的備份。"
 
-#: src/sbackup/ui/restoregui.py:614
+#: src/sbackup/ui/restoregui.py:614 src/sbackup/ui/restoregui.py:771
 #, python-format
 msgid ""
 "Snapshot version is not supported (Only %(supportedversion)s is supported). "
-"Version '%(currentversion)s' found. You should upgrade it. "
+"Version '%(currentversion)s' found."
 msgstr ""
 
 #: src/sbackup/ui/restoregui.py:643
@@ -1542,74 +1537,22 @@ msgstr "選擇還原位置"
 #: src/sbackup/ui/restoregui.py:662
 #, python-format
 msgid "Do you really want to revert '%s'?"
-msgstr ""
+msgstr "您真的要回溯「%s」？"
 
 #: src/sbackup/ui/restoregui.py:676
 msgid "Select revert location"
-msgstr ""
+msgstr "選擇回溯位置"
 
 #: src/sbackup/ui/restoregui.py:685
 #, python-format
 msgid "Do you really want to revert '%(source)s' to '%(dir)s'?"
-msgstr ""
+msgstr "您真的要回溯「%(source)s」至「%(dir)s」？"
 
 #: src/sbackup/ui/restoregui.py:763
 msgid "Reading snapshot..."
-msgstr ""
+msgstr "讀取快照中..."
 
 #: src/sbackup/ui/restoregui.py:782
-msgid "The version of the snapshot is greater than the supported one!"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:792
-#, python-format
-msgid ""
-"Upgrading the selected snapshot `%s` might corrupt your backup for this "
-"particular point in time. You cannot undo this operation. It is recommended "
-"to create a copy of the snapshot directory before upgrading it. The upgrade "
-"process takes a while - be patient.\n"
-"\n"
-"Are you sure that you want to upgrade the snapshot now?"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:796
-msgid "Do you really want to upgrade snapshot?"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:800
-#, python-format
-msgid "Upgrade snapshot '%s'"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:809
-msgid "Snapshot was sucessfully upgraded."
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:810
-msgid "Simple Backup upgrade"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:811
-msgid "Upgrade finished"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:814
-#, python-format
-msgid ""
-"While attempting to upgrade snapshot the following error occurred:\n"
-"%s"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:817
-msgid "Unable to upgrade snapshot"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:838
-#, python-format
-msgid "Do you really want to rebase '%(current)s' on '%(base)s' ?"
-msgstr ""
-
-#: src/sbackup/ui/restoregui.py:856
 #, python-format
 msgid ""
 "Deleting the selected snapshot `%s` will remove your backup for this "
@@ -1617,23 +1560,28 @@ msgid ""
 "\n"
 "Are you sure that you want to remove the snapshot permanently?"
 msgstr ""
+"刪除選擇的快照「%s」將會移除您在這一時間所備份的資料。您無法復原這個動作。\n"
+"\n"
+"您確定要永遠刪除這個快照？"
 
-#: src/sbackup/ui/restoregui.py:860
+#: src/sbackup/ui/restoregui.py:786
 msgid "Do you really want to remove snapshot?"
-msgstr ""
+msgstr "您真的要刪除快照嗎？"
 
-#: src/sbackup/ui/restoregui.py:869
+#: src/sbackup/ui/restoregui.py:795
 #, python-format
 msgid ""
 "While attempting to delete snapshot the following error occurred:\n"
 "%s"
 msgstr ""
+"當嘗試刪除快照時發生下列錯誤：\n"
+"%s"
 
-#: src/sbackup/ui/restoregui.py:872
+#: src/sbackup/ui/restoregui.py:798
 msgid "Unable to delete snapshot"
-msgstr ""
+msgstr "無法刪除快照"
 
-#: src/sbackup/ui/restoregui.py:878
+#: src/sbackup/ui/restoregui.py:804
 #, python-format
 msgid ""
 "The selected snapshot '%s' is referenced by more recent snapshots as base "
@@ -1641,58 +1589,68 @@ msgid ""
 "\n"
 "Remove all of these child snapshots in order to delete this snapshot."
 msgstr ""
+"選擇的快照「%s」已被更新的快照作為參考用的母快照。\n"
+"\n"
+"此快照必須先移除其所有子快照之後才能刪除。"
 
-#: src/sbackup/ui/restoregui.py:880
+#: src/sbackup/ui/restoregui.py:806
 msgid "Unable to remove snapshot"
-msgstr ""
+msgstr "無法移除快照"
 
-#: src/sbackup/ui/restoregui.py:888
+#: src/sbackup/ui/restoregui.py:814
 msgid "Termination in progress"
-msgstr ""
+msgstr "作業中斷"
 
-#: src/sbackup/ui/restoregui.py:904 src/sbackup/ui/restoregui.py:910
-#: src/sbackup/ui/restoregui.py:916 src/sbackup/ui/restoregui.py:922
-#: data/ui/sbackup-restore.glade:1039
+#: src/sbackup/ui/restoregui.py:830 src/sbackup/ui/restoregui.py:836
+#: src/sbackup/ui/restoregui.py:842 src/sbackup/ui/restoregui.py:848
+#: data/ui/sbackup-restore.glade:959
 msgid "Simple Backup restoration"
-msgstr ""
+msgstr "Simple Backup 還原"
 
-#: src/sbackup/ui/restoregui.py:905 src/sbackup/ui/restoregui.py:911
+#: src/sbackup/ui/restoregui.py:831 src/sbackup/ui/restoregui.py:837
 msgid "<b>Restoring of selected files</b>"
-msgstr ""
+msgstr "<b>還原所選擇的檔案</b>"
 
-#: src/sbackup/ui/restoregui.py:906
+#: src/sbackup/ui/restoregui.py:832
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> is in progress."
-msgstr ""
+msgstr "正在進行<tt>「%s」</tt>的還原。"
 
-#: src/sbackup/ui/restoregui.py:907
+#: src/sbackup/ui/restoregui.py:833
 #, python-format
 msgid "Restoring of <tt>'%s'</tt> was successful."
-msgstr ""
+msgstr "<tt>「%s」</tt>的還原成功。"
 
-#: src/sbackup/ui/restoregui.py:908
+#: src/sbackup/ui/restoregui.py:834
 #, python-format
 msgid ""
 "Restoring of <tt>'%s'</tt> was not successful.\n"
 "\n"
 "Following error occurred:\n"
 msgstr ""
+"<tt>「%s」</tt>的還原沒有成功。\n"
+"\n"
+"發生下列錯誤：\n"
 
-#: src/sbackup/ui/restoregui.py:912
+#: src/sbackup/ui/restoregui.py:838
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> is in progress."
 msgstr ""
+"正在進行<tt>「%(source)s」</tt>\n"
+"至<tt>「%(dirname)s」</tt>的還原。"
 
-#: src/sbackup/ui/restoregui.py:913
+#: src/sbackup/ui/restoregui.py:839
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
+"<tt>「%(source)s」</tt>\n"
+"至<tt>「%(dirname)s」</tt>的還原成功。"
 
-#: src/sbackup/ui/restoregui.py:914
+#: src/sbackup/ui/restoregui.py:840
 #, python-format
 msgid ""
 "Restoring of <tt>'%(source)s'</tt>\n"
@@ -1700,44 +1658,55 @@ msgid ""
 "\n"
 "Following error occurred:\n"
 msgstr ""
+"<tt>「%(source)s」</tt>\n"
+"至<tt>「%(dirname)s」</tt>的還原沒有成功。\n"
+"\n"
+"發生下列錯誤：\n"
 
-#: src/sbackup/ui/restoregui.py:917 src/sbackup/ui/restoregui.py:923
+#: src/sbackup/ui/restoregui.py:843 src/sbackup/ui/restoregui.py:849
 msgid "<b>Reverting selected files</b>"
-msgstr ""
+msgstr "<b>回溯所選擇的檔案</b>"
 
-#: src/sbackup/ui/restoregui.py:918
+#: src/sbackup/ui/restoregui.py:844
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> is in progress.\n"
-msgstr ""
+msgstr "正在進行<tt>「%s」</tt>的回溯。\n"
 
-#: src/sbackup/ui/restoregui.py:919
+#: src/sbackup/ui/restoregui.py:845
 #, python-format
 msgid "Reverting of <tt>'%s'</tt> was successful."
-msgstr ""
+msgstr "<tt>「%s」</tt>的回溯成功。"
 
-#: src/sbackup/ui/restoregui.py:920
+#: src/sbackup/ui/restoregui.py:846
 #, python-format
 msgid ""
 "Reverting of <tt>'%s'</tt> was not successful.\n"
 "\n"
 "Following error occurred:\n"
 msgstr ""
+"<tt>「%s」</tt>的回溯沒有成功。\n"
+"\n"
+"發生下列錯誤：\n"
 
-#: src/sbackup/ui/restoregui.py:924
+#: src/sbackup/ui/restoregui.py:850
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> is in progress."
 msgstr ""
+"正在進行<tt>「%(source)s」</tt>\n"
+"至<tt>「%(dirname)s」</tt>的回溯。"
 
-#: src/sbackup/ui/restoregui.py:925
+#: src/sbackup/ui/restoregui.py:851
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
 "to <tt>'%(dirname)s'</tt> was successful."
 msgstr ""
+"<tt>「%(source)s」</tt>\n"
+"至<tt>「%(dirname)s」</tt>的回溯成功。"
 
-#: src/sbackup/ui/restoregui.py:926
+#: src/sbackup/ui/restoregui.py:852
 #, python-format
 msgid ""
 "Reverting of <tt>'%(source)s'</tt>\n"
@@ -1745,151 +1714,152 @@ msgid ""
 "\n"
 "Following error occurred:\n"
 msgstr ""
+"<tt>「%(source)s」</tt>\n"
+"至<tt>「%(dirname)s」</tt>的回溯沒有成功。\n"
+"\n"
+"發生下列錯誤：\n"
 
 #: src/sbackup/util/__init__.py:439
 #, python-format
 msgid "%(mb)d MiB %(kb)d KiB"
-msgstr ""
+msgstr "%(mb)d MiB %(kb)d KiB"
 
 #: src/sbackup/util/__init__.py:442
 #, python-format
 msgid "%(mb)d MiB %(kb)d KiB %(bytes)d"
-msgstr ""
+msgstr "%(mb)d MiB %(kb)d KiB %(bytes)d"
 
 #: src/sbackup/util/__init__.py:447
 #, python-format
 msgid "%(mb)d MB %(kb)d kB"
-msgstr ""
+msgstr "%(mb)d MB %(kb)d kB"
 
 #: src/sbackup/util/__init__.py:450
 #, python-format
 msgid "%(mb)d MB %(kb)d kB %(bytes)d"
-msgstr ""
+msgstr "%(mb)d MB %(kb)d kB %(bytes)d"
 
 #: src/sbackup/util/filecollect.py:335
 #, python-format
-msgid "File '%(file)s' does not exist."
-msgstr ""
-
-#: src/sbackup/util/filecollect.py:348
-#, python-format
 msgid "File '%(file)s' is not accessable with error '%(error)s'."
-msgstr ""
+msgstr "檔案「%(file)s」無法被存取，錯誤訊息「%(error)s」。"
 
-#: src/sbackup/util/filecollect.py:364
+#: src/sbackup/util/filecollect.py:351
 #, python-format
 msgid ""
 "File '%(file)s' cannot be opened for read access. Operation timed out."
-msgstr ""
+msgstr "檔案「%(file)s」無法以讀取權限開啟。操作時間已逾時。"
 
-#: src/sbackup/util/filecollect.py:368
+#: src/sbackup/util/filecollect.py:355
 #, python-format
 msgid ""
 "File '%(file)s' cannot be opened for read access with error '%(error)s'."
-msgstr ""
+msgstr "檔案「%(file)s」無法以讀取權限開啟，錯誤訊息「%(error)s」。"
 
-#: src/sbackup/util/filecollect.py:385
-#, python-format
-msgid "File '%(file)s' is backup's target directory."
-msgstr ""
-
-#: src/sbackup/util/filecollect.py:394
+#: src/sbackup/util/filecollect.py:372
 #, python-format
 msgid "Symbolic link '%(path)s' -> '%(ln_target)s' is a circular symlink."
-msgstr ""
+msgstr "軟連結「%(path)s」->「%(ln_target)s」是循環軟連結。"
 
-#: src/sbackup/util/filecollect.py:414
+#: src/sbackup/util/filecollect.py:388
+#, python-format
+msgid "File '%(file)s' is backup's target directory."
+msgstr "檔案「%(file)s」是備份的目標資料夾。"
+
+#: src/sbackup/util/filecollect.py:393
+#, python-format
+msgid "Path '%(file)s' defined in excludes list."
+msgstr "路徑「%(file)s」已定義於排除列表中。"
+
+#: src/sbackup/util/filecollect.py:401
+#, python-format
+msgid "File '%(file)s' matches regular expression '%(regex)s'."
+msgstr "檔案「%(file)s」符合正規表達式「%(regex)s」。"
+
+#: src/sbackup/util/filecollect.py:419
 #, python-format
 msgid ""
 "File '%(file)s' exceeds maximum file size ( %(filesize)s > %(maxsize)s)."
-msgstr ""
+msgstr "檔案「%(file)s」超過檔案大小設限值 (%(filesize)s > %(maxsize)s)。"
 
-#: src/sbackup/util/filecollect.py:424
-#, python-format
-msgid "File '%(file)s' matches regular expression '%(regex)s'."
-msgstr ""
-
-#: src/sbackup/util/filecollect.py:430
-#, python-format
-msgid "Path '%(file)s' defined in excludes list."
-msgstr ""
-
-#: src/sbackup/util/filecollect.py:501
+#: src/sbackup/util/filecollect.py:497
 #, python-format
 msgid "Error while checking directory '%(dir)s': %(error)s."
-msgstr ""
+msgstr "在檢查目錄「%(dir)s」時發生錯誤：%(error)s。"
 
-#: src/sbackup/util/filecollect.py:552
+#: src/sbackup/util/filecollect.py:548
 msgid "Empty regular expression found. Skipped."
-msgstr ""
+msgstr "發現空白的正規表達式。已跳過。"
 
-#: src/sbackup/util/filecollect.py:558
+#: src/sbackup/util/filecollect.py:554
 #, python-format
 msgid "Invalid regular expression ('%s') found. Skipped."
-msgstr ""
+msgstr "發現無效的正規表達式(「%s」)。已跳過。"
 
-#: src/sbackup/util/filecollect.py:577
+#: src/sbackup/util/filecollect.py:573
 msgid "No directories to backup defined."
-msgstr ""
+msgstr "沒有定義要備份的資料夾。"
 
 #: src/sbackup/util/lock.py:76
 msgid "Another application instance is already running."
-msgstr ""
+msgstr "有另外一個程式正在運行。"
 
 #: src/sbackup/util/lock.py:78
 msgid "Invalid lock file found. Is being removed."
-msgstr ""
+msgstr "發現無效的鎖定檔。檔案已移除。"
 
 #: src/sbackup/util/lock.py:128 src/sbackup/util/lock.py:142
 #, python-format
 msgid "Unable to remove lock file: %s"
-msgstr ""
+msgstr "無法找到鎖定檔：%s"
 
 #: src/sbackup/util/lock.py:132 src/sbackup/util/lock.py:144
 msgid "Unable to remove lock file: File not found."
-msgstr ""
+msgstr "無法找到鎖定檔：檔案未發現。"
 
 #: data/ui/sbackup-config.glade:11
 msgid "Exclude file type"
-msgstr ""
+msgstr "排除檔案類型"
 
 #: data/ui/sbackup-config.glade:26
 msgid "Standard file types:"
-msgstr ""
+msgstr "常見檔案類型："
 
 #: data/ui/sbackup-config.glade:63
 msgid "Custom defined file type with "
-msgstr ""
+msgstr "自定義檔案類型為 "
 
 #: data/ui/sbackup-config.glade:93
 msgid "file extension"
-msgstr ""
+msgstr "副檔名"
 
 #: data/ui/sbackup-config.glade:163
 msgid "Exclude by regex"
-msgstr ""
+msgstr "從正規表示法排除"
 
 #: data/ui/sbackup-config.glade:180
 msgid ""
 "Enter a regular expression.\n"
 "Files and directories matching this expression will be excluded from backup."
 msgstr ""
+"輸入一條正規表達式。\n"
+"凡是符合表達式的檔案和資料夾將會從備份排除。"
 
 #: data/ui/sbackup-config.glade:257
 msgid "Enter the remote target to include"
-msgstr ""
+msgstr "輸入要包括的遠端目標"
 
 #: data/ui/sbackup-config.glade:278
 msgid "Choose a plugin to get the format"
-msgstr ""
+msgstr "選擇一個附加元件以取得格式"
 
 #: data/ui/sbackup-config.glade:295
 msgid "Choose your plugin :"
-msgstr ""
+msgstr "選擇您的附加元件："
 
 #: data/ui/sbackup-config.glade:367
 msgid "Check"
-msgstr ""
+msgstr "檢查"
 
 #: data/ui/sbackup-config.glade:479
 msgid ""
@@ -1900,21 +1870,26 @@ msgid ""
 "\n"
 "Do you want to save the configuration now?"
 msgstr ""
+"<b>儲存變更的設定？</b>\n"
+"\n"
+"設定已被變更。若您想要使用調整過的設定，您必須先儲存它。\n"
+"\n"
+"您要現在儲存設定嗎？"
 
 #: data/ui/sbackup-config.glade:572
 msgid "Configuration Profile Manager"
-msgstr ""
+msgstr "組態設定檔管理員"
 
 #: data/ui/sbackup-config.glade:594
 msgid ""
 "You can set up multiple configuration profiles which are processed when "
 "performing a backup. Each profile has its own set of settings including "
 "backup destination, backup format etc."
-msgstr ""
+msgstr "您可以設置多個組態設定檔，它們將在進行備份時執行。每個設定檔都有自己的一套設定組，包含備份目的地、備份格式等等。"
 
 #: data/ui/sbackup-config.glade:613
 msgid "<b>Configuration profiles</b>"
-msgstr ""
+msgstr "<b>組態設定檔</b>"
 
 #: data/ui/sbackup-config.glade:785
 msgid ""
@@ -1923,74 +1898,77 @@ msgid ""
 "Please enter the new profile name and set the according checkbox in order to "
 "enable resp. disable it."
 msgstr ""
+"<b>加入新的設定檔</b>\n"
+"\n"
+"請輸入新設定檔所用的名稱，並用下方的勾選框來決定要啟用還是停用它。"
 
 #: data/ui/sbackup-config.glade:810
 msgid "Profile name"
-msgstr ""
+msgstr "設定檔名稱"
 
 #: data/ui/sbackup-config.glade:836
 msgid "Enabled"
-msgstr ""
+msgstr "啟用"
 
 #: data/ui/sbackup-config.glade:915 data/ui/sbackup-restore.glade:7
 msgid "Simple Backup Suite"
-msgstr ""
+msgstr "Simple Backup Suite"
 
 #: data/ui/sbackup-config.glade:932
 msgid "_File"
-msgstr ""
+msgstr "檔案(_F)"
 
 #: data/ui/sbackup-config.glade:971
 msgid "Save as..."
-msgstr ""
+msgstr "儲存至..."
 
 #: data/ui/sbackup-config.glade:1008
 msgid "_Tools"
-msgstr ""
+msgstr "工具(_T)"
 
 #: data/ui/sbackup-config.glade:1016 data/ui/sbackup-config.glade:1140
 msgid "Set default settings..."
-msgstr ""
+msgstr "設回預設設定..."
 
 #: data/ui/sbackup-config.glade:1037
 msgid "Profile Manager..."
-msgstr ""
+msgstr "設定檔管理員..."
 
 #: data/ui/sbackup-config.glade:1058
 msgid "Make backup now"
-msgstr ""
+msgstr "現在就建立備份"
 
 #: data/ui/sbackup-config.glade:1079
 msgid "_Help"
-msgstr ""
+msgstr "幫助(_H)"
 
 #: data/ui/sbackup-config.glade:1087
 msgid "_View all help topics"
-msgstr ""
+msgstr "查看幫助主題(_V)"
 
 #: data/ui/sbackup-config.glade:1103
 msgid "_About this program"
-msgstr ""
+msgstr "關於本程式(_A)"
 
 #: data/ui/sbackup-config.glade:1154
 msgid "Reload configuration"
-msgstr ""
+msgstr "重新載入設定"
 
 #: data/ui/sbackup-config.glade:1168
 msgid "Save configuration"
-msgstr ""
+msgstr "儲存設定"
 
 #: data/ui/sbackup-config.glade:1191
 msgid "Make a backup now"
-msgstr ""
+msgstr "現在就建立備份"
 
 #: data/ui/sbackup-config.glade:1214
 msgid "Open the profile manager"
-msgstr ""
+msgstr "開啟設定檔管理員"
 
 #: data/ui/sbackup-config.glade:1215
 msgid "Profiles"
-msgstr ""
+msgstr "設定檔"
 
 #: data/ui/sbackup-config.glade:1253
 msgid ""
@@ -1998,33 +1976,38 @@ msgid ""
 "gzip\n"
 "bzip2"
 msgstr ""
+"無\n"
+"gzip\n"
+"bzip2"
 
 #: data/ui/sbackup-config.glade:1271
 msgid ""
 "Compression format\n"
 "Default is set to uncompressed backups."
 msgstr ""
+"壓縮格式\n"
+"預設設定為無壓縮備份。"
 
 #: data/ui/sbackup-config.glade:1290 data/ui/sbackup-config.glade:1403
 msgid ""
 "You can split the snapshot to make backup on some filesystem that doesn't "
 "support large files. This functionality can not be used if the backup is "
 "compressed."
-msgstr ""
+msgstr "您可以將快照分割，以便備份在不支援大檔案的檔案系統上。若您要壓縮備份，此功能將無法使用。"
 
 #: data/ui/sbackup-config.glade:1330
 msgid "Do a full backup at least once every"
-msgstr ""
+msgstr "每隔多久做一次完整備份"
 
 #: data/ui/sbackup-config.glade:1339
 msgid ""
 "Unless a set number of days has passed since the last full backup, "
 "incremental backups will be done."
-msgstr ""
+msgstr "除非距最近一次的完整備份已超過設定的天數，否則將進行增量備份。"
 
 #: data/ui/sbackup-config.glade:1356 data/ui/sbackup-config.glade:3015
 msgid "days"
-msgstr ""
+msgstr "天"
 
 #: data/ui/sbackup-config.glade:1370
 msgid " "
@@ -2032,148 +2015,150 @@ msgstr " "
 
 #: data/ui/sbackup-config.glade:1380 data/ui/sbackup-config.glade:2323
 msgid "MiB"
-msgstr ""
+msgstr "MiB"
 
 #: data/ui/sbackup-config.glade:1405
 msgid "Split backup archives into several chunks"
-msgstr ""
+msgstr "將備份存檔分割為若干塊"
 
 #: data/ui/sbackup-config.glade:1438 data/ui/sbackup-config.glade:2627
 #: data/ui/sbackup-config.glade:2863 data/ui/sbackup-config.glade:3111
 #: data/ui/sbackup-config.glade:3856
 msgid "Help"
-msgstr ""
+msgstr "幫助"
 
 #: data/ui/sbackup-config.glade:1442 data/ui/sbackup-config.glade:2632
 msgid "Show help topic about configuration GUI."
-msgstr ""
+msgstr "顯示有關設置 GUI 的幫助主題。"
 
 #: data/ui/sbackup-config.glade:1475
 msgid "General"
-msgstr ""
+msgstr "一般"
 
 #: data/ui/sbackup-config.glade:1495
 msgid "<b>Included files and directories</b>"
-msgstr ""
+msgstr "<b>要被包含的檔案和資料夾</b>"
 
 #: data/ui/sbackup-config.glade:1570 data/ui/sbackup-config.glade:1818
 #: data/ui/sbackup-config.glade:2023 data/ui/sbackup-config.glade:2181
 msgid "Remove"
-msgstr ""
+msgstr "移除"
 
 #: data/ui/sbackup-config.glade:1620 data/ui/sbackup-config.glade:1868
 msgid "Add File"
-msgstr ""
+msgstr "加入檔案"
 
 #: data/ui/sbackup-config.glade:1671 data/ui/sbackup-config.glade:1919
 msgid "Add Directory"
-msgstr ""
+msgstr "加入資料夾"
 
 #: data/ui/sbackup-config.glade:1718
 msgid "Include"
-msgstr ""
+msgstr "包含"
 
 #: data/ui/sbackup-config.glade:1739
 msgid "<b>Excluded files and directories</b>"
-msgstr ""
+msgstr "<b>要被排除的檔案和資料夾</b>"
 
 #: data/ui/sbackup-config.glade:1952
 msgid "Paths"
-msgstr ""
+msgstr "路徑"
 
 #: data/ui/sbackup-config.glade:2074 data/ui/sbackup-config.glade:2232
 msgid "Add"
-msgstr ""
+msgstr "加入"
 
 #: data/ui/sbackup-config.glade:2109
 msgid "File types"
-msgstr ""
+msgstr "檔案類型"
 
 #: data/ui/sbackup-config.glade:2267
 msgid ""
 "Regular\n"
 "Expressions"
 msgstr ""
+"正規\n"
+"表示法"
 
 #: data/ui/sbackup-config.glade:2288
 msgid "Do not backup files bigger than"
-msgstr ""
+msgstr "備份檔案大小限制為"
 
 #: data/ui/sbackup-config.glade:2344
 msgid "Follow symbolic links"
-msgstr ""
+msgstr "追隨符號連結"
 
 #: data/ui/sbackup-config.glade:2373
 msgid "Others"
-msgstr ""
+msgstr "其他"
 
 #: data/ui/sbackup-config.glade:2400
 msgid "Exclude"
-msgstr ""
+msgstr "排除"
 
 #: data/ui/sbackup-config.glade:2421
 msgid "Use default backup directory"
-msgstr ""
+msgstr "使用預設的備份資料夾"
 
 #: data/ui/sbackup-config.glade:2446
 msgid "/var/backup"
-msgstr ""
+msgstr "/var/backup"
 
 #: data/ui/sbackup-config.glade:2472
 msgid "Use custom local backup directory"
-msgstr ""
+msgstr "使用自訂的本地備份資料夾"
 
 #: data/ui/sbackup-config.glade:2500
 msgid "Select the destination folder"
-msgstr ""
+msgstr "選擇目的資料夾"
 
 #: data/ui/sbackup-config.glade:2526
 msgid "Use a remote site"
-msgstr ""
+msgstr "使用遠端站台"
 
 #: data/ui/sbackup-config.glade:2568
 msgid "ssh://username:password@example.com/remote/dir/"
-msgstr ""
+msgstr "ssh://username:password@example.com/remote/dir/"
 
 #: data/ui/sbackup-config.glade:2580
 msgid "Connect..."
-msgstr ""
+msgstr "連線..."
 
 #: data/ui/sbackup-config.glade:2672
 msgid ""
 "<i>The selected destination is not writeable with current permissions. "
 "Backups cannot be stored there.</i>"
-msgstr ""
+msgstr "<i>目前擁有的權限無法寫入指定目的資料夾。無法在此存放備份檔案。</i>"
 
 #: data/ui/sbackup-config.glade:2704
 msgid "Destination"
-msgstr ""
+msgstr "目的"
 
 #: data/ui/sbackup-config.glade:2725
 msgid "_No scheduled backups"
-msgstr ""
+msgstr "不要執行排程備份(_N)"
 
 #: data/ui/sbackup-config.glade:2742
 msgid "_Simple"
-msgstr ""
+msgstr "簡易(_S)"
 
 #: data/ui/sbackup-config.glade:2747
 msgid ""
 "This option will make a backup not at a precise time but when the computer "
 "is up. "
-msgstr ""
+msgstr "這個選項將會在電腦運作的時候自動建立備份。 "
 
 #: data/ui/sbackup-config.glade:2761
 msgid "_Custom"
-msgstr ""
+msgstr "自訂(_C)"
 
 #: data/ui/sbackup-config.glade:2781
 msgid "Do backups"
-msgstr ""
+msgstr "執行備份於"
 
 #: data/ui/sbackup-config.glade:2798
 msgid "Cron time definition"
-msgstr ""
+msgstr "Cron 定義時間"
 
 #: data/ui/sbackup-config.glade:2834
 msgid ""
@@ -2182,10 +2167,14 @@ msgid ""
 "weekly\n"
 "monthly"
 msgstr ""
+"每小時\n"
+"每天\n"
+"每周\n"
+"每月"
 
 #: data/ui/sbackup-config.glade:2867
 msgid "Show help topic about scheduled backups."
-msgstr ""
+msgstr "顯示關於排程備份的幫助主題。"
 
 #: data/ui/sbackup-config.glade:2905
 msgid ""
@@ -2193,22 +2182,24 @@ msgid ""
 "choosing an interval or precisely by a custom cron definition. See \"man 5 "
 "crontab\" for cron time definition format.</small>"
 msgstr ""
+"<small>欲設定排程 (即自動化) 備份時段，您可以簡單地選擇一個間隔，也可以用 cron 的時間配置來精確安排。有關 cron "
+"的時間格式定義詳見「man 5 crontab」。</small>"
 
 #: data/ui/sbackup-config.glade:2937
 msgid "Schedule"
-msgstr ""
+msgstr "定時"
 
 #: data/ui/sbackup-config.glade:2955
 msgid "Enable purging of old backups"
-msgstr ""
+msgstr "啟用老舊備份清理"
 
 #: data/ui/sbackup-config.glade:2983
 msgid "Simple cut-off: Erase all backups older than"
-msgstr ""
+msgstr "簡易裁切式：備份經過幾天後將被清除"
 
 #: data/ui/sbackup-config.glade:3039
 msgid "Logarithmic"
-msgstr ""
+msgstr "對數式"
 
 #: data/ui/sbackup-config.glade:3065
 msgid ""
@@ -2220,259 +2211,433 @@ msgid ""
 "Keep one backup per quarter from 2nd last year\n"
 "Keep one backup per year further into past</small>"
 msgstr ""
+"<small>分階段減少過去擁有的備份：\n"
+"保留昨天建立的所有備份\n"
+"保留上星期每天一個備份\n"
+"保留上個月每週一個備份\n"
+"保留去年每月一個備份\n"
+"保留前年至去年每季一個備份\n"
+"保留過去每年一個備份</small>"
 
 #: data/ui/sbackup-config.glade:3116
 msgid "Show help topic about purging of backups."
-msgstr ""
+msgstr "顯示有關清理備份的幫助主題。"
 
 #: data/ui/sbackup-config.glade:3152
 msgid ""
 "<small>Note: Additionally all incomplete and irrecoverable backups will be "
 "erased as long as there is a complete backup snapshot made later on.</small>"
-msgstr ""
+msgstr "<small>注意：如果存在新的完整備份快照，先前所有不完全和不可恢復的備份都將被刪除。</small>"
 
 #: data/ui/sbackup-config.glade:3184
 msgid "Purging"
-msgstr ""
+msgstr "清除"
 
 #: data/ui/sbackup-config.glade:3186
 msgid "Cleaning old backups"
-msgstr ""
+msgstr "清理舊的備份"
 
 #: data/ui/sbackup-config.glade:3209
 msgid "<b>Logging</b>"
-msgstr ""
+msgstr "<b>記錄</b>"
 
 #: data/ui/sbackup-config.glade:3234
 msgid "Debug is just for debbuging purpose.Info is the recommended setting"
-msgstr ""
+msgstr "Debug 只作為程式除錯用途。Info 是建議的設定"
 
 #: data/ui/sbackup-config.glade:3236
 msgid "Log level"
-msgstr ""
+msgstr "日誌等級"
 
 #: data/ui/sbackup-config.glade:3248
 msgid "Debug is just for debbuging purpose. Info is the recommended setting."
-msgstr ""
+msgstr "Debug 只作為程式除錯用途。Info 是建議的設定。"
 
 #: data/ui/sbackup-config.glade:3274
 msgid "Log file directory"
-msgstr ""
+msgstr "日誌檔案資料夾"
 
 #: data/ui/sbackup-config.glade:3320
 msgid "<b>Report by mail</b>"
-msgstr ""
+msgstr "<b>從郵件傳送報告</b>"
 
 #: data/ui/sbackup-config.glade:3350
 msgid "From"
-msgstr ""
+msgstr "從"
 
 #: data/ui/sbackup-config.glade:3361
 msgid "SMTP server"
-msgstr ""
+msgstr "SMTP 伺服器"
 
 #: data/ui/sbackup-config.glade:3375 data/ui/sbackup-config.glade:4053
 msgid "Port"
-msgstr ""
+msgstr "連接埠"
 
 #: data/ui/sbackup-config.glade:3391
 msgid "To"
-msgstr ""
+msgstr "至"
 
 #: data/ui/sbackup-config.glade:3478
 msgid "Use a username and password"
-msgstr ""
+msgstr "使用帳號和密碼"
 
 #: data/ui/sbackup-config.glade:3508 data/ui/sbackup-config.glade:4075
 msgid "Username"
-msgstr ""
+msgstr "帳號"
 
 #: data/ui/sbackup-config.glade:3540 data/ui/sbackup-config.glade:4124
 msgid "Password"
-msgstr ""
+msgstr "密碼"
 
 #: data/ui/sbackup-config.glade:3584
 msgid "Use secure connection"
-msgstr ""
+msgstr "使用安全連線"
 
 #: data/ui/sbackup-config.glade:3615
 msgid "Choose a certificate file"
-msgstr ""
+msgstr "選擇憑證檔案"
 
 #: data/ui/sbackup-config.glade:3629
 msgid "Key"
-msgstr ""
+msgstr "密鑰"
 
 #: data/ui/sbackup-config.glade:3645
 msgid "Certificate"
-msgstr ""
+msgstr "憑證"
 
 #: data/ui/sbackup-config.glade:3659
 msgid "Choose a key file"
-msgstr ""
+msgstr "選擇鑰匙檔案"
 
 #: data/ui/sbackup-config.glade:3731
 msgid "Test _mail settings"
-msgstr ""
+msgstr "測試郵件設定(_M)"
 
 #: data/ui/sbackup-config.glade:3772
 msgid "Report"
-msgstr ""
+msgstr "報表"
 
 #: data/ui/sbackup-config.glade:3811
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: data/ui/sbackup-config.glade:3860
 msgid "Show help topic about default values."
-msgstr ""
+msgstr "顯示有關預設值的幫助主題。"
 
 #: data/ui/sbackup-config.glade:3893
 msgid "_Set"
-msgstr ""
+msgstr "設置(_S)"
 
 #: data/ui/sbackup-config.glade:3935
 msgid "Set remote target"
-msgstr ""
+msgstr "設定遠端目標"
 
 #: data/ui/sbackup-config.glade:3957
 msgid "Type of service"
-msgstr ""
+msgstr "服務類型"
 
 #: data/ui/sbackup-config.glade:3997
 msgid "Hostname"
-msgstr ""
+msgstr "主機名稱"
 
 #: data/ui/sbackup-config.glade:4027
 msgid "<b>Details</b>"
-msgstr ""
+msgstr "<b>詳細資料</b>"
 
 #: data/ui/sbackup-config.glade:4157
 msgid "Show password"
-msgstr ""
+msgstr "顯示密碼"
 
 #: data/ui/sbackup-config.glade:4217
 msgid "_Connect"
-msgstr ""
+msgstr "連線(_C)"
 
 #: data/ui/sbackup-config.glade:4293
 msgid "Make a full backup"
+msgstr "建立一個完整備份"
+
+#: data/ui/sbackup-legacy-restore.glade:7
+msgid "Restore files/directories"
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:25
+msgid "<b>Restore Source Folder</b>"
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:90
+msgid "Available backups:"
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:109
+msgid ""
+"Type in this box text like that:\n"
+"\n"
+"/home/user/folder - To use a local folder\n"
+"ssh://user:password@machine:/remote/folder - To use a ssh location\n"
+"ftp://user:password@machine:/remote/folder - To use a ftp location"
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:179
+msgid "Use custom:"
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:200
+msgid "Use default:"
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:241
+msgid "<b>Files and Folders to restore</b>"
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:345 data/ui/sbackup-restore.glade:782
+msgid "Restore"
+msgstr "還原"
+
+#: data/ui/sbackup-legacy-restore.glade:390
+msgid "Restore As..."
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:448
+msgid "Restoring, this might take some time ..."
+msgstr ""
+
+#: data/ui/sbackup-legacy-restore.glade:463
+msgid "gtk-cancel"
 msgstr ""
 
 #: data/ui/sbackup-restore.glade:38
 msgid "<b>Backup destination</b>"
-msgstr ""
+msgstr "<b>備份目的地</b>"
 
 #: data/ui/sbackup-restore.glade:52
 msgid "Displays the manual in Help browser."
-msgstr ""
+msgstr "於說明瀏覽器中顯示手冊。"
 
 #: data/ui/sbackup-restore.glade:85
 msgid "Default profile's destination"
-msgstr ""
+msgstr "預設設定檔的目的地"
 
 #: data/ui/sbackup-restore.glade:90
 msgid ""
 "Set backup destination to the place specified in default configuration "
 "profile"
-msgstr ""
+msgstr "將備份目的地設為預設設定檔所指定的位置"
 
 #: data/ui/sbackup-restore.glade:137
 msgid "Custom destination"
-msgstr ""
+msgstr "自訂目的地"
 
 #: data/ui/sbackup-restore.glade:143
 msgid ""
 "Select a backup destination on your harddisk or at a remote site. Press "
 "Apply when ready."
-msgstr ""
+msgstr "從您的硬碟或遠端站台選擇一個備份目的地。準備好之後按「套用」。"
 
 #: data/ui/sbackup-restore.glade:184
 msgid "Choose a destination folder. For remote sites fill URI in text field"
-msgstr ""
+msgstr "選擇一個目的資料夾，或是在文字框中輸入遠端站台的 URI"
 
 #: data/ui/sbackup-restore.glade:201
 msgid "Change destination to path specified in left text field"
-msgstr ""
+msgstr "將目的地變更為左邊文字欄內的指定路徑"
 
 #: data/ui/sbackup-restore.glade:266
 msgid "Select a bold printed date to get the list of backups for that date."
-msgstr ""
+msgstr "選擇一個粗體標示的日期以獲取該天的備份列表。"
 
 #: data/ui/sbackup-restore.glade:310
 msgid "Available backups"
-msgstr ""
+msgstr "可用的備份"
 
 #: data/ui/sbackup-restore.glade:398
 msgid "Delete snapshot"
-msgstr ""
+msgstr "刪除快照"
 
 #: data/ui/sbackup-restore.glade:436
 msgid "Delete"
-msgstr ""
+msgstr "刪除"
 
-#: data/ui/sbackup-restore.glade:475
-msgid "Upgrade snapshot"
-msgstr ""
-
-#: data/ui/sbackup-restore.glade:515
-msgid "Upgrade"
-msgstr ""
-
-#: data/ui/sbackup-restore.glade:553
+#: data/ui/sbackup-restore.glade:473
 msgid "<b>Snapshot History</b>"
-msgstr ""
+msgstr "<b>快照歷史</b>"
 
-#: data/ui/sbackup-restore.glade:579
+#: data/ui/sbackup-restore.glade:499
 msgid "Current base:"
-msgstr ""
+msgstr "目前基於："
 
-#: data/ui/sbackup-restore.glade:620
+#: data/ui/sbackup-restore.glade:540
 msgid "Select a snapshot on this list to rebase on it."
-msgstr ""
+msgstr "選擇列表上的一個快照作為新的基底。"
 
-#: data/ui/sbackup-restore.glade:695
+#: data/ui/sbackup-restore.glade:615
 msgid "Rebase"
-msgstr ""
+msgstr "重定基底"
 
-#: data/ui/sbackup-restore.glade:746
+#: data/ui/sbackup-restore.glade:666
 msgid "<b>Snapshot Management</b>"
-msgstr ""
+msgstr "<b>快照管理</b>"
 
-#: data/ui/sbackup-restore.glade:785
+#: data/ui/sbackup-restore.glade:705
 msgid "Snapshot details"
-msgstr ""
+msgstr "快照詳情"
 
-#: data/ui/sbackup-restore.glade:850 data/ui/sbackup-restore.glade:867
+#: data/ui/sbackup-restore.glade:770 data/ui/sbackup-restore.glade:787
 msgid "Restores files/directories from the selected snapshot"
-msgstr ""
+msgstr "從選擇的快照中還原檔案/資料夾"
 
-#: data/ui/sbackup-restore.glade:862
-msgid "Restore"
-msgstr ""
-
-#: data/ui/sbackup-restore.glade:882 data/ui/sbackup-restore.glade:901
+#: data/ui/sbackup-restore.glade:802 data/ui/sbackup-restore.glade:821
 msgid ""
 "Restores files/directories recursively starting from the base snapshot to "
 "the selected snapshot"
-msgstr ""
+msgstr "從選擇的快照到其母快照為止，漸進還原檔案/資料夾"
 
-#: data/ui/sbackup-restore.glade:896
+#: data/ui/sbackup-restore.glade:816
 msgid "Revert"
-msgstr ""
+msgstr "回溯"
 
-#: data/ui/sbackup-restore.glade:939
+#: data/ui/sbackup-restore.glade:859
 msgid "<b>Restoration Management</b>"
-msgstr ""
+msgstr "<b>還原管理</b>"
 
-#: data/ui/sbackup-restore.glade:964
+#: data/ui/sbackup-restore.glade:884
 msgid "<b>Export Management</b>"
-msgstr ""
+msgstr "<b>匯出管理</b>"
 
-#: data/ui/sbackup-restore.glade:1056
+#: data/ui/sbackup-restore.glade:976
 msgid "Headline"
-msgstr ""
+msgstr "頭條"
 
-#: data/ui/sbackup-restore.glade:1069
+#: data/ui/sbackup-restore.glade:989
 msgid "Content"
-msgstr ""
+msgstr "內容"
+
+#, python-format
+#~ msgid "No need to rebase a full snapshot '%s'"
+#~ msgstr "不需要為完整的快照「%s」重定基底"
+
+#, python-format
+#~ msgid ""
+#~ "'%(snapshotToRebase)s'  doesn't have 'base' file , it might have been broken "
+#~ msgstr "「%(snapshotToRebase)s」沒有「base」檔案，它可能已經損毀 "
+
+#, python-format
+#~ msgid ""
+#~ "Cannot rebase a snapshot on an earlier one : '%(snapshotToRebase)s' <= "
+#~ "'%(NewBaseSnapshot)s' "
+#~ msgstr "無法用快照重定基底於先前的版本：「%(snapshotToRebase)s」<=「%(NewBaseSnapshot)s」 "
+
+#, python-format
+#~ msgid "Rebasing '%(current)s' on '%(base)s'"
+#~ msgstr "以「%(current)s」重定基底「%(base)s」"
+
+#, python-format
+#~ msgid "An error occurred when pulling snapshot '%s'."
+#~ msgstr "當取回快照「%s」時發生錯誤。"
+
+#, python-format
+#~ msgid "Base of snapshot '%s' is not set."
+#~ msgstr "快照「%s」的基底尚未設置。"
+
+#, python-format
+#~ msgid "Cancelling pull of snapshot '%s'"
+#~ msgstr "取消快照「%s」的取回"
+
+#, python-format
+#~ msgid "Unable to remove upgrade stamp: %s"
+#~ msgstr "無法移除升級標記：%s"
+
+#, python-format
+#~ msgid "Upgrading from v1.0 to v1.2: %s"
+#~ msgstr "從 v1.0 升級至 v1.2：%s"
+
+#, python-format
+#~ msgid "Upgrading to v1.3: %s"
+#~ msgstr "升級至 v1.3：%s"
+
+#, python-format
+#~ msgid "Upgrading to v1.4: %s"
+#~ msgstr "升級至 v1.4：%s"
+
+#, python-format
+#~ msgid "Upgrading to v1.5: %s"
+#~ msgstr "升級至 v1.5：%s"
+
+#, python-format
+#~ msgid "The SNAR file already exist for snapshot '%s'. It is not overwritten."
+#~ msgstr "SNAR 檔案已經存在於快照「%s」。它沒有被覆寫。"
+
+#~ msgid ""
+#~ "There are snapshots stored in outdated snapshot formats. Please upgrade them "
+#~ "using 'Simple Backup-Restoration' if you want to use them."
+#~ msgstr "這些快照的格式已經過時。若您要使用它們，請使用「Simple Backup-Restoration」將它們升級。"
+
+#~ msgid ""
+#~ "There are snapshots with old snapshot format. Please upgrade these using the "
+#~ "Restoration tool if you want to use them."
+#~ msgstr "這些是基於舊版格式的快照。若您要使用它們，請使用復原工具將它們升級。"
+
+#, python-format
+#~ msgid ""
+#~ "Snapshot version is not supported (Only %(supportedversion)s is supported). "
+#~ "Version '%(currentversion)s' found. You should upgrade it. "
+#~ msgstr ""
+#~ "不支援該快照版本 (只支援 %(supportedversion)s )。發現「%(currentversion)s」版本。您應該要將它升級。 "
+
+#~ msgid "The version of the snapshot is greater than the supported one!"
+#~ msgstr "快照的版本大於支援版本！"
+
+#, python-format
+#~ msgid ""
+#~ "Upgrading the selected snapshot `%s` might corrupt your backup for this "
+#~ "particular point in time. You cannot undo this operation. It is recommended "
+#~ "to create a copy of the snapshot directory before upgrading it. The upgrade "
+#~ "process takes a while - be patient.\n"
+#~ "\n"
+#~ "Are you sure that you want to upgrade the snapshot now?"
+#~ msgstr ""
+#~ "升級選擇的快照「%s」可能會干擾您在這一時間所備份的資料。您無法復原這個動作。建議在升級快照前先建立一份副本。升級過程將會進行一段時間 ─ "
+#~ "請耐心等待。\n"
+#~ "\n"
+#~ "您確定要現在升級這個快照？"
+
+#~ msgid "Do you really want to upgrade snapshot?"
+#~ msgstr "您真的要升級快照嗎？"
+
+#, python-format
+#~ msgid "Upgrade snapshot '%s'"
+#~ msgstr "升級快照「%s」"
+
+#~ msgid "Snapshot was sucessfully upgraded."
+#~ msgstr "快照已成功升級。"
+
+#~ msgid "Simple Backup upgrade"
+#~ msgstr "Simple Backup 升級"
+
+#~ msgid "Upgrade finished"
+#~ msgstr "升級完成"
+
+#, python-format
+#~ msgid ""
+#~ "While attempting to upgrade snapshot the following error occurred:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "當嘗試升級快照時發生下列錯誤：\n"
+#~ "%s"
+
+#~ msgid "Unable to upgrade snapshot"
+#~ msgstr "無法升級快照"
+
+#, python-format
+#~ msgid "Do you really want to rebase '%(current)s' on '%(base)s' ?"
+#~ msgstr "您真的要將「%(current)s」代替「%(base)s」成為新的基底？"
+
+#, python-format
+#~ msgid "File '%(file)s' does not exist."
+#~ msgstr "檔案「%(file)s」不存在。"
+
+#~ msgid "Upgrade snapshot"
+#~ msgstr "升級快照"
+
+#~ msgid "Upgrade"
+#~ msgstr "升級"

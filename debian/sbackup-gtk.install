@@ -11,5 +11,7 @@ usr/share/icons/ubuntu-mono-light/apps/24/*.png
 usr/share/icons/ubuntu-mono-dark/apps/24/*.png
 usr/share/sbackup/sbackup-config-gtk
 usr/share/sbackup/sbackup-restore-gtk
+usr/share/sbackup/sbackup-legacy-restore
 usr/bin/sbackup-restore-gtk
+usr/bin/sbackup-legacy-restore
 usr/bin/sbackup-config-gtk

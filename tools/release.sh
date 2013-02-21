@@ -260,6 +260,9 @@ case "$1" in
 
     source-with-orig)
         echo; echo "building source package"
+        if test "$version_pack" = ""; then
+            echo "Version not found in changelog: $version_pack"; exit 1; fi
+
         tar -czf $ORIGTARNAME $REL_DESTAPPDIR
 
         # we move the Debian directory back into the exported source in order
@@ -274,6 +277,9 @@ case "$1" in
 
     source-no-orig)
         echo; echo "building source package"
+        if test "$version_pack" = ""; then
+            echo "Version not found in changelog: $version_pack"; exit 1; fi
+
         rm -f "$ORIGTARNAME"
 
         # we move the Debian directory back into the exported source in order
@@ -288,6 +294,9 @@ case "$1" in
     
     update)
         echo; echo "updating source package"
+        if test "$version_pack" = ""; then
+            echo "Version not found in changelog: $version_pack"; exit 1; fi
+
         cp "$TARBALLDIR/$ORIGTARNAME" .
         echo ".orig tarball '$ORIGTARNAME' copied from '$TARBALLDIR'"
 

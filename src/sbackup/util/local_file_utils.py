@@ -1,6 +1,6 @@
 #   Simple Backup - unified file handling using (Python's) native functions
 #
-#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2009-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -208,6 +208,15 @@ def force_delete(path):
     _add_write_permission(path, recursive = True)
     delete(path)
 
+def destinsrc(src, dst):
+    src = os.path.abspath(src)
+    dst = os.path.abspath(dst)
+    if not src.endswith(os.path.sep):
+        src += os.path.sep
+    if not dst.endswith(os.path.sep):
+        dst += os.path.sep
+    return dst.startswith(src)
+
 def force_move(src, dst):
     """Modified version of `shutil.move` that uses `nssb_copytree`
     and even removes read-only files/directories.
@@ -218,7 +227,7 @@ def force_move(src, dst):
         os.rename(src, dst)
     except OSError:
         if os.path.isdir(src):
-            if shutil.destinsrc(src, dst):
+            if destinsrc(src, dst):
                 raise shutil.Error("Cannot move a directory '%s' into itself "\
                                    "'%s'." % (src, dst))
 #            _copytree(src, dst, symlinks = True)
@@ -354,6 +363,21 @@ def _add_write_permission(path, recursive = True):
                 _add_write_permission(_entrypath)
             else:
                 _add_write_permission(_entrypath, recursive = False)
+
+def chmod_no_rwx_grp_oth(path):
+    """Sets write permissions for user only for
+    given directory or file (*not* recursive). 
+    """
+    try:
+        fstats = os.stat(path)
+        fmode = fstats.st_mode
+        fmode = fmode & system.UNIX_PERM_GRPOTH_NORWX
+        os.chmod(path, fmode)
+    except Exception, error:
+        _msg = "Unable to set permissions: %s" % str(error)
+        _logger = log.LogFactory.getLogger()
+        _logger.warning(_msg)
+        return
 
 def rename(src, dst):
     # avoids (misused) move operations using `rename`

@@ -1,6 +1,6 @@
 #   Simple Backup - configuration file handling
 #
-#   Copyright (c)2009-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2009-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #   Copyright (c)2007-2009: Ouattara Oumar Aziz <wattazoum@gmail.com>
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -1333,6 +1333,10 @@ class ConfigurationFileHandler(object):
         if not os.path.exists(tempdir) :
             os.mkdir(tempdir)
 
+        #LP #785495: make the temp directory RWX only by owner
+        if (os.stat(tempdir).st_mode & 0777) != 0700:
+            os.chmod(tempdir,0700)
+            
         return tempdir
 
     def get_profilename(self, conffile):
@@ -1404,6 +1408,7 @@ class ConfigManagerStaticData(object):
      'dirconfig'    : { '*' : str },
      'exclude'         : { 'regex' : list, 'maxsize' : int },
      'places'         : { 'prefix' : str },
+     'hooks'        : {'pre-backup': list, 'post-backup': list },
      'schedule'     : {'anacron' : str , 'cron' : str }
     }
 
@@ -1658,13 +1663,13 @@ class _DefaultConfiguration(Configuration):
     def __init__(self):
         Configuration.__init__(self)
 
-        self._regex_excludes = "\.mp3$,\.avi$,\.mpeg$,\.mkv$,\.ogg$,\.iso$,"\
-                               "/home/[^/]+?/\.gvfs/,"\
-                               "/home/[^/]+?/\.thumbnails/,"\
-                               "/home/[^/]+?/\..+/[tT]rash/,"\
-                               "/home/[^/]+?/\..+/[cC]ache/,"\
+        self._regex_excludes = "^/home/[^/]+?/\.gvfs(/|$),"\
+                               "^/home/[^/]+?/\.thumbnails(/|$),"\
+                               "^/home/[^/]+?/\..+/[tT]rash(/|$),"\
+                               "^/home/[^/]+?/\.cache(/|$),"\
+                               "^/home/[^/]+?/\..+/[cC]ache(/|$),"\
+                               "^/home/[^/]+?/\..+/lock(/|$),"\
                                "~$"
-
         self._maxinc = 7
         self._cformat = 'none'
         self._follow_links = False

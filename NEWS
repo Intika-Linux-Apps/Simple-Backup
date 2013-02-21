@@ -1,0 +1,37 @@
+sbackup NEWS - User visible changes.
+Please report bugs at https://bugs.launchpad.net/sbackup
+
+sbackup (0.11.5), 2013-01-21
+
+* bug fixes
+
+* remove 'backup upgrade' feature and 'rebase snapshot' feature since it
+  is not reliable and can cause severe user data loss and added restore
+  utility which provides legacy support using the 0.10.5 algorithm.
+  Command must be executed from terminal:
+  'sbackup-legacy-restore BACKUP_PATH FILE_OR_DIR_TO_RESTORE [TARGET_DIR]'
+  or for more ease of use with GTK gui:
+  'sbackup-legacy-restore --gui'.
+
+* Pre/Post backup script hooks:
+  I've applied patch suggested by Derek Ditch and added this feature to
+  sbackup series 0.11 (sorry for the delay...) 
+
+  It is completely optional. To use it, please add following options to your configuration file:  
+  ...
+  [hooks]
+  pre-backup = <path to pre-backup script>
+  post-backup = <path to pre-backup script>
+  ...
+  You only need to specify scripts that should run, just leave it out if not
+  required! Please note, the script must be executable (chmod +x) and will be
+  run with same privileges as your backup process. So, be careful!
+  
+* improved regular expressions defined in default configuration
+	 -do not exclude specific types of files e.g. mp3, avi
+	 -fix regex for .gvfs, trash, cache etc. so these apply
+	  to 'top-level' directories
+	 -add a default regex for lock directories
+	  (e.g. $HOME/.mozilla/lock)
+	 -add a default regex for $HOME/.cache directory
+	 

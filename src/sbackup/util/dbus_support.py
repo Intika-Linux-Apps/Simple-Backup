@@ -1,6 +1,6 @@
 #   Simple Backup - support of DBus functionality
 #
-#   Copyright (c)2008-2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2008-2010,2013: Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -609,8 +609,7 @@ class DBusNotifier(notifier.Observer):
                              'finish',
                              'prepare',
                              'commit',
-                             'backup-canceled',
-                             'needupgrade'):
+                             'backup-canceled'):
                     ret_val = self.__dbus.emit_event_signal(state, urgency)
 
                 elif state == 'error':

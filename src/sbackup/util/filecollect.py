@@ -248,7 +248,6 @@ class FileCollector(object):
         self.__configuration = None
 
         # stats of last processed file
-        self.__exists_func = None
         self.__stat_func = None
         self.__fstats = None
         self.__fislink = None
@@ -302,10 +301,8 @@ class FileCollector(object):
                retrieval of file stats selected here.
         """
         if self.__snapshot.isFollowLinks():
-            self.__exists_func = os.path.exists
             self.__stat_func = os.stat
         else:
-            self.__exists_func = os.path.lexists
             self.__stat_func = os.lstat
         self.__collect_stats.clear()
 
@@ -329,21 +326,11 @@ class FileCollector(object):
     def __is_not_accessable(self, path):
         """Tests whether the given `path` can be accessed (i.e. exists and is readable).
         """
-        # return true if the file doesn't exist
-        try:
-            if not self.__exists_func(path):
-                self.__logger.warning(_("File '%(file)s' does not exist.") % {'file' : path})
-                return True
-        except OSError:
-            return True
-
         # get the stats, If not possible, the file has to be exclude, return True
         try:
             self.__fstats = self.__stat_func(path)
             self.__fisdir = local_file_utils.is_dir(path)
             self.__fislink = local_file_utils.is_link(path)
-#            self.__fisdir = self.__local_fop.is_dir(path)
-#            self.__fislink = self.__local_fop.is_link(path)
         except Exception, _exc:    #IGNORE:W0703
             self.__logger.warning(_("File '%(file)s' is not accessable with error '%(error)s'.")\
                                     % {'file' : path, 'error' : str(_exc)})
@@ -377,15 +364,6 @@ class FileCollector(object):
 #                pass    
         return _res
 
-    def __is_excluded_by_default(self, path):
-        """Tests whether the given `path` is excluded by default. Currently the
-        path is excluded by default in the case it is the target directory. 
-        """
-        if path == self.__configuration.get_target_dir():
-            self.__logger.info(_("File '%(file)s' is backup's target directory.") % {'file' : path})
-            return True
-        return False
-
     def __is_circular_symlink(self, path):
         if self.__fislink:
             if self.__snapshot.isFollowLinks():
@@ -397,14 +375,41 @@ class FileCollector(object):
         #test passed
         return False
 
-    def _is_excluded_by_config(self, path):
+    def _is_excluded_by_name(self, path):
+        """Decides whether or not a path has to be excluded by
+        its name using the lists of defined
+        * snapshot destination
+        * regular expressions
+        * blacklisted names.
+                
+        @return: True if the file has to be excluded, false if not
+        """
+        if path == self.__configuration.get_target_dir():
+            self.__logger.info(_("File '%(file)s' is backup's target directory.") % {'file' : path})
+            return True
+        
+        # if the file is in exclude list, return true
+        if self.__snapshot.is_path_in_excl_filelist(path):
+            self.__logger.info(_("Path '%(file)s' defined in excludes list.") % {'file' : path})
+            return True
+
+        # if the file matches an exclude regexp, return true
+# TODO: Regex are applied to the full path. Add a choice to apply Regex only to files, directories etc.
+        for _regex in self.__excl_regex:
+            _regex_res = _regex.search(path)
+            if _regex_res is not None:
+                self.__logger.info(_("File '%(file)s' matches regular expression '%(regex)s'.")\
+                                    % {'file' : path, 'regex' : str(_regex.pattern)})
+                return True
+        #all tests passed
+        return False
+
+    def _is_excluded_by_size(self, path):
         """Decides whether or not a file is to be excluded by the configuration.
         It is not decided for the incremental exclusion.
 
         Currently, following configuration options are tested:
         * file size
-        * regular expressions
-        * list of explicitely defined exclusions.
                 
         @return: True if the file has to be excluded, false if not
         """
@@ -415,20 +420,6 @@ class FileCollector(object):
                                     % {'file' : path, 'filesize' : str(self.__fstats.st_size),
                                        'maxsize' : str(self.__configuration.get_maxsize_limit())})
                 return True
-
-        # if the file matches an exclude regexp, return true
-# TODO: Regex are applied to the full path. Add a choice to apply Regex only to files, directories etc.
-        for _regex in self.__excl_regex:
-            _regex_res = _regex.search(path)
-            if _regex_res is not None:
-                self.__logger.info(_("File '%(file)s' matches regular expression '%(regex)s'.")\
-                                    % {'file' : path, 'regex' : str(_regex.pattern)})
-                return True
-
-        # if the file is in exclude list, return true
-        if self.__snapshot.is_path_in_excl_filelist(path):
-            self.__logger.info(_("Path '%(file)s' defined in excludes list.") % {'file' : path})
-            return True
         #all tests passed
         return False
 
@@ -439,14 +430,11 @@ class FileCollector(object):
 
         @return: True if the file has to be excluded, false if not
         """
-        _res = False
-        if self.__is_excluded_by_default(path) is True:
-            _res = True
-        elif self.__is_not_accessable(path) is True:
-            _res = True
+        if self.__is_not_accessable(path) is True:
+            return True
         elif self.__is_circular_symlink(path) is True:
-            _res = True
-        return _res
+            return True
+        return False
 
     def _check_for_excludes(self, path): #, force_exclusion=False):
         """Checks given `path` for exclusion and adds it to the `ExcludeFlist` if
@@ -462,13 +450,21 @@ class FileCollector(object):
         _excluded = False
         _stop_checking = False
 
-        if self._is_excluded_by_force(path):
+        if self._is_excluded_by_name(path):
+            if not self.__snapshot.is_subpath_in_incl_filelist(path):
+                # add to exclude list, if not explicitly included; since paths can be nested,
+                # it is checked for sub-paths instead of full paths
+                self.__snapshot.addToExcludeFlist(path)
+                self.__collect_stats.count_excl_config()
+                _excluded = True
+            
+        elif self._is_excluded_by_force(path):
             # force exclusion e.g. path is defined in includes list but does not exist/is not accessable
             self.__snapshot.addToExcludeFlist(path)
             self.__collect_stats.count_excl_forced()
             _excluded = True
 
-        elif self._is_excluded_by_config(path):
+        elif self._is_excluded_by_size(path):
             if not self.__snapshot.is_subpath_in_incl_filelist(path):
                 # add to exclude list, if not explicitly included; since paths can be nested,
                 # it is checked for sub-paths instead of full paths
@@ -540,7 +536,7 @@ class FileCollector(object):
         else:
             self.__collect_stats.count_skip_file()
 
-    def __prepare_excl_regex(self):
+    def __compile_excl_regex(self):
         """Prepares (i.e. compiles) Regular Expressions used for excluding files from flist.
         """
         self.__logger.debug("Prepare Regular Expressions used for file exclusion.")
@@ -608,7 +604,7 @@ class FileCollector(object):
         the backup.
         """
         self.__prepare_collecting()
-        self.__prepare_excl_regex()
+        self.__compile_excl_regex()
         self.__prepare_explicit_flists()
         util.enable_timeout_alarm()
 

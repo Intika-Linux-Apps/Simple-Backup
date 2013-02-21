@@ -4,8 +4,6 @@ creation of the snapshots.
 Directory 'manager' contains data related to general tests of
 snapshot manager.
 
-Directory 'rebase' contains data related to re-base tests.
-
 
 Note: The full snapshot of version 1 is corrupted - Needs to be replaced.
 
