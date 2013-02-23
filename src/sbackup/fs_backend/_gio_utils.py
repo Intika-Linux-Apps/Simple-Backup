@@ -45,7 +45,6 @@ from sbackup.util import structs
 from sbackup.util import system
 from sbackup.util import log
 
-
 errorcodes = {
     gio.ERROR_ALREADY_MOUNTED : exceptions.ErrorDescription(gio.ERROR_ALREADY_MOUNTED,
                                                             "ERROR_ALREADY_MOUNTED",
@@ -863,6 +862,15 @@ class GioOperations(interfaces.IOperations):
         _ostr.write(content)
         _ostr.close()
 
+    @classmethod
+    def close_stream(cls, file_desc):
+        try:
+            file_desc.close()
+        except gio.Error, error:
+            if error.code == gio.ERROR_CLOSED:
+                raise exceptions.FileAlreadyClosedException(_("Error while closing stream: %s") % error)
+            else:
+                raise exceptions.FileAccessException(get_gio_errmsg(error, _("Error while closing stream")))
 
 def get_gio_errmsg(error, title):
     _msg = "%s: %s" % (title, error)

@@ -181,3 +181,7 @@ class IOperations(object):
     @classmethod
     def is_dir(cls, path):
         raise NotImplementedError(_get_notimplemented_msg("IOperations", "is_dir"))
+
+    @classmethod
+    def close_stream(cls, file_desc):
+        raise NotImplementedError(_get_notimplemented_msg("IOperations", "close_stream"))

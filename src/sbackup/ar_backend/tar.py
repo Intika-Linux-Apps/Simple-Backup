@@ -35,7 +35,6 @@ import subprocess
 import tempfile
 import shutil
 import re
-import sys
 
 from datetime import datetime
 
@@ -46,7 +45,6 @@ from sbackup.fs_backend import fam
 
 from sbackup.util.log import LogFactory
 from sbackup.util.structs import SBdict
-from sbackup.util.exceptions import SBException
 from sbackup.util import exceptions
 from sbackup.util import constants
 from sbackup.util import system
@@ -1056,9 +1054,9 @@ class SnapshotFile(object):
                 n += 1
             header += c
         try:
-            fd.close()
-        except:
-            LogFactory.getLogger().warn("error on closing the snarfile header after reading: " + str(sys.exc_info()[1]))
+            _FOP.close_stream(fd)
+        except exceptions.FileAlreadyClosedError, error:
+            log.LogFactory.getLogger().warn(_("File was already closed (ignored): %s") % error)
 
         return header
 

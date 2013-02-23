@@ -34,7 +34,7 @@ from sbackup.util import exceptions
 from sbackup.util import interfaces
 from sbackup.util import structs
 from sbackup.util import pathparse
-
+from sbackup.util import exceptions
 
 #TODO: move available services into FUSE plugin manager and retrieve them dynamically
 REMOTE_SERVICE_SFTP = 101
@@ -175,6 +175,12 @@ class FuseOperations(interfaces.IOperations):
     def is_dir(cls, path):
         return local_file_utils.is_dir(path)
 
+    @classmethod
+    def close_stream(cls, file_desc):
+        try:
+            file_desc.close()
+        except IOError, error:
+            raise exceptions.FileAlreadyClosedError(_("Error while closing stream: %s") % error)
 
 def get_scheme_from_service(service):
     if not isinstance(service, types.IntType):

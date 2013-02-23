@@ -158,3 +158,8 @@ class RemoteUmountFailedError(FileAccessException):
     """This Exception is thrown when remote path is not mountable.
 
     """
+
+class FileAlreadyClosedError(SBException) :
+    """This Exception is thrown when a file or stream cannot be closed because it is already closed.
+
+    """
