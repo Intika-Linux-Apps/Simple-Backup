@@ -444,21 +444,15 @@ class GioOperations(interfaces.IOperations):
 
     @classmethod
     def path_exists(cls, path):
-        # `gfile.query_exists()' is not used since it returns True even
-        # if path is not accessible!
-        #XXX: rename into 'is_readable'?
+        # Be careful: `gfile.query_exists()' returns True even if path is not
+        # accessible! Nevertheless we use it here since `gfile.query_info`
+        # does not return required attributes from destination directories
+        # over ftp to check whether it is actually existing and readable.
+        # This caused a regression (LP #1190224) which let the backup fail.
         _gfileobj = gio.File(path)
-        try:
-            _ginfo = _gfileobj.query_info(attributes = gio.FILE_ATTRIBUTE_ACCESS_CAN_READ)
-            _can_read = _ginfo.get_attribute_boolean(gio.FILE_ATTRIBUTE_ACCESS_CAN_READ)
-        except gio.Error, error:
-            _can_read = False
-            if error.code == gio.ERROR_NOT_FOUND:
-                pass
-            else:
-                _logger = log.LogFactory.getLogger()
-                _logger.debug(get_gio_errmsg(error, "Unable to get attribute for path"))
-        return _can_read
+        _res = _gfileobj.query_exists()
+        print "_gfileobj.query_exists(): %s" % _res
+        return _res
 
     @classmethod
     def openfile_for_write(cls, path):
