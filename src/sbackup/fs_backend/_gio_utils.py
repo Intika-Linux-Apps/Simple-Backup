@@ -451,7 +451,6 @@ class GioOperations(interfaces.IOperations):
         # This caused a regression (LP #1190224) which let the backup fail.
         _gfileobj = gio.File(path)
         _res = _gfileobj.query_exists()
-        print "_gfileobj.query_exists(): %s" % _res
         return _res
 
     @classmethod
@@ -862,7 +861,7 @@ class GioOperations(interfaces.IOperations):
             file_desc.close()
         except gio.Error, error:
             if error.code == gio.ERROR_CLOSED:
-                raise exceptions.FileAlreadyClosedException(_("Error while closing stream: %s") % error)
+                raise exceptions.FileAlreadyClosedError(_("Error while closing stream: %s") % error)
             else:
                 raise exceptions.FileAccessException(get_gio_errmsg(error, _("Error while closing stream")))
 
