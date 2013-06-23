@@ -384,7 +384,7 @@ class SBconfigGTK(GladeGnomeApp):
             self.configman.set_logdir(_default_config.get_logdir())
             self.configman.set_logfile_templ_to_config()
 
-        loglevel = self.configman.get("log", "level")
+        loglevel = str(self.configman.get("log", "level"))  # LP #1159705
         valid_levels = ConfigManagerStaticData.get_valid_loglevels()
         selection = valid_levels[loglevel][1]
         self.widgets["loglevelcombobox"].set_active(selection)

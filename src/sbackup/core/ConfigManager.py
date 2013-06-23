@@ -1676,7 +1676,7 @@ class _DefaultConfiguration(Configuration):
         self._splitsize = 0
         self._max_filesize = -1 #Bugfix LP #146618
 
-        self._loglevel = 20
+        self._loglevel = "20"  # set values as strings (LP #1159705)
         self._report_smtpfrom = Infos.SMTPFROM
 
         self._lockfile = "/var/lock/sbackup/sbackup.lock"
