@@ -1535,8 +1535,9 @@ class SBconfigGTK(GladeGnomeApp):
         @todo: Check of accessibility should not take place in the UI.
         """
         _locp_widg = self.widgets["dest_localpath"]
-        _target = _locp_widg.get_filename()
-
+        _target = _locp_widg.get_filename()        
+        if _target is None:  # LP #1174124 Catch invalid selections
+            _target = ""
         _locp_widg.set_tooltip_text(_target)
 
         if (os.path.isdir(_target) and os.access(_target, os.R_OK | os.W_OK | os.X_OK)):
