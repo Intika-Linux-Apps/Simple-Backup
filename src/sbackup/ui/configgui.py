@@ -155,10 +155,6 @@ class SBconfigGTK(GladeGnomeApp):
         self.ex_ftypetv.append_column(column3)
         self.ex_ftypetv.append_column(column2)
 
-        # set label of default target
-        _default_target = str(self.configman.get_target_default())
-        self.widgets['label_default_target'].set_text(_default_target)
-
         self.ex_regex = gtk.ListStore(str)
         self.ex_regextv = self.widgets["ex_regextv"]
         self.ex_regextv.set_model(self.ex_regex)
@@ -198,6 +194,9 @@ class SBconfigGTK(GladeGnomeApp):
                                                       values = fam.get_remote_services_avail())
 
         self._fill_widgets_from_config(probe_fs = True)
+        
+        self.xml.signal_autoconnect(self.cb_dict)
+        
 
     def isConfigChanged(self, force_the_change = False):
         """Checks whether the current configuration has changed compared to
@@ -519,53 +518,39 @@ class SBconfigGTK(GladeGnomeApp):
                         int(self.configman.get("general", "splitsize")) / 1024)
                 self.widgets["splitsizeCB"].set_active(0)
 
+    def __dest_from_config_helper(self):
+        """Creates and returns a TargetHandlerInstance with set
+        destination path as stored/set in ConfigurationManager.
+        """
+        if self.__destination_uri_obj is None:
+            self.__destination_uri_obj = pathparse.UriParser()
+            
+        self.__destination_uri_obj.set_and_parse_uri(uri = self.configman.get_destination_path())
+        _dest = fam.get_fam_target_handler_facade_instance()
+        _dest.set_destination(self.__destination_uri_obj.uri)
+        return _dest
+
     def __fill_destination_widgets(self):
         """Helper method which fills the UI widgets related to
         the backup target (i.e. destination).
-        
-        :todo: Improve!
         """
-        dest_obj = pathparse.UriParser()
-        dest_obj.set_and_parse_uri(uri = self.configman.get_destination_path())
-        self.__destination_uri_obj = dest_obj
-
-        _dest = fam.get_fam_target_handler_facade_instance()
-        _dest.set_destination(dest_obj.uri)
-
-#        if _dest is not None:
+        _dest = self.__dest_from_config_helper()
         ctarget = _dest.query_dest_display_name()
         self.logger.debug("Current destination: %s" % ctarget)
 
         if _dest.is_local():
-            if self.__is_target_set_to_default(ctarget):
-                self.__set_target_option("default")
-
-            else:
-                if not _dest.dest_path_exists():
-                    self.__set_config_target_to_default()
-                    self.__set_target_option("default")
-
-                    _sec_msg = _("Please make sure the missing directory exists (e.g. by mounting an external disk) or change the specified target to an existing one.")
-                    _message_str = _("Backup target `%s` does not exist.\n\nAttention: The target will be set to the default value. Check this on the destination settings page before saving the configuration.") % ctarget
-                    _headline_str = \
-                    _("Unable to open backup target")
-
-                    gobject.idle_add(misc.show_errdialog,
-                                      _message_str,
-                                      self.__get_application_widget(),
-                                      _headline_str, _sec_msg)
-                    return
-
-                self.__set_target_option("local")
-                self.__set_target_value("local", ctarget)
-
+            self.__set_target_label("local", ctarget)
+            if not _dest.dest_path_exists():
+                _sec = _("A common mistake is a not mounted external disk.")
+                _msg = _("Backup destination folder `%s` does not exist.\n\nPlease make "\
+                  "sure the missing directory exists and check your settings on the "\
+                  "destination settings page.") % ctarget
+                _hdl = _("Unable to open backup destination")
+                gobject.idle_add(misc.show_errdialog, _msg,
+                                  self.__get_application_widget(),
+                                  _hdl, _sec)
         else:
-            self.__set_target_option("remote")
-            self.__set_target_value("remote", ctarget)
-#        else:
-#            # target set to default if no config option exists
-#            self.__set_config_target_to_default()
-#            self.__set_target_option("default")
+            self.__set_target_label("remote", ctarget)
 
     def _fill_widgets_from_config(self, probe_fs):
         """Prefill the GTK window with config infos.
@@ -654,17 +639,12 @@ class SBconfigGTK(GladeGnomeApp):
         enabled/disabled/set according to the given option.
         Unusable widgets are automatically disabled.
         """
-        def __enable_default_target(enable = True):
-            """The widgets within the 'Destination' page are
-            enabled/disabled/set according to default setting.
-            """
-            pass
-
         def __enable_local_target(enable = True):
             """The widgets within the 'Destination' page are
             enabled/disabled/set according to the given local target directory.
             """
-            self.widgets["dest_localpath"].set_sensitive(enable)
+            self.widgets["dest_local"].set_sensitive(enable)
+            self.widgets["btn_browse_local"].set_sensitive(enable)
 
         def __enable_remote_target(enable = True):
             """The widgets within the 'Destination' page are
@@ -674,52 +654,32 @@ class SBconfigGTK(GladeGnomeApp):
             self.widgets["dest_remote"].set_sensitive(enable)
             self.widgets["btn_set_remote"].set_sensitive(enable)
 
-        if option == "default":
-            __enable_default_target(enable = True)
-            __enable_local_target(enable = False)
-            __enable_remote_target(enable = False)
-        elif option == "local":
-            __enable_default_target(enable = False)
+        if option == "local":
             __enable_local_target(enable = True)
             __enable_remote_target(enable = False)
         elif option == "remote":
-            __enable_default_target(enable = False)
             __enable_local_target(enable = False)
             __enable_remote_target(enable = True)
         else:
             raise ValueError("Unknown target option given.")
 
-    def __set_target_option(self, option):
-        """Selects resp. sets the given choice for backup target. Possible
-        values are 'default', 'local', and 'remote'.
+    def __set_target_label(self, option, value):
+        """Selects resp. sets the given choice for backup target.
+        Valid options are 'local' and 'remote'.
         """
         self.__enable_target_option(option)
         twidget = None
-        if option == "default":
-            twidget = self.widgets["dest1"]
-        elif option == "local":
+        if option == "local":
             twidget = self.widgets["dest2"]
+            label = self.widgets["dest_local"]
         elif option == "remote":
             twidget = self.widgets["dest3"]
+            label = self.widgets["dest_remote"]
         else:
             raise ValueError("Unknown target option given.")
+        label.set_text(value)
         twidget.set_active(True)
         twidget.grab_focus()
-
-    def __set_target_value(self, option, value):
-        """Sets the destination widget according to the given option. Valid
-        options are: 'default', 'local', and 'remote'. In the case of the
-        default option, the given value is ignored (since the default
-        is used). 
-        """
-        if option == "default":
-            pass
-        elif option == "local":
-            self.widgets["dest_localpath"].set_current_folder(value)
-        elif option == "remote":
-            self.widgets["dest_remote"].set_text(value)
-        else:
-            raise ValueError("Unknown target option given.")
 
     def already_inc (self, configlist, toInclude):
         """configlist is like self.conf.items( "dirconfig" )
@@ -877,8 +837,6 @@ class SBconfigGTK(GladeGnomeApp):
 
                 if _full_bak is True:
                     _cmd.append("--full")
-
-                print _cmd
 
                 _env = None
                 if system.is_superuser():
@@ -1068,46 +1026,18 @@ class SBconfigGTK(GladeGnomeApp):
             self.isConfigChanged()
             store.remove(iter)
 
-    def __is_target_set_to_default(self, atarget):
-        """Checks if the given target directory is equal to the
-        default settings.
-
-        @rtype: Boolean
-        
-        @todo: Use functions from ConfigManager to proceed the check in
-                a consistent manner.
-        """
-        _reslt = False
-        _def_target = self.configman.get_target_default()
-        if (os.getuid() == 0 and atarget == _def_target) or\
-           (os.getuid() != 0 and atarget == _def_target):
-            _reslt = True
-        return _reslt
-
-    def __set_config_target_to_default(self):
-        """The target option within the configuration is set to the defaults.
-                        
-        @todo: We must ensure the default paths really do exist.
-        """
-        self.configman.set_target_to_default()
-        self.isConfigChanged()
-
-    def on_dest1_toggled(self, *args):
-        if self.widgets["dest1"].get_active():
-            self.__enable_target_option("default")
-            self.widgets["dest_unusable"].hide()
-            self.__set_config_target_to_default()
-
-        elif self.widgets["dest2"].get_active():
+    def on_dest_toggled(self, *args):
+        if self.widgets["dest2"].get_active():
             self.__enable_target_option("local")
-            self.on_dest_localpath_selection_changed()
 
         elif self.widgets["dest3"].get_active():
             self.__enable_target_option("remote")
-            if self.__destination_uri_obj is not None:
-                _uri = self.__destination_uri_obj.uri
-                self.configman.set("general", "target", _uri)
-                self.isConfigChanged()
+
+        # set changed path to destination
+        if self.__destination_uri_obj is not None:
+            _uri = self.__destination_uri_obj.uri
+            self.configman.set("general", "target", _uri)
+            self.isConfigChanged()
 
         else:
             raise ValueError("Unexpected widget was toggled.")
@@ -1530,22 +1460,50 @@ class SBconfigGTK(GladeGnomeApp):
             self.configman.remove_option("general", "followlinks")
         self.isConfigChanged()
 
-    def on_dest_localpath_selection_changed(self, *args): #IGNORE:W0613
-        """
-        @todo: Check of accessibility should not take place in the UI.
-        """
-        _locp_widg = self.widgets["dest_localpath"]
-        _target = _locp_widg.get_filename()        
-        if _target is None:  # LP #1174124 Catch invalid selections
-            _target = ""
-        _locp_widg.set_tooltip_text(_target)
+    def on_btn_browse_local_clicked(self, *args): #IGNORE:W0613
+        _dest = self.__dest_from_config_helper()
+        ctarget = _dest.query_dest_display_name()
+        
+        self.logger.debug("Current destination: %s" % ctarget)
+        self.widgets["dialog_browse_localdest"].set_current_folder(ctarget)
+        gobject.idle_add(self.__browse_localdest)
 
-        if (os.path.isdir(_target) and os.access(_target, os.R_OK | os.W_OK | os.X_OK)):
-            self.configman.set("general", "target", _target)
-            self.isConfigChanged()
-            self.widgets["dest_unusable"].hide()
+    def __browse_localdest(self):
+        dialog = self.widgets["dialog_browse_localdest"]
+        dialog.set_transient_for(self.__get_application_widget())
+        response = dialog.run()
+
+        if response == gtk.RESPONSE_APPLY:
+            dialog.hide()
+            _target = dialog.get_filename()            
+            if _target is None:  # LP #1174124 Catch invalid selections
+                _target = ""
+            
+            if not (os.path.isdir(_target) and \
+                    os.access(_target, os.R_OK | os.W_OK | os.X_OK)):
+                _sec_msg = _("Please make sure the directory exists "\
+                  "and check file permissions. Then try again.")
+                _message_str = _("Selected backup destination folder"\
+                  "`%s` does not exist or is not accessable.") % _target
+                _headline_str = \
+                _("Unable to access selected folder")
+                gobject.idle_add(misc.show_errdialog,
+                                  _message_str,
+                                  self.__get_application_widget(),
+                                  _headline_str, _sec_msg)
+            else:
+                self.widgets['dest_local'].set_text(_target)
+                self.configman.set("general", "target", _target)
+                _dest = self.__dest_from_config_helper()
+                self.isConfigChanged()
+
+        elif response in (gtk.RESPONSE_NONE, gtk.RESPONSE_CANCEL,
+                          gtk.RESPONSE_DELETE_EVENT):
+            dialog.hide()
+
         else:
-            self.widgets["dest_unusable"].show()
+            self.logger.error(_("Unexpected dialog response: %s") % response)
+            gobject.idle_add(self.__show_browse_localdest_dialog)
 
     def on_checkbtn_show_password_toggled(self, *args): #IGNORE:W0613
         self.__set_entry_remote_pass_visibiliy()
@@ -1563,7 +1521,6 @@ class SBconfigGTK(GladeGnomeApp):
 
     def __show_connect_remote_dialog(self):
         dialog = self.widgets["dialog_connect_remote"]
-#        btn_cancel = self.widgets['btn_cancel_remote']
         btn_connect = self.widgets['btn_connect_remote']
 
         _server_e = self.widgets['entry_set_remote_server']
