@@ -89,11 +89,10 @@ class GladeGnomeApp(object):
         fname = search_file(filename, search_path)
         self.xml = gtk.glade.XML(fname, domain = 'sbackup')
 
-        # connect callbacks
+        # prepare callbacks
         self.cb_dict = {}
         for f in handlers:
             self.cb_dict[f] = getattr(self, f)
-        self.xml.signal_autoconnect(self.cb_dict)
 
         self.widgets = {}
         for w in self.widget_list:

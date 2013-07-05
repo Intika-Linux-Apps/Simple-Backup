@@ -103,15 +103,13 @@ def get_configgui_widgets():
         'ex_max',
         'ex_maxsize',
         'vbox_destination_page',
-        'dest1',
         'dest2',
-        'label_default_target',
         'hbox9',
-        'dest_localpath',
+        'dest_local',
+        'btn_browse_local',
         'dest3',
         'hbox10',
         'dest_remote',
-#            'dest_remotetest',
         'dest_remote_light',
         'hbox11',
         'dest_unusable',
@@ -210,7 +208,8 @@ def get_configgui_widgets():
         'dialog_make_backup',
         'checkbtn_make_backup_full',
         'btn_make_backup',
-        'btn_cancel_make_backup'
+        'btn_cancel_make_backup',
+        'dialog_browse_localdest'
         ]
     return widget_list
 
@@ -244,8 +243,8 @@ def get_configgui_handlers():
         'on_ex_delregex_clicked',
         'on_ex_max_toggled',
         'on_ex_maxsize_changed',
-        'on_dest1_toggled',
-        'on_dest_localpath_selection_changed',
+        'on_dest_toggled',
+        'on_btn_browse_local_clicked',
 #     connect to remote host
         'on_btn_set_remote_clicked',
         'on_cmb_set_remote_service_changed',
