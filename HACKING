@@ -14,6 +14,12 @@ Eclipse IDE
 Pydev
 Pylint - checks the code style, imports, unused variables etc.
 
+Commit messages should have the same format as changelog entries
+  * [FIX] LP Bug #577296: Crash, a number is required, not str
+  * [Fix] regression: avoid backup of circular symlinks
+  * [Fix]: implemented a work-around to enable notifications
+  * [Change]: Logarithmic purge disabled since it still has issues  
+  * [Enhancement]: improvements to the release script
 
 Summary of style guide
 ----------------------
@@ -28,6 +34,14 @@ Summary of style guide
   words separated by underscores as necessary to improve readability.
 * Top level functions and classes are separated by 2 lines, method definitions
   within classes by a single line
+
+
+Branches and versions
+=====================
+
+Development takes place in the trunk version. At a certain point in time, a
+version branch is forked and a release is prepared. Fixes and modifications
+made to a specific branch are then re-merged into the trunk.
 
 
 How to run from source code
@@ -168,7 +182,17 @@ code for testing as follows:
 	python sbackup-restore-gtk
 	python sbackup
 	
-	
+
+Limitations
+~~~~~~~~~~~
+
+When running solely from a development environment it is currently not
+possible to perform/test any D-Bus related actions including the indicator
+application. Reason for this is the missing/not installed policy file
+in /etc/dbus-1/system.d. When installing sbackup properly from source or
+deb this file will be installed and D-Bus communication is possible.
+
+
 Translations
 ============
 
@@ -179,4 +203,12 @@ First, some links related to translations using Launchpad/Rosetta:
 * https://help.launchpad.net/Translations/YourProject/ImportingTranslations
 * https://help.launchpad.net/Translations/YourProject/ImportPolicy
 * https://help.launchpad.net/Translations/YourProject/Exports
+
+
+Testing
+=======
+
+Following test must be executed (automated or manually) before publishing
+a new version on each target distribution. Use the spreadsheet to document
+your efforts and results.
 

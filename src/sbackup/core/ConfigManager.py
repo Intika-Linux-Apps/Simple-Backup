@@ -19,87 +19,11 @@
 #
 
 """
-Format of the configuration file used by SBackup:
+Configuration definition
 
-[general]
-mountdir = /mnt/sbackup
-target=/var/backup
-#target=ssh://user:pass@example.com/home/user/backup/
+For a description of sbackup's file format please have a look at the shipped
+example configuration file in sbackup/data/sbackup.conf.example.
 
-# Maximal interval between two full backups (in days)
-maxincrement = 21
-
-# Backup format:
-
-# none : use a tar - All files are stored in a non compressed tar archive
-# gzip : use a tar.gz - All files are stored in the files.tar.gz
-# bzip2 :use a tar.bz2 - All files are stored in the files.tar.bz2
-format = gzip
-# backup the links 
-backuplinks=1
-# follow symlinks
-followlinks=1
-
-# For the split functionality :
-# this should be an integer.
-# It represent the size in KiB (1024 B) of each archive
-# (splitsize <= 0: unlimited)
-splitsize = 0
-
-# Set the package manager command to backup the package list
-packagecmd = <whatever command that will be launched>
-
-[log]
-level = 20
-file = sbackup.log
-
-[report]
-from =
-to = 
-smtpserver =
-smtpport = 
-smtptls =
-
-
-[dirconfig]
-# In this section you describe, what directories to backup and what to skip 
-# More precise commands override wider ones, for example:
-# /var=1  # This means that the whole /var directory is to be backuped
-# /var/cache=0 # This means the /var/cache and its subdirectories are not
-#              # to  be backuped
-# In this case all /var, except /var/cache will be backuped
-# It works the othe way around too
-# by default nothing is backuped
-
-/etc/=1
-/home/=1
-/usr/local/=1
-/var/=1
-/var/cache/=0
-/var/tmp/=0
-/proc/=0
-/dev/=0
-/sys/=0
-/tmp/=0
-/var/tmp/=0
-
-[schedule]
-anacron = daily
-cron = 
-
-[exclude]
-
-# Comma-separated list of regular expressions to exclude from backup
-# use this to exclude certain types of files or directories
-#
-# Note: If any of these expressions matches within the whole pathname
-#    of the file, it will NOT be backuped. Keep this list as specific 
-#    and as short as possible.
-
-regex=\.mp3,\.avi,\.mpeg,\.mpg,\.mkv,\.ogg,\.ogm,\.tmp,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache
-
-# Do not backup files bigger then this (in bytes)
-maxsize=100000000
 """
 
 
@@ -1396,7 +1320,6 @@ class ConfigManagerStaticData(object):
                            'format'         : str,
                            'splitsize'     : int,
                            'purge'         : str,
-                           'run4others'     : int,
                            'followlinks'     : int,
                            'stop_if_no_target' : int,
                         'packagecmd'    : str},

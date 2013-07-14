@@ -1,37 +1,75 @@
-*******************
-Simple Backup Suite
-*******************
+***************************
+sbackup Installation notes
+***************************
 
-Installation from Package (the easy way)
-========================================
+Installation from binary packages (the easy way)
+=================================================
 
-Include PPA
-~~~~~~~~~~~
-* If you use Debian or Ubuntu, try apt-get:
- * Install the nssbackup team repository 
-  * deb http://ppa.launchpad.net/nssbackup-team/ubuntu intrepid main
-  * deb http://ppa.launchpad.net/nssbackup-team/ubuntu hardy main
-  * deb http://ppa.launchpad.net/nssbackup-team/ubuntu gutsy main
+Debian Stable aka Wheezy - from downloaded deb-package
+-------------------------------------------------------
 
- [Note] See the PPA page for the full list of repository:
-        https://launchpad.net/~nssbackup-team/+archive/ppa
+1. Download binary packages and place in directory of your choice
+
+2. open a terminal, change into above directory and type:
+   sudo dpkg -i sbackup_0.11.6-0~bpo70+1_all.deb \
+                sbackup-gtk_0.11.6-0~bpo70+1_all.deb \
+                sbackup-plugins-fuse_0.11.6-0~bpo70+1_all.deb
+
+sbackup is now installed on your system and you call execute it from
+the application menu/overview as usual. When using GNOME-Shell, just
+type 'Backup' in the Activities Overview.
+
+To uninstall sbackup type:
+sudo apt-get remove sbackup sbackup-gtk sbackup-plugins-fuse
+
+This will keep your configuration files
+
+Or use:
+sudo apt-get purge sbackup sbackup-gtk sbackup-plugins-fuse
+to remove sbackup and its configurations etc. completely.
 
 
-Installation
-~~~~~~~~~~~~
- * sudo apt-get install sbackup
+Ubuntu - install from default repositories or include our PPA
+--------------------------------------------------------------
+
+If you use Ubuntu you can install sbackup by simply typing
+
+sudo apt-get install sbackup
+
+or using the software center.
+
+This will install version 0.11.4 of sbackup on your computer.
+
+If you want to use the latest version of sbackup, e.g. in case you are
+affected by a bug, install from the sbackup team repository (PPA):
+
+https://launchpad.net/~nssbackup-team/+archive/ppa
 
 
-Uninstalling
-~~~~~~~~~~~~
-* If installed via apt: 'sudo apt-get remove sbackup'
+1. add this PPA  "ppa:nssbackup-team/ppa" to your system's Software Sources as
+   described here: https://launchpad.net/+help-soyuz/ppa-sources-list.html
+
+2. pull down the latest list of software from each archive (apt-get update)
+
+3. install sbackup by simply typing:
+   sudo apt-get install sbackup
+
+To uninstall sbackup type:
+sudo apt-get remove sbackup sbackup-gtk sbackup-plugins-fuse
+
+This will keep your configuration files
+
+Or use:
+sudo apt-get purge sbackup sbackup-gtk sbackup-plugins-fuse
+to remove sbackup and its configurations etc. completely.
+
 
 
 Installation from source code
-=============================
+==============================
 
 Prerequist
-~~~~~~~~~~
+-----------
 python (>=2.5)
 pygnome
 pyglade
@@ -48,8 +86,9 @@ curlftpfs (for ftp and sftp fuse plugins)
 
 
 Installation
-~~~~~~~~~~~~
-By default, Simple Backup will be installed under "/usr/local" folder.
+-------------
+
+By default, sbackup will be installed under "/usr/local" folder.
 
 * Remove previously installed versions (using make or .deb packages)
 
@@ -65,16 +104,21 @@ By default, Simple Backup will be installed under "/usr/local" folder.
      sudo apt-get install gconf2 desktop-file-utils
 
 * Walk into the same directory as this README file
+
 * Type:
- make && sudo make install
- sudo sbackupconfig
+  make && sudo make install
+  sudo sbackupconfig
 
 
 Uninstalling
-~~~~~~~~~~~~
+-------------
+
 * Walk into the source code directory from where the application was installed
+
 * type:
- sudo make uninstall && make clean && sudo make purge-user-config
+  sudo make uninstall && make clean && sudo make purge-user-config
+
 * this will remove installed files as well as user configurations created
+
 * you can now remove the source code folder
 

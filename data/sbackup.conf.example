@@ -1,42 +1,79 @@
-# Simple backup configuration file
+# Example of sbackup configuration file
+# valid for sbackup >= 0.11.5
+
+
 
 [general]
+# basic settings
 
-#This is used as a base point for all the fuse mount point
-mountdir = /mnt/sbackup/
-# Backup target can be a local directory or a GnomeVFS compartible URI
-# (only ssh://user:pass@example.com/home/user/backup/ URIs are tested for now)
-target=/var/backup
-#target=ssh://user:pass@example.com/home/user/backup/
-
-# Where to put a lockfile (Leave the default)
-lockfile=/var/lock/sbackup.lock
 
 # Maximal interval between two full backups (in days)
-maxincrement = 21
+maxincrement = 7
 
-# Backup format:
-# 1 - All files are stored in the files.tgz
-format = 1
 
-# Run for others (This option is for root only) : will run normal users config files after the root run is finished
-run4others = 1
+# format of snapshot archive
+# none  - no compression (tar)
+# gzip  - gzip compression (tar.gz)
+# bzip2 - bzip compression (tar.bz)
+format = gzip
 
-# Backup links : use 1 to activate and 0 to deactivate (default = 0 )
-backuplinks=1
+
+# Follow symbolic links and backup link target instead of link
+# 1 = enabled, 0 = disabled (do not follow symbolic links)
+followlinks = 0
+
+
+# Backup destination (target) can be a local directory
+# or a GIO/GVFS compatible URI
+target = /media/externaldisk/backups
+#target = sftp://john.doe:passphrase@sftp.hidrive.strato.com/users/john.doe/
+
+
+# remove backups
+# purge = log - use a logarithmic scheme of removals
+# purge = 0   - do not remove snapshots
+# any positive number - remove snapshots older than x days
+purge = 30
+
+
+# mount point for userspace filesystems when using sbackup's fuse plugins
+mountdir = /home/johndoe/.local/share/sbackup/mountdir
+
+
+# where to put a lockfile (leave the default)
+lockfile = /var/lock/sbackup/sbackup.lock
+
+
+# Split snapshot archive into chunks of given size in MiB (1024*1024 bytes)
+# 0 = disabled (no splitting)
+# positive number = size of chunks in MiB
+splitsize = 0
+
 
 # Set the package manager command to backup the package list
 packagecmd = <whatever command that will be launched>
 
+
+
 [log]
-# level : 10 = DEBUG, 20 = INFO, 50 = ERROR
+# level of details in logs and where to find them
+
+
+# log level : 10 = DEBUG, 20 = INFO, 30 = Warning, 40 = ERROR
 level = 20
-# where to put the logfile when running , the logfile will be moved to the snapshot dir at the end of the backup
-#file = /var/log/sbackup.log
 
 
-# Backup report
+# this is the base logfile name. It is extended by the current time
+# when a logfile is actually created.  
+# the logfile will be copied to the snapshot dir at the end of the backup
+file = /home/jdoe/.local/share/sbackup/log/sbackup.log
+
+
+
 [report]
+# options for sending Backup reports via email
+
+
 #from = foo@foo.foo
 #to = foo@foo.foo
 #smtpserver = smtp.foo.com
@@ -48,20 +85,33 @@ level = 20
 #smtpuser = foo
 #smtppassword = pass 
 
+
+
 [schedule]
-#anacron = daily
-#cron = 
+# define automatic backups
+# only available for superuser/root
+
+
+# define auto-backups either the simple way using anacron
+#anacron = hourly|daily|weekly|monthly
+
+
+# or the exact way using a cron command (you should know how this looks when
+# using this option)
+#cron = ...
+
+
 
 [dirconfig]
-
 # In this section you describe, what directories to backup and what to skip 
 # More precise commands override wider ones, for example:
 # /var=1  # This means that the whole /var directory is to be backed up
 # /var/cache=0 # This means the /var/cache and its sub-directories are not
 #              # to  be backed up
 # In this case all /var, except /var/cache will be backed up
-# It works the othe way around too
+# It works the other way around too
 # by default nothing is backed up
+
 
 /etc/=1
 /home/=1
@@ -75,7 +125,11 @@ level = 20
 /tmp/=0
 /var/tmp/=0
 
+
+
 [exclude]
+# Define what files/paths to exclude from the backup
+
 
 # Comma-separated list of regular expressions to exclude from backup
 # use this to exclude certain types of files or directories
@@ -83,10 +137,28 @@ level = 20
 # Note: If any of these expressions matches within the whole pathname
 #	of the file, it will NOT be backuped. Keep this list as specific 
 #	and as short as possible.
+regex=^/home/[^/]+?/\.gvfs(/|$),^/home/[^/]+?/\.thumbnails(/|$),
+      ^/home/[^/]+?/\..+/[tT]rash(/|$),
+      ^/home/[^/]+?/\.cache(/|$), ~$
 
-regex=\.mp3,\.avi,\.mpeg,\.mpg,\.mkv,\.ogg,\.ogm,\.tmp,/home/[^/]+?/\.thumbnails/,/home/[^/]+?/\.Trash,/home/[^/]+?/\..+/[cC]ache
 
 # Do not backup files bigger then this (in bytes)
+# 0 = disabled
+maxsize=0
 
-maxsize=100000000
 
+
+[hooks]
+# specify scripts that should run, just leave it out if not required
+# scripts must be executable (chmod +x) and will be run with same privileges
+# as your backup process. So, be careful!
+
+
+pre-backup = <path to pre-backup script>
+post-backup = <path to pre-backup script>
+
+
+
+[places]
+# Installation prefix for internal use only. Will be removed in future versions
+prefix = /usr
