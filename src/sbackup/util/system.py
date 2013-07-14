@@ -359,7 +359,7 @@ def _set_envvar_from_session(key):
 def get_session_environment():
     #FIXME: support Unity, Mate, Cinnamon
     _sessionnames = ("x-session-manager", "gnome-session", "gnome-shell",
-                     "ksmserver")
+                     "ksmserver", "xfce4-session")
     mod_env = None
     for _name in _sessionnames:
         if grep_pid(_name) is not None:
