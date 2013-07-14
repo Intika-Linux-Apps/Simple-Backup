@@ -1503,7 +1503,7 @@ class SBconfigGTK(GladeGnomeApp):
 
         else:
             self.logger.error(_("Unexpected dialog response: %s") % response)
-            gobject.idle_add(self.__show_browse_localdest_dialog)
+            gobject.idle_add(self.__browse_localdest)
 
     def on_checkbtn_show_password_toggled(self, *args): #IGNORE:W0613
         self.__set_entry_remote_pass_visibiliy()
