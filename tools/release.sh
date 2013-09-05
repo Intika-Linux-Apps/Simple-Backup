@@ -11,7 +11,7 @@
 # * no files are written/modified within the actual branch
 #
 #
-#   Copyright (c)2010: Jean-Peer Lorenz <peer.loz@gmx.net>
+#   Copyright (c)2010,2013 Jean-Peer Lorenz <peer.loz@gmx.net>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@
 
 #TODO: check version in METAINFO against version in changelog when preparing releases
 
+set -e
+
 export GZIP="-9"
 
 startpwd=$PWD
@@ -44,19 +46,19 @@ startpwd=$PWD
 #
 # grab current version
 #
-changelog=$startpwd"/debian/changelog"
 metainfofile=$startpwd"/tools/metainfo.sh"
 source $metainfofile
 appname=$PKGNAME
 
-version_pack=$(grep --max-count=1 "^$PKGNAME ($VERFULL" $changelog|cut -d "(" -f 2 -|cut -d ")" -f 1 -)
-echo "version_pack:" $version_pack
 
 echo "-------------------------------------------------------"
 echo "Packaging tool for "$appname
 echo "-------------------------------------------------------"; echo
 
 case "$1" in
+    snapshot)
+        echo "Builds snapshot tarball."
+    ;;
     tarball)
         echo "Builds release tarball."
     ;;
@@ -64,11 +66,6 @@ case "$1" in
         echo "Builds source package."
         echo "Using this option you can create an intitial release within a"
         echo "source version. In this case the .orig tar is uploaded."
-    ;;
-    source-no-orig)
-        echo "Builds source package."
-        echo "Using this option you can create an (updated) release within the"
-        echo "same source version. The .orig tar is not created."
     ;;
     update)
         echo "Builds an updated source package."
@@ -78,9 +75,13 @@ case "$1" in
         echo "case but the existing .orig tar from the initial release is"
         echo "used."
     ;;
-    binary)
-        echo "Builds binary packages and publishes debs in local ppa."
+    publish)
+        echo "publishes debs in local ppa."
     ;;
+    binary-from-orig)
+        echo "Builds binary packages."
+    ;;
+    
     print-paths)
         echo "Outputs paths being used and exits."
     ;;
@@ -110,7 +111,6 @@ SRC=$pre
 REL_PACKDIR="../packaging"
 REL_LOCALPPA="$REL_PACKDIR/localppa"
 REL_TARBALLDIR="$REL_PACKDIR/tarballs"
-REL_DEBIANDIR="debian"
 
 #
 # directories where packages of *all* versions are stored
@@ -125,17 +125,25 @@ TAREXT=".tar.gz"
 #
 # tarball uses directories not tied to a particular distribution (e.g. lucid)
 # no orig-tar when building a release tarball
-if test "$1" = "tarball"; then
-    REL_DESTAPPDIR="$appname-$VERFULL"
-    destdir=$PACKDIR"/"$VERFULL
-    TARNAME=$appname"_"$VERFULL
-else
-    REL_DESTAPPDIR="$appname-$version_pack"
-    destdir=$PACKDIR"/"$version_pack
-    TARNAME=$appname"_"$VERFULL
-    ORIGTARNAME="$TARNAME.orig$TAREXT"
+REL_DESTAPPDIR="$appname-$VERFULL"
+destdir=$PACKDIR"/"$VERFULL
+TARNAME=$appname"_"$VERFULL
+
+bzrrev=`bzr log -r-1|grep revno| cut -d " " -f 2`
+echo "Latest bzr revision: "$bzrrev
+
+if test "$1" = "snapshot"; then
+    TARNAME="$TARNAME~r$bzrrev"
 fi
 
+if test "$2" = ""; then
+    echo "No suffix for tarball given"
+else
+    echo "Suffix for tarball given: "$2
+    TARNAME="$TARNAME~$2"
+fi
+
+ORIGTARNAME="$TARNAME.orig$TAREXT"
 TARNAME="$TARNAME$TAREXT"
 
 exportdestdir=$destdir"/"$REL_DESTAPPDIR
@@ -144,26 +152,14 @@ DEBIANDIR="$exportdestdir/$REL_DEBIANDIR"
 
 echo "Make sure your debian/CHANGELOG is up-to-date!"; echo
 
-echo "Changelog: $changelog"
-echo "==============================================================================="
-head $changelog
-echo "==============================================================================="; echo
-
 echo "Summary of parameters"
 echo "  From Metafile:"
 echo "    VERFULL: "$VERFULL
-#echo "    VERNUM: "$VERNUM
-#echo "    VERPOST: "$VERPOST
-#echo "    VERNUMMAJOR: "$VERNUMMAJOR
-#echo "    VERNUMMINOR: "$VERNUMMINOR
 echo "    PKGNAME: "$PKGNAME
 echo
 echo "  package: "$appname
 echo "  building version: "$version_pack
 echo "    full : "$VERFULL
-#echo "    major: "$VERNUMMAJOR
-#echo "    minor: "$VERNUMMINOR
-#echo "    post : "$VERPOST; echo
 echo "  source path: $SRC"
 echo "  packaging path: $PACKDIR"
 echo "  destination: "$destdir
@@ -177,6 +173,19 @@ case "$1" in
       exit 0
     ;;
 esac
+
+# check status of current branch
+echo
+bzrstat=`bzr status`
+#bzrstat=""
+if test "$bzrstat" == ""; then
+    echo "bzr status seems okay...go ahead"
+else
+    echo "There are uncommitted changes"
+    echo $bzrstat
+    echo; echo "Please commit first!"
+    exit 1
+fi
 
 echo; echo "creating directories"
 if [ -d $PACKDIR ]; then
@@ -235,31 +244,42 @@ rm -rf "$exportdestdir/tests"
 rm -rf "$exportdestdir/doc"
 rm -rf "$exportdestdir/tools"
 
-# clean Debian dir
-rm -rf "$DEBIANDIR/.bzr"
-rm -rf "$DEBIANDIR/.bzrignore"
-rm -rf "$DEBIANDIR/.pydevproject"
-rm -rf "$DEBIANDIR/.project"
-rm -rf "$DEBIANDIR/.settings"
-
-# remove the Debian specific directory temporarely from the exported source
-mv -f "$DEBIANDIR" "$destdir"
 
 case "$1" in
     tarball)
         echo; echo "creating tarball"
+        
         tar -czf $TARNAME $REL_DESTAPPDIR
         mv -f $TARNAME $TARBALLDIR
         echo "Release tarball '$TARNAME' created in '$TARBALLDIR'"
         echo; echo "cleaning of destination directory $destdir"
         rm -rf $destdir
         cd $TARBALLDIR
+		#FIXME: replace md5 with sha256
         md5sum "$TARNAME" > "$TARNAME.md5"
         md5sum -c "$TARNAME.md5"
+        
+
+		cp "$TARNAME" "$ORIGTARNAME"
+        md5sum "$ORIGTARNAME" > "$ORIGTARNAME.md5"
+        md5sum -c "$ORIGTARNAME.md5"
+        gpg --armor --sign --detach-sig $ORIGTARNAME
         gpg --armor --sign --detach-sig $TARNAME
     ;;
 
+    snapshot)
+        echo; echo "creating snapshot tarball"
+        
+        tar -czf $TARNAME $REL_DESTAPPDIR
+        mv -f $TARNAME $TARBALLDIR
+        echo "Snapshot tarball '$TARNAME' created in '$TARBALLDIR'"
+        echo; echo "cleaning of destination directory $destdir"
+        rm -rf $destdir
+    ;;
+
+
     source-with-orig)
+		#TODO: test this chunk of code
         echo; echo "building source package"
         if test "$version_pack" = ""; then
             echo "Version not found in changelog: $version_pack"; exit 1; fi
@@ -276,24 +296,8 @@ case "$1" in
         debuild -S --lintian-opts --color always
     ;;
 
-    source-no-orig)
-        echo; echo "building source package"
-        if test "$version_pack" = ""; then
-            echo "Version not found in changelog: $version_pack"; exit 1; fi
-
-        rm -f "$ORIGTARNAME"
-
-        # we move the Debian directory back into the exported source in order
-        # to build the deb packages
-        mv -f $REL_DEBIANDIR $exportdestdir
-
-        cd $exportdestdir
-        echo; echo "Working directory changed to "$PWD
-
-        debuild -S --lintian-opts --color always
-    ;;
-    
     update)
+		#TODO: test this chunk of code
         echo; echo "updating source package"
         if test "$version_pack" = ""; then
             echo "Version not found in changelog: $version_pack"; exit 1; fi
@@ -312,21 +316,7 @@ case "$1" in
     ;;
     
 
-    binary)
-        echo; echo "building binary packages"
-        #rm -f "$ORIGTARNAME"
-        # original tarball is required in packaging dir
-        cp $PACKDIR/$ORIGTARNAME $destdir/$ORIGTARNAME
-        
-        # we move the Debian directory back into the exported source in order
-        # to build the deb packages
-        mv -f $REL_DEBIANDIR $exportdestdir
-
-        cd $exportdestdir
-        echo; echo "Working directory changed to "$PWD
-
-        debuild --lintian-opts --color always
-
+    publish)
         if [ $? -eq 0 ]; then
             echo; echo "Publishing debs in local repository "$LOCALPPA
             cd $destdir
@@ -336,6 +326,40 @@ case "$1" in
         fi
     ;;
 
+    binary-from-orig)
+    #FIXME
+        echo; echo "building binary packages from orig-tar"
+        ls -lah
+        echo "Removing destination folder "$exportdestdir
+  	    rm -rf $exportdestdir
+
+        if [ ! -f $TARBALLDIR/$ORIGTARNAME ]
+        then            
+	        echo "ERROR: orig-tarball ($TARBALLDIR/$ORIGTARNAME) not found. Please run 'release.sh tarball' first."
+            exit 1
+        fi
+        ls -lah
+        # original tarball is required in packaging dir
+        cp $TARBALLDIR/$ORIGTARNAME $destdir/$ORIGTARNAME
+        ls -lah
+        tar xaf $destdir/$ORIGTARNAME
+        ls -lah
+        mv sbackup-* $exportdestdir
+        ls -lah
+        
+        cd $exportdestdir
+        echo; echo "Working directory changed to "$PWD
+        ls -lah
+        ls -lah ..
+
+    	if [ "$2" == "--no-signing" ]; then
+    	    DEBUILD_OPTS="-us -uc"; fi
+    	DEBUILD_CMD="debuild $DEBUILD_OPTS --lintian-opts --color always"
+    	echo "Running: "$DEBUILD_CMD
+    	$DEBUILD_CMD
+
+    ;;
+    
     *)
         echo; echo "called with unknown or missing argument: $1" >&2
         echo "Please use 'tarball', 'binary', or 'source' as parameter."
