@@ -1,3 +1,20 @@
+sbackup (0.11.6)
+
+  * Add XFCE4 to list of supported desktop environments to enable status
+    indicator on xfce4
+  * [Fix] LP: #1174124 Catch invalid path selections to avoid TypeErrors
+    when coercing to Unicode. Replace FileChooserButton with text entry
+    to avoid problems when selecting destination paths.
+  * [Fix] LP: #1159705 set default setting for log level as string, not as
+    integer in order to fix a KeyError if no log level is defined in config
+    file. Also make sure, a string is processed when setting GUI widgets
+    using the log level value.
+  * [Fix] LP: #1190224 Restore behaviour of GioOperations.path_exists.
+    This caused a regression which let the backup fail.
+  * merge fix for bug 632605. Thanks to Mascha
+  * merge from trunk: add french desktop entry
+  * fix internal helper tool script
+
 sbackup (0.11.5)
   * translations updated
   * [Fix] LP: #1000171 make it backwards compatible because upgrade-backups

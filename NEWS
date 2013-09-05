@@ -1,6 +1,15 @@
 sbackup NEWS - User visible changes.
 Please report bugs at https://bugs.launchpad.net/sbackup
 
+sbackup (0.11.6), 2013-07-14
+
+* bug fixes
+
+* Replace FileChooserButton with text entry to avoid problems when selecting
+  destination paths. This issue is related to GTK, for reference see:
+  http://askubuntu.com/questions/159413/gtkfilechooserbutton-select-folder-mode-returns-no-path
+
+
 sbackup (0.11.5), 2013-01-21
 
 * bug fixes
@@ -17,7 +26,7 @@ sbackup (0.11.5), 2013-01-21
   I've applied patch suggested by Derek Ditch and added this feature to
   sbackup series 0.11 (sorry for the delay...) 
 
-  It is completely optional. To use it, please add following options to your configuration file:  
+  It is completely optional. To use it, please add following options to your configuration file:
   ...
   [hooks]
   pre-backup = <path to pre-backup script>
@@ -26,12 +35,12 @@ sbackup (0.11.5), 2013-01-21
   You only need to specify scripts that should run, just leave it out if not
   required! Please note, the script must be executable (chmod +x) and will be
   run with same privileges as your backup process. So, be careful!
-  
+
 * improved regular expressions defined in default configuration
-	 -do not exclude specific types of files e.g. mp3, avi
-	 -fix regex for .gvfs, trash, cache etc. so these apply
-	  to 'top-level' directories
-	 -add a default regex for lock directories
-	  (e.g. $HOME/.mozilla/lock)
-	 -add a default regex for $HOME/.cache directory
-	 
+     -do not exclude specific types of files e.g. mp3, avi
+     -fix regex for .gvfs, trash, cache etc. so these apply
+      to 'top-level' directories
+     -add a default regex for lock directories
+      (e.g. $HOME/.mozilla/lock)
+     -add a default regex for $HOME/.cache directory
+
