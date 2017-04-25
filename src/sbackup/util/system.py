@@ -359,21 +359,32 @@ def _set_envvar_from_session(key):
 def get_session_environment():
     #FIXME: support Unity, Mate, Cinnamon
     _sessionnames = ("x-session-manager", "gnome-session", "gnome-shell",
-                     "ksmserver", "xfce4-session")
+                     "ksmserver", "xfce4-session", "gdm-x-session", 
+                     "gdm-wayland-session")
     mod_env = None
     for _name in _sessionnames:
-        if grep_pid(_name) is not None:
-            mod_env = _get_session_env(session = _name)
+        _session_pid = grep_pid(_name, True)
+        if _session_pid is not None:
+            mod_env = _get_session_env(_name, _session_pid)
             print "Desktop session %s found" % _name
             break
+    if mod_env is None:
+        print "Searching not owned sessions"
+        for _name in _sessionnames:
+            _session_pid = grep_pid(_name)
+            if _session_pid is not None:
+                mod_env = _get_session_env(_name, _session_pid)
+                print "Desktop session %s found" % _name
+                break
     if mod_env is None:
         print "No Desktop session found"
     return mod_env
 
 
-def _get_session_env(session):
+def _get_session_env(session, _session_pid=None):
     _mod_env = None
-    _session_pid = grep_pid(processname = session)
+    if _session_pid is None:
+        _session_pid = grep_pid(processname = session)
     if _session_pid is None:
         print "Session `%s` not found" % session
     else:
@@ -423,7 +434,7 @@ def exec_command_returncode(args, env = None):
     return _ret
 
 
-def grep_pid(processname):
+def grep_pid(processname, withuid=False):
     """
     note for using pgrep: The process name used for matching is limited to
     the 15 characters present in the output of /proc/pid/stat. Use
@@ -434,9 +445,11 @@ def grep_pid(processname):
     
     """
     _pid = None
-    output = exec_command_stdout(args = ["pgrep", "-f",
-                                    "^(/(.+/)*)?%s($|\s+.+)" % processname])
-    print "DEBUG: pgrep %s = %s" % (processname, output)
+    cmd = ["pgrep", "-f", "^(/(.+/)*)?%s($|\s+.+)" % processname]
+    if withuid:
+        cmd.extend(["-U", str(os.getuid())])
+    output = exec_command_stdout(args=cmd)
+    print "DEBUG: %s = %s" % (str(cmd), output)
     try:
         _pid = int(output)
     except ValueError:
