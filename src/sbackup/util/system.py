@@ -360,7 +360,7 @@ def get_session_environment():
     #FIXME: support Unity, Mate, Cinnamon
     _sessionnames = ("x-session-manager", "gnome-session", "gnome-shell",
                      "ksmserver", "xfce4-session", "gdm-x-session", 
-                     "gdm-wayland-session")
+                     "gdm-wayland-session", "gnome-session-binary")
     mod_env = None
     for _name in _sessionnames:
         _session_pid = grep_pid(_name, True)

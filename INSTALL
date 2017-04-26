@@ -101,7 +101,7 @@ By default, sbackup will be installed under "/usr/local" folder.
      sudo apt-get install gettext python-setuptools
      sudo apt-get install python-notify fuse-utils python-gnome2 python-glade2
      sudo apt-get install python-gtk2 gvfs gvfs-fuse gvfs-backends
-     sudo apt-get install gconf2 desktop-file-utils
+     sudo apt-get install gconf2 desktop-file-utils python-dbus python-appindicator
 
 * Walk into the same directory as this README file
 
