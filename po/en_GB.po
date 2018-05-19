@@ -51,15 +51,15 @@ msgstr "Backup was cancelled by user."
 
 #: src/sbackup/backupproc.py:307
 msgid "An error occurred during the cancellation of backup:"
-msgstr "Beim Abbruch der Sicherung trat ein Fehler auf:"
+msgstr "An error occurred during the cancellation of backup:"
 
 #: src/sbackup/backupproc.py:313
 msgid "An error occurred during the backup:"
-msgstr "Während der Sicherung trat ein Fehler auf:"
+msgstr "An error occurred during the backup:"
 
 #: src/sbackup/backupproc.py:330
 msgid "Error when sending email:"
-msgstr "Fehler beim Sender der E-Mail:"
+msgstr "Error when sending email:"
 
 #: src/sbackup/backupproc.py:361
 msgid "The following error(s) occurred before:"
@@ -71,7 +71,7 @@ msgid ""
 "Backup is not being started.\n"
 "%s"
 msgstr ""
-"Sicherung wurde nicht gestartet.\n"
+"Backup is not being started.\n"
 "%s"
 
 #: src/sbackup/pkginfo.py:42
@@ -178,7 +178,7 @@ msgid ""
 "TAR returned messages:\n"
 "%s"
 msgstr ""
-"TAR devolvió un mensaje:\n"
+"TAR returned messages:\n"
 "%s"
 
 #: src/sbackup/ar_backend/tar.py:533
@@ -201,11 +201,11 @@ msgstr ""
 
 #: src/sbackup/ar_backend/tar.py:542
 msgid "TAR returned warnings but has been finished successfully."
-msgstr "TAR devolvió advertencias pero ha finalizado satisfactoriamente."
+msgstr "TAR returned warnings but has been finished successfully."
 
 #: src/sbackup/ar_backend/tar.py:546
 msgid "Unable to finish successfully. TAR terminated with errors."
-msgstr "Imposible completar satisfactoriamente. TAR finaizó con errores."
+msgstr "Unable to finish successfully. TAR terminated with errors."
 
 #: src/sbackup/ar_backend/tar.py:727
 #, python-format
@@ -479,11 +479,11 @@ msgstr ""
 #: src/sbackup/core/profile_handler.py:101
 #, python-format
 msgid "Running of hooks: %s"
-msgstr ""
+msgstr "Running of hooks: %s"
 
 #: src/sbackup/core/profile_handler.py:111
 msgid "Preparation of backup process"
-msgstr "Preparando el proceso de backup"
+msgstr "Preparation of backup process"
 
 #: src/sbackup/core/profile_handler.py:146
 #, python-format
@@ -510,7 +510,7 @@ msgstr "Setting Excludes File."
 #: src/sbackup/core/profile_handler.py:181
 #, python-format
 msgid "Setting compression format to `%s`"
-msgstr "Formato de compresión configurado en `%s`"
+msgstr "Setting compression format to `%s`"
 
 #: src/sbackup/core/profile_handler.py:188
 #, python-format
@@ -527,12 +527,12 @@ msgstr "Option 'Follow symbolic links' is disabled."
 
 #: src/sbackup/core/profile_handler.py:206
 msgid "Snapshot is being committed"
-msgstr "La copia instantánea está siendo realizada"
+msgstr "Snapshot is being committed"
 
 #: src/sbackup/core/profile_handler.py:220
 #, python-format
 msgid "Error while purging old snapshots: %s"
-msgstr "Error al purgar copias instantáneas antiguas: %s"
+msgstr "Error while purging old snapshots: %s"
 
 #: src/sbackup/core/profile_handler.py:222
 msgid "Backup process finished."
@@ -540,11 +540,11 @@ msgstr "Backup process finished."
 
 #: src/sbackup/core/profile_handler.py:229
 msgid "Inspect file system and collect file infos"
-msgstr "Inspeciona el sistema de archivos y colecta archivos info"
+msgstr "Inspect file system and collect file infos"
 
 #: src/sbackup/core/profile_handler.py:240
 msgid "Summary of backup"
-msgstr "Resumen del backup"
+msgstr "Summary of backup"
 
 #: src/sbackup/core/profile_handler.py:241
 #, python-format
