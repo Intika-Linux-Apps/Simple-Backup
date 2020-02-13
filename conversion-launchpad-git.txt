@@ -1,0 +1,47 @@
+Technique:
+---------- 
+
+https://gist.github.com/intika/15b0491bf0ee03c96481908afd05392e
+
+Report:
+-------
+
+05:14:04 Calculating the revisions to include ...
+05:14:04 Starting export of 621 revisions ...
+05:14:35 WARNING: not creating tag 'refs/tags/merge nssbackup -> sbackup' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.11 series' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 beta 8' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC1' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC2' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC3' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC4' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC5' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC6' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC7' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC8' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.2 RC9' as its name would not be valid in git.
+05:14:35 WARNING: not creating tag 'refs/tags/0.1-4~ppa1' as its name would not be valid in git.
+05:14:35 Exported 621 revisions in 0:00:30
+/usr/lib64/git-core/git-fast-import statistics:
+---------------------------------------------------------------------
+Alloc'd objects:      10000
+Total objects:         6798 (      2459 duplicates                  )
+      blobs  :         3450 (      2025 duplicates       2406 deltas of       3281 attempts)
+      trees  :         2727 (       434 duplicates       2024 deltas of       2553 attempts)
+      commits:          621 (         0 duplicates          0 deltas of          0 attempts)
+      tags   :            0 (         0 duplicates          0 deltas of          0 attempts)
+Total branches:          16 (         1 loads     )
+      marks:           1024 (       621 unique    )
+      atoms:            568
+Memory total:          2579 KiB
+       pools:          2110 KiB
+     objects:           468 KiB
+---------------------------------------------------------------------
+pack_report: getpagesize()            =       4096
+pack_report: core.packedGitWindowSize = 1073741824
+pack_report: core.packedGitLimit      = 8589934592
+pack_report: pack_used_ctr            =        864
+pack_report: pack_mmap_calls          =        335
+pack_report: pack_open_windows        =          1 /          1
+pack_report: pack_mapped              =   20292158 /   20292158
+---------------------------------------------------------------------
